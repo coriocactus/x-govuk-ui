@@ -1,0 +1,61 @@
+/* Countdown. A thin line along the foot of a Callout or a toast that closes by itself. It shrinks
+   as the time runs out, in step with the timer, and stops whenever the timer stops. People can then
+   see that it will close, and that holding it keeps it open. Set its colour with
+   --x-govuk-ui-countdown-colour and its thickness with --x-govuk-ui-countdown-height. */
+.x-govuk-ui-countdown {
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+  left: 10px;
+  height: var(--x-govuk-ui-countdown-height, 3px);
+  border-radius: 2px;
+  background: var(--x-govuk-ui-countdown-colour, currentColor);
+  opacity: 0.5;
+  pointer-events: none;
+  transform-origin: left center;
+  animation: x-govuk-ui-countdown var(--x-govuk-ui-countdown-time, 0ms) linear forwards;
+}
+.x-govuk-ui-countdown:dir(rtl) {
+  transform-origin: right center;
+}
+@keyframes x-govuk-ui-countdown {
+  to {
+    transform: scaleX(0);
+  }
+}
+/* The timer stops while the card is held, and while the window is in the background. */
+.x-govuk-ui-callout[data-held] .x-govuk-ui-countdown,
+.x-govuk-ui-toast-viewport[data-expanded] .x-govuk-ui-countdown,
+.x-govuk-ui-toast-scope[data-window-away] .x-govuk-ui-countdown {
+  animation-play-state: paused;
+}
+/* A toast's line takes the colour of its type, close to its foot. */
+.x-govuk-ui-toast .x-govuk-ui-countdown {
+  right: 8px;
+  bottom: 3px;
+  left: 6px;
+  height: var(--x-govuk-ui-countdown-height, 2px);
+  background: var(
+    --x-govuk-ui-countdown-colour,
+    var(--x-govuk-ui-toast-accent, var(--x-govuk-ui-link))
+  );
+  opacity: 0.7;
+}
+/* With reduced motion, the line still shrinks, because it is how the time left is shown, and it
+   moves slowly and evenly. Other animations stop. */
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-countdown.x-govuk-ui-countdown {
+    animation: x-govuk-ui-countdown var(--x-govuk-ui-countdown-time, 0ms) linear forwards !important;
+  }
+  .x-govuk-ui-callout[data-held] .x-govuk-ui-countdown.x-govuk-ui-countdown,
+  .x-govuk-ui-toast-viewport[data-expanded] .x-govuk-ui-countdown.x-govuk-ui-countdown,
+  .x-govuk-ui-toast-scope[data-window-away] .x-govuk-ui-countdown.x-govuk-ui-countdown {
+    animation-play-state: paused !important;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-countdown {
+    background: CanvasText;
+    opacity: 1;
+  }
+}

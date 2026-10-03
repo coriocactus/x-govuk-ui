@@ -1,0 +1,43 @@
+@use "sass:meta";
+// GDS Transport is licensed only for www.gov.uk, *.service.gov.uk and *.blog.gov.uk. The font
+// files are not bundled into this stylesheet, because bundlers would inline them. The components
+// therefore fall back to Arial, unless a GOV.UK service serves the files and declares @font-face.
+// Anything public on another domain must use another font. Set --x-govuk-ui-font on the page, as
+// the workbench's production build does with Roboto, or set $govuk-font-family here.
+@use "pkg:govuk-frontend/base" as govuk with (
+  $govuk-include-default-font-face: false
+);
+// GOV.UK's functional colours as custom properties, such as --govuk-text-colour. A service that
+// sets its own functional colours changes x-govuk-ui's components too.
+@use "pkg:govuk-frontend/custom-properties/functional-colours";
+
+// GOV.UK Frontend supplies only settings, which are the typeface and the colour palette. The
+// components are x-govuk-ui's own, so none of GOV.UK Frontend's component CSS is used.
+$palette: (
+  "blue": ("primary", "tint-25", "tint-50", "tint-80", "tint-95", "shade-10", "shade-25", "shade-50"),
+  "green": ("primary", "tint-25", "tint-50", "tint-80", "tint-95", "shade-25", "shade-50"),
+  "teal": ("primary", "tint-25", "tint-50", "tint-80", "tint-95", "shade-25", "shade-50", "accent"),
+  "purple": ("primary", "tint-25", "tint-50", "tint-80", "tint-95", "shade-25", "shade-50"),
+  "magenta": ("primary", "tint-25", "tint-50", "tint-80", "tint-95", "shade-25", "shade-50"),
+  "red": ("primary", "tint-25", "tint-50", "tint-80", "tint-95", "shade-25", "shade-50"),
+  "orange": ("primary", "tint-25", "tint-50", "tint-80", "tint-95", "shade-25", "shade-50"),
+  "yellow": ("primary", "tint-25", "tint-50", "tint-80", "tint-95", "shade-25", "shade-50"),
+  "brown": ("primary", "tint-25", "tint-50", "tint-95"),
+  "black": ("primary", "tint-25", "tint-50", "tint-80", "tint-95"),
+);
+
+// The GOV.UK palette by name, such as --x-govuk-ui-blue or --x-govuk-ui-blue-tint-50.
+// src/styles/base.css builds the semantic tokens and the dark theme from these properties.
+:root {
+  --x-govuk-ui-font: #{meta.inspect(govuk.$govuk-font-family)};
+  --x-govuk-ui-white: #{govuk.govuk-colour("white")};
+  @each $name, $variants in $palette {
+    @each $variant in $variants {
+      @if $variant == "primary" {
+        --x-govuk-ui-#{$name}: #{govuk.govuk-colour($name)};
+      } @else {
+        --x-govuk-ui-#{$name}-#{$variant}: #{govuk.govuk-colour($name, $variant)};
+      }
+    }
+  }
+}

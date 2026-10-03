@@ -1,0 +1,54 @@
+/* Orb. The colours turn inside a still highlight, so the orb reads as a sphere. */
+.x-govuk-ui-orb {
+  --x-govuk-ui-orb-size: 16px;
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--x-govuk-ui-orb-size);
+  height: var(--x-govuk-ui-orb-size);
+  overflow: hidden;
+  border-radius: 50%;
+  vertical-align: middle;
+  transition: scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-orb::before,
+.x-govuk-ui-orb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.x-govuk-ui-orb::before {
+  background: conic-gradient(
+    from 200deg,
+    var(--x-govuk-ui-blue),
+    var(--x-govuk-ui-teal),
+    var(--x-govuk-ui-magenta),
+    var(--x-govuk-ui-orange),
+    var(--x-govuk-ui-blue)
+  );
+}
+.x-govuk-ui-orb::after {
+  background: radial-gradient(circle at 34% 30%, rgb(255 255 255 / 72%), transparent 46%);
+  box-shadow: inset 0 0 0 1px rgb(11 12 12 / 8%);
+}
+.x-govuk-ui-orb[data-state="listening"]::before {
+  animation: x-govuk-ui-spin 4s linear infinite;
+}
+.x-govuk-ui-orb[data-state="working"]::before {
+  animation: x-govuk-ui-spin 1.1s linear infinite;
+}
+.x-govuk-ui-orb[data-state="working"] {
+  animation: x-govuk-ui-orb-breathe 1.1s ease-in-out infinite alternate;
+}
+@keyframes x-govuk-ui-orb-breathe {
+  to {
+    scale: 0.86;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-orb {
+    border: 1px solid CanvasText;
+  }
+}

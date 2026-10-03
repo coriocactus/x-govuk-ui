@@ -1,0 +1,45 @@
+name: Deploy
+
+# The site is deployed each time main passes its checks, so it shows main instead of the last
+# release. A service's tools read the docs of the version it installed, which ship inside each
+# package, and the MCP server reads those first. Run by hand from the Actions tab, it deploys main
+# again.
+on:
+  workflow_run:
+    workflows: [Check]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time, and none cancelled halfway. GitHub keeps only the newest waiting run, so a
+# burst of pushes deploys the first and the last.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # A push to main whose checks passed. The branches filter matches a pull request's branch by its
+    # name only, so a fork's branch called main would pass it. The event and the repository rule
+    # that out.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # The commit the checks passed, which main may have moved past since.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # v1.6
+      # Built from the Dockerfile on Fly's builder, as a deploy by hand is. The token deploys only
+      # this app.
+      - run: flyctl deploy --remote-only --ha=false
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

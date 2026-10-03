@@ -1,0 +1,297 @@
+/* Prose. Content as GOV.UK sets a page's text, in Prose, in a Rich text and in the Editor. It has
+   19 pixel body text, bold headings from the second level down, bullets and numbers with GOV.UK's
+   spacing, and GOV.UK's links. Its size and leading are custom properties, so the Editor's box can
+   count its lines, and a service can set them.
+
+   Its rules reach plain elements through :where(), which adds no specificity, so a library part
+   inside it, such as a Table or a Link, keeps its own styles. Its lists of elements are written
+   out, not as :is(), because :is()'s fallback for older browsers would be as specific as a
+   class. */
+.x-govuk-ui-prose {
+  --x-govuk-ui-prose-size: 19px;
+  --x-govuk-ui-prose-leading: 1.32;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: var(--x-govuk-ui-prose-size);
+  line-height: var(--x-govuk-ui-prose-leading);
+  /* A typeface without an italic, such as GDS Transport, has one drawn for it. */
+  font-synthesis-style: auto;
+  /* Normal line wrapping, even inside a message that keeps a plain text's line breaks. */
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+:where(.x-govuk-ui-prose) > :first-child {
+  margin-top: 0;
+}
+:where(.x-govuk-ui-prose) > :last-child {
+  margin-bottom: 0;
+}
+:where(.x-govuk-ui-prose) p {
+  margin: 0 0 20px;
+}
+:where(.x-govuk-ui-prose) h1,
+:where(.x-govuk-ui-prose) h2,
+:where(.x-govuk-ui-prose) h3,
+:where(.x-govuk-ui-prose) h4,
+:where(.x-govuk-ui-prose) h5,
+:where(.x-govuk-ui-prose) h6 {
+  margin: 30px 0 15px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+:where(.x-govuk-ui-prose) h1 {
+  font-size: 32px;
+}
+:where(.x-govuk-ui-prose) h2 {
+  font-size: 27px;
+}
+:where(.x-govuk-ui-prose) h3 {
+  font-size: 24px;
+  line-height: 1.25;
+}
+:where(.x-govuk-ui-prose) h4,
+:where(.x-govuk-ui-prose) h5,
+:where(.x-govuk-ui-prose) h6 {
+  font-size: 19px;
+  line-height: 1.32;
+}
+:where(.x-govuk-ui-prose) ul,
+:where(.x-govuk-ui-prose) ol {
+  margin: 0 0 20px;
+  padding-left: 20px;
+}
+:where(.x-govuk-ui-prose) li {
+  margin-bottom: 5px;
+}
+:where(.x-govuk-ui-prose) li > p {
+  margin: 0;
+}
+:where(.x-govuk-ui-prose) ul ul,
+:where(.x-govuk-ui-prose) ul ol,
+:where(.x-govuk-ui-prose) ol ul,
+:where(.x-govuk-ui-prose) ol ol {
+  margin: 5px 0 0;
+}
+:where(.x-govuk-ui-prose) strong,
+:where(.x-govuk-ui-prose) b {
+  font-weight: 700;
+}
+:where(.x-govuk-ui-prose) em,
+:where(.x-govuk-ui-prose) i {
+  font-style: italic;
+}
+:where(.x-govuk-ui-prose) s,
+:where(.x-govuk-ui-prose) del {
+  text-decoration: line-through;
+}
+:where(.x-govuk-ui-prose) u {
+  text-decoration: underline;
+}
+/* A quotation as GOV.UK's inset text. */
+:where(.x-govuk-ui-prose) blockquote {
+  margin: 0 0 20px;
+  padding: 0 0 0 15px;
+  border-left: 10px solid var(--x-govuk-ui-line);
+}
+:where(.x-govuk-ui-prose) blockquote > :last-child {
+  margin-bottom: 0;
+}
+/* Code in the code block's face. Inline code sits on a tint, and a block in a ruled box that
+   scrolls across. */
+:where(.x-govuk-ui-prose) code,
+:where(.x-govuk-ui-prose) pre {
+  font-family: var(
+    --x-govuk-ui-code-font,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace
+  );
+}
+:where(.x-govuk-ui-prose) code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-surface);
+  font-size: 0.9em;
+}
+:where(.x-govuk-ui-prose) pre {
+  display: block;
+  position: relative;
+  margin: 0 0 20px;
+  padding: 12px 15px;
+  overflow-x: auto;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 0;
+  background: var(--x-govuk-ui-surface);
+  font-size: 16px;
+  line-height: 1.5;
+  tab-size: 2;
+  white-space: pre;
+}
+:where(.x-govuk-ui-prose) pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+:where(.x-govuk-ui-prose) hr {
+  height: 0;
+  margin: 30px 0;
+  border: 0;
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+/* A checklist's items each have a box, ticked when done. */
+:where(.x-govuk-ui-prose) ul[data-checklist] {
+  padding-left: 0;
+  list-style: none;
+}
+:where(.x-govuk-ui-prose) li[data-checked] {
+  position: relative;
+  padding-left: 32px;
+  list-style: none;
+}
+:where(.x-govuk-ui-prose) li[data-checked]::before {
+  content: "";
+  position: absolute;
+  top: 0.15em;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border: 2px solid var(--x-govuk-ui-text);
+}
+:where(.x-govuk-ui-prose) li[data-checked="true"]::after {
+  content: "";
+  position: absolute;
+  top: calc(0.15em + 4px);
+  left: 6px;
+  width: 6px;
+  height: 10px;
+  border: solid var(--x-govuk-ui-text);
+  border-width: 0 3px 3px 0;
+  rotate: 45deg;
+}
+:where(.x-govuk-ui-prose) li[data-checked="true"] {
+  color: var(--x-govuk-ui-muted);
+}
+/* A table as GOV.UK sets one, ruled between rows, scrolling across inside its own frame. */
+.x-govuk-ui-rich-text-table {
+  margin: 0 0 20px;
+  overflow-x: auto;
+}
+:where(.x-govuk-ui-prose) table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 16px;
+  line-height: 1.5;
+}
+:where(.x-govuk-ui-prose) th,
+:where(.x-govuk-ui-prose) td {
+  position: relative;
+  padding: 10px 20px 10px 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  text-align: left;
+  vertical-align: top;
+}
+:where(.x-govuk-ui-prose) th {
+  font-weight: 700;
+}
+:where(.x-govuk-ui-prose) th > p,
+:where(.x-govuk-ui-prose) td > p {
+  margin: 0;
+}
+/* A highlight is drawn in its own colours, and a background tint keeps GOV.UK's black on it. */
+:where(.x-govuk-ui-prose) mark {
+  background: none;
+  color: inherit;
+}
+:where(.x-govuk-ui-prose) mark[style*="background"] {
+  color: var(--x-govuk-ui-black);
+}
+:where(.x-govuk-ui-prose) sub,
+:where(.x-govuk-ui-prose) sup {
+  font-size: 0.75em;
+  line-height: 0;
+}
+:where(.x-govuk-ui-prose) a {
+  color: var(--x-govuk-ui-link);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+  transition: text-decoration-thickness var(--x-govuk-ui-duration-instant) ease;
+}
+:where(.x-govuk-ui-prose) a:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+:where(.x-govuk-ui-prose) a:focus-visible {
+  outline: 3px solid transparent;
+  background-color: var(--x-govuk-ui-focus);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}
+/* An image at its own proportions under its caption, or a video's first frame, as GOV.UK's
+   figure. */
+:where(.x-govuk-ui-prose) figure {
+  position: relative;
+  margin: 0;
+}
+:where(.x-govuk-ui-prose) figure img,
+:where(.x-govuk-ui-prose) figure video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+:where(.x-govuk-ui-prose) figcaption {
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+/* A gallery sets images side by side, two or three across, filling the row. */
+:where(.x-govuk-ui-prose) [data-gallery] {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
+  gap: 8px;
+  margin: 0 0 20px;
+}
+:where(.x-govuk-ui-prose) [data-gallery][data-count="2"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+:where(.x-govuk-ui-prose) [data-gallery] img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+/* A mention shows its name in a chip, drawn whole, as the Editor's prompt draws it. */
+:where(.x-govuk-ui-prose) [data-mention] {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--x-govuk-ui-link) 12%, transparent);
+  color: var(--x-govuk-ui-link);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+@media (max-width: 40em) {
+  .x-govuk-ui-prose {
+    --x-govuk-ui-prose-size: 16px;
+    --x-govuk-ui-prose-leading: 1.25;
+  }
+  :where(.x-govuk-ui-prose) h1 {
+    font-size: 27px;
+  }
+  :where(.x-govuk-ui-prose) h2 {
+    font-size: 24px;
+  }
+  :where(.x-govuk-ui-prose) h3 {
+    font-size: 21px;
+  }
+  :where(.x-govuk-ui-prose) h4 {
+    font-size: 16px;
+  }
+}

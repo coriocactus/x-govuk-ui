@@ -1,0 +1,12 @@
+/* Sunburst. Recharts writes each arc's raw figure on it. The card and the table already give the
+   figure as the service writes it, so the arcs are left without words. */
+.x-govuk-ui-sunburst-text {
+  display: none;
+}
+.x-govuk-ui-sunburst .recharts-sector {
+  outline: none;
+  transition: opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-sunburst .recharts-sector:hover {
+  opacity: 0.85;
+}

@@ -1,0 +1,177 @@
+/* The Editor's suggestions from a model. A toolbar floats over the selection, with its tools,
+   prompt and suggestion. The document draws two ranges with the CSS Custom Highlight API, without
+   changing the document. They are the selection kept while the toolbar is busy, and the text that
+   has just replaced a selection. */
+::highlight(x-govuk-ui-editor-held) {
+  background-color: color-mix(in srgb, var(--x-govuk-ui-link) 24%, transparent);
+}
+::highlight(x-govuk-ui-editor-inserted) {
+  background-color: color-mix(in srgb, var(--x-govuk-ui-success) 22%, transparent);
+}
+/* Above the selection, the suggestion grows upwards, so the tools stay beside the text. The tools
+   and the prompt share one row and crossfade, so the toolbar never resizes when the prompt
+   opens. */
+.x-govuk-ui-editor-ai-toolbar {
+  position: absolute;
+  z-index: 20;
+  translate: -50% calc(-100% - 10px);
+  transform-origin: bottom center;
+  display: grid;
+  grid-template-areas: "panel" "row";
+  width: max-content;
+  max-width: min(440px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 4px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
+  color: var(--x-govuk-ui-text);
+  font: 16px / 1.4 var(--x-govuk-ui-font);
+}
+.x-govuk-ui-editor-ai-toolbar[data-below] {
+  translate: -50% 10px;
+  transform-origin: top center;
+  grid-template-areas: "row" "panel";
+}
+/* The tools and the prompt take turns in one row. Each keeps its own width, which the toolbar
+   measures and eases to. Each wraps within the box, so a narrow box or a wide typeface cuts none of
+   it off. The toolbar clips the one not showing. */
+.x-govuk-ui-editor-ai-tools,
+.x-govuk-ui-editor-ai-prompt {
+  grid-area: row;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(440px, var(--x-govuk-ui-editor-ai-room, 440px));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 5px;
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    translate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-editor-ai-prompt {
+  gap: 6px;
+}
+.x-govuk-ui-editor-ai-toolbar[data-asking] .x-govuk-ui-editor-ai-tools,
+.x-govuk-ui-editor-ai-toolbar:not([data-asking]) .x-govuk-ui-editor-ai-prompt {
+  opacity: 0;
+  pointer-events: none;
+}
+.x-govuk-ui-editor-ai-toolbar[data-asking] .x-govuk-ui-editor-ai-tools {
+  translate: -8px 0;
+}
+.x-govuk-ui-editor-ai-toolbar:not([data-asking]) .x-govuk-ui-editor-ai-prompt {
+  translate: 8px 0;
+}
+/* Tools are quiet Buttons, sized to the toolbar and set in the text colour. */
+.x-govuk-ui-editor-ai-tool.x-govuk-ui-button {
+  height: 36px;
+  padding: 0 11px;
+  border-radius: 3px;
+  color: var(--x-govuk-ui-text);
+  font-size: 16px;
+  white-space: nowrap;
+}
+.x-govuk-ui-editor-ai-tool .x-govuk-ui-button-label {
+  gap: 8px;
+}
+.x-govuk-ui-editor-ai-ask {
+  font-weight: 700;
+}
+.x-govuk-ui-editor-ai-divider {
+  width: 1px;
+  height: 20px;
+  margin-inline: 4px;
+  background: var(--x-govuk-ui-line);
+}
+/* The prompt is an Input with the orb inside it, beside a square send Button. */
+.x-govuk-ui-editor-ai-prompt .x-govuk-ui-field {
+  flex: 1;
+  min-width: 15em;
+}
+.x-govuk-ui-editor-ai-prompt .x-govuk-ui-input-group {
+  height: 36px;
+  padding-inline: 10px;
+  font-size: 16px;
+}
+/* An icon Button, so its arrow is centred, as tall as the field beside it. */
+.x-govuk-ui-editor-ai-send.x-govuk-ui-button {
+  width: 36px;
+  height: 36px;
+}
+.x-govuk-ui-editor-ai-panel {
+  grid-area: panel;
+  overflow: hidden;
+}
+/* The progress and the suggestion keep their own width too, so the toolbar can grow to fit them.
+   Where the row is wider, they fill the toolbar, so the suggestion's words have its whole width and
+   its scrollbar is at its edge. The line between them and the row belongs to the panel, so it spans
+   the toolbar. */
+.x-govuk-ui-editor-ai-status,
+.x-govuk-ui-editor-ai-result {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 100%;
+  max-width: min(440px, var(--x-govuk-ui-editor-ai-room, 440px));
+  margin: 0;
+  padding: 15px 16px 16px;
+}
+.x-govuk-ui-editor-ai-panel:has(.x-govuk-ui-editor-ai-status, .x-govuk-ui-editor-ai-result) {
+  box-shadow: inset 0 -1px var(--x-govuk-ui-line);
+}
+.x-govuk-ui-editor-ai-toolbar[data-below]
+  .x-govuk-ui-editor-ai-panel:has(.x-govuk-ui-editor-ai-status, .x-govuk-ui-editor-ai-result) {
+  box-shadow: inset 0 1px var(--x-govuk-ui-line);
+}
+/* With no tools, there is nothing to show until a suggestion arrives. */
+.x-govuk-ui-editor-ai-toolbar:has(.x-govuk-ui-editor-ai-tools:empty):not([data-asking]):not(
+  :has(.x-govuk-ui-editor-ai-status, .x-govuk-ui-editor-ai-result)
+) {
+  visibility: hidden;
+}
+.x-govuk-ui-editor-ai-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--x-govuk-ui-muted);
+}
+/* The suggestion sits in Inset text, with space before the choices, as wide as the toolbar. The
+   toolbar's own limit keeps the lines short enough to read. An error uses the same bar in the error
+   colour. */
+.x-govuk-ui-editor-ai-proposal,
+.x-govuk-ui-editor-ai-error {
+  margin: 0 0 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+/* Six lines, then the suggestion scrolls in a Scroll area, which takes the Inset text's height.
+   The words keep clear of the scrollbar, which lies over the area's edge. */
+.x-govuk-ui-editor-ai-proposal {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(6lh + 4px);
+}
+.x-govuk-ui-editor-ai-proposal-scroll .x-govuk-ui-scroll-area-content {
+  padding-right: 16px;
+}
+/* A suggestion in Markdown, formatted in the suggestion's own size. */
+.x-govuk-ui-editor-ai-markdown {
+  --x-govuk-ui-prose-size: 16px;
+  --x-govuk-ui-prose-leading: 1.5;
+  white-space: normal;
+}
+.x-govuk-ui-editor-ai-error {
+  color: var(--x-govuk-ui-error);
+  font-weight: 700;
+}
+.x-govuk-ui-editor-ai-error::before {
+  background: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-editor-ai-choices {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}

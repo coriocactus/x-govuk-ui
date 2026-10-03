@@ -1,0 +1,167 @@
+/* Pagination. GOV.UK's Previous and Next with arrows, and the page numbers between. The current
+   page's brand-blue fill glides to the new number. */
+.x-govuk-ui-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 15px;
+  margin: 0 0 30px;
+  font-family: var(--x-govuk-ui-font);
+  font-size: 17px;
+  line-height: 1.25;
+}
+.x-govuk-ui-pagination-link,
+.x-govuk-ui-pagination-number {
+  color: var(--x-govuk-ui-link);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-pagination-link {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 10px;
+  padding: 10px 5px;
+}
+.x-govuk-ui-pagination-title {
+  font-weight: 700;
+}
+.x-govuk-ui-pagination-link svg {
+  fill: currentColor;
+  transition: translate var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-pagination-previous .x-govuk-ui-pagination-link:hover svg {
+  translate: -3px 0;
+}
+.x-govuk-ui-pagination-next .x-govuk-ui-pagination-link:hover svg {
+  translate: 3px 0;
+}
+.x-govuk-ui-pagination-next .x-govuk-ui-pagination-link {
+  flex-direction: row-reverse;
+}
+.x-govuk-ui-pagination-link[href]:hover,
+.x-govuk-ui-pagination-number:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+/* At either end, Previous or Next stays in place, muted, and leads nowhere. */
+.x-govuk-ui-pagination-link[aria-disabled="true"] {
+  color: var(--x-govuk-ui-muted);
+  text-decoration: none;
+  opacity: 0.6;
+  cursor: default;
+}
+.x-govuk-ui-pagination-link[aria-disabled="true"] svg {
+  translate: none;
+}
+.x-govuk-ui-pagination-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Every slot has one width, wide enough for a three-digit page, so the numbers never shift. Where
+   there is little space, five narrower slots take the place of seven. The widths are also in
+   pagination.tsx, which works out what each fit needs. */
+.x-govuk-ui-pagination-item,
+.x-govuk-ui-pagination-ellipsis {
+  position: relative;
+  box-sizing: border-box;
+  width: 46px;
+  text-align: center;
+}
+.x-govuk-ui-pagination[data-fit="few"] {
+  column-gap: 6px;
+}
+.x-govuk-ui-pagination[data-fit="few"]
+  :is(.x-govuk-ui-pagination-item, .x-govuk-ui-pagination-ellipsis) {
+  width: 36px;
+}
+/* Short of space, Previous and Next show only their arrows. Their words are for screen readers. */
+.x-govuk-ui-pagination:is([data-fit="arrows"], [data-fit="few"])
+  .x-govuk-ui-pagination-link
+  > .x-govuk-ui-pagination-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* The words, measured out of sight. */
+.x-govuk-ui-pagination-measure {
+  position: absolute;
+  display: flex;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.x-govuk-ui-pagination-number {
+  position: relative;
+  display: block;
+  padding: 10px 0;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-pagination-ellipsis {
+  padding: 10px 0;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-pagination-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-pagination-item[data-current] .x-govuk-ui-pagination-number {
+  color: var(--x-govuk-ui-white);
+  font-weight: 700;
+  text-decoration: none;
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope
+    .x-govuk-ui-pagination-item[data-current]
+    .x-govuk-ui-pagination-number:not(:focus-visible) {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+.x-govuk-ui-pagination-link:focus-visible,
+.x-govuk-ui-pagination-number:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}
+.x-govuk-ui-pagination-item[data-current] .x-govuk-ui-pagination-number:focus-visible {
+  color: var(--x-govuk-ui-focus-text);
+}
+/* Block mode stacks Previous and Next, each with its page's title beneath. */
+.x-govuk-ui-pagination[data-block] {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.x-govuk-ui-pagination[data-block] .x-govuk-ui-pagination-next .x-govuk-ui-pagination-link {
+  flex-direction: row;
+}
+/* On the first and last pages, the step that leads nowhere is left out, as GOV.UK leaves it. */
+.x-govuk-ui-pagination[data-block] [data-hidden] {
+  display: none;
+}
+.x-govuk-ui-pagination-label {
+  flex-basis: 100%;
+  padding-left: 25px;
+  color: var(--x-govuk-ui-link);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-pagination-fill {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .x-govuk-ui-pagination-item[data-current] .x-govuk-ui-pagination-number {
+    color: HighlightText;
+  }
+}

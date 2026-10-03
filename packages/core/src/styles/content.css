@@ -1,0 +1,385 @@
+/* Link. GOV.UK's link is underlined, and the underline thickens under the pointer. It turns purple
+   once visited, and has GOV.UK's yellow focus. */
+.x-govuk-ui-link {
+  color: var(--x-govuk-ui-link);
+  font-family: var(--x-govuk-ui-font);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+  transition: text-decoration-thickness var(--x-govuk-ui-duration-instant) ease;
+}
+.x-govuk-ui-link:visited {
+  color: var(--x-govuk-ui-link-visited);
+}
+.x-govuk-ui-link:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-link[data-no-visited]:visited {
+  color: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-link[data-colour="text"],
+.x-govuk-ui-link[data-colour="text"]:visited,
+.x-govuk-ui-link[data-colour="text"]:hover {
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-link[data-colour="inverse"],
+.x-govuk-ui-link[data-colour="inverse"]:visited,
+.x-govuk-ui-link[data-colour="inverse"]:hover {
+  color: var(--x-govuk-ui-white);
+}
+.x-govuk-ui-link[data-no-underline]:not(:hover) {
+  text-decoration: none;
+}
+.x-govuk-ui-link:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  box-decoration-break: clone;
+}
+
+/* Card. A keyline box. When its title is a link, the link reaches over the whole card. The card
+   stays still under the pointer. Only a MediaCredit rises into view. */
+.x-govuk-ui-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-card-media {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Media credit. A small Tag in a photo's bottom right corner. It rises into view when the pointer
+   is over the photo or its container, or when something in the container has focus. */
+.x-govuk-ui-media-credit {
+  position: absolute;
+  z-index: 1;
+  right: 8px;
+  bottom: 8px;
+  opacity: 0;
+  translate: 0 4px;
+  pointer-events: none;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    translate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-tag.x-govuk-ui-media-credit-tag {
+  display: block;
+  max-width: none;
+  padding: 1px 7px 2px;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgb(11 12 12 / 18%);
+}
+:hover > .x-govuk-ui-media-credit,
+:focus-within > .x-govuk-ui-media-credit,
+:is(.x-govuk-ui-card, .x-govuk-ui-carousel-slide):is(:hover, :focus-within)
+  .x-govuk-ui-media-credit {
+  opacity: 1;
+  translate: 0 0;
+}
+.x-govuk-ui-card-media > :is(img, video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.x-govuk-ui-card-title {
+  margin: 20px 22px 0;
+  font-size: 21px;
+  line-height: 1.3;
+}
+.x-govuk-ui-card-link {
+  color: var(--x-govuk-ui-link);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.x-govuk-ui-card-link:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-card:has(.x-govuk-ui-card-link:focus-visible) {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+}
+.x-govuk-ui-card-description {
+  margin: 8px 22px 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 17px;
+  line-height: 1.45;
+}
+.x-govuk-ui-card > :last-child:not(.x-govuk-ui-card-media) {
+  margin-bottom: 22px;
+}
+.x-govuk-ui-card-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: auto 22px 0;
+  padding-top: 16px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+}
+
+/* Item. Media, a title and a description, and actions at the end, in one row. */
+.x-govuk-ui-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-item[data-variant="outline"] {
+  padding: 14px 16px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+}
+.x-govuk-ui-item-group {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-item-group > li + li {
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-item-media {
+  display: grid;
+  flex: none;
+  place-items: center;
+  color: var(--x-govuk-ui-muted);
+}
+/* An icon in a tile of the brand's tint, as in Question card's header. */
+.x-govuk-ui-item-media[data-variant="tile"] {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 12%, var(--x-govuk-ui-paper));
+  color: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-item-content {
+  flex: 1;
+  min-width: 0;
+}
+.x-govuk-ui-item-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.x-govuk-ui-item-description {
+  margin: 2px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+  line-height: 1.4;
+}
+.x-govuk-ui-item-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Avatar. A circle with a photo, or initials on one of GOV.UK's colours. */
+.x-govuk-ui-avatar {
+  --x-govuk-ui-avatar-size: 40px;
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--x-govuk-ui-avatar-size);
+  height: var(--x-govuk-ui-avatar-size);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-white);
+  font-family: var(--x-govuk-ui-font);
+  font-size: calc(var(--x-govuk-ui-avatar-size) * 0.4);
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+  vertical-align: middle;
+}
+.x-govuk-ui-avatar[data-size="small"] {
+  --x-govuk-ui-avatar-size: 28px;
+}
+.x-govuk-ui-avatar[data-size="large"] {
+  --x-govuk-ui-avatar-size: 56px;
+}
+.x-govuk-ui-avatar[data-tint="blue"] {
+  background: var(--x-govuk-ui-blue);
+}
+.x-govuk-ui-avatar[data-tint="teal"] {
+  background: var(--x-govuk-ui-teal);
+}
+.x-govuk-ui-avatar[data-tint="purple"] {
+  background: var(--x-govuk-ui-purple);
+}
+.x-govuk-ui-avatar[data-tint="green"] {
+  background: var(--x-govuk-ui-green);
+}
+.x-govuk-ui-avatar[data-tint="magenta"] {
+  background: var(--x-govuk-ui-magenta);
+}
+.x-govuk-ui-avatar[data-tint="red"] {
+  background: var(--x-govuk-ui-red);
+}
+.x-govuk-ui-avatar-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: x-govuk-ui-avatar-in var(--x-govuk-ui-duration-medium) ease;
+}
+@keyframes x-govuk-ui-avatar-in {
+  from {
+    opacity: 0;
+  }
+}
+.x-govuk-ui-avatar-group {
+  display: inline-flex;
+}
+/* Under the pointer, the avatar there rises and grows a little, over its neighbours, which rise
+   less the further away they are. They rise smoothly, and spring back into line with a bounce as
+   the pointer leaves. The rise comes before the growth, so the growth does not stretch it. */
+.x-govuk-ui-avatar-group > .x-govuk-ui-avatar {
+  box-shadow: 0 0 0 2px var(--x-govuk-ui-paper);
+  transform: translateY(var(--x-govuk-ui-avatar-lift, 0px)) scale(var(--x-govuk-ui-avatar-grow, 1));
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.x-govuk-ui-avatar-group[data-settling] > .x-govuk-ui-avatar {
+  transition-timing-function: cubic-bezier(0.34, 3.85, 0.64, 1);
+}
+.x-govuk-ui-avatar-group > .x-govuk-ui-avatar[data-active] {
+  z-index: 1;
+}
+.x-govuk-ui-avatar-group > .x-govuk-ui-avatar + .x-govuk-ui-avatar {
+  margin-left: calc(var(--x-govuk-ui-avatar-size) * -0.18);
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-avatar-group > .x-govuk-ui-avatar {
+    transform: none;
+  }
+}
+.x-govuk-ui-avatar-more {
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+  font-size: 13px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-avatar {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Aspect ratio. Content fills the shape. */
+.x-govuk-ui-aspect-ratio {
+  position: relative;
+  overflow: hidden;
+}
+.x-govuk-ui-aspect-ratio > :is(img, video, iframe) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
+/* Aside. Related content under a brand-blue rule, like GOV.UK's related links. */
+.x-govuk-ui-aside {
+  padding-top: 12px;
+  border-top: 2px solid var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  line-height: 1.45;
+}
+.x-govuk-ui-aside-title {
+  margin: 0 0 12px;
+  font-size: 19px;
+  line-height: 1.3;
+}
+.x-govuk-ui-aside ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-aside li + li {
+  margin-top: 10px;
+}
+
+/* Marker. A highlight that sweeps across the words, from the start of each line, once seen. */
+.x-govuk-ui-marker {
+  --x-govuk-ui-marker: var(--x-govuk-ui-yellow-tint-50);
+  padding: 0 2px;
+  border-radius: 3px;
+  background:
+    linear-gradient(var(--x-govuk-ui-marker), var(--x-govuk-ui-marker)) no-repeat 0 0 / 0% 100%;
+  color: inherit;
+  box-decoration-break: clone;
+  transition: background-size 700ms var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-marker[data-drawn] {
+  background-size: 100% 100%;
+}
+.x-govuk-ui-marker[data-colour="blue"] {
+  --x-govuk-ui-marker: var(--x-govuk-ui-blue-tint-80);
+}
+.x-govuk-ui-marker[data-colour="green"] {
+  --x-govuk-ui-marker: var(--x-govuk-ui-green-tint-80);
+}
+.x-govuk-ui-marker[data-colour="pink"] {
+  --x-govuk-ui-marker: var(--x-govuk-ui-magenta-tint-80);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-marker {
+    --x-govuk-ui-marker: color-mix(in srgb, var(--x-govuk-ui-yellow) 30%, var(--x-govuk-ui-paper));
+  }
+  :scope .x-govuk-ui-marker[data-colour="blue"] {
+    --x-govuk-ui-marker: color-mix(in srgb, var(--x-govuk-ui-blue) 45%, var(--x-govuk-ui-paper));
+  }
+  :scope .x-govuk-ui-marker[data-colour="green"] {
+    --x-govuk-ui-marker: color-mix(in srgb, var(--x-govuk-ui-green) 45%, var(--x-govuk-ui-paper));
+  }
+  :scope .x-govuk-ui-marker[data-colour="pink"] {
+    --x-govuk-ui-marker: color-mix(in srgb, var(--x-govuk-ui-magenta) 40%, var(--x-govuk-ui-paper));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-marker {
+    background-size: 100% 100%;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-marker {
+    forced-color-adjust: none;
+    background: Mark;
+    color: MarkText;
+  }
+}

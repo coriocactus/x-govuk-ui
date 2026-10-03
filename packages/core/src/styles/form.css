@@ -1,0 +1,25 @@
+/* Form. The error summary opens above the fields in a box that eases to its height, so the fields
+   move down smoothly. The box reaches a little past the summary on every side, so the summary's
+   focus ring shows in full, and the box takes no extra space for it. */
+.x-govuk-ui-form-summary.x-govuk-ui-auto-height {
+  margin: -4px;
+  padding: 4px;
+}
+/* The summary's own margin stays inside the box. */
+.x-govuk-ui-form-summary > div {
+  display: flow-root;
+}
+/* Fields stack with GOV.UK's spacing between them, and buttons keep their own width. The column is
+   the form's width, so a field with something wide inside, such as a long line of code, scrolls
+   that content instead of widening the field and every field with it. */
+.x-govuk-ui-form-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  gap: 20px;
+}
+@media (min-width: 40.0625em) {
+  .x-govuk-ui-form-fields {
+    gap: 30px;
+  }
+}

@@ -1,0 +1,237 @@
+/* Form steps. One step of a form at a time, as a GOV.UK question page, or a card set into a page.
+   Every step stays in the form, and the steps out of sight are hidden. */
+.x-govuk-ui-form-steps {
+  font-family: var(--x-govuk-ui-font);
+  color: var(--x-govuk-ui-text);
+}
+/* The steps fill the form's width. Form's own fields keep their widths, which browsers that align
+   blocks would otherwise apply to the steps. */
+.x-govuk-ui-form-steps-form:focus {
+  outline: none;
+}
+.x-govuk-ui-form-steps-form > .x-govuk-ui-form-fields {
+  display: block;
+  justify-items: normal;
+}
+.x-govuk-ui-form-steps-buttons {
+  justify-self: start;
+}
+.x-govuk-ui-form-step {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.x-govuk-ui-form-step[hidden] {
+  display: none;
+}
+/* A step's fields stack with GOV.UK's spacing between them, as a Form's do. */
+.x-govuk-ui-form-step-fields {
+  display: grid;
+  gap: 20px;
+}
+@media (min-width: 40.0625em) {
+  .x-govuk-ui-form-step-fields {
+    gap: 30px;
+  }
+}
+.x-govuk-ui-form-step > .x-govuk-ui-hint {
+  margin: -10px 0 20px;
+}
+.x-govuk-ui-form-steps-progress {
+  margin: 0 0 10px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-form-steps-caption {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 19px;
+  line-height: 1.32;
+}
+.x-govuk-ui-form-step-title {
+  margin: 0 0 20px;
+  outline: none;
+  font-size: 19px;
+  line-height: 1.32;
+}
+.x-govuk-ui-form-steps[data-layout="page"] .x-govuk-ui-form-step-title {
+  margin-bottom: 20px;
+  font-size: 32px;
+  line-height: 1.15;
+}
+.x-govuk-ui-legend h1:focus {
+  outline: none;
+}
+/* On a page, a step that asks one thing makes its question the step's heading, as GOV.UK's
+   question pages do, at GOV.UK's medium size. */
+.x-govuk-ui-form-steps[data-layout="page"]
+  .x-govuk-ui-form-step:not(:has(> .x-govuk-ui-form-step-title))
+  .x-govuk-ui-form-step-fields
+  > :first-child
+  > .x-govuk-ui-label,
+.x-govuk-ui-form-steps[data-layout="page"]
+  .x-govuk-ui-form-step:not(:has(> .x-govuk-ui-form-step-title))
+  .x-govuk-ui-form-step-fields
+  > :first-child
+  > fieldset
+  > .x-govuk-ui-legend {
+  margin-bottom: 12px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.x-govuk-ui-form-steps-buttons {
+  margin-top: 30px;
+  margin-bottom: 0;
+}
+.x-govuk-ui-form-steps-back {
+  margin-bottom: 20px;
+}
+.x-govuk-ui-form-steps-review-title {
+  margin: 0 0 20px;
+  outline: none;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.x-govuk-ui-form-steps-review .x-govuk-ui-panel {
+  margin-bottom: 30px;
+}
+.x-govuk-ui-form-steps-review .x-govuk-ui-panel-title:focus,
+.x-govuk-ui-form-steps-done:focus,
+.x-govuk-ui-form-steps-summary:focus {
+  outline: none;
+}
+.x-govuk-ui-form-steps-answer {
+  display: block;
+}
+.x-govuk-ui-form-steps-answer[data-muted] {
+  color: var(--x-govuk-ui-muted);
+}
+
+/* A card eases to each step's height. The box that eases reaches into the card's padding, so what
+   sits beside a question shows in full while it moves. That includes the answers' shading,
+   GOV.UK's focus, and the red bar 15px out from a question with an error. */
+.x-govuk-ui-form-steps[data-layout="card"] .x-govuk-ui-form-steps-form .x-govuk-ui-auto-height {
+  margin-inline: -18px;
+  padding-inline: 18px;
+}
+.x-govuk-ui-form-steps-done {
+  font-size: 19px;
+  line-height: 1.32;
+}
+.x-govuk-ui-form-steps-done p {
+  margin: 0 0 15px;
+}
+.x-govuk-ui-form-steps-done > :last-child {
+  margin-bottom: 0;
+}
+
+/* Card. An agent's card, with its title and a ring in the header that fills as the steps are
+   answered. Back, Skip and Continue sit in a footer that keeps its height. */
+.x-govuk-ui-form-steps[data-layout="card"] {
+  box-sizing: border-box;
+  padding: 18px 20px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 10px;
+  background: var(--x-govuk-ui-paper);
+  overflow: clip;
+}
+.x-govuk-ui-form-steps-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.x-govuk-ui-form-steps-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 12%, var(--x-govuk-ui-paper));
+  color: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-form-steps-header .x-govuk-ui-form-steps-title {
+  flex: 1;
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.3;
+}
+.x-govuk-ui-form-steps-ring {
+  display: flex;
+}
+.x-govuk-ui-form-steps-ring svg {
+  rotate: -90deg;
+}
+.x-govuk-ui-form-steps-ring circle {
+  fill: none;
+  stroke-width: 2.25;
+}
+.x-govuk-ui-form-steps-ring-track {
+  stroke: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-form-steps-ring-fill {
+  stroke: var(--x-govuk-ui-brand);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-form-steps[data-done] .x-govuk-ui-form-steps-ring-fill {
+  stroke: var(--x-govuk-ui-success);
+}
+.x-govuk-ui-form-steps[data-layout="card"] .x-govuk-ui-form-steps-body {
+  padding-bottom: 14px;
+}
+/* In a card, questions keep a field's own spacing between label, hint and answer, a little smaller,
+   with less space between questions. */
+.x-govuk-ui-form-steps[data-layout="card"] .x-govuk-ui-form-step-fields {
+  gap: 20px;
+}
+.x-govuk-ui-form-steps[data-layout="card"] .x-govuk-ui-hint {
+  font-size: 16px;
+}
+.x-govuk-ui-form-steps-footer {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  margin: 2px -20px -18px;
+  padding: 0 20px;
+  border-top: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-surface);
+  font-size: 16px;
+}
+/* A Tag in the footer, such as Answered, is as tall as the small buttons beside it. */
+.x-govuk-ui-form-steps-footer > .x-govuk-ui-tag {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 5px;
+}
+.x-govuk-ui-form-steps-gap {
+  flex: 1;
+}
+/* The shortcut sits inside the button, in caps of the button's own colours. */
+.x-govuk-ui-button .x-govuk-ui-form-steps-shortcut {
+  margin-inline-start: 8px;
+  color: inherit;
+}
+.x-govuk-ui-button .x-govuk-ui-form-steps-shortcut .x-govuk-ui-kbd-key {
+  min-width: 18px;
+  padding: 2px 4px;
+  border-color: rgb(255 255 255 / 40%);
+  background: rgb(11 12 12 / 24%);
+  color: inherit;
+}
+.x-govuk-ui-button:focus-visible .x-govuk-ui-form-steps-shortcut .x-govuk-ui-kbd-key {
+  border-color: currentColor;
+  background: transparent;
+}
+.x-govuk-ui-form-steps[data-layout="card"] .x-govuk-ui-form-steps-summary {
+  margin-bottom: 0;
+  outline: none;
+}

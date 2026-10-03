@@ -1,0 +1,78 @@
+/* Waffle. A square grid of cells, with each part in the next of the palette's colours and the rest
+   in the page's secondary colour. It sits beside its key, or above it where the space is narrow. */
+.x-govuk-ui-waffle {
+  container-type: inline-size;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-waffle-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--x-govuk-ui-waffle-columns, 10), minmax(0, 1fr));
+  gap: 3px;
+  width: min(100%, 220px);
+  margin-bottom: 16px;
+}
+.x-govuk-ui-waffle-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  animation: x-govuk-ui-waffle-cell 260ms var(--x-govuk-ui-ease-out) backwards;
+  animation-delay: calc(var(--x-govuk-ui-waffle-index, 0) * 5ms);
+}
+.x-govuk-ui-waffle-cell[data-empty] {
+  background: var(--x-govuk-ui-secondary);
+}
+@keyframes x-govuk-ui-waffle-cell {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+.x-govuk-ui-waffle-key {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 16px;
+  line-height: 1.3;
+}
+.x-govuk-ui-waffle-key li {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+}
+.x-govuk-ui-waffle-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  align-self: center;
+}
+.x-govuk-ui-waffle-figure {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.x-govuk-ui-waffle-share {
+  color: var(--x-govuk-ui-muted);
+  font-weight: 400;
+}
+/* With space for both, the key sits beside the grid. */
+@container (min-width: 440px) {
+  .x-govuk-ui-waffle-body {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: center;
+    gap: 28px;
+  }
+  .x-govuk-ui-waffle-grid {
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-waffle-cell,
+  .x-govuk-ui-waffle-swatch {
+    forced-color-adjust: none;
+  }
+}

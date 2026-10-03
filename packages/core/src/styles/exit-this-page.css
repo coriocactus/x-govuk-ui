@@ -1,0 +1,47 @@
+/* Exit this page. A red button that stays at the top of the page as it scrolls. Three dots under
+   its label count the Shift presses. As it leaves, the page is covered at once. */
+.x-govuk-ui-exit-this-page {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 0;
+}
+.x-govuk-ui-button.x-govuk-ui-exit-this-page-button {
+  flex-direction: column;
+  gap: 4px;
+  text-decoration: none;
+}
+.x-govuk-ui-exit-this-page-indicator {
+  display: none;
+  gap: 6px;
+  justify-content: center;
+}
+.x-govuk-ui-exit-this-page-indicator[data-shown] {
+  display: flex;
+}
+.x-govuk-ui-exit-this-page-indicator > span {
+  width: 8px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-exit-this-page-indicator > span[data-on] {
+  background: currentColor;
+  scale: 1.15;
+}
+.x-govuk-ui-exit-this-page-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 19px;
+}

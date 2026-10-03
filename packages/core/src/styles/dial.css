@@ -1,0 +1,108 @@
+/* Dial. A short numeric field that turns like a dial, as Date input's and Time input's fields do.
+   While it turns, a drum rises out of the field, behind it, with the values rolling past. The
+   nearer values are larger, and the value in the field shows through the drum. The drum fades once
+   the dial settles. */
+/* The dial is as wide as its field, so the drum centres on the field. Otherwise a grid would
+   stretch the dial to a wider label above it, such as Month or Minute. */
+.x-govuk-ui-dial {
+  position: relative;
+  isolation: isolate;
+  justify-self: start;
+  width: fit-content;
+}
+/* While it turns, the dial and its drum sit over what is around them, such as a status message. */
+.x-govuk-ui-dial[data-showing] {
+  z-index: 2;
+}
+/* The field is as wide as the figures it takes, in the page's font, with half a figure to spare for
+   the caret, and its padding and border around them, so it fits in any typeface. Its figures all
+   have one width. A field that turns is shaded faintly at its top and bottom edges, as a drum
+   curves away. It takes the grab cursor, so it invites a drag. */
+.x-govuk-ui-input.x-govuk-ui-dial-input {
+  width: calc((var(--x-govuk-ui-dial-chars, 2) + 0.5) * 1ch + 2 * 8px + 2 * 1.5px);
+  padding-inline: 8px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.x-govuk-ui-dial-input {
+  --x-govuk-ui-dial-shade: color-mix(in srgb, var(--x-govuk-ui-text) 7%, transparent);
+  background-image: linear-gradient(
+    var(--x-govuk-ui-dial-shade),
+    transparent 30%,
+    transparent 70%,
+    var(--x-govuk-ui-dial-shade)
+  );
+  touch-action: pan-x pinch-zoom;
+}
+.x-govuk-ui-dial-input:not(:disabled) {
+  cursor: grab;
+}
+.x-govuk-ui-dial[data-dragging] .x-govuk-ui-dial-input {
+  cursor: grabbing;
+}
+.x-govuk-ui-dial[data-showing] .x-govuk-ui-dial-input {
+  background-color: transparent;
+  background-image: none;
+  color: transparent;
+  caret-color: transparent;
+}
+.x-govuk-ui-dial-drum {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: -8px;
+  right: -8px;
+  height: 168px;
+  translate: 0 -50%;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 10px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 10px 30px rgb(11 12 12 / 14%);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  scale: 1 0.6;
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-dial[data-showing] .x-govuk-ui-dial-drum {
+  opacity: 1;
+  scale: 1;
+}
+/* The values fade towards the drum's ends, as they turn away. */
+.x-govuk-ui-dial-values {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  mask-image: linear-gradient(transparent, #000 24%, #000 76%, transparent);
+}
+.x-govuk-ui-dial-value {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 28px;
+  margin-top: -14px;
+  line-height: 28px;
+  text-align: center;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-dial-value[data-current] {
+  color: var(--x-govuk-ui-text);
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-dial-drum {
+    scale: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-dial-drum {
+    border-color: CanvasText;
+  }
+}

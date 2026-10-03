@@ -1,0 +1,30 @@
+/* Separator. A keyline in GOV.UK's border colour. Horizontal ones take GOV.UK's section break
+   spacing. Vertical ones fill the height of their row, inset a little. */
+.x-govuk-ui-separator {
+  flex-shrink: 0;
+  border: 0;
+  background: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-separator[data-orientation="horizontal"] {
+  width: 100%;
+  height: 1px;
+}
+.x-govuk-ui-separator[data-spacing="small"] {
+  margin-block: 15px;
+}
+.x-govuk-ui-separator[data-spacing="medium"] {
+  margin-block: 30px;
+}
+.x-govuk-ui-separator[data-spacing="large"] {
+  margin-block: 50px;
+}
+.x-govuk-ui-separator[data-orientation="vertical"] {
+  align-self: stretch;
+  width: 1px;
+  margin-block: 6px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-separator {
+    background: CanvasText;
+  }
+}

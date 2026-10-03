@@ -1,0 +1,2099 @@
+/* Example layouts inside the workbench preview frame. */
+/* The stage fills the preview as the only item of the preview's grid, whose one row stretches to
+   the grid's height, at least the preview's own. It takes no `min-height: 100%` of that row,
+   because the row's height would then be the stage's. Safari resolves that cycle once, at its
+   first layout, and never again, so a stage that was once taller, as an Editor is while it starts,
+   would keep its height. */
+.preview-stage {
+  outline: none;
+  display: grid;
+  /* The column is the stage's width, so content that scrolls sideways, such as a wide code block,
+     cannot widen it and push the example off centre. */
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  padding: 64px 36px;
+  background: var(--preview);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  position: relative;
+}
+/* An example that grows keeps one edge still, such as an accordion its top, or a conversation its
+   composer. A top-anchored example starts centred, from --anchor-top, which the workbench measures
+   when the example starts and when the preview resizes, but not as the example grows. */
+.preview-stage[data-anchor="top"] {
+  align-content: start;
+  padding-top: max(
+    var(--anchor-top, clamp(40px, calc(28vh - 70px), 180px)),
+    var(--room-above, 0px)
+  );
+}
+/* The foot of a page, such as a footer, reaches the preview's edges and sits at its foot. As it
+   grows, it takes the free space above it first, so the footer stays put, then the preview
+   scrolls, as a page does. */
+.preview-stage[data-anchor="foot"] {
+  align-content: end;
+  padding: 0;
+}
+/* A bottom-anchored example keeps its foot still as it changes height, such as a card whose footer
+   contains the buttons under the pointer. It starts centred, from --anchor-bottom, which the
+   workbench measures when the example starts and when the preview resizes. Once taller than the
+   preview, it lines up with the top instead, so none of it is out of reach above. */
+.preview-stage[data-anchor="bottom"] {
+  align-content: safe end;
+  padding-top: 24px;
+  padding-bottom: var(--anchor-bottom, 25vh);
+}
+.preview-summary-form {
+  position: relative;
+}
+.preview-summary {
+  position: absolute;
+  bottom: calc(100% + 20px);
+  inset-inline: 0;
+}
+.preview-summary .x-govuk-ui-error-summary {
+  margin-bottom: 0;
+}
+/* An example as wide as it can be, such as a gallery, has a little space at the preview's sides,
+   and a band that reaches the edges has none. */
+.preview-stage[data-sides="narrow"] {
+  padding-inline: 16px;
+}
+.preview-stage[data-sides="none"] {
+  padding-inline: 0;
+}
+/* A full-page example, such as a chat, fills the preview edge to edge and scrolls itself, so its
+   scrollbar sits at the preview's edge. */
+.preview-frame:has(.preview-stage[data-anchor="fill"])
+  > .x-govuk-ui-scroll-area-viewport
+  > .x-govuk-ui-scroll-area-content {
+  height: 100%;
+}
+.preview-stage[data-anchor="fill"] {
+  display: block;
+  height: 100%;
+  padding: 0;
+}
+.preview-stage[data-anchor="fill"] > .preview-example {
+  width: 100%;
+  height: 100%;
+}
+/* A box of updates or months that scrolls inside its border. */
+.preview-scroll {
+  height: 280px;
+  border: 1px solid var(--x-govuk-ui-line);
+}
+.preview-scroll--horizontal {
+  height: auto;
+}
+.preview-updates,
+.preview-months {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 16px;
+  line-height: 1.45;
+}
+.preview-updates li {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+.preview-updates li:last-child {
+  border-bottom: 0;
+}
+.preview-updates time {
+  display: block;
+  font-weight: 700;
+}
+.preview-scroll--both .preview-updates {
+  width: 620px;
+}
+.preview-months {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+}
+.preview-months li {
+  flex: none;
+  display: grid;
+  width: 128px;
+  padding: 12px 14px;
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.preview-months span {
+  color: var(--x-govuk-ui-text);
+  font-weight: 700;
+}
+.preview-months strong {
+  margin-top: 8px;
+  color: var(--x-govuk-ui-text);
+  font-size: 24px;
+  line-height: 1.2;
+}
+/* A desk of tiles in a bordered box, under its dock and the buttons that lay it out. It fills the
+   preview, as tall as the preview is, and the preview scrolls only when that leaves too little
+   space. */
+.preview-tiles.x-govuk-ui-tiles {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 16px;
+}
+.preview-tiles > .x-govuk-ui-tiles-board {
+  min-height: 360px;
+  border: 1px solid var(--x-govuk-ui-line);
+}
+.preview-tiles-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.preview-tiles-dock {
+  flex: 1;
+  min-width: min(100%, 320px);
+}
+.preview-tile > .x-govuk-ui-scroll-area-viewport > .x-govuk-ui-scroll-area-content {
+  padding: 12px 16px;
+}
+.preview-tile .x-govuk-ui-summary-list {
+  margin: 0;
+}
+.preview-tile-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.preview-tile-list li + li {
+  margin-top: 6px;
+}
+/* Headings and paragraphs, for examples that divide or reveal text. */
+.preview-prose h2,
+.preview-panel-heading {
+  margin: 0 0 10px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.preview-prose p,
+.x-govuk-ui-details-text p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.preview-inline-links {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 0;
+  font-size: 17px;
+}
+.preview-inline-links a {
+  color: var(--x-govuk-ui-link);
+}
+/* A list of names and figures, as a tab panel might contain. */
+.preview-pairs {
+  display: grid;
+  margin: 0;
+}
+.preview-pairs > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  font-size: 17px;
+}
+.preview-pairs dd {
+  margin: 0;
+  color: var(--x-govuk-ui-muted);
+}
+/* Overlays. Each example's button sits centred, with its outcome beneath. */
+.preview-example--dialog,
+.preview-example--sheet,
+.preview-example--popover,
+.preview-example--dropdown-menu {
+  display: grid;
+  justify-items: center;
+}
+.preview-example--dialog .preview-message,
+.preview-example--sheet .preview-message,
+.preview-example--dropdown-menu .preview-message {
+  text-align: center;
+}
+.preview-hint {
+  margin: 0 0 12px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+}
+.preview-documents {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.preview-document {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: context-menu;
+  transition: background var(--x-govuk-ui-duration-fast) ease;
+}
+.preview-documents li + li {
+  margin-top: 8px;
+}
+.preview-document[data-popup-open],
+.preview-document:hover {
+  background: var(--x-govuk-ui-secondary);
+}
+.preview-document span {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.preview-prose-line {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+}
+.preview-prose-line a {
+  color: var(--x-govuk-ui-link);
+  text-underline-offset: 0.15em;
+}
+.preview-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.preview-person > div {
+  display: grid;
+}
+.preview-person span:not(.x-govuk-ui-avatar, .x-govuk-ui-avatar *) {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.preview-person-note {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+/* Messages and status. */
+.preview-example--notification-banner,
+.preview-example--panel {
+  display: grid;
+  justify-items: center;
+}
+.preview-example--notification-banner > *,
+.preview-example--panel > * {
+  width: 100%;
+}
+.preview-example--notification-banner > .x-govuk-ui-button {
+  width: auto;
+}
+.preview-stack {
+  display: grid;
+  justify-items: start;
+}
+.preview-statuses,
+.preview-progress {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+}
+.preview-progress > .x-govuk-ui-progress {
+  width: 100%;
+}
+.preview-pairs-list {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.preview-pairs-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  font-size: 17px;
+}
+/* A tag that does not fit beside its name moves to a line of its own, kept to the right. */
+.preview-pairs-list li > .x-govuk-ui-tag {
+  margin-left: auto;
+}
+.preview-spinner {
+  display: grid;
+  place-items: center;
+  color: var(--x-govuk-ui-brand);
+}
+/* A caseworker card, and the skeleton that stands in for it. */
+.preview-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.preview-card p {
+  margin: 0;
+}
+.preview-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.preview-card-name {
+  display: grid;
+  flex: 1;
+}
+.preview-card-name span {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.preview-card-name.x-govuk-ui-skeleton .x-govuk-ui-skeleton-line:first-child {
+  width: 50%;
+}
+.preview-card .x-govuk-ui-skeleton[data-variant="circle"] {
+  width: 44px;
+  height: 44px;
+}
+/* The back link sits centred. */
+.preview-example--back-link {
+  display: grid;
+  justify-items: center;
+}
+/* A service's own mark beside its name, in the generic header. */
+.preview-generic-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.preview-page-top {
+  overflow: hidden;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+}
+.preview-pagination {
+  display: grid;
+  justify-items: center;
+}
+/* The pagination fits the width it is given, so it is given the preview's, with its numbers
+   centred. */
+.preview-pagination:not([data-block]) > .x-govuk-ui-pagination {
+  justify-self: stretch;
+  justify-content: center;
+}
+/* Block pagination and its page title share a centred column of fixed width, wide enough for the
+   longest title, so the left edge stays put between pages. */
+.preview-pagination[data-block] {
+  grid-template-columns: min(100%, 220px);
+  justify-content: center;
+  justify-items: start;
+}
+.preview-skip {
+  position: relative;
+  padding-top: 48px;
+}
+.preview-skip-content {
+  padding: 16px 20px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  outline: none;
+}
+.preview-skip-content:focus {
+  box-shadow: 0 0 0 3px var(--x-govuk-ui-focus);
+}
+.preview-skip-content h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+.preview-skip-content p {
+  margin: 0;
+  font-size: 17px;
+}
+.preview-language p {
+  margin: 16px 0 0;
+  font-size: 19px;
+  line-height: 1.5;
+}
+/* The button and its hint share one centred column. A service would put the button at the top
+   right of its page. */
+.preview-exit {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+.preview-exit .x-govuk-ui-exit-this-page {
+  justify-content: center;
+}
+.preview-exit .preview-hint {
+  margin: 0;
+}
+.preview-field-gap {
+  margin-top: 24px;
+}
+.preview-calendar {
+  display: grid;
+  justify-items: center;
+}
+.preview-calendar .x-govuk-ui-calendar {
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+}
+.preview-calendar .preview-message {
+  text-align: center;
+}
+.preview-date {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+/* The date or time sits in the middle, as wide as its legend and fields. An error is not part of
+   that width. It wraps within it, so the fields stay where they were as it appears. */
+.preview-date .x-govuk-ui-error-container {
+  contain: inline-size;
+}
+.preview-date .preview-message {
+  right: auto;
+  width: max-content;
+  max-width: min(460px, 90vw);
+}
+/* Fields in a column, as a form sets them. */
+.preview-stack {
+  display: grid;
+  gap: 24px;
+}
+.preview-postcode {
+  max-width: 10em;
+}
+/* The Field example's number stepper, with a button either side of the number. */
+.preview-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.preview-stepper .x-govuk-ui-input {
+  width: 5em;
+  text-align: center;
+}
+.preview-toast-demos {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+.preview-toast-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+/* Single controls sit in the centre of the preview, with any status text beneath. */
+.preview-example--button,
+.preview-example--toast,
+.preview-example--command-menu,
+.preview-example--navigation-menu,
+.preview-example--toggle-group {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+.preview-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+/* Conversation. The log fills the preview, with the composer floating over its foot. */
+.preview-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.preview-chat .x-govuk-ui-conversation {
+  flex: 1;
+  min-height: 0;
+}
+.preview-chat-input {
+  position: relative;
+}
+.preview-streaming {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+}
+.preview-streaming-text,
+.preview-citation-text {
+  max-width: 560px;
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+}
+.preview-summary-list {
+  position: relative;
+}
+.preview-summary-list .x-govuk-ui-summary-card {
+  margin: 0;
+}
+.preview-plan-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--x-govuk-ui-muted);
+}
+.preview-plan-status .x-govuk-ui-spinner {
+  color: var(--x-govuk-ui-brand);
+}
+.preview-chat-files {
+  display: block;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.preview-chat-files:not(:first-child) {
+  margin-top: 4px;
+}
+.preview-reasoning {
+  display: grid;
+}
+.preview-reasoning > * {
+  grid-area: 1 / 1;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 16px;
+}
+.preview-reasoning-room {
+  visibility: hidden;
+}
+/* Replay keeps its place while hidden, and fades in once there is something to replay. */
+.preview-replay {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    visibility 0s var(--x-govuk-ui-duration-medium);
+}
+.preview-replay[data-shown] {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    visibility 0s;
+}
+.preview-link-text {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+}
+.preview-link-text[data-inverse] {
+  padding: 20px 24px;
+  border-radius: 6px;
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-white);
+}
+.preview-hidden {
+  margin: 0;
+  font-size: 19px;
+}
+.preview-hidden {
+  container-type: inline-size;
+}
+.preview-hidden > div {
+  display: grid;
+  grid-template-columns: 9em minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+/* On a phone, as in GOV.UK's summary list, the name takes a line, above the value and its link. */
+@container (max-width: 400px) {
+  .preview-hidden > div {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 16px;
+  }
+  .preview-hidden dt {
+    grid-column: 1 / -1;
+  }
+}
+.preview-hidden dt {
+  font-weight: 700;
+}
+.preview-hidden dd {
+  margin: 0;
+}
+/* Revealed, the hidden words show in place with a dashed outline. */
+.preview-hidden[data-reveal] .x-govuk-ui-visually-hidden {
+  position: static;
+  width: auto;
+  height: auto;
+  clip-path: none;
+  outline: 2px dashed var(--x-govuk-ui-brand);
+  outline-offset: 1px;
+}
+.preview-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+.preview-card-media {
+  height: 140px;
+}
+.preview-items {
+  display: grid;
+  gap: 12px;
+}
+.preview-avatars {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.preview-ratio {
+  border-radius: 8px;
+}
+.preview-aside {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 32px;
+  font-family: var(--x-govuk-ui-font);
+  font-size: 19px;
+  line-height: 1.45;
+}
+.preview-aside p {
+  margin: 0;
+}
+.preview-aside-heading {
+  margin: 0 0 12px;
+  font-size: 27px;
+  line-height: 1.2;
+}
+.preview-cookie-page {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  padding: 24px 20px;
+  font-family: var(--x-govuk-ui-font);
+}
+.preview-cookie-page p {
+  margin: 0;
+}
+.preview-filters {
+  position: relative;
+}
+.preview-menubar {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+/* Feedback, the foot of a service's page, with the band at the end of the content, then the
+   footer. What people said, and Ask again, sit above the band without moving it. */
+.preview-page-foot-content {
+  position: relative;
+  padding-top: 40px;
+}
+.preview-feedback-after {
+  position: absolute;
+  bottom: calc(100% - 28px);
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--x-govuk-ui-font);
+}
+.preview-feedback-said {
+  margin: 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+}
+.preview-feedback-said:empty {
+  display: none;
+}
+
+/* The heading of what the empty conversation offers. */
+.preview-chat-start-title {
+  margin: 0 0 12px;
+  color: var(--x-govuk-ui-text);
+  font-size: 24px;
+  line-height: 1.25;
+}
+/* Each slide is a Card, with its image at a set height. The carousel's viewport already draws the
+   keyline, so the card has none of its own, and every card fills its slide's height. */
+.preview-service-card.x-govuk-ui-card {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+.preview-service-card .x-govuk-ui-card-media {
+  height: 180px;
+}
+.preview-actions {
+  margin-top: 24px;
+}
+.preview-actions .x-govuk-ui-button {
+  gap: 28px;
+}
+.preview-actions .x-govuk-ui-button-label {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+/* Status text sits below the example without taking up space, so nothing above it moves. */
+.preview-example {
+  position: relative;
+}
+/* An example narrower than its column, such as a sentence, shrinks the column to fit, so it sits
+   in the middle. */
+.preview-example[data-fit] {
+  width: fit-content;
+  max-width: min(var(--x-govuk-ui-container-width), 100%);
+}
+.preview-message {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 16px);
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--x-govuk-ui-muted);
+}
+.preview-kbd {
+  margin-inline-start: 6px;
+  padding: 1px 5px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 4px;
+  color: var(--x-govuk-ui-muted);
+  font: 400 12px / 1.5 var(--x-govuk-ui-font);
+}
+/* Small screens have tighter padding. */
+@media (max-width: 400px) {
+  .preview-stage {
+    padding: 40px 22px 60px;
+  }
+}
+
+/* Sidebar. A small application frame with the sidebar beside its page. */
+.preview-app {
+  height: 480px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+}
+.preview-app[data-side="right"] {
+  flex-direction: row-reverse;
+}
+/* The service switcher fills the header beside the sidebar button. */
+.preview-app-switcher.x-govuk-ui-button {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+  padding-inline: 8px;
+}
+.preview-app-switcher .x-govuk-ui-button-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+}
+.preview-app-name {
+  font-size: 15px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* The page beside the sidebar, with its heading, a line and an action, each with space. */
+.preview-app-title {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.2;
+}
+.preview-app-page {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 16px;
+  padding: 28px 40px;
+}
+.preview-app-page p {
+  margin: 0;
+  max-width: 34em;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Tooltip. A row of icon buttons. */
+.preview-icon-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Keyboard key. A list of shortcuts. */
+.preview-shortcuts {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+.preview-shortcuts > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+.preview-shortcuts dt {
+  font-size: 16px;
+}
+.preview-shortcuts dd {
+  margin: 0;
+}
+
+/* Editor. The AI toolbar's own word count tool. */
+.preview-word-count {
+  padding-inline: 8px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Text shimmer, centred on the stage. */
+.preview-shimmer {
+  margin: 0;
+  text-align: center;
+  font-size: 19px;
+}
+/* Collapsed to icons, the header keeps only the sidebar button. */
+.x-govuk-ui-sidebar[data-state="collapsed"][data-collapsible="icon"] .preview-app-switcher {
+  display: none;
+}
+/* Width container. A band for the screen, the container's edges dashed inside it, and a tinted
+   block for each column. */
+.preview-screen {
+  padding-block: 24px;
+  border-block: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-surface);
+}
+.preview-container {
+  outline: 2px dashed color-mix(in srgb, var(--x-govuk-ui-brand) 55%, transparent);
+  outline-offset: 8px;
+}
+.preview-column {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 14%, var(--x-govuk-ui-paper));
+  color: var(--x-govuk-ui-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+/* A form's status message sits beneath its button. */
+.preview-example .x-govuk-ui-form {
+  position: relative;
+}
+/* A page fills the preview, with its footer at the foot of it on a short page. */
+.preview-stage[data-anchor="fill"] .x-govuk-ui-page {
+  min-height: 100%;
+}
+/* A page's heading, in GOV.UK's large size. */
+.preview-page-heading {
+  margin: 0 0 30px;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 36px;
+  line-height: 1.11;
+  font-weight: 700;
+}
+/* Grouped table. Status marks, priorities and the pills in each row. */
+.preview-grouped-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.preview-grouped-title span {
+  margin-left: 6px;
+  color: var(--x-govuk-ui-muted);
+  font-weight: 400;
+}
+.preview-mark-review {
+  color: var(--x-govuk-ui-success);
+}
+.preview-mark-progress {
+  color: var(--x-govuk-ui-warning);
+}
+.preview-urgent {
+  color: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-tag.preview-change,
+.x-govuk-ui-tag.preview-area {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 8px 2px;
+  border-radius: 12px;
+  color: var(--x-govuk-ui-text);
+  font-size: 14px;
+  font-weight: 400;
+}
+.preview-change svg {
+  color: var(--x-govuk-ui-success);
+}
+.preview-change[data-state="draft"] svg {
+  color: var(--x-govuk-ui-muted);
+}
+.preview-change[data-state="closed"] svg {
+  color: var(--x-govuk-ui-error);
+}
+.preview-area-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--x-govuk-ui-tag-text, currentColor);
+}
+.preview-area-dot[data-colour="orange"] {
+  background: var(--x-govuk-ui-orange);
+}
+.preview-area-dot[data-colour="purple"] {
+  background: var(--x-govuk-ui-purple);
+}
+.preview-area-dot[data-colour="teal"] {
+  background: var(--x-govuk-ui-teal);
+}
+.preview-area-dot[data-colour="red"] {
+  background: var(--x-govuk-ui-red);
+}
+.preview-area-dot[data-colour="blue"] {
+  background: var(--x-govuk-ui-blue);
+}
+.preview-area-dot[data-colour="green"] {
+  background: var(--x-govuk-ui-green);
+}
+.preview-area-dot[data-colour="magenta"] {
+  background: var(--x-govuk-ui-magenta);
+}
+.preview-points {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.preview-points svg {
+  color: var(--x-govuk-ui-muted);
+}
+.preview-updated {
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+}
+/* Data table. Each organisation's mark, its tags, and a bar for how likely it is to be funded. */
+.preview-organisation,
+.preview-tags {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+.preview-organisation-mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-paper);
+  font-size: 13px;
+  font-weight: 700;
+}
+.preview-tags .x-govuk-ui-tag {
+  padding: 1px 7px 2px;
+  font-size: 14px;
+}
+.preview-likelihood {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.preview-likelihood-bar {
+  display: block;
+  width: 64px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-secondary);
+  overflow: hidden;
+}
+.preview-likelihood-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--x-govuk-ui-brand);
+}
+/* Timeline. The button that adds the next update sits above the history. */
+.preview-timeline {
+  display: grid;
+  justify-items: start;
+  gap: 24px;
+}
+/* QR code. The code above the address it contains. */
+.preview-qr {
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+}
+/* Image generation. The prompt above the frame, and the button and credit beneath it. */
+.preview-image-generation {
+  display: grid;
+  gap: 14px;
+}
+.preview-image-prompt {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.45;
+}
+.preview-image-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.preview-image-credit {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+
+/* Bubbles in a short exchange, with a hint beneath. */
+.preview-bubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.preview-bubble-status {
+  margin: 4px 2px 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  text-align: end;
+}
+.preview-bubble-status:focus {
+  outline: none;
+}
+.preview-bubble-status:not([data-success]) {
+  color: var(--x-govuk-ui-error);
+}
+.preview-bubble-hint {
+  margin: 4px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.preview-message-day {
+  display: flex;
+  justify-content: center;
+  min-height: 32px;
+  align-items: center;
+  margin: 0 0 8px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+/* Message scroller. A service's help chat, docked at the foot of a page. The page fills the
+   preview, however much space the code beneath leaves it, so the chat is always in view. The
+   page's words sit in the middle of the space above the folded chat. */
+.preview-help {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding-bottom: 96px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.preview-help-page {
+  box-sizing: border-box;
+  max-width: 30rem;
+  padding: 24px 32px;
+}
+.preview-help-page h1 {
+  margin: 0 0 20px;
+  font-size: 36px;
+  line-height: 1.1;
+}
+.preview-help-page p {
+  margin: 0 0 15px;
+  font-size: 19px;
+  line-height: 1.4;
+}
+/* The chat is docked at the foot of the page, in the middle, as a documentation site's assistant
+   is. Its message box is always there. The conversation opens up out of it, and folds back down. */
+.preview-help-chat {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 1;
+  bottom: 20px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, calc(100% - 40px));
+  max-height: calc(100% - 40px);
+  translate: -50% 0;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 16px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow:
+    0 18px 48px rgb(11 12 12 / 18%),
+    0 2px 8px rgb(11 12 12 / 8%);
+  overflow: clip;
+}
+.preview-help-top {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+/* Folded away, it disappears once it has folded. */
+.preview-help-chat:not([data-open]) .preview-help-top {
+  visibility: hidden;
+  transition: visibility 0s 300ms;
+}
+.preview-help-header {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 10px 12px 18px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+.preview-help-header > div {
+  flex: 1;
+  min-width: 0;
+}
+.preview-help-header h2 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.3;
+}
+.preview-help-header p {
+  margin: 2px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+}
+/* The pinned question sits under the header, and goes to the question in the log. */
+.preview-help-pinned {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 18px;
+  border: 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-text);
+  font: inherit;
+  font-size: 15px;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--x-govuk-ui-duration-fast) ease;
+}
+.preview-help-pinned:hover {
+  background: var(--x-govuk-ui-secondary);
+}
+.preview-help-pinned:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: -3px;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+}
+.preview-help-pinned svg {
+  flex: none;
+  color: var(--x-govuk-ui-brand);
+}
+.preview-help-pinned-label {
+  flex: none;
+  font-weight: 700;
+}
+.preview-help-pinned-text {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--x-govuk-ui-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.preview-help-pinned:focus-visible .preview-help-pinned-text {
+  color: inherit;
+}
+/* 440 pixels tall above the message box, or as tall as the preview leaves space for. */
+.preview-help-log {
+  display: flex;
+  flex: 1 1 440px;
+  flex-direction: column;
+  min-height: 0;
+}
+.preview-help-log .x-govuk-ui-message-scroller {
+  flex: 1;
+}
+/* The message box has no box of its own. The docked chat is its box, and takes GOV.UK's focus
+   around the whole chat. */
+.preview-help-composer {
+  padding: 4px 8px 8px 2px;
+}
+.preview-help-chat:has(.x-govuk-ui-chat-input:focus-within) {
+  border-color: var(--x-govuk-ui-focus-text);
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+}
+.preview-help-composer .x-govuk-ui-chat-input:focus-within {
+  border-color: transparent;
+  outline: none;
+  box-shadow: none;
+}
+.preview-help-chat[data-open] .preview-help-composer {
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+/* Folded, a line above the message box says how many messages there are, and opens the chat. Its
+   words sit 10px below the card's top, as margin and padding, and its box reaches as far below
+   them as above, so its focus has the words in the middle of the yellow. The margin beneath takes
+   back the padding, so the message box stays where it was. */
+.preview-help-expand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 -4px;
+  padding: 4px 16px;
+  border: 0;
+  background: none;
+  color: var(--x-govuk-ui-muted);
+  font: inherit;
+  font-size: 14px;
+  text-align: start;
+  cursor: pointer;
+}
+.preview-help-expand:hover {
+  color: var(--x-govuk-ui-text);
+}
+/* The dark edge sits beneath the line, over the message box's top, so the words stay in the
+   middle of the yellow. */
+.preview-help-expand:focus-visible {
+  z-index: 1;
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 4px var(--x-govuk-ui-focus-text);
+}
+/* The office's replies keep their tools beneath them, lined up with the bubbles. */
+.preview-help-tools {
+  margin: 2px 0 0 -6px;
+}
+.preview-help-empty {
+  padding: 48px 12px 16px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  text-align: center;
+}
+.preview-help-empty p {
+  margin: 0;
+}
+.preview-help-empty .preview-help-empty-title {
+  margin-bottom: 6px;
+  color: var(--x-govuk-ui-text);
+  font-size: 24px;
+  font-weight: 700;
+}
+/* Callout. A question with help beside its label, and a notice pointing at a new button. */
+.preview-callout {
+  position: relative;
+  display: grid;
+  gap: 20px;
+}
+.preview-callout-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 7px;
+}
+.preview-callout-label .x-govuk-ui-label {
+  margin-bottom: 0;
+}
+.preview-callout-input {
+  max-width: 16em;
+}
+.preview-callout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+/* Show the notice again sits above the question, out of the notice's way and taking no space, so
+   nothing moves when it shows. */
+.preview-callout-again {
+  position: absolute;
+  bottom: calc(100% + 16px);
+  left: 0;
+  margin: 0;
+}
+.preview-callout-again[data-hidden] {
+  visibility: hidden;
+}
+
+/* Tour. A short page of applications to walk through. */
+.preview-tour {
+  display: grid;
+  gap: 18px;
+}
+.preview-tour-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.preview-tour-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.preview-tour-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+.preview-tour-list > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+.preview-tour-list > li > span {
+  display: grid;
+  gap: 2px;
+}
+.preview-tour-list > li > span > span {
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+}
+.preview-tour-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Form in stages. A short survey set into a page, with a way to start again beneath it. */
+.preview-survey {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+}
+.preview-survey > .x-govuk-ui-form-steps {
+  justify-self: stretch;
+}
+
+/* The workbench's own page, with how many components there are, how to find one, and every
+   component drawn, under its group, as a catalogue pictures its parts. Groups share a row where
+   they fit, so a group of three sits beside the next instead of alone. */
+.landing {
+  width: min(1600px, 100%);
+  margin-inline: auto;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.landing-count {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.landing-number {
+  font-size: 40px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.landing-lead {
+  max-width: 36em;
+  margin: 8px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.landing-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 36px 48px;
+  margin-top: 36px;
+}
+.landing-group {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.landing-heading {
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  font-size: 19px;
+  line-height: 1.3;
+}
+.landing-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* A tile is the drawing and the name beneath it, a link as the sidebar's are. Its focus is
+   GOV.UK's, with the name yellow on a dark edge, and the drawing ringed in yellow, as a Card's
+   is. */
+.landing-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 104px;
+  outline: 3px solid transparent;
+  color: var(--x-govuk-ui-link);
+  text-decoration: none;
+}
+.landing-art {
+  box-sizing: content-box;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 72px;
+  overflow: hidden;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 6px;
+  background: var(--x-govuk-ui-paper);
+  transition: border-color var(--x-govuk-ui-duration-fast) ease;
+}
+.landing-art svg {
+  display: block;
+}
+.landing-name {
+  max-width: 100%;
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: break-word;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.landing-tile:hover .landing-art {
+  border-color: var(--x-govuk-ui-border);
+}
+.landing-tile:hover .landing-name {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-line: underline;
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.landing-tile:focus-visible .landing-art {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  border-color: var(--x-govuk-ui-focus-text);
+}
+.landing-tile:focus-visible .landing-name {
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  box-decoration-break: clone;
+}
+/* An experimental component has the sidebar's flask after its name, clear of the drawing. */
+.landing-name .sidebar-experimental {
+  padding: 1px;
+  vertical-align: -3px;
+}
+
+/* The drawings' tones, each a design token or a mix of two, so the drawings follow the theme. Each
+   shape takes its colour as currentColor, from its tone. */
+.landing-art .ink {
+  color: var(--x-govuk-ui-text);
+}
+.landing-art .words {
+  color: color-mix(in srgb, var(--x-govuk-ui-text) 34%, var(--x-govuk-ui-paper));
+}
+.landing-art .faint {
+  color: color-mix(in srgb, var(--x-govuk-ui-text) 9%, var(--x-govuk-ui-paper));
+}
+.landing-art .surface {
+  color: var(--x-govuk-ui-surface);
+}
+.landing-art .paper {
+  color: var(--x-govuk-ui-paper);
+}
+.landing-art .line {
+  color: var(--x-govuk-ui-line);
+}
+.landing-art .border {
+  color: var(--x-govuk-ui-border);
+}
+.landing-art .link {
+  color: var(--x-govuk-ui-link);
+}
+.landing-art .brand {
+  color: var(--x-govuk-ui-brand);
+}
+.landing-art .tint {
+  color: color-mix(in srgb, var(--x-govuk-ui-link) 14%, var(--x-govuk-ui-paper));
+}
+/* GOV.UK's buttons, as Button colours them. */
+.landing-art .go {
+  color: var(--x-govuk-ui-green);
+}
+.landing-art .go-dark {
+  color: var(--x-govuk-ui-green-shade-50);
+}
+.landing-art .danger {
+  color: var(--x-govuk-ui-red);
+}
+.landing-art .danger-dark {
+  color: var(--x-govuk-ui-red-shade-50);
+}
+.landing-art .grey {
+  color: var(--x-govuk-ui-secondary);
+}
+.landing-art .grey-dark {
+  color: var(--x-govuk-ui-black-tint-50);
+}
+.landing-art .red {
+  color: var(--x-govuk-ui-error);
+}
+.landing-art .red-tint {
+  color: color-mix(in srgb, var(--x-govuk-ui-error) 14%, var(--x-govuk-ui-paper));
+}
+.landing-art .success {
+  color: var(--x-govuk-ui-success);
+}
+.landing-art .green-tint {
+  color: color-mix(in srgb, var(--x-govuk-ui-success) 16%, var(--x-govuk-ui-paper));
+}
+.landing-art .focus {
+  color: var(--x-govuk-ui-focus);
+}
+.landing-art .focus-text {
+  color: var(--x-govuk-ui-focus-text);
+}
+.landing-art .white,
+.landing-art .fixed-white {
+  color: var(--x-govuk-ui-white);
+}
+/* The Panel's words, which are white on its green, and dark on the lighter green of the dark
+   theme. */
+.landing-art .on-success {
+  color: var(--x-govuk-ui-white);
+}
+.landing-art .scrim {
+  color: color-mix(in srgb, var(--x-govuk-ui-black) 40%, transparent);
+}
+.landing-art .shadow {
+  color: color-mix(in srgb, var(--x-govuk-ui-black) 12%, transparent);
+}
+/* The Lightbox, dark in either theme, and its photos in greys that read on it. */
+.landing-art .dark {
+  color: color-mix(in srgb, var(--x-govuk-ui-black) 90%, transparent);
+}
+.landing-art .lit-sky {
+  color: var(--x-govuk-ui-black-tint-50);
+}
+.landing-art .lit-land {
+  color: var(--x-govuk-ui-black-tint-80);
+}
+.landing-art .fixed-dark {
+  color: #1b1f22;
+}
+.landing-art .fixed-light-line {
+  color: var(--x-govuk-ui-black-tint-80);
+}
+.landing-art .fixed-dark-line {
+  color: #3d444a;
+}
+/* The charts' first colours, as memetics' palette sets them, and its heat map's shades. */
+.landing-art {
+  --landing-chart-1: #12436d;
+  --landing-chart-2: #28a197;
+  --landing-chart-3: #801650;
+  --landing-chart-4: #f46a25;
+}
+.landing-art .c1 {
+  color: var(--landing-chart-1);
+}
+.landing-art .c2 {
+  color: var(--landing-chart-2);
+}
+.landing-art .c3 {
+  color: var(--landing-chart-3);
+}
+.landing-art .c4 {
+  color: var(--landing-chart-4);
+}
+.landing-art .on-c1 {
+  color: var(--x-govuk-ui-white);
+}
+.landing-art .c1-tint {
+  color: color-mix(in srgb, var(--landing-chart-1) 18%, var(--x-govuk-ui-paper));
+}
+.landing-art .heat1 {
+  color: color-mix(in srgb, var(--landing-chart-1) 12%, var(--x-govuk-ui-paper));
+}
+.landing-art .heat2 {
+  color: color-mix(in srgb, var(--landing-chart-1) 30%, var(--x-govuk-ui-paper));
+}
+.landing-art .heat3 {
+  color: color-mix(in srgb, var(--landing-chart-1) 50%, var(--x-govuk-ui-paper));
+}
+.landing-art .heat4 {
+  color: color-mix(in srgb, var(--landing-chart-1) 75%, var(--x-govuk-ui-paper));
+}
+.landing-art .heat5 {
+  color: var(--landing-chart-1);
+}
+.landing-art .band1 {
+  color: color-mix(in srgb, var(--x-govuk-ui-text) 8%, var(--x-govuk-ui-paper));
+}
+.landing-art .band2 {
+  color: color-mix(in srgb, var(--x-govuk-ui-text) 16%, var(--x-govuk-ui-paper));
+}
+.landing-art .band3 {
+  color: color-mix(in srgb, var(--x-govuk-ui-text) 26%, var(--x-govuk-ui-paper));
+}
+/* A boundary between areas, such as two regions of a map, in the page's colour. */
+.landing-art .landing-art-boundary {
+  stroke: var(--x-govuk-ui-paper);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+}
+.landing-art .marker {
+  color: var(--x-govuk-ui-yellow-tint-50);
+}
+.landing-art .keyword {
+  color: var(--x-govuk-ui-code-keyword);
+}
+.landing-art .string {
+  color: var(--x-govuk-ui-code-string);
+}
+.landing-art .entity {
+  color: var(--x-govuk-ui-code-entity);
+}
+@scope ([data-theme="dark"]) to ([data-theme="light"]) {
+  :scope .landing-art {
+    --landing-chart-1: #6fa3d6;
+    --landing-chart-2: #4fc3b7;
+    --landing-chart-3: #d46a9f;
+    --landing-chart-4: #f8955f;
+  }
+  :scope .landing-art .on-success,
+  :scope .landing-art .on-c1 {
+    color: var(--x-govuk-ui-paper);
+  }
+  :scope .landing-art .marker {
+    color: color-mix(in srgb, var(--x-govuk-ui-yellow) 40%, var(--x-govuk-ui-paper));
+  }
+}
+
+/* Theme picker. A small page of its own, in whichever theme the picker chooses. */
+.preview-theme {
+  overflow: visible;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.preview-theme-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px 12px 18px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  font-size: 16px;
+}
+.preview-theme-body {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  padding: 18px;
+}
+.preview-theme-body p {
+  margin: 0;
+  font-size: 17px;
+}
+
+/* The editor's Form, with its buttons, and Saved beside them, which takes no space of its own. */
+.preview-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.preview-saved {
+  color: var(--x-govuk-ui-success);
+  font-weight: 700;
+}
+/* A member of the team in the editor's @ menu, with the name, and the role beneath it, however
+   long. */
+.preview-team-member {
+  display: flex;
+  flex-direction: column;
+}
+.preview-team-member strong {
+  font-weight: 700;
+}
+.preview-team-member span {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+
+/* Sound. Every cue on a card, with a drawing of what plays it beside a drawing of the sound. The
+   cards run in their families, which only their colour tells apart. Each family's colour is from
+   GOV.UK's palette, a step darker than its own on the light page and a step lighter on the dark
+   one. It is vivid in both, and contrasts with the page by more than the three to one a drawing
+   needs. */
+.preview-sound {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  gap: 10px;
+}
+.preview-sound-pad {
+  --preview-sound-ink: var(--x-govuk-ui-blue-shade-25);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 6px;
+  background: var(--x-govuk-ui-paper);
+  color: var(--preview-sound-ink);
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  /* A drag across the cards plays them, while the page can still scroll up and down. */
+  touch-action: pan-y;
+  transition: border-color var(--x-govuk-ui-duration-fast) ease;
+}
+.preview-sound-pad[data-colour="green"] {
+  --preview-sound-ink: var(--x-govuk-ui-green-shade-25);
+}
+.preview-sound-pad[data-colour="purple"] {
+  --preview-sound-ink: var(--x-govuk-ui-purple-shade-25);
+}
+.preview-sound-pad[data-colour="teal"] {
+  --preview-sound-ink: var(--x-govuk-ui-teal-shade-25);
+}
+.preview-sound-pad[data-colour="orange"] {
+  --preview-sound-ink: var(--x-govuk-ui-orange-shade-25);
+}
+.preview-sound-pad[data-colour="magenta"] {
+  --preview-sound-ink: var(--x-govuk-ui-magenta-shade-25);
+}
+@scope ([data-theme="dark"]) to ([data-theme="light"]) {
+  :scope .preview-sound-pad {
+    --preview-sound-ink: var(--x-govuk-ui-blue-tint-25);
+  }
+  :scope .preview-sound-pad[data-colour="green"] {
+    --preview-sound-ink: var(--x-govuk-ui-green-tint-25);
+  }
+  :scope .preview-sound-pad[data-colour="purple"] {
+    --preview-sound-ink: var(--x-govuk-ui-purple-tint-25);
+  }
+  :scope .preview-sound-pad[data-colour="teal"] {
+    --preview-sound-ink: var(--x-govuk-ui-teal-tint-25);
+  }
+  :scope .preview-sound-pad[data-colour="orange"] {
+    --preview-sound-ink: var(--x-govuk-ui-orange-tint-25);
+  }
+  :scope .preview-sound-pad[data-colour="magenta"] {
+    --preview-sound-ink: var(--x-govuk-ui-magenta-tint-25);
+  }
+}
+.preview-sound-pad:hover {
+  border-color: var(--preview-sound-ink);
+}
+.preview-sound-pad:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  border-color: var(--x-govuk-ui-focus-text);
+  box-shadow: inset 0 0 0 1px var(--x-govuk-ui-focus-text);
+}
+.preview-sound-glyph {
+  display: flex;
+}
+.preview-sound-glyph svg {
+  overflow: visible;
+}
+/* The sound, with pitch up the card and time along it, as thick as it is loud. It is faint until
+   it plays, then lit from its start to its end at its own pace. Every card draws on the same
+   scale. */
+.preview-sound-shape {
+  position: relative;
+  display: block;
+  height: 40px;
+}
+.preview-sound-shape svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.preview-sound-shape path {
+  fill: color-mix(in srgb, var(--preview-sound-ink) 50%, transparent);
+}
+.preview-sound-shape .preview-sound-lit {
+  position: absolute;
+  inset: 0;
+  animation:
+    preview-sound-sweep var(--preview-sound-length) linear both,
+    preview-sound-fade 700ms ease var(--preview-sound-length) forwards;
+}
+.preview-sound-lit path {
+  fill: var(--preview-sound-ink);
+}
+@keyframes preview-sound-sweep {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes preview-sound-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Each icon acts out what plays its cue, as it plays. A part that steps sits at its step, and
+   moves on from the one before. */
+.preview-sound-glyph * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.preview-glyph-row {
+  transform: translate(0, var(--step));
+}
+.preview-glyph-slide {
+  transform: translate(var(--step), 0);
+}
+.preview-glyph-hand {
+  transform-box: view-box;
+  transform-origin: 16px 13px;
+  transform: rotate(var(--step));
+}
+[data-live] .preview-glyph-row {
+  animation: preview-glyph-row 160ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-slide {
+  animation: preview-glyph-slide 160ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-hand {
+  animation: preview-glyph-hand 120ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-press {
+  animation: preview-glyph-press 220ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-lid {
+  transform-origin: left bottom;
+  animation: preview-glyph-lid 320ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-nudge {
+  animation: preview-glyph-nudge 260ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-blink {
+  animation: preview-glyph-blink 420ms steps(1, end) 2;
+}
+/* A switch and a menu turn by transitions instead of an animation, so they turn from wherever they
+   are. They turn quickly when pressed, and slowly back once their moment has passed. Pressed again
+   on their way back, they turn again from there. */
+:is(
+  .preview-glyph-fill,
+  .preview-glyph-knob,
+  .preview-glyph-chevron,
+  .preview-glyph-place,
+  .preview-glyph-panel
+) {
+  transition:
+    fill-opacity 480ms ease-in-out,
+    opacity 480ms ease-in-out,
+    transform 480ms ease-in-out;
+}
+[data-turned]
+  :is(
+    .preview-glyph-fill,
+    .preview-glyph-knob,
+    .preview-glyph-chevron,
+    .preview-glyph-place,
+    .preview-glyph-panel
+  ) {
+  transition-duration: 260ms;
+  transition-timing-function: var(--x-govuk-ui-ease-out);
+}
+[data-cue="toggleOn"] [data-turned] .preview-glyph-fill {
+  fill-opacity: 0.3;
+}
+[data-cue="toggleOn"] [data-turned] .preview-glyph-knob {
+  fill-opacity: 1;
+  transform: translateX(12px);
+}
+[data-cue="toggleOff"] [data-turned] .preview-glyph-fill {
+  fill-opacity: 0;
+}
+[data-cue="toggleOff"] [data-turned] .preview-glyph-knob {
+  fill-opacity: 0;
+  transform: translateX(-12px);
+}
+/* The menu, drawn open. Open rests closed and opens when turned, and Close does the reverse.
+   Closed, its panel is folded into the button's foot, its chevron points down, and the outline of
+   where the panel goes shows. */
+.preview-sound-glyph .preview-glyph-panel {
+  transform-origin: center top;
+}
+.preview-glyph-place {
+  opacity: 0;
+}
+[data-cue="open"] .preview-sound-glyph:not([data-turned]) .preview-glyph-panel,
+[data-cue="close"] .preview-sound-glyph[data-turned] .preview-glyph-panel {
+  opacity: 0;
+  transform: translateY(-2.5px) scaleY(0);
+}
+[data-cue="open"] .preview-sound-glyph:not([data-turned]) .preview-glyph-place,
+[data-cue="close"] .preview-sound-glyph[data-turned] .preview-glyph-place {
+  opacity: 0.4;
+}
+[data-cue="open"] .preview-sound-glyph:not([data-turned]) .preview-glyph-chevron,
+[data-cue="close"] .preview-sound-glyph[data-turned] .preview-glyph-chevron {
+  transform: rotate(180deg);
+}
+.preview-glyph-draw {
+  stroke-dasharray: 1;
+}
+[data-live] .preview-glyph-draw {
+  animation: preview-glyph-draw 320ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-pop {
+  animation: preview-glyph-pop 220ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-shake {
+  animation: preview-glyph-shake 320ms ease;
+}
+[data-live] .preview-glyph-twice {
+  animation: preview-glyph-pop 150ms var(--x-govuk-ui-ease-out) 2;
+}
+[data-live] .preview-glyph-ring {
+  transform-origin: center top;
+  animation: preview-glyph-ring 520ms ease;
+}
+[data-live] .preview-glyph-lift {
+  animation: preview-glyph-lift 260ms var(--x-govuk-ui-ease-out);
+}
+[data-live] .preview-glyph-turn {
+  animation: preview-glyph-turn 260ms var(--x-govuk-ui-ease-out);
+}
+@keyframes preview-glyph-row {
+  from {
+    transform: translate(0, var(--was));
+  }
+}
+@keyframes preview-glyph-slide {
+  from {
+    transform: translate(var(--was), 0);
+  }
+}
+@keyframes preview-glyph-hand {
+  from {
+    transform: rotate(var(--was));
+  }
+}
+@keyframes preview-glyph-press {
+  35% {
+    transform: translateY(3px);
+  }
+}
+@keyframes preview-glyph-lid {
+  40% {
+    transform: rotate(-24deg) translateY(-1px);
+  }
+}
+@keyframes preview-glyph-nudge {
+  40% {
+    transform: translateX(3px);
+  }
+}
+@keyframes preview-glyph-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes preview-glyph-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes preview-glyph-pop {
+  45% {
+    transform: scale(1.18);
+  }
+}
+@keyframes preview-glyph-shake {
+  20%,
+  60% {
+    transform: translateX(-2.5px);
+  }
+  40%,
+  80% {
+    transform: translateX(2.5px);
+  }
+}
+@keyframes preview-glyph-ring {
+  15%,
+  55% {
+    transform: rotate(14deg);
+  }
+  35%,
+  75% {
+    transform: rotate(-14deg);
+  }
+}
+@keyframes preview-glyph-lift {
+  45% {
+    transform: translate(2px, 2px);
+  }
+}
+@keyframes preview-glyph-turn {
+  from {
+    transform: rotate(-90deg) scale(0.6);
+  }
+}
+/* Without motion, the icons stay still, and the whole sound lights and fades. */
+@media (prefers-reduced-motion: reduce) {
+  .preview-sound-pad,
+  .preview-sound-glyph * {
+    transition: none;
+    animation: none !important;
+  }
+  .preview-sound-shape .preview-sound-lit {
+    animation: preview-sound-fade 700ms ease 300ms forwards;
+  }
+}
+@media (forced-colors: active) {
+  .preview-sound-pad {
+    color: CanvasText;
+  }
+  .preview-sound-shape path {
+    fill: GrayText;
+  }
+  .preview-sound-lit path {
+    fill: Highlight;
+  }
+}

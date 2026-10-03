@@ -1,0 +1,67 @@
+/* Organisation name. An organisation's name as GOV.UK's organisation logo sets one without an
+   image. The name is in the regular weight at 19 pixels, beside a 2 pixel bar of its colour. Given
+   the Royal Arms, it sits under them, as in a department's lock-up. */
+.x-govuk-ui-organisation-name {
+  display: inline-block;
+  padding: 2px 0 2px 8px;
+  border-left: 2px solid var(--x-govuk-ui-organisation-colour, var(--x-govuk-ui-text));
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.3;
+  text-decoration: none;
+  text-wrap: balance;
+}
+/* The Royal Arms, drawn in the words' colour above the name. */
+.x-govuk-ui-organisation-name[data-crest]::before {
+  content: "";
+  display: block;
+  width: 33px;
+  height: 27px;
+  margin-bottom: 4px;
+  background: currentColor;
+  mask: var(--x-govuk-ui-organisation-crest) no-repeat 0 0 / contain;
+}
+/* As a link, it is GOV.UK's link in the text's colour. It is underlined, and the underline thickens
+   under the pointer. */
+a.x-govuk-ui-organisation-name {
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+  transition: text-decoration-thickness var(--x-govuk-ui-duration-instant) ease;
+}
+a.x-govuk-ui-organisation-name:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+/* GOV.UK's organisation logo puts the focus bar 8 pixels below the name, not 4 as a link's is, so
+   the bar never covers the name's last line. */
+a.x-govuk-ui-organisation-name:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus),
+    0 8px var(--x-govuk-ui-focus-text);
+}
+/* On dark paper, a dark colour, such as the Ministry of Justice's black, is lightened to show. */
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-organisation-name {
+    border-left-color: color-mix(
+      in srgb,
+      var(--x-govuk-ui-organisation-colour, var(--x-govuk-ui-text)) 55%,
+      var(--x-govuk-ui-white)
+    );
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-organisation-name {
+    border-left-color: CanvasText;
+  }
+  .x-govuk-ui-organisation-name[data-crest]::before {
+    background: CanvasText;
+  }
+}

@@ -1,0 +1,86 @@
+/* Skeleton. Grey shapes where content will be. A soft band of light sweeps across them. The band
+   only moves, so the browser's compositor runs it without painting the shapes again. The band
+   crosses the width of the window at the same pace in every shape, so shapes in a column sweep
+   together. */
+.x-govuk-ui-skeleton {
+  --x-govuk-ui-skeleton-base: var(--x-govuk-ui-secondary);
+  --x-govuk-ui-skeleton-light: color-mix(
+    in srgb,
+    var(--x-govuk-ui-secondary) 40%,
+    var(--x-govuk-ui-paper)
+  );
+  display: block;
+}
+.x-govuk-ui-skeleton[data-variant="block"],
+.x-govuk-ui-skeleton[data-variant="circle"],
+.x-govuk-ui-skeleton-line {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--x-govuk-ui-skeleton-base);
+}
+.x-govuk-ui-skeleton[data-variant="block"]::after,
+.x-govuk-ui-skeleton[data-variant="circle"]::after,
+.x-govuk-ui-skeleton-line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    var(--x-govuk-ui-skeleton-light) 50%,
+    transparent 70%
+  );
+  animation: x-govuk-ui-skeleton-sweep 1.6s ease-in-out infinite;
+}
+.x-govuk-ui-skeleton[data-variant="block"] {
+  height: 48px;
+  border-radius: 6px;
+}
+.x-govuk-ui-skeleton[data-variant="circle"] {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.x-govuk-ui-skeleton[data-variant="text"] {
+  display: grid;
+  gap: 0.6em;
+}
+.x-govuk-ui-skeleton-line {
+  height: 0.8em;
+  border-radius: 4px;
+}
+.x-govuk-ui-skeleton-line:last-child:not(:first-child) {
+  width: 60%;
+}
+@keyframes x-govuk-ui-skeleton-sweep {
+  from {
+    transform: translateX(-100vw);
+  }
+  to {
+    transform: translateX(100vw);
+  }
+}
+/* With reduced motion, the shapes stay still. */
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-skeleton[data-variant="block"]::after,
+  .x-govuk-ui-skeleton[data-variant="circle"]::after,
+  .x-govuk-ui-skeleton-line::after {
+    display: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-skeleton[data-variant="block"],
+  .x-govuk-ui-skeleton[data-variant="circle"],
+  .x-govuk-ui-skeleton-line {
+    forced-color-adjust: none;
+    background: GrayText;
+  }
+  .x-govuk-ui-skeleton[data-variant="block"]::after,
+  .x-govuk-ui-skeleton[data-variant="circle"]::after,
+  .x-govuk-ui-skeleton-line::after {
+    display: none;
+  }
+}

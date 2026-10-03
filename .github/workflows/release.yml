@@ -1,0 +1,96 @@
+name: Release
+
+# A push to main whose version has no GitHub release yet. Once the push's checks pass, each
+# package is staged on npm, for a maintainer to approve with 2FA, and the version gets a GitHub
+# release, with no notes until someone writes them. Any other push stops in seconds. It runs on the
+# push itself, and waits there for Check, because npm's trusted publishing names a push as an event
+# it accepts.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One release at a time, and none cancelled halfway through staging.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      # The GitHub release and its tag.
+      contents: write
+      # Waiting for Check.
+      actions: read
+      # npm's trusted publishing, which signs in without a token.
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Nothing to release while every package is private, or once the version has its GitHub
+      # release, which is made only after every package is staged.
+      - id: version
+        run: |
+          version=$(jq -r .version packages/core/package.json)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          public=$(jq -s 'map(select(.private != true)) | length' packages/*/package.json mcp/package.json)
+          if [ "$public" = 0 ]; then
+            echo "Every package is private, so there is nothing to release."
+          elif gh release view "v$version" > /dev/null 2>&1; then
+            echo "v$version is released already."
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The push's own Check, which may take a few seconds to be listed.
+      - if: steps.version.outputs.release
+        run: |
+          for _ in $(seq 30); do
+            run=$(gh run list --workflow check.yml --commit "$GITHUB_SHA" --json databaseId --jq '.[0].databaseId')
+            [ -n "$run" ] && break
+            sleep 10
+          done
+          if [ -z "$run" ]; then
+            echo "No Check run for $GITHUB_SHA."
+            exit 1
+          fi
+          gh run watch "$run" --exit-status --interval 30 > /dev/null || {
+            echo "Check did not pass for $GITHUB_SHA, so nothing is released."
+            exit 1
+          }
+
+      - if: steps.version.outputs.release
+        uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+        with:
+          install_args: --locked
+      - if: steps.version.outputs.release
+        run: bun install --frozen-lockfile
+      # No registry-url. npm's own registry is the default, and trusted publishing replaces the
+      # token setup-node would write.
+      - if: steps.version.outputs.release
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      # Staging needs npm 11.15 or later, which Node 24 may not have brought.
+      - if: steps.version.outputs.release
+        run: npm install --global npm@^11.15.0
+
+      - if: steps.version.outputs.release
+        run: bun run stage
+
+      # The release marks the version as staged, so a later push stages nothing again.
+      - if: steps.version.outputs.release
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          options=(--target "$GITHUB_SHA" --title "$VERSION" --notes "")
+          if [[ "$VERSION" == *-* ]]; then options+=(--prerelease); fi
+          gh release create "v$VERSION" "${options[@]}"

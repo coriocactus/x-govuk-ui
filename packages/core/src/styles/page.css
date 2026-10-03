@@ -1,0 +1,14 @@
+/* Page. The skip link, header, content and footer in a column. The content takes any space left, so
+   the footer stays at the foot of the screen on a short page. */
+.x-govuk-ui-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-page-body {
+  flex: 1 0 auto;
+}

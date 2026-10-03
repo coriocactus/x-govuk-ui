@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "types": ["bun"],
+    "paths": {
+      "x-govuk-ui": ["./packages/core/src/index.ts"],
+      "x-govuk-ui/internal": ["./packages/core/src/internal.ts"],
+      "@x-govuk-ui/belsize": ["./packages/belsize/src/index.ts"],
+      "@x-govuk-ui/jorjorwel": ["./packages/jorjorwel/src/index.ts"],
+      "@x-govuk-ui/memetics": ["./packages/memetics/src/index.ts"]
+    }
+  },
+  "include": ["packages/*/src", "site", "mcp", "scripts", "tests", "playwright.config.ts"]
+}

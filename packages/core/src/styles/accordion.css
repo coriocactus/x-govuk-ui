@@ -1,0 +1,121 @@
+/* Accordion. */
+.x-govuk-ui-accordion {
+  box-sizing: border-box;
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-accordion {
+  width: 100%;
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-accordion-item {
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+/* The top line belongs to the first section, so Show all sits above it. */
+.x-govuk-ui-accordion > .x-govuk-ui-accordion-item:first-of-type {
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-accordion-heading {
+  margin: 0;
+}
+.x-govuk-ui-accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 19px 0;
+  border: 0;
+  background: transparent;
+  text-align: start;
+  color: var(--x-govuk-ui-link);
+  font: 700 17px / 1.4 var(--x-govuk-ui-font);
+  cursor: pointer;
+}
+.x-govuk-ui-accordion-trigger:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.x-govuk-ui-accordion-trigger:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 3px;
+}
+.x-govuk-ui-accordion-trigger[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.x-govuk-ui-accordion-title {
+  display: grid;
+  gap: 4px;
+}
+/* The summary reads as plain text beneath the link-coloured title. */
+.x-govuk-ui-accordion-summary {
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.x-govuk-ui-accordion-trigger:hover .x-govuk-ui-accordion-summary {
+  text-decoration: none;
+}
+.x-govuk-ui-accordion-trigger svg,
+.x-govuk-ui-accordion-show-all svg {
+  flex-shrink: 0;
+  transition: transform var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-accordion-trigger[data-panel-open] svg,
+.x-govuk-ui-accordion-show-all[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+/* GOV.UK's Show all sections, a link-coloured control above the first section. */
+.x-govuk-ui-accordion-show-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--x-govuk-ui-link);
+  font: 400 16px / 1.4 var(--x-govuk-ui-font);
+  cursor: pointer;
+}
+.x-govuk-ui-accordion-show-all:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.x-govuk-ui-accordion-show-all:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 2px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-accordion-panel {
+  height: var(--accordion-panel-height);
+  overflow: hidden;
+  transition:
+    height var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-accordion-panel[data-starting-style],
+.x-govuk-ui-accordion-panel[data-ending-style] {
+  height: 0;
+  opacity: 0;
+}
+.x-govuk-ui-accordion-content {
+  padding: 0 28px 20px 0;
+  font-size: 16px;
+  line-height: 1.65;
+}
+/* The chevrons have no class of their own, so base.css's reduced-motion rule misses them. */
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-accordion-trigger svg,
+  .x-govuk-ui-accordion-show-all svg {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-accordion-trigger:focus-visible {
+    outline-color: Highlight;
+  }
+}

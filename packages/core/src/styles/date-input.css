@@ -1,0 +1,34 @@
+/* Date input. Day, Month and Year as short fields in a row, each labelled above, with the
+   calendar's button beside them. */
+.x-govuk-ui-date-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 20px;
+}
+.x-govuk-ui-date-input-item {
+  display: grid;
+  gap: 6px;
+}
+.x-govuk-ui-date-input-label {
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 17px;
+  line-height: 1.3;
+}
+.x-govuk-ui-input.x-govuk-ui-date-input-field {
+  max-width: none;
+  font-variant-numeric: tabular-nums;
+}
+/* With its bottom edge, the calendar's button is exactly as tall as the fields beside it, in the
+   same width of border. */
+.x-govuk-ui-button.x-govuk-ui-date-input-picker {
+  width: 46px;
+  height: 44px;
+  min-height: 44px;
+  margin-bottom: 2px;
+  border-width: 1.5px;
+}
+.x-govuk-ui-floating.x-govuk-ui-date-input-popup {
+  padding: 0;
+}

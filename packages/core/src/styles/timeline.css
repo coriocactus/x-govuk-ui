@@ -1,0 +1,130 @@
+/* Timeline. Events down a rail, the latest first. Each event's heading has a knob on the rail, like
+   Slider's thumb, with a line as thick as the rail from its edge to the heading. The latest is in
+   brand blue. The rail is one unbroken rounded bar, as Inset text's is, from the first knob to the
+   last. The list measures where the last event starts. */
+.x-govuk-ui-timeline {
+  --x-govuk-ui-timeline-knob: 16px;
+  /* The middle of the first line of a heading, where its knob sits. */
+  --x-govuk-ui-timeline-middle: 13px;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-timeline::before {
+  content: "";
+  position: absolute;
+  top: var(--x-govuk-ui-timeline-middle);
+  left: calc(var(--x-govuk-ui-timeline-knob) / 2 - 2px);
+  width: 4px;
+  height: var(--x-govuk-ui-timeline-rail, calc(100% - var(--x-govuk-ui-timeline-middle)));
+  border-radius: 2px;
+  background: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-timeline-item {
+  position: relative;
+  overflow: hidden;
+}
+.x-govuk-ui-timeline-event {
+  --x-govuk-ui-timeline-colour: var(--x-govuk-ui-muted);
+  position: relative;
+  padding: 0 0 26px 38px;
+}
+.x-govuk-ui-timeline-item:first-child .x-govuk-ui-timeline-event {
+  --x-govuk-ui-timeline-colour: var(--x-govuk-ui-brand);
+}
+/* The knob on the rail, and the line from its edge to the heading. An event that arrives grows
+   its knob, then draws its line out. */
+.x-govuk-ui-timeline-event::before,
+.x-govuk-ui-timeline-event::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+}
+.x-govuk-ui-timeline-event::before {
+  z-index: 1;
+  top: calc(var(--x-govuk-ui-timeline-middle) - var(--x-govuk-ui-timeline-knob) / 2);
+  left: 0;
+  width: var(--x-govuk-ui-timeline-knob);
+  height: var(--x-govuk-ui-timeline-knob);
+  border: 2px solid var(--x-govuk-ui-timeline-colour);
+  border-radius: 50%;
+  background: var(--x-govuk-ui-paper);
+}
+/* The line runs on from under the knob's ring, as thick as the rail, so the notch and the rail
+   read as one weight. Only its far end is rounded. */
+.x-govuk-ui-timeline-event::after {
+  top: calc(var(--x-govuk-ui-timeline-middle) - 2px);
+  left: calc(var(--x-govuk-ui-timeline-knob) - 2px);
+  width: 16px;
+  height: 4px;
+  border-radius: 0 2px 2px 0;
+  background: var(--x-govuk-ui-timeline-colour);
+  transform-origin: left center;
+}
+.x-govuk-ui-timeline-item[data-entered] .x-govuk-ui-timeline-event::before {
+  animation: x-govuk-ui-timeline-knob var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out)
+    120ms backwards;
+}
+.x-govuk-ui-timeline-item[data-entered] .x-govuk-ui-timeline-event::after {
+  animation: x-govuk-ui-timeline-line var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out)
+    260ms backwards;
+}
+@keyframes x-govuk-ui-timeline-knob {
+  from {
+    scale: 0;
+  }
+}
+@keyframes x-govuk-ui-timeline-line {
+  from {
+    scale: 0 1;
+  }
+}
+.x-govuk-ui-timeline-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.32;
+}
+.x-govuk-ui-timeline-by,
+.x-govuk-ui-timeline-date {
+  margin: 2px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.4;
+}
+.x-govuk-ui-timeline-description {
+  margin-top: 8px;
+  font-size: 17px;
+  line-height: 1.45;
+}
+.x-govuk-ui-timeline-description > p {
+  margin: 0 0 8px;
+}
+.x-govuk-ui-timeline-description > :last-child {
+  margin-bottom: 0;
+}
+.x-govuk-ui-timeline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+  font-size: 16px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-timeline-item[data-entered] .x-govuk-ui-timeline-event::before,
+  .x-govuk-ui-timeline-item[data-entered] .x-govuk-ui-timeline-event::after {
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-timeline::before,
+  .x-govuk-ui-timeline-event::after {
+    background: CanvasText;
+  }
+  .x-govuk-ui-timeline-event::before {
+    border-color: CanvasText;
+  }
+}

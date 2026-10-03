@@ -1,0 +1,166 @@
+/* Select. The field is Input's, with the chosen option and a chevron. The list opens over it with
+   the chosen option in place, and grows from the field. */
+.x-govuk-ui-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: start;
+  cursor: pointer;
+}
+/* The field is a button, so pressing it with a pointer focuses it. GOV.UK's focus shows only for
+   keyboard focus, as on other buttons, so the field looks the same before it opens as after. */
+.x-govuk-ui-select-trigger:focus:not(:focus-visible) {
+  outline: none;
+  border-color: var(--x-govuk-ui-border);
+  box-shadow: none;
+}
+.x-govuk-ui-select-trigger[data-popup-open] {
+  border-color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-select-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.x-govuk-ui-select-value[data-placeholder] {
+  color: var(--x-govuk-ui-placeholder);
+}
+.x-govuk-ui-select-icon {
+  display: flex;
+  flex-shrink: 0;
+}
+.x-govuk-ui-select-trigger[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.x-govuk-ui-select-positioner {
+  z-index: var(--x-govuk-ui-layer-overlay);
+  outline: none;
+}
+/* The list opens over the field at exactly its width. Each option's text starts where the field's
+   text does, 13.5px in from the edge, so the chosen option sits exactly over the field's value. */
+.x-govuk-ui-select-popup {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--x-govuk-ui-select-width, var(--anchor-width));
+  max-height: var(--available-height);
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 6px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 8px 28px rgb(11 12 12 / 16%);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 17px;
+  outline: none;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-select-popup[data-starting-style],
+.x-govuk-ui-select-popup[data-ending-style] {
+  opacity: 0;
+  scale: 0.96;
+}
+.x-govuk-ui-select-popup[data-side="none"] {
+  /* When it opens over the field, the list only fades, so the chosen option stays where it was. */
+  scale: 1;
+}
+.x-govuk-ui-select-list {
+  outline: none;
+}
+/* A long list opens beneath the field, at least as wide as it, at most 320 pixels tall, and
+   scrolls in a Scroll area that fades the edge with more beyond it. */
+.x-govuk-ui-select-popup[data-long] {
+  display: flex;
+  width: max-content;
+  min-width: var(--x-govuk-ui-select-width, var(--anchor-width));
+  max-height: min(320px, var(--available-height));
+  overflow: hidden;
+  padding: 0;
+}
+.x-govuk-ui-select-scroll {
+  flex: 1;
+}
+/* The highlight is placed in the viewport that scrolls, so it scrolls with the options. */
+.x-govuk-ui-select-scroll > .x-govuk-ui-scroll-area-viewport {
+  position: relative;
+}
+.x-govuk-ui-select-scroll > .x-govuk-ui-scroll-area-viewport > .x-govuk-ui-scroll-area-content {
+  padding: 4px;
+}
+/* One highlight slides behind the options, as a Combobox's does, instead of each option fading in
+   and out on its own. */
+.x-govuk-ui-select-highlight {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  right: 4px;
+  height: 0;
+  border-radius: 4px;
+  background: var(--x-govuk-ui-secondary);
+  opacity: 0;
+  pointer-events: none;
+  /* A short glide between options in view. Where the list scrolls, it moves at once, with them. */
+  transition:
+    transform var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
+    height var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-select-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 8.5px;
+  border-radius: 4px;
+  line-height: 1.4;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+.x-govuk-ui-select-item[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.x-govuk-ui-select-item-text {
+  grid-column: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.x-govuk-ui-select-check {
+  grid-column: 2;
+  display: flex;
+  color: var(--x-govuk-ui-text);
+}
+/* Small, for dense layouts. */
+.x-govuk-ui-select-popup[data-size="small"] {
+  font-size: 12px;
+}
+/* The small field's text is 11px in, from its 1px border and 10px padding. */
+.x-govuk-ui-select-popup[data-size="small"] .x-govuk-ui-select-item {
+  grid-template-columns: minmax(0, 1fr) 12px;
+  padding: 6px 8px 6px 6px;
+}
+.x-govuk-ui-select-popup[data-size="small"] .x-govuk-ui-select-check svg {
+  width: 11px;
+  height: 11px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-select-item[data-highlighted] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .x-govuk-ui-select-popup {
+    border-color: CanvasText;
+  }
+}

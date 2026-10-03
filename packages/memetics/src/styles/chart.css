@@ -1,0 +1,416 @@
+/* Chart. Set in a Figure, as every chart is. A short rule in brand blue sits over a headline and a
+   line that says what is measured. Then come a key in squares, only horizontal gridlines, the
+   figures on the right, and the source at the foot, in the colours `palette.css` sets. */
+.x-govuk-ui-chart-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+}
+.x-govuk-ui-chart-key li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.x-govuk-ui-chart-key-mark {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: currentColor;
+}
+/* A line in a mix of lines and bars, or a dashed one for a projection, is keyed as a line. */
+.x-govuk-ui-chart-key-mark[data-mark="line"],
+.x-govuk-ui-chart-key-mark[data-mark="dashed"] {
+  width: 16px;
+  height: 3px;
+  border-radius: 1px;
+}
+.x-govuk-ui-chart-key-mark[data-mark="dashed"] {
+  background: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 8px);
+}
+.x-govuk-ui-chart-key-mark[data-mark="hollow"] {
+  border: 2px solid currentColor;
+  background: transparent;
+}
+.x-govuk-ui-chart-plot {
+  position: relative;
+}
+/* Recharts draws in SVG. These classes give its parts the chart's colours. */
+.x-govuk-ui-chart-grid line {
+  stroke: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-chart-baseline {
+  stroke: var(--x-govuk-ui-text);
+  stroke-width: 1.5;
+}
+.x-govuk-ui-chart-tick {
+  fill: var(--x-govuk-ui-muted);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-chart-cursor {
+  stroke: var(--x-govuk-ui-text);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.x-govuk-ui-chart-band {
+  fill: var(--x-govuk-ui-secondary);
+  opacity: 0.7;
+}
+.x-govuk-ui-chart-dot {
+  stroke: var(--x-govuk-ui-paper);
+}
+/* A figure at a bar's or a dot's end, a point's name, or a series' name at its line's end, each
+   with a halo of the paper's colour where it crosses a line or a dot. */
+.x-govuk-ui-chart-label {
+  fill: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  paint-order: stroke;
+  stroke: var(--x-govuk-ui-paper);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.x-govuk-ui-chart-line-label {
+  font-family: var(--x-govuk-ui-font);
+  font-size: 13px;
+  font-weight: 700;
+}
+/* A pie sector's name beside it, and the line that leads to it. */
+.x-govuk-ui-chart .recharts-pie-label-text {
+  fill: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 13px;
+}
+.x-govuk-ui-chart-label-line {
+  stroke: var(--x-govuk-ui-muted);
+}
+/* The middle of a donut, with the whole and what it is. */
+.x-govuk-ui-chart-centre {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  pointer-events: none;
+  text-align: center;
+}
+.x-govuk-ui-chart-centre-figure {
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-chart-centre-label {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+/* A band about a line, such as a confidence interval, and the band a reference marks. */
+.x-govuk-ui-chart-reference-area {
+  fill: var(--x-govuk-ui-text);
+  fill-opacity: 0.07;
+}
+/* The thin line from each of a waterfall's steps to the next. */
+.x-govuk-ui-chart-connector {
+  stroke: var(--x-govuk-ui-muted);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+/* A box plot's whiskers and box, in the palette's first colour, with the median in ink. */
+.x-govuk-ui-chart-box line {
+  stroke: var(--x-govuk-ui-chart-1);
+  stroke-width: 1.5;
+}
+.x-govuk-ui-chart-box-body {
+  fill: color-mix(in srgb, var(--x-govuk-ui-chart-1) 22%, var(--x-govuk-ui-paper));
+  stroke: var(--x-govuk-ui-chart-1);
+  stroke-width: 1.5;
+}
+.x-govuk-ui-chart-box .x-govuk-ui-chart-box-median line {
+  stroke: var(--x-govuk-ui-text);
+  stroke-width: 2.5;
+}
+/* The empty part of a radial bar's ring. */
+.x-govuk-ui-chart-track {
+  fill: var(--x-govuk-ui-secondary);
+}
+/* A slope's names are ink, and grey where another is picked out. */
+.x-govuk-ui-chart-slope-label[data-quiet] {
+  fill: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-chart-tick-strong {
+  fill: var(--x-govuk-ui-text);
+  font-weight: 700;
+}
+/* A heat map is its table, with each figure's cell shaded by its class, and its ink changed to read
+   on the shade. */
+.x-govuk-ui-chart-heat[data-step="1"] {
+  background: var(--x-govuk-ui-chart-heat-1);
+}
+.x-govuk-ui-chart-heat[data-step="2"] {
+  background: var(--x-govuk-ui-chart-heat-2);
+}
+.x-govuk-ui-chart-heat[data-step="3"] {
+  background: var(--x-govuk-ui-chart-heat-3);
+}
+.x-govuk-ui-chart-heat[data-step="4"] {
+  background: var(--x-govuk-ui-chart-heat-4);
+  color: var(--x-govuk-ui-chart-heat-ink-strong);
+}
+.x-govuk-ui-chart-heat[data-step="5"] {
+  background: var(--x-govuk-ui-chart-heat-5);
+  color: var(--x-govuk-ui-chart-heat-ink-strong);
+}
+.x-govuk-ui-chart-heatmap .x-govuk-ui-chart-heat {
+  border-bottom-color: var(--x-govuk-ui-paper);
+  border-inline-start: 2px solid var(--x-govuk-ui-paper);
+  padding-inline: 10px;
+  font-variant-numeric: tabular-nums;
+}
+/* No figure is hatched, so it is never taken for the palest shade. */
+.x-govuk-ui-chart-heat[data-missing] {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--x-govuk-ui-secondary) 0 2px,
+    var(--x-govuk-ui-muted) 2px 3px
+  );
+}
+.x-govuk-ui-chart-key .x-govuk-ui-chart-heat {
+  width: 18px;
+  height: 11px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--x-govuk-ui-line);
+}
+/* The brush beneath a long chart. It draws the whole chart small, with the part shown clear between
+   two handles and the rest under a pale veil. The handles are two range inputs laid one over the
+   other. The overview is inset by half a handle at each end, so each point of the overview sits
+   where a handle's middle stops for it. Only the handles take the pointer, so either can be reached
+   wherever the other is. */
+.x-govuk-ui-chart-brush {
+  /* At least as wide as a target for a finger or an unsteady hand needs to be. */
+  --x-govuk-ui-chart-brush-handle: 24px;
+  margin-top: 12px;
+}
+.x-govuk-ui-chart-brush-track {
+  position: relative;
+  height: 44px;
+}
+.x-govuk-ui-chart-brush-overview {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--x-govuk-ui-chart-brush-handle) / 2);
+  right: calc(var(--x-govuk-ui-chart-brush-handle) / 2);
+  border-radius: 3px;
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-chart-brush-shade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--x-govuk-ui-paper) 72%, transparent);
+}
+.x-govuk-ui-chart-brush-window {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-block: 2px solid var(--x-govuk-ui-text);
+}
+.x-govuk-ui-chart-brush-handle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: none;
+  appearance: none;
+  pointer-events: none;
+}
+.x-govuk-ui-chart-brush-handle::-webkit-slider-runnable-track {
+  height: 100%;
+  background: none;
+}
+.x-govuk-ui-chart-brush-handle::-moz-range-track {
+  height: 100%;
+  background: none;
+}
+.x-govuk-ui-chart-brush-handle::-webkit-slider-thumb {
+  width: var(--x-govuk-ui-chart-brush-handle);
+  height: 44px;
+  border: 2px solid var(--x-govuk-ui-text);
+  border-radius: 3px;
+  background: var(--x-govuk-ui-paper);
+  cursor: ew-resize;
+  appearance: none;
+  pointer-events: auto;
+}
+.x-govuk-ui-chart-brush-handle::-moz-range-thumb {
+  box-sizing: border-box;
+  width: var(--x-govuk-ui-chart-brush-handle);
+  height: 44px;
+  border: 2px solid var(--x-govuk-ui-text);
+  border-radius: 3px;
+  background: var(--x-govuk-ui-paper);
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+/* A handle with focus takes GOV.UK's yellow, as every control does. */
+.x-govuk-ui-chart-brush-handle:focus-visible {
+  outline: none;
+}
+.x-govuk-ui-chart-brush-handle:focus-visible::-webkit-slider-thumb {
+  border-color: var(--x-govuk-ui-focus-text);
+  background: var(--x-govuk-ui-focus);
+  box-shadow: 0 0 0 3px var(--x-govuk-ui-focus);
+}
+.x-govuk-ui-chart-brush-handle:focus-visible::-moz-range-thumb {
+  border-color: var(--x-govuk-ui-focus-text);
+  background: var(--x-govuk-ui-focus);
+  box-shadow: 0 0 0 3px var(--x-govuk-ui-focus);
+}
+.x-govuk-ui-chart-brush-range {
+  margin: 6px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  text-align: center;
+}
+/* What a scatter's axes measure, with the vertical axis named above the figures, and the horizontal
+   axis beneath. */
+.x-govuk-ui-chart-axis-title {
+  margin: 0 0 4px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 13px;
+  text-align: right;
+}
+.x-govuk-ui-chart-axis-title[data-axis="x"] {
+  margin: 4px 56px 0 0;
+}
+/* A line marking a target, or when something changed. */
+.x-govuk-ui-chart-reference {
+  stroke: var(--x-govuk-ui-text);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+/* The label keeps a halo of the paper's colour, so it reads where it must cross a bar. */
+.x-govuk-ui-chart-reference-label {
+  fill: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 13px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--x-govuk-ui-paper);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.x-govuk-ui-chart .recharts-surface:focus,
+.x-govuk-ui-chart .recharts-wrapper:focus {
+  outline: none;
+}
+.x-govuk-ui-chart .recharts-sector {
+  outline: none;
+}
+/* Small multiples, as panels in a grid, each with only its title, stacking on a phone. */
+.x-govuk-ui-chart-panel {
+  min-width: 0;
+}
+.x-govuk-ui-chart-set-panels {
+  display: grid;
+  grid-template-columns: repeat(var(--x-govuk-ui-chart-set-columns, 3), minmax(0, 1fr));
+  gap: 16px 20px;
+}
+@media (max-width: 40em) {
+  .x-govuk-ui-chart-set-panels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.x-govuk-ui-chart-panel-title {
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* A card the chart sets itself over the point under the pointer, where Recharts does not, such as
+   on a calendar's day or a map's area. It stands above the point, kept within the plot near its
+   ends. It takes the pointer, so a reader can move onto it to read it under a magnifier. It stands
+   only as far above as `--x-govuk-ui-chart-float-gap` sets, so the pointer reaches it before
+   crossing anything else. */
+.x-govuk-ui-chart-float {
+  --x-govuk-ui-chart-float-lift: calc(-100% - var(--x-govuk-ui-chart-float-gap, 8px));
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, var(--x-govuk-ui-chart-float-lift));
+}
+.x-govuk-ui-chart-float[data-edge="start"] {
+  transform: translate(-12px, var(--x-govuk-ui-chart-float-lift));
+}
+.x-govuk-ui-chart-float[data-edge="end"] {
+  transform: translate(calc(-100% + 12px), var(--x-govuk-ui-chart-float-lift));
+}
+/* The card under the pointer, like the library's floating parts. It is as wide as its words, up to
+   a measure. Each row has a name and its figure in columns of their own, with a swatch before them
+   where the figures have colours. */
+.x-govuk-ui-chart-tooltip {
+  width: max-content;
+  min-width: 140px;
+  max-width: 300px;
+  padding: 8px 10px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 8px 24px rgb(11 12 12 / 14%);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 14px;
+  line-height: 1.35;
+}
+.x-govuk-ui-chart-tooltip-label {
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+.x-govuk-ui-chart-tooltip ul {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-chart-tooltip li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: 7px;
+}
+.x-govuk-ui-chart-tooltip ul[data-swatched] li {
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+}
+.x-govuk-ui-chart-tooltip-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  align-self: center;
+}
+.x-govuk-ui-chart-tooltip-name {
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-chart-tooltip-value {
+  padding-left: 9px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+@media (forced-colors: active) {
+  /* A key's mark and a card's swatch keep their colours, as `palette.css` keeps the plot's. They
+     are outlined in the reader's text colour, so the palest shows on any paper. */
+  .x-govuk-ui-chart-key-mark,
+  .x-govuk-ui-chart-tooltip-swatch,
+  .x-govuk-ui-chart-key .x-govuk-ui-chart-heat {
+    forced-color-adjust: none;
+    outline: 1px solid CanvasText;
+  }
+}

@@ -1,0 +1,250 @@
+/* Lightbox. Photos in rows that fill the width. Each photo grows in proportion to its shape, so
+   every photo in a row shares its height. The last row keeps the height rows aim for. */
+.x-govuk-ui-lightbox {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* The photos move as they spread and gather. Firefox would take that for the page moving, and
+     scroll to follow, so the photos are never used as the scroll anchor. */
+  overflow-anchor: none;
+}
+.x-govuk-ui-lightbox::after {
+  content: "";
+  flex-grow: 1000000;
+}
+.x-govuk-ui-lightbox-item {
+  flex: var(--x-govuk-ui-lightbox-ratio) 1
+    calc(var(--x-govuk-ui-lightbox-ratio) * var(--x-govuk-ui-lightbox-row));
+  min-width: 0;
+}
+.x-govuk-ui-lightbox-item {
+  transition:
+    translate 420ms var(--x-govuk-ui-ease-out),
+    scale 420ms var(--x-govuk-ui-ease-out),
+    opacity 300ms ease;
+}
+/* While one photo is open, the others spread outwards from it and fade, so they are gone from
+   behind the blur. They gather again as it closes. */
+.x-govuk-ui-lightbox[data-viewing] .x-govuk-ui-lightbox-item:not(:has([data-away])) {
+  translate: var(--x-govuk-ui-lightbox-dx, 0) var(--x-govuk-ui-lightbox-dy, 0);
+  scale: 0.92;
+  opacity: 0;
+}
+/* The place of the photo showing is unseen. It settles there at once, ready for the photo. */
+.x-govuk-ui-lightbox[data-viewing] .x-govuk-ui-lightbox-item:has([data-away]) {
+  transition: none;
+}
+.x-govuk-ui-lightbox-thumbnail {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--x-govuk-ui-secondary);
+  overflow: hidden;
+  cursor: zoom-in;
+  /* When it is scrolled into sight behind the viewer, it keeps a little space from the edge. */
+  scroll-margin: 16px;
+  /* Only its press eases. It hides and shows again at once, as the photo leaves and lands. */
+  transition: scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-lightbox-thumbnail img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: scale var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-lightbox-thumbnail:hover img {
+  scale: 1.04;
+}
+/* A press dips the photo a little before it moves to the centre. */
+.x-govuk-ui-lightbox-thumbnail:active {
+  scale: 0.96;
+}
+.x-govuk-ui-lightbox-thumbnail:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  box-shadow: 0 0 0 7px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-lightbox-thumbnail[data-away] {
+  opacity: 0;
+}
+
+/* The viewer. The page blurs under a light veil of its own colour, and clears again on closing. */
+.x-govuk-ui-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  background: color-mix(in srgb, var(--x-govuk-ui-paper) 62%, transparent);
+  backdrop-filter: blur(18px) saturate(1.1);
+  transition:
+    opacity 420ms var(--x-govuk-ui-ease-out),
+    backdrop-filter 420ms var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-lightbox-backdrop:is([data-starting-style], [data-closing], [data-ending-style]) {
+  opacity: 0;
+  backdrop-filter: blur(0) saturate(1);
+}
+.x-govuk-ui-lightbox-backdrop:is([data-closing], [data-ending-style]) {
+  transition-duration: 340ms;
+}
+.x-govuk-ui-lightbox-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  outline: none;
+  touch-action: pan-y;
+  cursor: zoom-out;
+  /* A photo sliding away leaves the screen without widening the page. */
+  overflow: clip;
+}
+/* The buttons and words fade in after the photo, and out before it goes back. */
+.x-govuk-ui-lightbox-bar,
+.x-govuk-ui-lightbox-stage > .x-govuk-ui-lightbox-button,
+.x-govuk-ui-lightbox-caption {
+  transition: opacity var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-lightbox-viewer:is([data-starting-style], [data-closing])
+  :is(
+    .x-govuk-ui-lightbox-bar,
+    .x-govuk-ui-lightbox-stage > .x-govuk-ui-lightbox-button,
+    .x-govuk-ui-lightbox-caption
+  ) {
+  opacity: 0;
+}
+.x-govuk-ui-lightbox-viewer[data-ending-style] {
+  opacity: 0;
+  transition: opacity 80ms ease;
+}
+.x-govuk-ui-lightbox-viewer[data-ending-style] .x-govuk-ui-lightbox-photo {
+  visibility: hidden;
+}
+.x-govuk-ui-lightbox-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+.x-govuk-ui-lightbox-count {
+  margin: 0;
+  padding-left: 8px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-lightbox-stage {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 24px;
+  min-height: 0;
+}
+.x-govuk-ui-lightbox-figure {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+}
+/* The photo shows large, with space around it, lifted over the veil by a soft shadow. */
+.x-govuk-ui-lightbox-photo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(100%, 960px);
+  max-height: min(calc(100vh - 200px), 640px);
+  border-radius: 8px;
+  box-shadow: 0 24px 60px rgb(11 12 12 / 22%);
+  cursor: default;
+  user-select: none;
+  transform-origin: center;
+}
+/* The photo showing and the one sliding in share one place. */
+.x-govuk-ui-lightbox-frame {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+.x-govuk-ui-lightbox-frame > .x-govuk-ui-lightbox-photo {
+  grid-area: 1 / 1;
+}
+.x-govuk-ui-lightbox-credit {
+  display: block;
+  margin-top: 2px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.x-govuk-ui-lightbox-caption {
+  max-width: 60ch;
+  font-size: 16px;
+  line-height: 1.45;
+  text-align: center;
+  cursor: default;
+}
+.x-govuk-ui-lightbox-button {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 50%;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 4px 14px rgb(11 12 12 / 12%);
+  color: var(--x-govuk-ui-text);
+  cursor: pointer;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-lightbox-button:hover {
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-lightbox-button:active {
+  scale: 0.92;
+}
+.x-govuk-ui-lightbox-button:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+}
+@media (max-width: 640px) {
+  .x-govuk-ui-lightbox-stage {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 8px 16px;
+  }
+  .x-govuk-ui-lightbox-stage > .x-govuk-ui-lightbox-button {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-lightbox-item {
+    transition: opacity var(--x-govuk-ui-duration-medium) ease;
+  }
+  .x-govuk-ui-lightbox[data-viewing] .x-govuk-ui-lightbox-item:not(:has([data-away])) {
+    translate: none;
+    scale: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-lightbox-backdrop {
+    background: Canvas;
+  }
+  .x-govuk-ui-lightbox-button {
+    border: 1px solid ButtonText;
+  }
+}

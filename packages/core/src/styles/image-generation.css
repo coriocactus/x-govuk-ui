@@ -1,0 +1,132 @@
+/* Image generation. A rounded frame at the image's proportions, filled with a mosaic of small
+   cells while the image is made, out of which the image forms. */
+.x-govuk-ui-image-generation {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--x-govuk-ui-surface);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-image-generation-canvas,
+.x-govuk-ui-image-generation-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.x-govuk-ui-image-generation-image {
+  object-fit: cover;
+}
+/* Once the image is whole, the mosaic rests out of sight. */
+.x-govuk-ui-image-generation[data-phase="made"] .x-govuk-ui-image-generation-canvas {
+  visibility: hidden;
+}
+/* The mosaic's tones, from the surface behind the cells, through the ridges, to the brightest
+   ridge, and last a glint for cells that pop. The mosaic reads them, and learns of a theme change
+   as their colour transition ends. */
+.x-govuk-ui-image-generation-tones {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+.x-govuk-ui-image-generation-tones > span {
+  transition: color 1ms;
+}
+.x-govuk-ui-image-generation-tones > :nth-child(1) {
+  color: var(--x-govuk-ui-surface);
+}
+.x-govuk-ui-image-generation-tones > :nth-child(2) {
+  color: color-mix(in srgb, var(--x-govuk-ui-brand) 22%, var(--x-govuk-ui-surface));
+}
+.x-govuk-ui-image-generation-tones > :nth-child(3) {
+  color: color-mix(in srgb, var(--x-govuk-ui-brand) 55%, var(--x-govuk-ui-surface));
+}
+.x-govuk-ui-image-generation-tones > :nth-child(4) {
+  color: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-image-generation-tones > :nth-child(5) {
+  color: var(--x-govuk-ui-paper);
+}
+/* Without the theme's colours, the mosaic would be noise, so only the status shows. */
+@media (forced-colors: active) {
+  .x-govuk-ui-image-generation-canvas {
+    display: none;
+  }
+}
+/* An image that has just formed comes into focus as the last cells clear. */
+.x-govuk-ui-image-generation[data-phase="forming"] .x-govuk-ui-image-generation-image {
+  animation: x-govuk-ui-image-sharpen 900ms var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-image-sharpen {
+  from {
+    filter: blur(6px) saturate(0.7);
+  }
+}
+/* The label, and any progress, sit over the foot of the frame on a band of paper. The band goes as
+   the image forms. */
+.x-govuk-ui-image-generation-status {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--x-govuk-ui-paper) 86%, transparent);
+  backdrop-filter: blur(10px);
+  color: var(--x-govuk-ui-text);
+  font-size: 15px;
+  transition:
+    opacity var(--x-govuk-ui-duration-slow) ease,
+    translate var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-image-generation[data-phase="forming"] .x-govuk-ui-image-generation-status {
+  opacity: 0;
+  translate: 0 6px;
+}
+.x-govuk-ui-image-generation-meter {
+  grid-column: 1 / -1;
+  order: 2;
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--x-govuk-ui-secondary);
+  overflow: hidden;
+  /* The bar keeps its fill's movement to itself. */
+  contain: layout paint;
+}
+/* A service that reports only when it is done has no bar to see, only the label. Screen readers
+   still hear a progress bar, with no share done. */
+.x-govuk-ui-image-generation-meter[data-indeterminate] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+}
+.x-govuk-ui-image-generation-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--x-govuk-ui-brand);
+  transition: width var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-image-generation-share {
+  color: var(--x-govuk-ui-muted);
+  font-variant-numeric: tabular-nums;
+}
+/* With reduced motion, the mosaic stays still, and fades away as the image arrives. */
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-image-generation[data-phase="forming"] .x-govuk-ui-image-generation-image {
+    animation: none;
+  }
+  .x-govuk-ui-image-generation[data-phase="forming"] .x-govuk-ui-image-generation-canvas {
+    opacity: 0;
+    transition: opacity var(--x-govuk-ui-duration-slow) ease;
+  }
+}

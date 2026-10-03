@@ -1,0 +1,77 @@
+/* Dialog. A box centred over a dimmed page. It grows into place from a little below and shrinks
+   away. Long content scrolls in the window, with the dialog. */
+.x-govuk-ui-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  background: rgb(11 12 12 / 44%);
+  transition: opacity var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-dialog-backdrop:is([data-starting-style], [data-ending-style]) {
+  opacity: 0;
+}
+.x-govuk-ui-dialog-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* Its width is --x-govuk-ui-dialog-width, such as wider for a guide or a form of several columns. */
+.x-govuk-ui-dialog {
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, var(--x-govuk-ui-dialog-width, 560px));
+  padding: 28px 30px 30px;
+  border-radius: 8px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 24px 64px rgb(11 12 12 / 28%);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  outline: none;
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    translate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-dialog[data-starting-style] {
+  opacity: 0;
+  scale: 0.96;
+  translate: 0 8px;
+}
+.x-govuk-ui-dialog[data-ending-style] {
+  opacity: 0;
+  scale: 0.98;
+  transition-duration: var(--x-govuk-ui-duration-fast);
+}
+.x-govuk-ui-dialog-title {
+  margin: 0 40px 12px 0;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.x-govuk-ui-dialog-description {
+  margin: 0 0 24px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.x-govuk-ui-dialog .x-govuk-ui-button-group {
+  margin-top: 24px;
+}
+.x-govuk-ui-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+@media (max-width: 40em) {
+  .x-govuk-ui-dialog {
+    padding: 22px 20px 24px;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-dialog {
+    border: 1px solid CanvasText;
+  }
+}

@@ -1,0 +1,71 @@
+/* Header. GOV.UK's bar of brand blue, with the white logo linking to the homepage. */
+.x-govuk-ui-header {
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-white);
+  font-family: var(--x-govuk-ui-font);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-header:not([data-generic]) {
+    background: var(--x-govuk-ui-blue-shade-50);
+  }
+}
+/* GOV.UK's generic header, for a government service that is not part of GOV.UK. It shows the
+   service's own logo in white on black, at GOV.UK's 30px, in either theme. */
+.x-govuk-ui-header[data-generic] {
+  background: var(--x-govuk-ui-black);
+}
+.x-govuk-ui-header[data-generic] .x-govuk-ui-header-container {
+  padding-block: 15px;
+}
+.x-govuk-ui-header[data-generic] .x-govuk-ui-header-link {
+  align-items: center;
+  font-size: 30px;
+  line-height: 1;
+}
+.x-govuk-ui-header-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 24px;
+  padding-block: 16px;
+}
+.x-govuk-ui-header-link {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+.x-govuk-ui-header-link:hover {
+  border-bottom-color: currentColor;
+}
+.x-govuk-ui-header-link:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-header-logo {
+  display: block;
+  height: 30px;
+  width: auto;
+}
+.x-govuk-ui-header-logo .x-govuk-ui-logo-dot {
+  fill: var(--x-govuk-ui-logo-dot);
+}
+.x-govuk-ui-header-product {
+  font-size: 24px;
+  line-height: 1;
+  translate: 0 -1px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-header {
+    border-bottom: 1px solid CanvasText;
+  }
+  .x-govuk-ui-header-logo .x-govuk-ui-logo-dot {
+    fill: currentColor;
+  }
+}

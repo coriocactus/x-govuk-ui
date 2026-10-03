@@ -1,0 +1,87 @@
+/* Breadcrumbs. A trail of muted links that darken under the pointer, with the current page in the
+   text colour, and a chevron or a slash between the steps. */
+.x-govuk-ui-breadcrumbs {
+  --x-govuk-ui-breadcrumbs-step: var(--x-govuk-ui-muted);
+  --x-govuk-ui-breadcrumbs-page: var(--x-govuk-ui-text);
+  margin: 15px 0;
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  line-height: 1.25;
+}
+.x-govuk-ui-breadcrumbs[data-inverse] {
+  --x-govuk-ui-breadcrumbs-step: color-mix(in srgb, var(--x-govuk-ui-white) 75%, transparent);
+  --x-govuk-ui-breadcrumbs-page: var(--x-govuk-ui-white);
+}
+.x-govuk-ui-breadcrumbs-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-breadcrumbs-item {
+  display: inline-flex;
+  align-items: center;
+  color: var(--x-govuk-ui-breadcrumbs-step);
+}
+.x-govuk-ui-breadcrumbs-item + .x-govuk-ui-breadcrumbs-item::before {
+  flex: none;
+  color: var(--x-govuk-ui-breadcrumbs-step);
+}
+.x-govuk-ui-breadcrumbs[data-separator="chevron"]
+  .x-govuk-ui-breadcrumbs-item
+  + .x-govuk-ui-breadcrumbs-item::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin: 0 11px 0 7px;
+  border: solid currentColor;
+  border-width: 1.5px 1.5px 0 0;
+  rotate: 45deg;
+}
+.x-govuk-ui-breadcrumbs[data-separator="slash"]
+  .x-govuk-ui-breadcrumbs-item
+  + .x-govuk-ui-breadcrumbs-item::before {
+  content: "/";
+  margin: 0 8px;
+}
+.x-govuk-ui-breadcrumbs-link {
+  border-radius: 2px;
+  color: var(--x-govuk-ui-breadcrumbs-step);
+  text-decoration: none;
+  transition: color var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-breadcrumbs-link:hover {
+  color: var(--x-govuk-ui-breadcrumbs-page);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-breadcrumbs-page {
+  color: var(--x-govuk-ui-breadcrumbs-page);
+}
+.x-govuk-ui-breadcrumbs-link:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}
+/* The ellipsis is a small quiet button, the height of the text. */
+.x-govuk-ui-button.x-govuk-ui-breadcrumbs-ellipsis {
+  width: 26px;
+  height: 22px;
+  min-height: 0;
+  color: inherit;
+}
+/* On small screens, a long trail can show only its first and last steps. */
+@media (max-width: 40em) {
+  .x-govuk-ui-breadcrumbs[data-collapse-on-mobile]
+    .x-govuk-ui-breadcrumbs-item:not(:first-child, :last-child) {
+    display: none;
+  }
+}

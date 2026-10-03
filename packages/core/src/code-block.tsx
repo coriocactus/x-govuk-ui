@@ -1,0 +1,201 @@
+"use client";
+
+import {
+  type ComponentPropsWithRef,
+  type CSSProperties,
+  createContext,
+  type ReactNode,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
+import { codeTokens } from "./code-tokens";
+import { CopyButton, type CopyLabels } from "./copy";
+import { ScrollArea } from "./scroll-area";
+
+export type CodeBlockProps = ComponentPropsWithRef<"figure"> & {
+  /**
+   * Lets people change the code. They type in a text box laid over the coloured code, which is
+   * coloured again as they type. The caret, selection, undo and screen reader support are then the
+   * browser's own. Tab leaves the box, as it leaves any text box.
+   */
+  editable?: boolean;
+  /** Called with the code as it is typed, in an editable block. */
+  onCodeChange?: (code: string) => void;
+  /**
+   * Attributes for the editable block's text box, such as a `name` to send it with a form, an
+   * `id`, `aria-describedby` or a `ref`. The filename or `label` names it, unless it has a name of
+   * its own.
+   */
+  inputProps?: ComponentPropsWithRef<"textarea">;
+  /**
+   * The language to colour, by name, alias or file extension, such as "tsx", "python", "rb" or
+   * "html". Code in a language the block does not know is shown plain.
+   */
+  language?: string;
+  /** Shows a header naming the file, with the actions beside the name. */
+  filename?: string;
+  /** Names the code for screen readers when there is no filename. */
+  label?: string;
+  lineNumbers?: boolean;
+  /** Actions for the code, such as `CodeBlockCopy`. */
+  children?: ReactNode;
+} & (
+    | {
+        /**
+         * The code. In an editable block, it changes only when its owner changes it, in response to
+         * `onCodeChange`.
+         */
+        code: string;
+        defaultCode?: never;
+      }
+    | {
+        code?: never;
+        /** The code an editable block starts with, which then changes as it is typed. */
+        defaultCode: string;
+      }
+  );
+
+const CodeContext = createContext<string | null>(null);
+
+/**
+ * Splits highlighted code into lines of text and coloured spans. File diff colours code with it
+ * too. A final line break ends the last line, unless `open` keeps the empty line after it, where
+ * the caret can stand, as a text box does.
+ */
+export function highlight(code: string, language: string, open = false) {
+  const lines: ReactNode[][] = [[]];
+  for (const [kind, value] of codeTokens(code, language)) {
+    // Comments and template strings can span lines, so tokens are split at each line break.
+    value.split("\n").forEach((part, index) => {
+      if (index) lines.push([]);
+      const line = lines.at(-1)!;
+      if (!part) return;
+      line.push(
+        kind === null ? (
+          part
+        ) : (
+          <span key={line.length} className={`x-govuk-ui-code-${kind}`}>
+            {part}
+          </span>
+        ),
+      );
+    });
+  }
+  if (!open && lines.length > 1 && !lines.at(-1)!.length) lines.pop();
+  return lines;
+}
+
+/**
+ * Code coloured by its syntax, with line numbers, in a region that scrolls both ways. Actions
+ * such as `CodeBlockCopy` sit in the header beside the filename, or float over the top corner
+ * when there is no filename. The block needs a height or a maximum height from its container to
+ * scroll. An editable block is a code editor, which colours the code as it is typed.
+ */
+export function CodeBlock({
+  code: given,
+  defaultCode,
+  editable = false,
+  onCodeChange,
+  inputProps,
+  language = "tsx",
+  filename,
+  label,
+  lineNumbers = true,
+  children,
+  className = "",
+  ...props
+}: CodeBlockProps) {
+  const [own, setOwn] = useState(defaultCode ?? "");
+  const code = given ?? own;
+  const lines = useMemo(() => highlight(code, language, editable), [code, language, editable]);
+  const name = filename ?? label;
+  return (
+    <CodeContext value={code}>
+      <figure
+        {...props}
+        className={`x-govuk-ui-code-block ${className}`.trim()}
+        data-line-numbers={lineNumbers || undefined}
+        data-editable={editable || undefined}
+      >
+        {filename ? (
+          <figcaption className="x-govuk-ui-code-block-header">
+            <span className="x-govuk-ui-code-block-filename">{filename}</span>
+            {children && <div className="x-govuk-ui-code-block-actions">{children}</div>}
+          </figcaption>
+        ) : (
+          children && (
+            <div className="x-govuk-ui-code-block-actions" data-floating="">
+              {children}
+            </div>
+          )
+        )}
+        {/* The text box of an editable block is the Tab stop, named as the region would be. */}
+        <ScrollArea orientation="both" label={editable ? undefined : name} fade>
+          <div
+            className="x-govuk-ui-code-block-text"
+            style={{ "--x-govuk-ui-code-digits": String(lines.length).length } as CSSProperties}
+          >
+            {/* An editable block's text box says what the code says, so the colours are hidden
+                from screen readers. */}
+            <pre className="x-govuk-ui-code-block-code" aria-hidden={editable || undefined}>
+              <code>
+                {lines.map((line, index) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: Code lines have positional identities and no component state.
+                  <span className="x-govuk-ui-code-line" key={index}>
+                    {lineNumbers && (
+                      <span className="x-govuk-ui-code-line-number" aria-hidden="true">
+                        {index + 1}
+                      </span>
+                    )}
+                    {line.length ? line : " "}
+                  </span>
+                ))}
+              </code>
+            </pre>
+            {editable && (
+              <textarea
+                aria-label={inputProps?.["aria-labelledby"] ? undefined : name}
+                spellCheck={false}
+                autoCapitalize="off"
+                autoComplete="off"
+                autoCorrect="off"
+                wrap="off"
+                {...inputProps}
+                className={`x-govuk-ui-code-block-input ${inputProps?.className ?? ""}`.trim()}
+                value={code}
+                onChange={(event) => {
+                  inputProps?.onChange?.(event);
+                  if (given === undefined) setOwn(event.target.value);
+                  onCodeChange?.(event.target.value);
+                }}
+                // Safari scrolls the box itself to show the caret as a line grows past it, before
+                // the code beneath grows. The region takes the scroll instead, and the box goes
+                // back over its code, which has grown by then.
+                onScroll={(event) => {
+                  inputProps?.onScroll?.(event);
+                  const box = event.currentTarget;
+                  if (!box.scrollLeft && !box.scrollTop) return;
+                  box
+                    .closest(".x-govuk-ui-scroll-area-viewport")
+                    ?.scrollBy(box.scrollLeft, box.scrollTop);
+                  box.scrollLeft = 0;
+                  box.scrollTop = 0;
+                }}
+              />
+            )}
+          </div>
+        </ScrollArea>
+      </figure>
+    </CodeContext>
+  );
+}
+
+export type CodeBlockCopyProps = CopyLabels;
+
+/** Copies the block's code. The icon turns to a tick for a moment once it is copied. */
+export function CodeBlockCopy(labels: CodeBlockCopyProps) {
+  const code = useContext(CodeContext);
+  if (code === null) throw new Error("CodeBlockCopy must be used inside a CodeBlock.");
+  return <CopyButton {...labels} text={() => code} />;
+}

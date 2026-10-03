@@ -1,0 +1,126 @@
+/* GOV.UK's table, with bold headings, keylines between rows and no fills. A row is shaded under the
+   pointer, so the eye can follow it across. */
+.x-govuk-ui-table-scroll {
+  margin-bottom: 30px;
+}
+.x-govuk-ui-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-table-caption {
+  margin-bottom: 15px;
+  text-align: left;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.x-govuk-ui-table-caption--small {
+  font-size: 19px;
+}
+.x-govuk-ui-table-caption--medium {
+  font-size: 24px;
+}
+.x-govuk-ui-table-caption--large {
+  font-size: 36px;
+  line-height: 1.1;
+}
+.x-govuk-ui-table-caption--extra-large {
+  font-size: 48px;
+  line-height: 1.05;
+}
+.x-govuk-ui-table-head,
+.x-govuk-ui-table-cell {
+  padding: 10px 20px 10px 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  text-align: left;
+  vertical-align: top;
+}
+.x-govuk-ui-table-head:last-child,
+.x-govuk-ui-table-cell:last-child {
+  padding-right: 0;
+}
+.x-govuk-ui-table-head {
+  font-weight: 700;
+}
+:is(.x-govuk-ui-table-head, .x-govuk-ui-table-cell)[data-numeric] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+tbody > .x-govuk-ui-table-row {
+  transition: background-color var(--x-govuk-ui-duration-fast) ease;
+}
+tbody > .x-govuk-ui-table-row:hover {
+  background: color-mix(in srgb, var(--x-govuk-ui-secondary) 60%, transparent);
+}
+
+/* A sortable heading is a button the width of its text. The arrow for the current order darkens
+   and the other fades. */
+.x-govuk-ui-table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--x-govuk-ui-link);
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+.x-govuk-ui-table-head[data-numeric] .x-govuk-ui-table-sort {
+  flex-direction: row-reverse;
+}
+.x-govuk-ui-table-sort:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-table-sort:focus-visible {
+  outline: 3px solid transparent;
+  color: var(--x-govuk-ui-focus-text);
+  background: var(--x-govuk-ui-focus);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}
+.x-govuk-ui-table-sort svg {
+  flex-shrink: 0;
+  fill: currentColor;
+}
+.x-govuk-ui-table-sort path {
+  opacity: 0.35;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    translate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+[aria-sort="ascending"] .x-govuk-ui-table-sort-up,
+[aria-sort="descending"] .x-govuk-ui-table-sort-down {
+  opacity: 1;
+}
+[aria-sort="ascending"] .x-govuk-ui-table-sort-down,
+[aria-sort="descending"] .x-govuk-ui-table-sort-up {
+  opacity: 0;
+}
+/* The arrow left showing moves to the middle, so one arrow points the way the column runs. */
+[aria-sort="ascending"] .x-govuk-ui-table-sort-up {
+  translate: 0 2.5px;
+}
+[aria-sort="descending"] .x-govuk-ui-table-sort-down {
+  translate: 0 -2.5px;
+}
+
+@media (max-width: 40em) {
+  .x-govuk-ui-table {
+    font-size: 16px;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-table-sort:focus-visible {
+    outline-color: Highlight;
+  }
+}

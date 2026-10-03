@@ -1,0 +1,54 @@
+/* Choropleth map. Each area is shaded as a heat map's cells are, separated from its neighbours by a
+   line of the paper's colour. An area with no figure is left in the page's secondary colour. The
+   area under the pointer is outlined in ink. */
+.x-govuk-ui-choropleth-map-plot {
+  position: relative;
+}
+.x-govuk-ui-choropleth-map-drawing {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.x-govuk-ui-choropleth-map-area {
+  stroke: var(--x-govuk-ui-paper);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.x-govuk-ui-choropleth-map-area[data-step="1"] {
+  fill: var(--x-govuk-ui-chart-heat-1);
+}
+.x-govuk-ui-choropleth-map-area[data-step="2"] {
+  fill: var(--x-govuk-ui-chart-heat-2);
+}
+.x-govuk-ui-choropleth-map-area[data-step="3"] {
+  fill: var(--x-govuk-ui-chart-heat-3);
+}
+.x-govuk-ui-choropleth-map-area[data-step="4"] {
+  fill: var(--x-govuk-ui-chart-heat-4);
+}
+.x-govuk-ui-choropleth-map-area[data-step="5"] {
+  fill: var(--x-govuk-ui-chart-heat-5);
+}
+/* The hatching of an area with no figure, in the page's secondary colour, with grey stripes. */
+.x-govuk-ui-choropleth-map-hatch {
+  fill: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-choropleth-map-stripe {
+  stroke: var(--x-govuk-ui-muted);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+.x-govuk-ui-choropleth-map-outline {
+  fill: none;
+  stroke: var(--x-govuk-ui-text);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-choropleth-map-area {
+    stroke: CanvasText;
+  }
+}

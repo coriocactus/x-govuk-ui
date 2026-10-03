@@ -1,0 +1,12 @@
+/* Time input. Date input's row of fields, which are Dials. On a 12-hour clock, am or pm is a Toggle
+   group as tall as the fields beside it. */
+.x-govuk-ui-time-input-period .x-govuk-ui-toggle-group {
+  box-sizing: border-box;
+  height: 46px;
+}
+.x-govuk-ui-time-input-period .x-govuk-ui-toggle {
+  height: 38px;
+}
+.x-govuk-ui-time-input-period .x-govuk-ui-toggle-group[data-invalid] {
+  border-color: var(--x-govuk-ui-error);
+}

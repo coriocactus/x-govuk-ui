@@ -1,0 +1,866 @@
+/* Sidebar. It sits on GOV.UK's tinted surface, with a link-blue wash under the pointer. */
+/* Set again on each themed part, because a value made from the theme's colours is computed where it
+   is set. */
+:root,
+[data-theme] {
+  --x-govuk-ui-sidebar-fill: var(--x-govuk-ui-surface);
+  --x-govuk-ui-sidebar-hover: color-mix(in srgb, var(--x-govuk-ui-link) 10%, transparent);
+}
+.x-govuk-ui-sidebar {
+  --x-govuk-ui-sidebar-icon-width: 56px;
+  /* What the panel's edges take from the sidebar's width. It is the keyline, or the inset of a
+     floating panel and its keylines. Words can then be set at the width the open panel gives
+     them. */
+  --x-govuk-ui-sidebar-edges: 1px;
+  position: relative;
+  flex-shrink: 0;
+  width: var(--x-govuk-ui-sidebar-width);
+  height: 100%;
+  min-height: 0;
+}
+.x-govuk-ui-sidebar[data-collapsible="icon"][data-state="collapsed"] {
+  width: var(--x-govuk-ui-sidebar-icon-width);
+}
+.x-govuk-ui-sidebar[data-collapsible="offcanvas"][data-state="collapsed"] {
+  width: 0;
+}
+/* When collapsed off the screen, the sidebar keeps a narrow gutter for the trigger that brings it
+   back. */
+.x-govuk-ui-sidebar[data-collapsible="offcanvas"][data-state="collapsed"][data-gutter] {
+  width: 56px;
+}
+.x-govuk-ui-sidebar-gutter {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  left: 12px;
+  opacity: 0;
+  visibility: hidden;
+  translate: -6px 0;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    translate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-drawer),
+    visibility 0s var(--x-govuk-ui-duration-medium);
+}
+.x-govuk-ui-sidebar[data-side="right"] > .x-govuk-ui-sidebar-gutter {
+  right: 12px;
+  left: auto;
+  translate: 6px 0;
+}
+/* It appears once the panel has slid most of the way out. */
+.x-govuk-ui-sidebar[data-state="collapsed"] > .x-govuk-ui-sidebar-gutter {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) ease var(--x-govuk-ui-duration-fast),
+    translate var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer)
+    var(--x-govuk-ui-duration-fast),
+    visibility 0s;
+}
+.x-govuk-ui-sidebar[data-variant="floating"][data-collapsible="icon"][data-state="collapsed"] {
+  width: calc(var(--x-govuk-ui-sidebar-icon-width) + 16px);
+}
+.x-govuk-ui-sidebar[data-animate~="collapse"]:not([data-resizing]) {
+  transition: width var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+
+/* The panel contains the content. A sidebar that collapses off the screen slides its panel away. */
+.x-govuk-ui-sidebar-panel {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--x-govuk-ui-sidebar-fill);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+/* The side is physical, the left or right of the screen, so these rules use physical properties. */
+.x-govuk-ui-sidebar > .x-govuk-ui-sidebar-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-right: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-sidebar[data-side="right"] > .x-govuk-ui-sidebar-panel {
+  right: 0;
+  left: auto;
+  border-right: 0;
+  border-left: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-sidebar[data-collapsible="offcanvas"] > .x-govuk-ui-sidebar-panel {
+  width: var(--x-govuk-ui-sidebar-width);
+}
+.x-govuk-ui-sidebar[data-collapsible="offcanvas"][data-state="collapsed"]
+  > .x-govuk-ui-sidebar-panel {
+  translate: -100% 0;
+}
+.x-govuk-ui-sidebar[data-side="right"][data-collapsible="offcanvas"][data-state="collapsed"]
+  > .x-govuk-ui-sidebar-panel {
+  translate: 100% 0;
+}
+.x-govuk-ui-sidebar[data-animate~="collapse"] > .x-govuk-ui-sidebar-panel {
+  transition: translate var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+.x-govuk-ui-sidebar[data-variant="floating"] > .x-govuk-ui-sidebar-panel {
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+  width: auto;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgb(11 12 12 / 8%);
+}
+.x-govuk-ui-sidebar[data-variant="floating"][data-collapsible="offcanvas"]
+  > .x-govuk-ui-sidebar-panel {
+  right: auto;
+  width: calc(var(--x-govuk-ui-sidebar-width) - 16px);
+}
+.x-govuk-ui-sidebar[data-variant="floating"][data-side="right"][data-collapsible="offcanvas"]
+  > .x-govuk-ui-sidebar-panel {
+  right: 8px;
+  left: auto;
+}
+.x-govuk-ui-sidebar[data-variant="inset"] > .x-govuk-ui-sidebar-panel {
+  border: 0;
+  background: transparent;
+}
+
+.x-govuk-ui-sidebar[data-variant="floating"] {
+  --x-govuk-ui-sidebar-edges: 18px;
+}
+.x-govuk-ui-sidebar[data-variant="inset"] {
+  --x-govuk-ui-sidebar-edges: 0px;
+}
+.x-govuk-ui-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: var(--x-govuk-ui-bar-height, 56px);
+  padding: 10px 12px;
+  white-space: nowrap;
+}
+/* The rows scroll in a Scroll area, which fades the edge with more rows beyond it. The hover
+   highlight is placed in its viewport, which keeps the highlight behind every row and label. */
+.x-govuk-ui-sidebar-content {
+  flex: 1;
+  min-height: 0;
+}
+.x-govuk-ui-sidebar-content > .x-govuk-ui-scroll-area-viewport {
+  position: relative;
+  isolation: isolate;
+}
+.x-govuk-ui-sidebar-content > .x-govuk-ui-scroll-area-viewport > .x-govuk-ui-scroll-area-content {
+  position: relative;
+  padding: 4px 8px 12px;
+}
+/* The highlight's layer covers the rows and clips the highlight to them. */
+.x-govuk-ui-sidebar-highlight-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: clip;
+  pointer-events: none;
+}
+/* The footer's words wrap, but its rows keep to one line. A sidebar that narrows to its icons
+   keeps them on one line too, or they would reflow at every step as it narrowed and widened. */
+.x-govuk-ui-sidebar-footer {
+  flex-shrink: 0;
+  padding: 8px;
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-sidebar[data-collapsible="icon"] .x-govuk-ui-sidebar-footer {
+  white-space: nowrap;
+}
+/* The sidebar's search field, an Input sized to match the rows beneath it. */
+.x-govuk-ui-sidebar-input {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  height: 48px;
+  padding: 2px 8px 10px;
+}
+.x-govuk-ui-sidebar-content .x-govuk-ui-sidebar-input {
+  padding-inline: 0;
+}
+.x-govuk-ui-sidebar-input .x-govuk-ui-input-group {
+  height: 36px;
+  padding-inline: 10px;
+  gap: 7px;
+  border-width: 1px;
+  border-color: var(--x-govuk-ui-line);
+  border-radius: 6px;
+  background: var(--x-govuk-ui-paper);
+  font-size: 14px;
+}
+.x-govuk-ui-sidebar-input .x-govuk-ui-input::-webkit-search-cancel-button {
+  appearance: none;
+}
+/* Small screens zoom into fields with text under 16 pixels. */
+.x-govuk-ui-sidebar-sheet .x-govuk-ui-sidebar-input {
+  height: 52px;
+}
+.x-govuk-ui-sidebar-sheet .x-govuk-ui-sidebar-input .x-govuk-ui-input-group {
+  height: 40px;
+  font-size: 16px;
+}
+.x-govuk-ui-sidebar-separator {
+  margin: 10px 8px;
+  border: 0;
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+
+/* Groups. A label shrinks away when the sidebar collapses to icons. */
+.x-govuk-ui-sidebar-group + .x-govuk-ui-sidebar-group {
+  margin-top: 12px;
+}
+/* A separator keeps the same space above and below it, so a group between two sits in the middle.
+   The group after it needs no space of its own. */
+.x-govuk-ui-sidebar-separator + .x-govuk-ui-sidebar-group {
+  margin-top: 0;
+}
+.x-govuk-ui-sidebar-group-label {
+  box-sizing: border-box;
+  height: 30px;
+  padding: 8px 11px 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 700;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-sidebar-menu {
+  display: grid;
+  /* Rows never grow wider than the sidebar, so a collapsed row ends at its icon. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-sidebar-menu-item {
+  position: relative;
+  margin: 0;
+}
+/* A row with an action keeps space for it at its end, so the label never runs beneath it. A badge
+   rests in that space, at the row's edge, as on a row without an action. It moves aside for the
+   action while the action shows. It moves by the space less the row's own padding, as a transform,
+   so the row is not laid out again. */
+.x-govuk-ui-sidebar-menu-item[data-has-action] > .x-govuk-ui-sidebar-item {
+  padding-inline-end: 38px;
+}
+.x-govuk-ui-sidebar-menu-item[data-has-action] .x-govuk-ui-sidebar-badge {
+  translate: 28px 0;
+  transition:
+    translate var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-sidebar-menu-item[data-has-action]:hover .x-govuk-ui-sidebar-badge,
+.x-govuk-ui-sidebar-menu-item[data-has-action]:has(
+    > .x-govuk-ui-sidebar-item-actions :is(:focus-visible, [aria-expanded="true"])
+  )
+  .x-govuk-ui-sidebar-badge {
+  translate: 0 0;
+}
+/* The action shows while the row is under the pointer, while the action itself has keyboard focus,
+   and while its menu is open. An action of your own in the tab order can take keyboard focus. A
+   row whose link has focus, as the current row's does after a click, keeps its action out of sight.
+   An action that its closed menu gives focus back to also stays out of sight. Where there is no
+   pointer to rest, the action always shows. With the gliding highlight, the action rides the
+   highlight between rows, so it appears and goes at once. */
+.x-govuk-ui-sidebar-item-actions {
+  position: absolute;
+  /* A strip the row's full height, reaching over the gap to the next row. A pointer moving down the
+     actions is then always over a strip. A press anywhere in the strip goes to the action, even
+     while the action glides into place. */
+  top: 0;
+  bottom: -1px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding-inline: 4px;
+  opacity: 0;
+  transition: opacity var(--x-govuk-ui-duration-fast) ease;
+}
+
+[data-animate~="highlight"] .x-govuk-ui-sidebar-item-actions {
+  transition: none;
+}
+.x-govuk-ui-sidebar-menu-item:hover > .x-govuk-ui-sidebar-item-actions,
+.x-govuk-ui-sidebar-item-actions:has(:focus-visible),
+.x-govuk-ui-sidebar-item-actions:has([aria-expanded="true"]) {
+  opacity: 1;
+}
+@media (hover: none) {
+  .x-govuk-ui-sidebar-item-actions {
+    opacity: 1;
+  }
+  .x-govuk-ui-sidebar-menu-item[data-has-action] .x-govuk-ui-sidebar-badge {
+    translate: 0 0;
+  }
+}
+/* It has no shading of its own under the pointer, because the row's highlight is its hover. */
+.x-govuk-ui-button.x-govuk-ui-sidebar-item-action {
+  --x-govuk-ui-button-text: var(--x-govuk-ui-text);
+  --x-govuk-ui-button-hover: transparent;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+}
+
+/* Sidebar customise. A sheet of lists, one for each group, with the pinned entries first. Each row
+   has its name, and at its end a small switch to show or hide it. Under the pointer, or with focus
+   in it, a row offers its pin before the name, which moves aside to make space. Move up and Move
+   down come after the name. A pinned row keeps its pin in view. Done and Reset stay in view at the
+   foot. */
+.x-govuk-ui-sheet.x-govuk-ui-sidebar-customise {
+  width: min(440px, calc(100vw - 32px));
+  padding-bottom: 0;
+}
+.x-govuk-ui-sidebar-customise-groups {
+  display: grid;
+  gap: 24px;
+  margin: 18px 0 8px;
+}
+.x-govuk-ui-sidebar-customise-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+}
+.x-govuk-ui-sidebar-customise-heading {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.3;
+}
+.x-govuk-ui-sidebar-customise-list {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-sidebar-customise-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+/* The pin waits out of sight, just past the left edge of the row's lead, which clips it. When the
+   row is under the pointer or has keyboard focus, the pin and name move right together after a
+   moment, on a curve that starts softly. The pin comes in from the left as the name makes space.
+   The delay means a pointer passing over the list sets nothing moving. A pinned row keeps its pin,
+   and its space, in view. A button pressed with the pointer keeps focus without keeping its row
+   open, so a row just unpinned closes once the pointer leaves it. The name keeps space at its end
+   for when it moves aside, so it never runs under Move. The space, the timings and the curve are
+   custom properties. */
+.x-govuk-ui-sidebar-customise-groups {
+  --x-govuk-ui-pin-room: 42px;
+  --x-govuk-ui-pin-duration: 450ms;
+  --x-govuk-ui-pin-leave: 350ms;
+  --x-govuk-ui-pin-delay: 60ms;
+  --x-govuk-ui-pin-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+.x-govuk-ui-sidebar-customise-lead {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  align-self: stretch;
+  min-width: 0;
+  /* Space inside the clip for the pin's focus ring. */
+  margin-inline-start: -6px;
+  padding-inline-start: 6px;
+  overflow: hidden;
+}
+.x-govuk-ui-sidebar-customise-pin,
+.x-govuk-ui-sidebar-customise-name {
+  transition: translate var(--x-govuk-ui-pin-leave) var(--x-govuk-ui-pin-ease);
+}
+.x-govuk-ui-sidebar-customise-pin {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  display: flex;
+  translate: calc(-1 * var(--x-govuk-ui-pin-room)) -50%;
+}
+/* The name, and its badge after it, which keeps its size while the name shortens. */
+.x-govuk-ui-sidebar-customise-name {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding-inline-end: var(--x-govuk-ui-pin-room);
+  font-size: 16px;
+}
+.x-govuk-ui-sidebar-customise-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.x-govuk-ui-sidebar-customise-badge {
+  display: flex;
+  flex-shrink: 0;
+}
+.x-govuk-ui-sidebar-customise-row[data-hidden] .x-govuk-ui-sidebar-customise-name {
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-sidebar-customise-move {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-sidebar-customise-row .x-govuk-ui-switch {
+  margin-inline-start: 8px;
+}
+.x-govuk-ui-sidebar-customise-row:is(:hover, :has(:focus-visible), [data-pinned])
+  .x-govuk-ui-sidebar-customise-name {
+  translate: var(--x-govuk-ui-pin-room) 0;
+}
+.x-govuk-ui-sidebar-customise-row:is(:hover, :has(:focus-visible), [data-pinned])
+  .x-govuk-ui-sidebar-customise-pin {
+  translate: 0 -50%;
+}
+.x-govuk-ui-sidebar-customise-row:is(:hover, :has(:focus-visible), [data-pinned])
+  :is(.x-govuk-ui-sidebar-customise-pin, .x-govuk-ui-sidebar-customise-name) {
+  transition: translate var(--x-govuk-ui-pin-duration) var(--x-govuk-ui-pin-ease)
+    var(--x-govuk-ui-pin-delay);
+}
+.x-govuk-ui-sidebar-customise-row:is(:hover, :has(:focus-visible))
+  .x-govuk-ui-sidebar-customise-move,
+.x-govuk-ui-sidebar-customise-group-head:is(:hover, :has(:focus-visible))
+  .x-govuk-ui-sidebar-customise-move {
+  opacity: 1;
+  transition: opacity var(--x-govuk-ui-duration-slow) ease var(--x-govuk-ui-pin-delay);
+}
+/* Without a pointer to rest, everything shows. */
+@media (hover: none) {
+  .x-govuk-ui-sidebar-customise-pin {
+    translate: 0 -50%;
+  }
+  .x-govuk-ui-sidebar-customise-move {
+    opacity: 1;
+  }
+  .x-govuk-ui-sidebar-customise-name {
+    translate: var(--x-govuk-ui-pin-room) 0;
+  }
+}
+/* With reduced motion, the pin and name move at once, and Move only fades. */
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-sidebar-customise-groups {
+    --x-govuk-ui-pin-duration: 0ms;
+    --x-govuk-ui-pin-leave: 0ms;
+    --x-govuk-ui-pin-delay: 0ms;
+  }
+}
+.x-govuk-ui-sidebar-customise-empty {
+  margin: 4px 0 0;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-sidebar-customise-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: auto -24px 0;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-paper);
+}
+/* Skeleton rows sit where items will, at their height. */
+.x-govuk-ui-sidebar-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 10px 0 11px;
+}
+.x-govuk-ui-skeleton.x-govuk-ui-sidebar-skeleton-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+.x-govuk-ui-skeleton.x-govuk-ui-sidebar-skeleton-label {
+  height: 10px;
+  border-radius: 4px;
+}
+[data-state="collapsed"][data-collapsible="icon"] .x-govuk-ui-sidebar-skeleton-label {
+  display: none;
+}
+
+/* Items and the labels of groups that fold share one row layout. */
+.x-govuk-ui-sidebar-item,
+.x-govuk-ui-sidebar-group-trigger {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  margin: 0;
+  padding: 7px 10px 7px 11px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: start;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.x-govuk-ui-sidebar-item {
+  color: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-sidebar-item[data-active] {
+  font-weight: 700;
+}
+.x-govuk-ui-sidebar-group-trigger {
+  color: var(--x-govuk-ui-text);
+}
+/* The dark edge sits beneath the item, as GOV.UK's does, not over its foot, so the item's name and
+   badge stay in the middle of the yellow. When focus scrolls an item into view, its edge comes into
+   view too. */
+.x-govuk-ui-sidebar-item,
+.x-govuk-ui-sidebar-group-trigger {
+  scroll-margin-block: 4px;
+}
+.x-govuk-ui-sidebar-item:focus-visible,
+.x-govuk-ui-sidebar-group-trigger:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 4px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-sidebar-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+.x-govuk-ui-sidebar-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.x-govuk-ui-sidebar-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* A count of one figure is square, as wide as its line is tall. */
+.x-govuk-ui-sidebar-badge {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+.x-govuk-ui-sidebar-badge[data-single] {
+  padding-inline: 0;
+}
+
+/* The hover highlight glides between rows. Without that animation, rows highlight in place. */
+.x-govuk-ui-sidebar-highlight {
+  position: absolute;
+  top: 0;
+  inset-inline: 8px;
+  border-radius: 4px;
+  background: var(--x-govuk-ui-sidebar-hover);
+  transform-origin: 0 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-sidebar-highlight[data-shown] {
+  opacity: 1;
+}
+/* A row's action is part of the row, so the row looks hovered while the pointer is on it. */
+[data-animate]:not([data-animate~="highlight"]) .x-govuk-ui-sidebar-item:hover,
+[data-animate]:not([data-animate~="highlight"])
+  .x-govuk-ui-sidebar-item:has(~ .x-govuk-ui-sidebar-item-actions:hover),
+[data-animate]:not([data-animate~="highlight"]) .x-govuk-ui-sidebar-group-trigger:hover,
+:is(.x-govuk-ui-sidebar-header, .x-govuk-ui-sidebar-footer) .x-govuk-ui-sidebar-item:hover {
+  background: var(--x-govuk-ui-sidebar-hover);
+}
+.x-govuk-ui-sidebar-item:hover .x-govuk-ui-sidebar-label,
+.x-govuk-ui-sidebar-item:has(~ .x-govuk-ui-sidebar-item-actions:hover) .x-govuk-ui-sidebar-label {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.x-govuk-ui-sidebar-line {
+  position: absolute;
+  left: -8px;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  background: var(--x-govuk-ui-link);
+  /* It glides from another item by its top. */
+  transform-origin: 0 0;
+}
+[data-animate~="press"] .x-govuk-ui-sidebar-item,
+[data-animate~="press"] .x-govuk-ui-sidebar-group-trigger {
+  transition: scale var(--x-govuk-ui-duration-fast) ease-out;
+}
+[data-animate~="press"] .x-govuk-ui-sidebar-item:active,
+[data-animate~="press"] .x-govuk-ui-sidebar-group-trigger:active {
+  scale: 0.97;
+}
+
+/* Groups that fold show a plus or a minus, and indent their items along a guide line. */
+.x-govuk-ui-sidebar-fold {
+  position: relative;
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  margin-left: auto;
+}
+.x-govuk-ui-sidebar-fold::before,
+.x-govuk-ui-sidebar-fold::after {
+  content: "";
+  position: absolute;
+  inset: 5px 0;
+  border-radius: 1px;
+  background: currentColor;
+}
+.x-govuk-ui-sidebar-fold::after {
+  rotate: 90deg;
+  transition: rotate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-drawer);
+}
+.x-govuk-ui-sidebar-group-trigger[data-panel-open] .x-govuk-ui-sidebar-fold::after,
+.x-govuk-ui-sidebar-submenu-trigger[data-panel-open] .x-govuk-ui-sidebar-fold::after {
+  rotate: 0deg;
+}
+/* Sub-items indent along a guide line, as the items of a group that folds do. */
+.x-govuk-ui-sidebar-submenu {
+  margin: 1px 0 3px 19px;
+  padding-left: 8px;
+  border-left: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-sidebar-submenu .x-govuk-ui-sidebar-icon {
+  display: none;
+}
+/* A closed submenu that contains the current page reads as current itself. */
+.x-govuk-ui-sidebar-submenu-trigger:not([data-panel-open]):has(
+  + .x-govuk-ui-sidebar-group-panel [aria-current="page"]
+) {
+  font-weight: 700;
+}
+.x-govuk-ui-sidebar-group-panel {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+}
+[data-animate~="folding"] .x-govuk-ui-sidebar-group-panel {
+  transition: height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+.x-govuk-ui-sidebar-group-panel[data-starting-style],
+.x-govuk-ui-sidebar-group-panel[data-ending-style] {
+  height: 0;
+}
+.x-govuk-ui-sidebar-group[data-foldable] .x-govuk-ui-sidebar-menu {
+  margin: 2px 0 4px 19px;
+  padding-left: 8px;
+  border-left: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-sidebar-group[data-foldable] .x-govuk-ui-sidebar-menu .x-govuk-ui-sidebar-icon {
+  display: none;
+}
+
+/* A column of icons has no space for a scrollbar. The icons still scroll with a wheel, touch or
+   keys. */
+[data-state="collapsed"][data-collapsible="icon"]
+  .x-govuk-ui-sidebar-content
+  > .x-govuk-ui-scroll-area-scrollbar {
+  display: none;
+}
+/* Collapsed to icons, the sidebar hides labels, badges and group names, and shows each item's
+   icon. */
+.x-govuk-ui-sidebar-label,
+.x-govuk-ui-sidebar-badge,
+.x-govuk-ui-sidebar-group-label,
+.x-govuk-ui-sidebar-group-trigger,
+.x-govuk-ui-sidebar-input {
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    min-height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    padding var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+[data-state="collapsed"][data-collapsible="icon"]
+  :is(.x-govuk-ui-sidebar-label, .x-govuk-ui-sidebar-badge) {
+  opacity: 0;
+}
+[data-state="collapsed"][data-collapsible="icon"]
+  :is(
+    .x-govuk-ui-sidebar-group-label,
+    .x-govuk-ui-sidebar-group-trigger,
+    .x-govuk-ui-sidebar-input
+  ) {
+  height: 0;
+  min-height: 0;
+  padding-block: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+[data-state="collapsed"][data-collapsible="icon"]
+  .x-govuk-ui-sidebar-group[data-foldable]
+  .x-govuk-ui-sidebar-menu {
+  margin: 0;
+  padding: 0;
+  border-color: transparent;
+}
+[data-state="collapsed"][data-collapsible="icon"]
+  .x-govuk-ui-sidebar-group[data-foldable]
+  .x-govuk-ui-sidebar-menu
+  .x-govuk-ui-sidebar-icon {
+  display: inline-flex;
+}
+
+/* Dragging the edge resizes the sidebar. The rail is a ResizableHandle laid over the panel's
+   edge, so it draws no line of its own until it is used. */
+.x-govuk-ui-resizable-handle.x-govuk-ui-sidebar-rail {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: transparent;
+}
+.x-govuk-ui-sidebar[data-side="right"] > .x-govuk-ui-resizable-handle.x-govuk-ui-sidebar-rail {
+  right: auto;
+  left: 0;
+}
+
+/* On small screens, the sidebar opens as the library's Sheet, as wide as the sidebar. */
+.x-govuk-ui-sheet.x-govuk-ui-sidebar-sheet {
+  width: min(var(--x-govuk-ui-sidebar-width), calc(100vw - 48px));
+  padding: 0;
+  overflow: hidden;
+}
+
+/* The frame, with the sidebar and the page side by side. Beside an inset sidebar, it takes the
+   sidebar's fill, and the page is raised on it. */
+.x-govuk-ui-sidebar-layout {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--x-govuk-ui-paper);
+}
+.x-govuk-ui-sidebar-layout:has(> .x-govuk-ui-sidebar[data-variant="inset"]) {
+  background: var(--x-govuk-ui-sidebar-fill);
+}
+/* The page, a column that takes the space the sidebar leaves. */
+.x-govuk-ui-sidebar-inset {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+/* Beside an inset sidebar, the page is a raised panel, held off the edges of the screen but not off
+   the sidebar. The sides are the screen's, so these rules use physical properties. */
+.x-govuk-ui-sidebar[data-variant="inset"] ~ .x-govuk-ui-sidebar-inset,
+.x-govuk-ui-sidebar-inset:has(~ .x-govuk-ui-sidebar[data-variant="inset"]) {
+  margin: 8px 8px 8px 0;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 1px 3px rgb(11 12 12 / 6%);
+}
+.x-govuk-ui-sidebar[data-variant="inset"][data-side="right"] ~ .x-govuk-ui-sidebar-inset,
+.x-govuk-ui-sidebar-inset:has(~ .x-govuk-ui-sidebar[data-variant="inset"][data-side="right"]) {
+  margin: 8px 0 8px 8px;
+}
+/* The bar along the top of the page, as tall as the sidebar's header. One custom property sets both
+   heights. */
+.x-govuk-ui-sidebar-page-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--x-govuk-ui-bar-height, 56px);
+  padding: 8px 16px 8px 12px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+/* Words in the header or the footer, which wrap. They are one grid row, so their height can ease
+   to zero and back. A height cannot ease to and from auto in every browser, but a row can. */
+.x-govuk-ui-sidebar-text {
+  display: grid;
+  grid-template-rows: 1fr;
+  margin: 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: normal;
+  /* The row eases as the sidebar's width does. The words are hidden only once faded, and shown
+     before they fade in. */
+  transition:
+    grid-template-rows var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    visibility var(--x-govuk-ui-duration-fast);
+}
+/* The words clip only while the sidebar is narrow or opening. Once it is open, a link's focus style
+   shows in full. */
+.x-govuk-ui-sidebar-text-inner {
+  min-height: 0;
+  transition: overflow 0s var(--x-govuk-ui-duration-slow) allow-discrete;
+}
+/* In a sidebar that narrows to its icons, they keep the width the open sidebar gives them, less
+   the panel's edges and their container's padding, so they never reflow as it narrows and widens.
+   While the sidebar is narrow, they are hidden, and their height eases away, so the footer's rows
+   sit at its foot. */
+.x-govuk-ui-sidebar[data-collapsible="icon"] .x-govuk-ui-sidebar-footer > .x-govuk-ui-sidebar-text {
+  width: calc(var(--x-govuk-ui-sidebar-width) - var(--x-govuk-ui-sidebar-edges) - 16px);
+}
+.x-govuk-ui-sidebar[data-collapsible="icon"] .x-govuk-ui-sidebar-header > .x-govuk-ui-sidebar-text {
+  width: calc(var(--x-govuk-ui-sidebar-width) - var(--x-govuk-ui-sidebar-edges) - 24px);
+}
+.x-govuk-ui-sidebar[data-collapsible="icon"][data-state="collapsed"] .x-govuk-ui-sidebar-text {
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  opacity: 0;
+}
+.x-govuk-ui-sidebar[data-collapsible="icon"][data-state="collapsed"]
+  .x-govuk-ui-sidebar-text-inner {
+  overflow: hidden;
+  transition: none;
+}
+/* An Avatar given as a row's icon is sized to the icon's slot. */
+.x-govuk-ui-sidebar-item .x-govuk-ui-sidebar-icon > .x-govuk-ui-avatar {
+  --x-govuk-ui-avatar-size: 18px;
+  font-size: 8px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-sidebar-line {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .x-govuk-ui-sidebar-item:hover {
+    outline: 1px solid Highlight;
+  }
+}

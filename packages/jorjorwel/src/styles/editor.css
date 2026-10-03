@@ -1,0 +1,862 @@
+/* Editor. A field for rich text on Lexical, after Lexxy. It is GOV.UK's form group, with a toolbar
+   over the document in a box with the Input's edge. The document is prose, set as GOV.UK sets a
+   page's text. The box knows the prose's line height, so it can be sized in rows of it. */
+.x-govuk-ui-editor {
+  --x-govuk-ui-editor-line: calc(var(--x-govuk-ui-prose-size) * var(--x-govuk-ui-prose-leading));
+  position: relative;
+  box-sizing: border-box;
+  border: 1.5px solid var(--x-govuk-ui-border);
+  border-radius: 5px;
+  background-color: inherit;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  transition:
+    border-color var(--x-govuk-ui-duration-fast) ease,
+    box-shadow var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-editor:not([data-disabled]):hover:not(:focus-within) {
+  border-color: var(--x-govuk-ui-text);
+}
+/* The Input draws the ring inside its edge as an inset shadow. Here the ring is drawn over the box
+   and its toolbar instead. The toolbar's band then does not cover it, and the ring is one edge
+   around both the toolbar and the document. */
+.x-govuk-ui-editor::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: 3.5px;
+  box-shadow: inset 0 0 0 var(--x-govuk-ui-editor-ring, 0) var(--x-govuk-ui-editor-ring-colour);
+  pointer-events: none;
+}
+/* The box takes the Input's focus, as one field, while the caret is in the document or the
+   source. */
+.x-govuk-ui-editor:has(.x-govuk-ui-editor-content:focus, .x-govuk-ui-code-block-input:focus) {
+  --x-govuk-ui-editor-ring: 1px;
+  --x-govuk-ui-editor-ring-colour: var(--x-govuk-ui-focus-text);
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 1px;
+  border-color: var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-editor[data-invalid],
+.x-govuk-ui-editor[data-over-limit] {
+  --x-govuk-ui-editor-ring: 0.5px;
+  --x-govuk-ui-editor-ring-colour: var(--x-govuk-ui-error);
+  border-color: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-editor[data-disabled] {
+  opacity: 0.55;
+}
+.x-govuk-ui-editor[data-disabled] .x-govuk-ui-editor-content {
+  cursor: not-allowed;
+}
+/* While files are dragged over the box, it shows that it will take them. */
+.x-govuk-ui-editor[data-drag-over] {
+  --x-govuk-ui-editor-ring: 2px;
+  --x-govuk-ui-editor-ring-colour: var(--x-govuk-ui-link);
+  border-color: var(--x-govuk-ui-link);
+}
+
+/* The toolbar is a band at the top of the box. Its controls are quiet icon buttons set in the text
+   colour, shown pressed while their formatting is on where the caret is. As a long document scrolls
+   by with the page, the toolbar sticks to the top, so it is always within reach. */
+.x-govuk-ui-editor-toolbar {
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  border-radius: 3.5px 3.5px 0 0;
+  background: var(--x-govuk-ui-surface);
+}
+.x-govuk-ui-editor-toolbar[data-sticky] {
+  position: sticky;
+  top: 0;
+}
+.x-govuk-ui-editor-control.x-govuk-ui-button {
+  color: var(--x-govuk-ui-text);
+}
+/* A control that offers a choice, such as a colour, has a chevron after its icon. */
+.x-govuk-ui-editor-control.x-govuk-ui-button[data-choice] {
+  width: auto;
+  padding-inline: 6px 4px;
+}
+.x-govuk-ui-editor-control[data-choice] .x-govuk-ui-button-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.x-govuk-ui-editor-caret {
+  flex: none;
+}
+/* History sits at the end of the row, as More does. */
+.x-govuk-ui-editor-spacer {
+  flex: 1;
+}
+.x-govuk-ui-editor-item {
+  display: flex;
+  flex: none;
+}
+/* Once measured, the toolbar keeps to one row, and what does not fit waits behind More. Until then,
+   as the server sends it, it wraps, so every control is there. */
+.x-govuk-ui-editor-toolbar[data-overflow] {
+  flex-wrap: nowrap;
+}
+.x-govuk-ui-editor-more-popup {
+  padding: 6px;
+}
+.x-govuk-ui-editor-overflow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  max-width: min(288px, 80vw);
+}
+.x-govuk-ui-editor-control.x-govuk-ui-button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 14%, transparent);
+  color: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-editor-control.x-govuk-ui-button[aria-disabled="true"] {
+  opacity: 0.4;
+}
+.x-govuk-ui-editor-glyph {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+.x-govuk-ui-editor-glyph small {
+  font-size: 11px;
+  font-weight: 700;
+}
+.x-govuk-ui-editor-glyph sub,
+.x-govuk-ui-editor-glyph sup {
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: -0.3em;
+}
+.x-govuk-ui-editor-glyph sup {
+  vertical-align: 0.5em;
+}
+.x-govuk-ui-editor-glyph[data-style="italic"] {
+  font-style: italic;
+  font-family: Georgia, "Times New Roman", serif;
+  font-synthesis-style: auto;
+}
+.x-govuk-ui-editor-glyph[data-style="underline"] {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.x-govuk-ui-editor-glyph[data-style="strike"] {
+  text-decoration: line-through;
+}
+/* The colour control's icon is drawn in the colours the caret is in. */
+.x-govuk-ui-editor-colour-icon {
+  display: inline-flex;
+  border-radius: 2px;
+}
+.x-govuk-ui-editor-separator {
+  width: 1px;
+  height: 20px;
+  margin-inline: 4px;
+  background: var(--x-govuk-ui-line);
+}
+
+/* The document, where people write. Lexical's element takes focus, and the box around it shows
+   the focus. The body is never shorter than the document's rows. With a cap, it is no taller than
+   the cap, and scrolls inside, with the thin scrollbar along the box's edge. */
+.x-govuk-ui-editor-scroll {
+  display: block;
+  border-radius: 0 0 3.5px 3.5px;
+}
+.x-govuk-ui-editor-scroll[hidden] {
+  display: none;
+}
+.x-govuk-ui-editor-body {
+  box-sizing: border-box;
+  min-height: calc(var(--x-govuk-ui-editor-rows, 8) * var(--x-govuk-ui-editor-line) + 22px);
+}
+.x-govuk-ui-editor-document {
+  position: relative;
+  min-height: inherit;
+}
+/* A cap below the rows wins, because a minimum height would otherwise override a maximum. */
+.x-govuk-ui-editor[data-capped] .x-govuk-ui-editor-body {
+  min-height: calc(
+    min(var(--x-govuk-ui-editor-rows, 8), var(--x-govuk-ui-editor-max-rows)) *
+    var(--x-govuk-ui-editor-line) +
+    22px
+  );
+  max-height: calc(var(--x-govuk-ui-editor-max-rows) * var(--x-govuk-ui-editor-line) + 22px);
+}
+.x-govuk-ui-editor-scroll > .x-govuk-ui-scroll-area-scrollbar {
+  margin: 3px 2px 3px 0;
+}
+.x-govuk-ui-editor-content {
+  min-height: inherit;
+  box-sizing: border-box;
+  padding: 10px 12px 12px;
+  outline: none;
+  caret-color: var(--x-govuk-ui-text);
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+/* The placeholder sits where the first line would, as the Input's does, until something is
+   typed. */
+.x-govuk-ui-editor-placeholder {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  overflow: hidden;
+  color: var(--x-govuk-ui-placeholder);
+  font-size: var(--x-govuk-ui-prose-size);
+  line-height: var(--x-govuk-ui-prose-leading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+/* With Cmd or Ctrl held, a link can be opened, so it shows a link's pointer cursor. */
+.x-govuk-ui-editor-content a {
+  cursor: text;
+}
+.x-govuk-ui-editor[data-links-openable] .x-govuk-ui-editor-content a {
+  cursor: pointer;
+}
+/* A paragraph the caret needs between two blocks is a sliver until the caret is in it. */
+.x-govuk-ui-editor-provisional[data-hidden] {
+  height: 6px;
+  margin: 0;
+}
+/* The count sits beneath the box, as the Textarea's does. */
+.x-govuk-ui-editor-count .x-govuk-ui-character-count {
+  margin-top: 8px;
+}
+/* The field the form checks for the editor, unseen. */
+.x-govuk-ui-editor-validity {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+  opacity: 0;
+}
+/* The source, in place of the document. It is a Code block of what the field submits, as tall as
+   the document was, in the editor's border, which draws its focus. */
+.x-govuk-ui-editor .x-govuk-ui-code-block.x-govuk-ui-editor-source {
+  min-height: calc(var(--x-govuk-ui-editor-rows, 8) * var(--x-govuk-ui-editor-line) + 22px);
+  border: 0;
+  border-radius: 0 0 3.5px 3.5px;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* A control's popover, such as the link's field, the colours, or an image's description. */
+.x-govuk-ui-editor-popup {
+  width: min(360px, 90vw);
+  padding: 14px 16px 12px;
+}
+.x-govuk-ui-editor-link-form,
+.x-govuk-ui-editor-alt-form {
+  display: grid;
+  gap: 12px;
+}
+.x-govuk-ui-editor-popup-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+/* Swatches are a row of round colours under their name, with the one in use ringed. */
+.x-govuk-ui-editor-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+}
+.x-govuk-ui-editor-swatches-legend {
+  margin-bottom: 6px;
+  padding: 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.x-govuk-ui-editor-swatch {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid var(--x-govuk-ui-paper);
+  border-radius: 50%;
+  background: var(--x-govuk-ui-editor-swatch);
+  box-shadow: 0 0 0 1px var(--x-govuk-ui-line);
+  cursor: pointer;
+}
+/* A text colour's swatch is its letter, in the colour, as it will look. */
+.x-govuk-ui-editor-swatch[data-property="color"] {
+  position: relative;
+  background: var(--x-govuk-ui-paper);
+}
+.x-govuk-ui-editor-swatch[data-property="color"]::before {
+  content: "A";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--x-govuk-ui-editor-swatch);
+  font: 700 15px / 1 var(--x-govuk-ui-font);
+}
+.x-govuk-ui-editor-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--x-govuk-ui-text);
+}
+.x-govuk-ui-editor-swatch:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 1px;
+}
+/* The formatting menu shows each heading as it will look. */
+.x-govuk-ui-editor-heading-choice .x-govuk-ui-menu-label {
+  font-weight: 700;
+}
+.x-govuk-ui-editor-heading-choice[data-tag="h1"] .x-govuk-ui-menu-label,
+.x-govuk-ui-editor-heading-choice[data-tag="h2"] .x-govuk-ui-menu-label {
+  font-size: 1.2em;
+}
+.x-govuk-ui-editor-heading-choice[data-tag="h3"] .x-govuk-ui-menu-label {
+  font-size: 1.1em;
+}
+
+/* The tools that come up over the document, such as a table's, a code block's language, and an
+   attachment's. Each is placed by what it acts on, through the anchor the editor measures, and
+   moved there only by a transform. */
+.x-govuk-ui-editor-tools {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.x-govuk-ui-editor-tools-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 4px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
+}
+.x-govuk-ui-editor-tool.x-govuk-ui-button {
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-editor-tool.x-govuk-ui-button[data-destructive]:hover {
+  background: color-mix(in srgb, var(--x-govuk-ui-error) 14%, transparent);
+  color: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-editor-tool-count.x-govuk-ui-button {
+  padding-inline: 8px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+/* Where a toolbar floats. `above` centres it above what it acts on, clear of it, as a table's
+   tools are. `inside` puts it in the top right corner, as an attachment's and a code block's are.
+   `below` puts it below, from the start, as a link's are. Each is kept inside the box's width. */
+.x-govuk-ui-editor-tools[data-placement="above"] {
+  translate: clamp(
+      0px,
+      calc(var(--x-govuk-ui-editor-anchor-left) + var(--x-govuk-ui-editor-anchor-width) / 2 - 50%),
+      calc(var(--x-govuk-ui-editor-box-width) - 100%)
+    )
+    calc(var(--x-govuk-ui-editor-anchor-top) - 100% - 6px);
+}
+.x-govuk-ui-editor-tools[data-placement="inside"] {
+  translate: calc(
+      var(--x-govuk-ui-editor-anchor-left) +
+      var(--x-govuk-ui-editor-anchor-width) -
+      100% -
+      8px
+    )
+    calc(var(--x-govuk-ui-editor-anchor-top) + 8px);
+}
+.x-govuk-ui-editor-tools[data-placement="below"] {
+  translate: clamp(
+      0px,
+      var(--x-govuk-ui-editor-anchor-left),
+      calc(var(--x-govuk-ui-editor-box-width) - 100%)
+    )
+    calc(var(--x-govuk-ui-editor-anchor-top) + var(--x-govuk-ui-editor-anchor-height) + 6px);
+}
+/* The address, as a GOV.UK link, cut short with an ellipsis where it is long. */
+.x-govuk-ui-editor-link-address {
+  display: inline-flex;
+  align-items: center;
+  max-width: 30ch;
+  min-height: 32px;
+  padding-inline: 8px 4px;
+  font-size: 16px;
+}
+.x-govuk-ui-editor-link-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The cells a table tool acts on are tinted while it is under the pointer or focused, and red for
+   one that removes them. */
+.x-govuk-ui-editor-content [data-tool] {
+  background: color-mix(in srgb, var(--x-govuk-ui-link) 12%, transparent);
+}
+.x-govuk-ui-editor-content [data-tool="table"] {
+  background: color-mix(in srgb, var(--x-govuk-ui-error) 10%, transparent);
+}
+/* The code block's language, in its top right corner. */
+.x-govuk-ui-editor-language-select {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 3px;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font: 14px var(--x-govuk-ui-font);
+}
+.x-govuk-ui-editor-language-select:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+}
+.x-govuk-ui-editor-alt.x-govuk-ui-button {
+  padding-inline: 8px;
+  color: var(--x-govuk-ui-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* The Editor's document is Prose, from core's stylesheet, as a Rich text's is. Lexical draws some
+   of its nodes with classes instead of plain elements, so they take the same look here. Its size
+   and leading are set on the whole Editor, so its box can count its lines. */
+.x-govuk-ui-editor {
+  --x-govuk-ui-prose-size: 19px;
+  --x-govuk-ui-prose-leading: 1.32;
+}
+/* Lexical puts a nested list in an item of its own, which shows no bullet. */
+.x-govuk-ui-editor-nested {
+  list-style: none;
+}
+.x-govuk-ui-editor-bold {
+  font-weight: 700;
+}
+.x-govuk-ui-editor-italic {
+  font-style: italic;
+}
+.x-govuk-ui-editor-strike {
+  text-decoration: line-through;
+}
+.x-govuk-ui-editor-underline {
+  text-decoration: underline;
+}
+.x-govuk-ui-editor-underline-strike {
+  text-decoration: underline line-through;
+}
+.x-govuk-ui-editor-inline-code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-surface);
+  font-family: var(
+    --x-govuk-ui-code-font,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace
+  );
+  font-size: 0.9em;
+}
+/* A code block as Prose sets a pre, with space for the language picker over its first line. */
+.x-govuk-ui-prose .x-govuk-ui-editor-code {
+  display: block;
+  position: relative;
+  margin: 0 0 20px;
+  padding: 12px 150px 12px 15px;
+  overflow-x: auto;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 0;
+  background: var(--x-govuk-ui-surface);
+  font-family: var(
+    --x-govuk-ui-code-font,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace
+  );
+  font-size: 16px;
+  line-height: 1.5;
+  tab-size: 2;
+  white-space: pre;
+}
+/* A divider selected in the editor is ringed with GOV.UK's focus. */
+.x-govuk-ui-prose hr.x-govuk-ui-editor-selected {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 6px;
+}
+/* A checklist's items each have a box, ticked when done, which a press ticks. */
+.x-govuk-ui-prose .x-govuk-ui-editor-checklist {
+  padding-left: 0;
+  list-style: none;
+}
+.x-govuk-ui-editor-checked,
+.x-govuk-ui-editor-unchecked {
+  position: relative;
+  padding-left: 32px;
+  list-style: none;
+}
+.x-govuk-ui-editor-checked::before,
+.x-govuk-ui-editor-unchecked::before {
+  content: "";
+  position: absolute;
+  top: 0.15em;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border: 2px solid var(--x-govuk-ui-text);
+  cursor: pointer;
+}
+.x-govuk-ui-editor-checked::after {
+  content: "";
+  position: absolute;
+  top: calc(0.15em + 4px);
+  left: 6px;
+  width: 6px;
+  height: 10px;
+  border: solid var(--x-govuk-ui-text);
+  border-width: 0 3px 3px 0;
+  rotate: 45deg;
+}
+.x-govuk-ui-editor-checked {
+  color: var(--x-govuk-ui-muted);
+}
+/* A table scrolls across inside its own frame, as Prose's does. While it is edited, every cell's
+   edge shows, so an empty one has somewhere to type. */
+.x-govuk-ui-editor-table {
+  margin: 0 0 20px;
+  overflow-x: auto;
+}
+.x-govuk-ui-editor-content.x-govuk-ui-prose th,
+.x-govuk-ui-editor-content.x-govuk-ui-prose td {
+  min-width: 3em;
+  padding: 8px 12px;
+  border: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-editor-content.x-govuk-ui-prose th {
+  background: var(--x-govuk-ui-surface);
+}
+.x-govuk-ui-editor-selected-cell {
+  background: color-mix(in srgb, var(--x-govuk-ui-link) 14%, transparent);
+}
+.x-govuk-ui-editor-table-selection *::selection {
+  background: transparent;
+}
+
+/* Attachments. An image shows at its own proportions under its caption, a video as its first
+   frame, and a file as its type, name and size. Each is in a figure that the pointer can drag. In a
+   Rich text, the image and caption are Prose's figure. */
+.x-govuk-ui-editor-attachment-slot {
+  display: block;
+  margin: 0 0 20px;
+}
+span.x-govuk-ui-editor-attachment-slot {
+  display: inline-block;
+  margin: 0;
+  vertical-align: top;
+}
+.x-govuk-ui-editor-attachment {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: grab;
+}
+.x-govuk-ui-editor-attachment:hover:not([data-selected]) {
+  outline: 3px solid color-mix(in srgb, var(--x-govuk-ui-focus) 40%, transparent);
+}
+.x-govuk-ui-editor-attachment[data-selected] {
+  outline: 3px solid var(--x-govuk-ui-focus);
+}
+.x-govuk-ui-editor-attachment[data-dragging] {
+  opacity: 0.4;
+}
+.x-govuk-ui-editor-attachment-image,
+.x-govuk-ui-editor-attachment-video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.x-govuk-ui-editor-attachment[data-uploading] .x-govuk-ui-editor-attachment-image {
+  opacity: 0.6;
+}
+.x-govuk-ui-editor-caption {
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+/* An image's caption is written by pressing it. Without one, its file's name stands in, in
+   italic, in the caption's own muted colour, which is dark enough to read. */
+.x-govuk-ui-editor-caption:not([data-file]) {
+  min-width: 8em;
+  cursor: text;
+}
+.x-govuk-ui-editor-caption[data-placeholder] {
+  font-style: italic;
+}
+.x-govuk-ui-editor-caption[data-editing] .x-govuk-ui-editor-caption-text {
+  visibility: hidden;
+}
+.x-govuk-ui-editor-caption-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* The caption being written, in a field over the caption, in its face. */
+.x-govuk-ui-editor-caption-field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font: 16px / 1.5 var(--x-govuk-ui-font);
+  resize: none;
+  outline: 3px solid var(--x-govuk-ui-focus);
+  translate: var(--x-govuk-ui-editor-anchor-left) var(--x-govuk-ui-editor-anchor-top);
+}
+/* A file shows its type in a box, then its name and size. */
+.x-govuk-ui-editor-attachment[data-kind="file"] {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-editor-attachment-icon {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 52px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border: 2px solid var(--x-govuk-ui-muted);
+  border-radius: 2px;
+  color: var(--x-govuk-ui-muted);
+  font: 700 13px / 1 var(--x-govuk-ui-font);
+  text-transform: uppercase;
+}
+.x-govuk-ui-editor-caption[data-file] {
+  display: grid;
+}
+.x-govuk-ui-editor-attachment-name {
+  color: var(--x-govuk-ui-text);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.x-govuk-ui-editor-attachment-progress {
+  width: 100%;
+  max-width: 240px;
+  height: 6px;
+  grid-column: 1 / -1;
+  accent-color: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-editor-attachment-error {
+  padding: 10px 14px;
+  border-left: 5px solid var(--x-govuk-ui-error);
+  color: var(--x-govuk-ui-error);
+  font-weight: 700;
+}
+/* Something from the page itself, embedded whole. */
+.x-govuk-ui-editor-attachment[data-kind="embed"] {
+  display: block;
+  padding: 12px 15px;
+  border: 1px solid var(--x-govuk-ui-line);
+}
+/* What screen readers hear of a selected attachment, unseen. */
+.x-govuk-ui-editor-fake-selection {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* A gallery sets images side by side, two or three across, filling the row. */
+.x-govuk-ui-editor-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
+  gap: 8px;
+  margin: 0 0 20px;
+}
+.x-govuk-ui-editor-gallery[data-count="2"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+.x-govuk-ui-editor-gallery span.x-govuk-ui-editor-attachment-slot {
+  display: block;
+  min-width: 0;
+}
+.x-govuk-ui-editor-gallery .x-govuk-ui-editor-attachment-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+/* Where a dragged attachment will go, shown as a line between blocks, or beside an image. */
+.x-govuk-ui-editor-content [data-drop] {
+  position: relative;
+}
+.x-govuk-ui-editor-content [data-drop]::after {
+  content: "";
+  position: absolute;
+  border-radius: 1px;
+  background: var(--x-govuk-ui-link);
+  pointer-events: none;
+}
+.x-govuk-ui-editor-content [data-drop^="line"]::after {
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.x-govuk-ui-editor-content [data-drop="line-before"]::after {
+  top: -6px;
+}
+.x-govuk-ui-editor-content [data-drop="line-after"]::after {
+  bottom: -6px;
+}
+.x-govuk-ui-editor-content [data-drop^="side"]::after {
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+.x-govuk-ui-editor-content [data-drop="side-before"]::after {
+  left: -6px;
+}
+.x-govuk-ui-editor-content [data-drop="side-after"]::after {
+  right: -6px;
+}
+
+/* A mention shows its name in a chip, drawn whole, as its prompt draws it. */
+.x-govuk-ui-editor-mention {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--x-govuk-ui-link) 12%, transparent);
+  color: var(--x-govuk-ui-link);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.x-govuk-ui-editor-mention {
+  cursor: default;
+  user-select: none;
+}
+.x-govuk-ui-editor-mention[data-selected] {
+  outline: 3px solid var(--x-govuk-ui-focus);
+}
+/* A prompt's menu, at the caret. It is a list of suggestions, with the one the keys are on
+   highlighted. It is placed relative to the viewport, as the caret is. The floating surface is
+   otherwise placed relative to its container. */
+.x-govuk-ui-editor-prompt {
+  position: fixed;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  display: flex;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 200px;
+  max-width: min(280px, calc(100vw - 16px));
+  max-height: 280px;
+  margin: 0;
+  font: 16px / 1.4 var(--x-govuk-ui-font);
+}
+/* The suggestions scroll in a Scroll area, which takes the menu's height. */
+.x-govuk-ui-editor-prompt-scroll {
+  flex: 1;
+}
+.x-govuk-ui-editor-prompt-scroll
+  > .x-govuk-ui-scroll-area-viewport
+  > .x-govuk-ui-scroll-area-content {
+  padding: 4px;
+}
+.x-govuk-ui-editor-prompt-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-editor-prompt[data-above] {
+  translate: 0 -100%;
+}
+/* One highlight glides behind the suggestions, in grey, as in Combobox, Select and the menus. The
+   words keep their colour while it moves. */
+.x-govuk-ui-editor-prompt-scroll > .x-govuk-ui-scroll-area-viewport {
+  position: relative;
+}
+.x-govuk-ui-editor-prompt-highlight {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  right: 4px;
+  height: 0;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-secondary);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
+    height var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-editor-prompt-item {
+  position: relative;
+  padding: 7px 10px;
+  border-radius: 3px;
+  color: var(--x-govuk-ui-text);
+  cursor: pointer;
+}
+.x-govuk-ui-editor-prompt-empty {
+  padding: 7px 10px;
+  color: var(--x-govuk-ui-muted);
+}
+
+@media (max-width: 40em) {
+  .x-govuk-ui-editor {
+    --x-govuk-ui-prose-size: 16px;
+    --x-govuk-ui-prose-leading: 1.25;
+  }
+}
+
+/* In forced colours, backgrounds and shadows are dropped, so what is chosen, pressed or selected
+   is shown in the system's own colours and lines. */
+@media (forced-colors: active) {
+  /* A swatch's colour is what it offers, so it keeps it, with a ring in the reader's text colour.
+     The ring shows even the palest swatch, however the reader's colours are set. A text colour's
+     letter stays on the page's paper, which it was chosen to be read on. */
+  .x-govuk-ui-editor-swatch {
+    forced-color-adjust: none;
+    box-shadow: 0 0 0 1px CanvasText;
+  }
+  .x-govuk-ui-editor-prompt-item[aria-selected="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .x-govuk-ui-editor-control.x-govuk-ui-button[aria-pressed="true"],
+  .x-govuk-ui-editor-swatch[aria-pressed="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: 1px;
+  }
+  .x-govuk-ui-editor-attachment[data-selected] {
+    outline: 3px solid Highlight;
+  }
+}

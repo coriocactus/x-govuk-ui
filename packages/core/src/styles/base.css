@@ -1,0 +1,138 @@
+/* Design tokens. Light values are GOV.UK's functional colours. GOV.UK has no dark theme, so dark
+   values come from the GOV.UK palette, with a few neutral surfaces of our own. The light values
+   are also set on a light part of a dark page, so its colours are light throughout.
+
+   The components' own rules for the dark theme are scoped from a dark element to the nearest light
+   element inside it, with
+   `@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"])`. Scoped rules
+   win ties of specificity whatever their order. A rule that must beat a scoped rule, such as a
+   focus style, therefore needs to be more specific, or the scoped rule must leave its state out. */
+:root,
+[data-theme="light"] {
+  --x-govuk-ui-text: var(--govuk-text-colour);
+  --x-govuk-ui-muted: var(--govuk-secondary-text-colour);
+  --x-govuk-ui-paper: var(--govuk-body-background-colour);
+  /* GOV.UK's tinted surface, behind content that sits apart from the page. */
+  --x-govuk-ui-surface: var(--govuk-surface-background-colour);
+  /* Keylines, separators and quiet edges. */
+  --x-govuk-ui-line: var(--govuk-border-colour);
+  /* The edges of form controls. */
+  --x-govuk-ui-border: var(--govuk-input-border-colour);
+  /* Secondary fills, such as secondary buttons and hover shading. */
+  --x-govuk-ui-secondary: var(--x-govuk-ui-black-tint-95);
+  --x-govuk-ui-brand: var(--govuk-brand-colour);
+  --x-govuk-ui-link: var(--govuk-link-colour);
+  --x-govuk-ui-link-hover: var(--govuk-link-hover-colour);
+  --x-govuk-ui-link-visited: var(--govuk-link-visited-colour);
+  --x-govuk-ui-focus: var(--govuk-focus-colour);
+  --x-govuk-ui-focus-text: var(--govuk-focus-text-colour);
+  --x-govuk-ui-error: var(--govuk-error-colour);
+  --x-govuk-ui-success: var(--govuk-success-colour);
+  --x-govuk-ui-warning: var(--x-govuk-ui-orange);
+  --x-govuk-ui-logo-dot: var(--x-govuk-ui-teal-accent);
+  /* Placeholder text, clearly lighter than typed text, and still 4.8:1 on white. */
+  --x-govuk-ui-placeholder: color-mix(in srgb, var(--x-govuk-ui-text) 58%, var(--x-govuk-ui-paper));
+  /* Code colours from the GOV.UK palette, each at least 4.5:1 on the page. */
+  --x-govuk-ui-code-keyword: var(--x-govuk-ui-purple);
+  --x-govuk-ui-code-string: var(--x-govuk-ui-green);
+  --x-govuk-ui-code-entity: var(--x-govuk-ui-link);
+  --x-govuk-ui-code-property: var(--x-govuk-ui-magenta-shade-25);
+
+  /* Motion. Two curves and four durations, which src/motion.ts repeats for Motion. Looping
+     animations and staggers keep their own timing. */
+  /* Things arriving, settling and gliding into place. */
+  --x-govuk-ui-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Sheets, sidebars and folds. */
+  --x-govuk-ui-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Quick fades and presses, such as a tooltip appearing. */
+  --x-govuk-ui-duration-instant: 120ms;
+  /* Colour, hover and focus feedback, and small things leaving. */
+  --x-govuk-ui-duration-fast: 150ms;
+  /* Small movements, such as popups, panels and error messages opening. */
+  --x-govuk-ui-duration-medium: 220ms;
+  /* Larger movements, such as sidebars, glides and messages arriving. */
+  --x-govuk-ui-duration-slow: 300ms;
+  /* Layers. Every overlay, from a tooltip to a dialog, shares one layer. Base UI puts each overlay
+     at the end of the page as it opens, so the one opened last is on top. A dialog covers a popover
+     or a tour step that is already open, and a menu opened in a dialog sits above the dialog.
+     Notifications sit above every overlay. A page whose own layers reach these numbers can raise
+     them, or give its root `isolation: isolate`, so nothing in the page rises above an overlay. */
+  --x-govuk-ui-layer-overlay: 60;
+  --x-govuk-ui-layer-notification: 70;
+}
+[data-theme="light"] {
+  color-scheme: light;
+}
+[data-theme="dark"],
+[data-theme="inverse"] {
+  color-scheme: dark;
+  --x-govuk-ui-text: var(--x-govuk-ui-black-tint-95);
+  --x-govuk-ui-muted: var(--x-govuk-ui-black-tint-80);
+  --x-govuk-ui-paper: #1b1f22;
+  --x-govuk-ui-surface: #21272c;
+  --x-govuk-ui-line: #3d444a;
+  --x-govuk-ui-border: var(--x-govuk-ui-black-tint-50);
+  --x-govuk-ui-secondary: #2c3237;
+  --x-govuk-ui-brand: var(--x-govuk-ui-blue-tint-25);
+  --x-govuk-ui-link: var(--x-govuk-ui-blue-tint-50);
+  --x-govuk-ui-link-hover: var(--x-govuk-ui-blue-tint-80);
+  --x-govuk-ui-link-visited: var(--x-govuk-ui-purple-tint-50);
+  --x-govuk-ui-error: var(--x-govuk-ui-red-tint-50);
+  --x-govuk-ui-success: var(--x-govuk-ui-green-tint-50);
+  --x-govuk-ui-warning: var(--x-govuk-ui-orange-tint-25);
+  /* 4.7:1 on the dark page. */
+  --x-govuk-ui-placeholder: color-mix(in srgb, var(--x-govuk-ui-text) 50%, var(--x-govuk-ui-paper));
+  --x-govuk-ui-code-keyword: var(--x-govuk-ui-purple-tint-50);
+  --x-govuk-ui-code-string: var(--x-govuk-ui-green-tint-50);
+  --x-govuk-ui-code-entity: var(--x-govuk-ui-link);
+  --x-govuk-ui-code-property: var(--x-govuk-ui-magenta-tint-50);
+}
+/* An inverse part of the page, such as a header or a sidebar's head, set on GOV.UK's black like
+   GOV.UK's own header. It takes the dark theme's colours and rules, on GOV.UK's black, with white
+   words and links. It is only ever a part of a page, in either theme, and never the page itself. */
+[data-theme="inverse"] {
+  --x-govuk-ui-text: var(--x-govuk-ui-white);
+  --x-govuk-ui-paper: var(--x-govuk-ui-black);
+  --x-govuk-ui-link: var(--x-govuk-ui-white);
+  --x-govuk-ui-link-hover: var(--x-govuk-ui-white);
+  --x-govuk-ui-link-visited: var(--x-govuk-ui-white);
+  background-color: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+}
+/* Each part's padding and border sit inside the width and height its rules give it. GOV.UK
+   Frontend sets no box-sizing for the whole page, and a service may set none, so the library sets
+   it on its own elements. These are the elements with a class starting `x-govuk-ui-`. A service's
+   own elements keep their box-sizing. :where() gives the rule no specificity, so a part's own rule
+   wins, such as the content-box of Code block's line numbers. Pseudo-elements keep content-box,
+   which their rules are written for. */
+:where([class*="x-govuk-ui-"]) {
+  box-sizing: border-box;
+}
+/* Words only screen readers hear. They keep their place down the page, so a screen reader's cursor
+   stays beside the words they go with. They sit at their box's left, so the pixel they take at the
+   end of a line never widens a box that scrolls. */
+.x-govuk-ui-visually-hidden {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.x-govuk-ui-sound-scope {
+  display: contents;
+}
+@keyframes x-govuk-ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class^="x-govuk-ui-"],
+  [class*=" x-govuk-ui-"] {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

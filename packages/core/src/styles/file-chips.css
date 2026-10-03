@@ -1,0 +1,115 @@
+/* File chips. A row of chips that wraps, each with a file's or document's icon, name and kind. */
+.x-govuk-ui-file-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* A chip is at least 28 pixels tall, and taller where the typeface needs it. A transparent outline
+   shows its edge in forced colours, where its fill is dropped. */
+.x-govuk-ui-file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* It may narrow below its name's width in a narrow list, and the name is cut to fit. */
+  min-width: 0;
+  max-width: 220px;
+  min-height: 28px;
+  padding: 0 4px 0 8px;
+  border-radius: 6px;
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.x-govuk-ui-file-chip > svg {
+  flex: none;
+  color: var(--x-govuk-ui-muted);
+}
+/* A chip that cannot be removed keeps the same space at both ends. */
+.x-govuk-ui-file-chip:not(:has(.x-govuk-ui-file-chip-remove)) {
+  padding-right: 8px;
+}
+/* A long name is cut short in its middle, inside the chip's 220 pixels, and file-chips.tsx finds
+   where. Spaces are kept, so the space between the two parts shows when the name is whole. */
+.x-govuk-ui-file-chip-name {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  white-space: pre;
+}
+/* Until script cuts the name, and without script, the start gives way with CSS's ellipsis. */
+.x-govuk-ui-file-chip-start {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.x-govuk-ui-file-chip-end {
+  flex: none;
+}
+/* Once script has cut the name, its parts are inline text on one line, as wide as the letters they
+   draw, including the ellipsis. Nothing is clipped, and a selection runs across them. */
+.x-govuk-ui-file-chip-name[data-measured] {
+  display: block;
+}
+/* The whole name, for screen readers, is set on one line as the shown parts are, so its width
+   estimates where the cut falls. Copying what shows leaves it out. */
+.x-govuk-ui-file-chip-whole {
+  white-space: pre;
+  user-select: none;
+}
+/* A name that links to its document is GOV.UK's link in the text's colour. Its underline thickens
+   under the pointer. */
+a.x-govuk-ui-file-chip-name {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+a.x-govuk-ui-file-chip-name:hover {
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+a.x-govuk-ui-file-chip-name:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+}
+/* What kind of thing it is, after its name, in the muted colour. */
+.x-govuk-ui-file-chip-kind {
+  flex: none;
+  color: var(--x-govuk-ui-muted);
+  font-size: 13px;
+}
+.x-govuk-ui-file-chip-remove {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--x-govuk-ui-muted);
+  cursor: pointer;
+}
+.x-govuk-ui-file-chip-remove:hover {
+  background: color-mix(in srgb, var(--x-govuk-ui-secondary) 80%, var(--x-govuk-ui-text));
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-file-chip-remove:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+}

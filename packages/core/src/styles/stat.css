@@ -1,0 +1,123 @@
+/* Stat. One figure that matters, set as The Economist sets a big number. The figure is large and
+   bold, in tabular numerals. What it counts sits above, in quiet small text, and how it moved sits
+   beneath, with an arrow. Stats sets several side by side, with a keyline between each, in a
+   Figure, which gives them a Chart's rule, headline and source. */
+/* The stats sit in a grid of equal cells, as many across as fit at the least width a stat needs.
+   The grid wraps into another row of the same cells when it runs out of space. Every stat draws a
+   keyline at its left and its top. The grid sits a pixel up and to the left of the box around it,
+   which clips those two sides, so the first row and the first column show no keyline. The first
+   column's padding is clipped too, so its words line up with the headline. In a column, the cells
+   stack. */
+.x-govuk-ui-stats-grid {
+  /* A block formatting root of its own, so the grid's margin cannot collapse through it. It also
+     clips. */
+  display: flow-root;
+  overflow: clip;
+}
+.x-govuk-ui-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--x-govuk-ui-stat-width, 180px), 1fr));
+  margin: -1px 0 0 -21px;
+}
+.x-govuk-ui-stats-row > .x-govuk-ui-stat {
+  border-top: 1px solid var(--x-govuk-ui-line);
+  border-left: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-stats[data-orientation="vertical"] .x-govuk-ui-stats-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+/* A stat is a container, so its words are set to the space its cell has. A wide cell has the icon
+   beside the figure, and a narrow cell puts it above. The figure scales down with a narrow cell.
+   A figure still too long for its cell at the smallest size wraps, at a space if it has one, so it
+   is never clipped at the grid's edge or run into the next. */
+.x-govuk-ui-stat {
+  container-type: inline-size;
+  box-sizing: border-box;
+  padding: 10px 24px 12px 20px;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-stat-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+@container (max-width: 260px) {
+  .x-govuk-ui-stat-body {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .x-govuk-ui-stat-icon {
+    justify-content: flex-start;
+  }
+  .x-govuk-ui-stats[data-align="centre"] .x-govuk-ui-stat-icon {
+    justify-content: center;
+  }
+}
+.x-govuk-ui-stats[data-align="centre"] .x-govuk-ui-stat-body {
+  justify-content: center;
+  text-align: center;
+}
+.x-govuk-ui-stats[data-align="centre"] .x-govuk-ui-stat-words {
+  align-items: center;
+}
+.x-govuk-ui-stat-words {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  min-width: 0;
+}
+.x-govuk-ui-stat-words > dd {
+  margin: 0;
+}
+.x-govuk-ui-stat-label {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.x-govuk-ui-stat-value {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  font-size: clamp(26px, 19cqi, 36px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-stat-description {
+  margin-top: 4px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+/* The arrow and the words say what the change means, and colour adds to them. Good news is green,
+   and bad news is red. */
+.x-govuk-ui-stat-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-stat-change[data-sentiment="good"] {
+  color: var(--x-govuk-ui-success);
+}
+.x-govuk-ui-stat-change[data-sentiment="bad"] {
+  color: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-stat-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-stat-icon svg {
+  width: 28px;
+  height: 28px;
+}

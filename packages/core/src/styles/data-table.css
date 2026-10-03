@@ -1,0 +1,193 @@
+/* Data table. A bordered card over Table's parts, scrolling both ways. The headings stay at the
+   top, the foot at the bottom, and the pinned columns at the side, each over the page's paper, so
+   the rows pass beneath them. Cells keep to one line and end with an ellipsis. */
+.x-govuk-ui-data-table {
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 10px;
+  overflow: clip;
+  background: var(--x-govuk-ui-paper);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-data-table-scroll {
+  min-height: 0;
+}
+.x-govuk-ui-table.x-govuk-ui-data-table-table {
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 16px;
+}
+.x-govuk-ui-data-table-table :is(th, td) {
+  box-sizing: border-box;
+  height: 44px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  background: var(--x-govuk-ui-paper);
+}
+.x-govuk-ui-data-table-table :is(th, td):last-child {
+  padding-right: 12px;
+}
+/* Headings are muted, with their icons, and sit over the rows as they scroll. */
+.x-govuk-ui-data-table-table thead th {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+  font-weight: 400;
+}
+.x-govuk-ui-data-table-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.x-govuk-ui-data-table-icon {
+  display: flex;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-data-table-head .x-govuk-ui-table-sort {
+  max-width: 100%;
+}
+/* Each heading's right edge is a handle that resizes its column. Its line shows under the pointer
+   and while dragged or focused. */
+.x-govuk-ui-resizable-handle.x-govuk-ui-data-table-resize {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  right: 0;
+  background: transparent;
+}
+.x-govuk-ui-data-table-table thead th:hover .x-govuk-ui-data-table-resize {
+  background: var(--x-govuk-ui-line);
+}
+/* Rows shade under the pointer, and chosen rows take a tint of brand blue. */
+.x-govuk-ui-data-table-table tbody th {
+  color: var(--x-govuk-ui-text);
+  font-weight: 400;
+}
+.x-govuk-ui-data-table-table tbody tr:hover > * {
+  background: color-mix(in srgb, var(--x-govuk-ui-secondary) 55%, var(--x-govuk-ui-paper));
+}
+.x-govuk-ui-data-table-table tbody tr[data-selected] > * {
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 9%, var(--x-govuk-ui-paper));
+}
+.x-govuk-ui-data-table-table tbody tr:hover {
+  background: none;
+}
+/* The pinned columns stay at the side, with a shadow along their edge once the rest scrolls. */
+.x-govuk-ui-data-table-table [data-pinned] {
+  position: sticky;
+  z-index: 1;
+}
+.x-govuk-ui-data-table-table thead [data-pinned],
+.x-govuk-ui-data-table-table tfoot [data-pinned] {
+  z-index: 3;
+}
+.x-govuk-ui-data-table-table [data-pinned="last"] {
+  transition: box-shadow var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-data-table[data-scrolled] [data-pinned="last"] {
+  box-shadow: 6px 0 8px -6px rgb(11 12 12 / 22%);
+}
+/* The foot shows the count, and each column's figure on a button. */
+.x-govuk-ui-data-table-table tfoot td {
+  position: sticky;
+  z-index: 2;
+  bottom: 0;
+  border-top: 1px solid var(--x-govuk-ui-line);
+  border-bottom: 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+}
+.x-govuk-ui-button.x-govuk-ui-data-table-add {
+  min-height: 30px;
+  padding: 2px 8px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.x-govuk-ui-data-table-figure {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  max-width: 100%;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--x-govuk-ui-text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.x-govuk-ui-data-table-figure span {
+  color: var(--x-govuk-ui-muted);
+  font-size: 13px;
+}
+.x-govuk-ui-data-table-figure:hover {
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-data-table-figure:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  box-shadow: inset 0 0 0 2px var(--x-govuk-ui-focus-text);
+}
+/* Checkboxes are GOV.UK's small square, with a tick, or a bar when only some rows are chosen. */
+.x-govuk-ui-data-table-check {
+  text-align: center;
+}
+.x-govuk-ui-data-table-table :is(th, td).x-govuk-ui-data-table-check {
+  padding: 0;
+  text-align: center;
+}
+.x-govuk-ui-data-table-checkbox {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 2px solid var(--x-govuk-ui-text);
+  border-radius: 3px;
+  background: var(--x-govuk-ui-paper);
+  vertical-align: middle;
+  cursor: pointer;
+}
+.x-govuk-ui-data-table-checkbox::before {
+  content: "";
+  width: 9px;
+  height: 5px;
+  border: solid var(--x-govuk-ui-paper);
+  border-width: 0 0 2px 2px;
+  rotate: -45deg;
+  translate: 0 -1px;
+  scale: 0;
+  transition: scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-data-table-checkbox:is(:checked, :indeterminate) {
+  background: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-data-table-checkbox:checked::before {
+  scale: 1;
+}
+.x-govuk-ui-data-table-checkbox:indeterminate::before {
+  width: 8px;
+  height: 0;
+  border-width: 0 0 2px;
+  rotate: 0deg;
+  translate: 0 0;
+  scale: 1;
+}
+.x-govuk-ui-data-table-checkbox:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px var(--x-govuk-ui-focus-text);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-data-table-checkbox:checked {
+    background: CanvasText;
+  }
+}

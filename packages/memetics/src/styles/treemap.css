@@ -1,0 +1,17 @@
+/* Treemap. Each part is in its branch's colour, separated by lines of the paper's colour, and named
+   in the ink that reads on that colour. */
+.x-govuk-ui-treemap-label {
+  font-family: var(--x-govuk-ui-font);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.x-govuk-ui-treemap-name {
+  font-weight: 700;
+}
+.x-govuk-ui-treemap-part rect {
+  transition: opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-treemap-part:hover rect {
+  opacity: 0.85;
+}

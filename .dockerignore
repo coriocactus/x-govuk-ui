@@ -1,0 +1,21 @@
+# Only what `bun run build` reads goes to the image. That is the source, the site, the scripts,
+# the package files and the licences. Docs and the tools' settings stay out, so editing them does
+# not rebuild the image.
+.git
+.jj
+.github
+**/node_modules
+**/dist
+tests
+test-results
+playwright-report
+.DS_Store
+*.md
+biome.json
+playwright.config.ts
+mise.toml
+mise.lock
+**/tsconfig.lib.json
+Dockerfile
+fly.toml
+mcp

@@ -1,0 +1,541 @@
+/* Tiles, on react-mosaic. react-mosaic places each tile in its own elements, with its own class
+   names, at percentages of the board from each edge. The package leaves out react-mosaic's
+   stylesheet. These rules style its elements in GOV.UK's way instead, with flush tiles, a keyline
+   between them, a bar at the top of each, and drop targets in link blue.
+
+   Each rule reaches react-mosaic's elements from the board. A service therefore styles the Tiles
+   through the board, the tile's parts, and two colours. They are --x-govuk-ui-tiles-line, the
+   keyline, and --x-govuk-ui-tiles-drop, where a dragged tile would go. */
+/* Tiles has any parts given to it, such as a dock, then the board, which takes the rest. */
+.x-govuk-ui-tiles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+/* The board fills the space it is given, and is a layer of its own, so nothing in a tile rises
+   above what is outside it. */
+.x-govuk-ui-tiles-board {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  /* Shows in the pixel each tile leaves after it, as the keyline between tiles. */
+  background: var(--x-govuk-ui-tiles-line, var(--x-govuk-ui-line));
+}
+.x-govuk-ui-tiles-mosaic {
+  position: absolute;
+  inset: 0;
+}
+
+/* Each tile gives the pixel after it, to the right and below, to the line before the next. The
+   board reaches a pixel past the Tiles on those sides, so the last tiles reach its edges. */
+.x-govuk-ui-tiles-mosaic > .mosaic-root,
+.x-govuk-ui-tiles-dividers {
+  position: absolute;
+  inset: 0 -1px -1px 0;
+}
+/* A tile moves rarely, and only on request, as it is dropped, split, closed or maximised. Its
+   content has to reflow to fill its new box, so its box eases into place. A transform would jump
+   at the end. A divider's drag follows the pointer with no easing. A new tile fades in. */
+.x-govuk-ui-tiles-mosaic > .mosaic-root > .mosaic-tile {
+  position: absolute;
+  margin: 0 1px 1px 0;
+  transition:
+    top var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    right var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    bottom var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    left var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    visibility 0s;
+}
+@starting-style {
+  .x-govuk-ui-tiles-mosaic > .mosaic-root > .mosaic-tile {
+    opacity: 0;
+  }
+}
+/* A frame inside a tile would take the pointer from the divider. */
+.x-govuk-ui-tiles-board[data-resizing] > .x-govuk-ui-tiles-mosaic > .mosaic-root > .mosaic-tile {
+  pointer-events: none;
+}
+/* With a snap, each step glides into place. */
+.x-govuk-ui-tiles-board[data-resizing]:not([data-snap])
+  > .x-govuk-ui-tiles-mosaic
+  > .mosaic-root
+  > .mosaic-tile {
+  transition: none;
+}
+.x-govuk-ui-tiles-board[data-resizing][data-snap]
+  > .x-govuk-ui-tiles-mosaic
+  > .mosaic-root
+  > .mosaic-tile,
+.x-govuk-ui-tiles-board[data-resizing][data-snap]
+  > .x-govuk-ui-tiles-dividers
+  > .x-govuk-ui-tiles-divider {
+  transition-duration: var(--x-govuk-ui-duration-medium);
+}
+
+/* The window react-mosaic wraps each tile in. Its own bar is left empty, because the Tile draws its
+   own inside. Its body is the Tile's space. */
+.x-govuk-ui-tiles-board .mosaic-window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--x-govuk-ui-paper);
+}
+.x-govuk-ui-tiles-board .mosaic-window-toolbar,
+.x-govuk-ui-tiles-board .mosaic-window-body-overlay,
+.x-govuk-ui-tiles-board .mosaic-window-additional-actions-bar {
+  display: none;
+}
+.x-govuk-ui-tiles-board .mosaic-window-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--x-govuk-ui-paper);
+}
+
+/* react-mosaic's own picture of a dragged window is not drawn, because the Tiles draws its own. */
+.x-govuk-ui-tiles-board .mosaic-preview {
+  display: none;
+}
+/* The picture that follows a dragged tile or chip, for a pointer and a finger alike. It shows the
+   tile's title on a chip in the tile's colours, above the page. */
+.x-govuk-ui-tiles-drag-picture {
+  position: fixed;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  top: 0;
+  left: 0;
+  max-width: 240px;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  overflow: hidden;
+  border: 2px solid var(--x-govuk-ui-tiles-drop, var(--x-govuk-ui-link));
+  border-radius: 4px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.2);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Where a dragged tile can go, as a band at each edge of the tile under it, and of the whole Tiles.
+   The band under the pointer widens to the half the tile would take, in link blue. Only the bands
+   take the pointer, so the tile between them is still under it, and keeps its own bands. */
+.x-govuk-ui-tiles-board .drop-target-container {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: none;
+  pointer-events: none;
+}
+.x-govuk-ui-tiles-board .mosaic-window.drop-target-hover > .drop-target-container,
+.x-govuk-ui-tiles-mosaic > .drop-target-container.-dragging {
+  display: block;
+}
+/* While a tile from other Tiles is dragged, this board takes no drop. */
+.x-govuk-ui-tiles-board[data-foreign] > .x-govuk-ui-tiles-mosaic > .drop-target-container,
+.x-govuk-ui-tiles-board[data-foreign]
+  > .x-govuk-ui-tiles-mosaic
+  > .mosaic-root
+  > .mosaic-tile
+  > .mosaic-window
+  > .drop-target-container {
+  display: none;
+}
+.x-govuk-ui-tiles-board .drop-target {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+}
+.x-govuk-ui-tiles-board .drop-target.left {
+  right: 70%;
+}
+.x-govuk-ui-tiles-board .drop-target.right {
+  left: 70%;
+}
+.x-govuk-ui-tiles-board .drop-target.top {
+  bottom: 70%;
+}
+.x-govuk-ui-tiles-board .drop-target.bottom {
+  top: 70%;
+}
+.x-govuk-ui-tiles-board .drop-target.drop-target-hover.left {
+  right: 50%;
+}
+.x-govuk-ui-tiles-board .drop-target.drop-target-hover.right {
+  left: 50%;
+}
+.x-govuk-ui-tiles-board .drop-target.drop-target-hover.top {
+  bottom: 50%;
+}
+.x-govuk-ui-tiles-board .drop-target.drop-target-hover.bottom {
+  top: 50%;
+}
+.x-govuk-ui-tiles-board .drop-target.swap {
+  z-index: 1;
+  inset: 30%;
+}
+.x-govuk-ui-tiles-board .drop-target.swap.-fill {
+  inset: 0;
+}
+.x-govuk-ui-tiles-mosaic > .drop-target-container > .drop-target.left {
+  right: calc(100% - 12px);
+}
+.x-govuk-ui-tiles-mosaic > .drop-target-container > .drop-target.right {
+  left: calc(100% - 12px);
+}
+.x-govuk-ui-tiles-mosaic > .drop-target-container > .drop-target.top {
+  bottom: calc(100% - 12px);
+}
+.x-govuk-ui-tiles-mosaic > .drop-target-container > .drop-target.bottom {
+  top: calc(100% - 12px);
+}
+.x-govuk-ui-tiles-mosaic > .drop-target-container > .drop-target.drop-target-hover.left {
+  right: 75%;
+}
+.x-govuk-ui-tiles-mosaic > .drop-target-container > .drop-target.drop-target-hover.right {
+  left: 75%;
+}
+.x-govuk-ui-tiles-mosaic > .drop-target-container > .drop-target.drop-target-hover.top {
+  bottom: 75%;
+}
+.x-govuk-ui-tiles-mosaic > .drop-target-container > .drop-target.drop-target-hover.bottom {
+  top: 75%;
+}
+/* The band grows out from its edge as it fades in. */
+.x-govuk-ui-tiles-board .drop-target::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(
+    in srgb,
+    var(--x-govuk-ui-tiles-drop, var(--x-govuk-ui-link)) 14%,
+    transparent
+  );
+  box-shadow: inset 0 0 0 3px var(--x-govuk-ui-tiles-drop, var(--x-govuk-ui-link));
+  opacity: 0;
+  scale: 0.6;
+  pointer-events: none;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-tiles-board .drop-target.left::after {
+  transform-origin: left;
+  scale: 0.6 1;
+}
+.x-govuk-ui-tiles-board .drop-target.right::after {
+  transform-origin: right;
+  scale: 0.6 1;
+}
+.x-govuk-ui-tiles-board .drop-target.top::after {
+  transform-origin: top;
+  scale: 1 0.6;
+}
+.x-govuk-ui-tiles-board .drop-target.bottom::after {
+  transform-origin: bottom;
+  scale: 1 0.6;
+}
+.x-govuk-ui-tiles-board .drop-target.drop-target-hover::after {
+  opacity: 1;
+  scale: 1;
+}
+
+/* The dividers lie over the lines between tiles, each a Resizable handle. They are hidden while a
+   tile is dragged, because the tiles move under them, and while a tile is maximised. */
+.x-govuk-ui-tiles-dividers {
+  z-index: 2;
+  pointer-events: none;
+}
+.x-govuk-ui-tiles-dividers > .x-govuk-ui-tiles-divider {
+  position: absolute;
+  pointer-events: auto;
+  transition:
+    top var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    right var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    bottom var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    left var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+.x-govuk-ui-tiles-board[data-resizing]:not([data-snap])
+  > .x-govuk-ui-tiles-dividers
+  > .x-govuk-ui-tiles-divider {
+  transition: none;
+}
+.x-govuk-ui-tiles-mosaic.-dragging ~ .x-govuk-ui-tiles-dividers,
+.x-govuk-ui-tiles-board[data-maximised] > .x-govuk-ui-tiles-dividers {
+  visibility: hidden;
+}
+/* In preview, the line moves alone in link blue, and the tiles follow once it is let go. */
+.x-govuk-ui-tiles-dividers > .x-govuk-ui-tiles-divider[data-preview] {
+  z-index: 3;
+}
+
+/* A maximised tile fills the Tiles over the rest, which fade away and are out of reach. */
+.x-govuk-ui-tiles-board[data-maximised] > .x-govuk-ui-tiles-mosaic > .mosaic-root > .mosaic-tile {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    top var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    right var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    bottom var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    left var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    visibility 0s linear var(--x-govuk-ui-duration-medium);
+}
+.x-govuk-ui-tiles-board[data-maximised]
+  > .x-govuk-ui-tiles-mosaic
+  > .mosaic-root
+  > .mosaic-tile:has(> .mosaic-window > .mosaic-window-body > .x-govuk-ui-tile[data-maximised]) {
+  z-index: 3;
+  /* react-mosaic places the tile in its own style attribute. */
+  inset: 0 !important;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    top var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    right var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    bottom var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer),
+    left var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+
+/* With no tiles, the Tiles shows its `empty` content in the middle. */
+.x-govuk-ui-tiles-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: 24px;
+  overflow: auto;
+  background: var(--x-govuk-ui-paper);
+}
+
+/* A tile, with its bar, then its content, filling the window. Its own width decides which controls
+   its bar has space for. */
+.x-govuk-ui-tile {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  container-type: inline-size;
+}
+.x-govuk-ui-tile-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  box-sizing: border-box;
+  /* As tall as the sidebar's header and a page's bar, once --x-govuk-ui-bar-height sets them
+     together. */
+  min-height: var(--x-govuk-ui-bar-height, 44px);
+  padding-right: 6px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-paper);
+}
+/* The heading is the handle a tile is dragged by, beside a grip of dots that shows it. */
+.x-govuk-ui-tile-grip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  padding: 0 8px 0 14px;
+  user-select: none;
+}
+.x-govuk-ui-tile-grip[data-draggable] {
+  padding-left: 8px;
+  cursor: grab;
+  touch-action: none;
+}
+.x-govuk-ui-tile-grip[data-draggable]:active {
+  cursor: grabbing;
+}
+.x-govuk-ui-tile-grip-dots {
+  flex: none;
+  width: 10px;
+  height: 16px;
+  fill: var(--x-govuk-ui-muted);
+  transition: fill var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-tile-grip[data-draggable]:hover > .x-govuk-ui-tile-grip-dots {
+  fill: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-tile-heading {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.x-govuk-ui-tile-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+/* On a small screen, where the tile is among the others, between buttons to the one before and
+   the one after. */
+.x-govuk-ui-tile-pager {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.x-govuk-ui-tile-pager-place {
+  padding-inline: 4px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  white-space: nowrap;
+}
+/* A narrow tile gives its title the space first. Its menu does everything its own buttons do, so
+   while it has a menu, the buttons go. The splits go first, then Maximise, then Close. A service's
+   own buttons stay, because the menu cannot do what they do. */
+@container (max-width: 360px) {
+  .x-govuk-ui-tile-controls:has(> .x-govuk-ui-tile-menu-trigger) > .x-govuk-ui-tile-split {
+    display: none;
+  }
+}
+@container (max-width: 300px) {
+  .x-govuk-ui-tile-controls:has(> .x-govuk-ui-tile-menu-trigger) > .x-govuk-ui-tile-maximise {
+    display: none;
+  }
+}
+@container (max-width: 200px) {
+  .x-govuk-ui-tile-controls:has(> .x-govuk-ui-tile-menu-trigger) > .x-govuk-ui-tile-close {
+    display: none;
+  }
+}
+.x-govuk-ui-tile-content {
+  flex: 1;
+  min-height: 0;
+}
+div.x-govuk-ui-tile-content {
+  overflow: hidden;
+}
+
+/* The dock, a row of the closed tiles, as chips with the grip a tile's bar has. While a tile from
+   the board is dragged, the dock is a place to drop it. It is outlined, and in link blue under the
+   pointer. */
+.x-govuk-ui-tiles-dock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px dashed transparent;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  line-height: 1.25;
+  transition:
+    border-color var(--x-govuk-ui-duration-fast) ease,
+    background var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-tiles-dock[data-ready] {
+  border-color: var(--x-govuk-ui-border);
+  background: var(--x-govuk-ui-surface);
+}
+.x-govuk-ui-tiles-dock[data-over] {
+  border-style: solid;
+  border-color: var(--x-govuk-ui-tiles-drop, var(--x-govuk-ui-link));
+  background: color-mix(
+    in srgb,
+    var(--x-govuk-ui-tiles-drop, var(--x-govuk-ui-link)) 14%,
+    var(--x-govuk-ui-paper)
+  );
+}
+.x-govuk-ui-tiles-dock-label {
+  font-weight: 700;
+}
+.x-govuk-ui-tiles-dock-hint {
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-tiles-dock-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 4px 12px 4px 8px;
+  border: 1px solid var(--x-govuk-ui-border);
+  border-radius: 4px;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition:
+    border-color var(--x-govuk-ui-duration-fast) ease,
+    opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-tiles-dock-tile:hover {
+  border-color: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-tiles-dock-tile:hover > .x-govuk-ui-tile-grip-dots {
+  fill: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-tiles-dock-tile:active {
+  cursor: grabbing;
+}
+.x-govuk-ui-tiles-dock-tile:focus-visible {
+  outline: 3px solid transparent;
+  border-color: var(--x-govuk-ui-focus-text);
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  /* The dark edge sits beneath the tile, as GOV.UK's does, so its name stays in the middle of the
+     yellow. */
+  box-shadow: 0 4px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-tiles-dock-tile:focus-visible > .x-govuk-ui-tile-grip-dots {
+  fill: currentColor;
+}
+/* The dragged chip waits faintly in the dock, so the dock does not reflow beneath the pointer. */
+.x-govuk-ui-tiles-dock-tile[data-dragging] {
+  opacity: 0.4;
+}
+.x-govuk-ui-tiles-tidy .x-govuk-ui-button-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (forced-colors: active) {
+  .x-govuk-ui-tiles-dock[data-ready] {
+    border-color: CanvasText;
+  }
+  .x-govuk-ui-tiles-dock[data-over] {
+    border-color: Highlight;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-tiles-mosaic > .mosaic-root > .mosaic-tile,
+  .x-govuk-ui-tiles-board[data-maximised] > .x-govuk-ui-tiles-mosaic > .mosaic-root > .mosaic-tile,
+  .x-govuk-ui-tiles-board .drop-target::after {
+    transition: none !important;
+  }
+}

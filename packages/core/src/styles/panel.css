@@ -1,0 +1,53 @@
+/* Panel. GOV.UK's green confirmation panel with white text, centred, with softened corners. It
+   rises into place. */
+.x-govuk-ui-panel {
+  box-sizing: border-box;
+  margin-bottom: 30px;
+  padding: 32px 28px 36px;
+  border-radius: 8px;
+  background: var(--x-govuk-ui-success);
+  color: var(--x-govuk-ui-white);
+  font-family: var(--x-govuk-ui-font);
+  text-align: center;
+  overflow-wrap: break-word;
+  animation: x-govuk-ui-panel-in var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-panel-in {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-panel {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+.x-govuk-ui-panel-title {
+  margin: 0 0 16px;
+  font-size: 40px;
+  line-height: 1.1;
+}
+.x-govuk-ui-panel-title:last-child {
+  margin-bottom: 0;
+}
+.x-govuk-ui-panel-body {
+  font-size: 28px;
+  line-height: 1.3;
+}
+@media (max-width: 40em) {
+  .x-govuk-ui-panel {
+    padding: 24px 20px 26px;
+  }
+  .x-govuk-ui-panel-title {
+    font-size: 32px;
+  }
+  .x-govuk-ui-panel-body {
+    font-size: 22px;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-panel {
+    border: 4px solid CanvasText;
+  }
+}

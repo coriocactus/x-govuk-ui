@@ -1,0 +1,135 @@
+/* The charts' colours. They are the Government Analysis Function's categorical palette, lighter on
+   dark paper. Each has the ink that reads on it, which is white on the dark colours and black on
+   the light ones.
+
+   Text in a series' colour, such as a line's name at its end, takes the colour's ink. That is the
+   colour itself where it contrasts with the paper at 4.5 to 1, and a darker shade where it does
+   not. The grey sets back everything but the series picked out, as the Analysis Function's focus
+   charts do. The five shades of a heat map run from the paper to the palette's first colour. */
+.x-govuk-ui-chart,
+.x-govuk-ui-chart-set,
+.x-govuk-ui-sparkline,
+.x-govuk-ui-bar-list,
+.x-govuk-ui-gauge,
+.x-govuk-ui-bullet-chart,
+.x-govuk-ui-waffle {
+  --x-govuk-ui-chart-1: #12436d;
+  --x-govuk-ui-chart-2: #28a197;
+  --x-govuk-ui-chart-3: #801650;
+  --x-govuk-ui-chart-4: #f46a25;
+  --x-govuk-ui-chart-5: #3d3d3d;
+  --x-govuk-ui-chart-6: #a285d1;
+  --x-govuk-ui-chart-on-1: #ffffff;
+  --x-govuk-ui-chart-on-2: #0b0c0c;
+  --x-govuk-ui-chart-on-3: #ffffff;
+  --x-govuk-ui-chart-on-4: #0b0c0c;
+  --x-govuk-ui-chart-on-5: #ffffff;
+  --x-govuk-ui-chart-on-6: #0b0c0c;
+  --x-govuk-ui-chart-ink-1: var(--x-govuk-ui-chart-1);
+  --x-govuk-ui-chart-ink-2: #1b7a72;
+  --x-govuk-ui-chart-ink-3: var(--x-govuk-ui-chart-3);
+  --x-govuk-ui-chart-ink-4: #b54a10;
+  --x-govuk-ui-chart-ink-5: var(--x-govuk-ui-chart-5);
+  --x-govuk-ui-chart-ink-6: #6f55a6;
+  --x-govuk-ui-chart-muted: #bfbfbf;
+  --x-govuk-ui-chart-heat-1: color-mix(
+    in srgb,
+    var(--x-govuk-ui-chart-1) 12%,
+    var(--x-govuk-ui-paper)
+  );
+  --x-govuk-ui-chart-heat-2: color-mix(
+    in srgb,
+    var(--x-govuk-ui-chart-1) 30%,
+    var(--x-govuk-ui-paper)
+  );
+  --x-govuk-ui-chart-heat-3: color-mix(
+    in srgb,
+    var(--x-govuk-ui-chart-1) 50%,
+    var(--x-govuk-ui-paper)
+  );
+  --x-govuk-ui-chart-heat-4: color-mix(
+    in srgb,
+    var(--x-govuk-ui-chart-1) 75%,
+    var(--x-govuk-ui-paper)
+  );
+  --x-govuk-ui-chart-heat-5: var(--x-govuk-ui-chart-1);
+  --x-govuk-ui-chart-heat-ink-strong: #ffffff;
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-chart,
+  :scope .x-govuk-ui-chart-set,
+  :scope .x-govuk-ui-sparkline,
+  :scope .x-govuk-ui-bar-list,
+  :scope .x-govuk-ui-gauge,
+  :scope .x-govuk-ui-bullet-chart,
+  :scope .x-govuk-ui-waffle {
+    --x-govuk-ui-chart-1: #6fa3d6;
+    --x-govuk-ui-chart-2: #4fc3b7;
+    --x-govuk-ui-chart-3: #d46a9f;
+    --x-govuk-ui-chart-4: #f8955f;
+    --x-govuk-ui-chart-5: #c8c8c8;
+    --x-govuk-ui-chart-6: #b9a3e0;
+    --x-govuk-ui-chart-on-1: var(--x-govuk-ui-paper);
+    --x-govuk-ui-chart-on-2: var(--x-govuk-ui-paper);
+    --x-govuk-ui-chart-on-3: var(--x-govuk-ui-paper);
+    --x-govuk-ui-chart-on-4: var(--x-govuk-ui-paper);
+    --x-govuk-ui-chart-on-5: var(--x-govuk-ui-paper);
+    --x-govuk-ui-chart-on-6: var(--x-govuk-ui-paper);
+    --x-govuk-ui-chart-ink-1: var(--x-govuk-ui-chart-1);
+    --x-govuk-ui-chart-ink-2: var(--x-govuk-ui-chart-2);
+    --x-govuk-ui-chart-ink-3: var(--x-govuk-ui-chart-3);
+    --x-govuk-ui-chart-ink-4: var(--x-govuk-ui-chart-4);
+    --x-govuk-ui-chart-ink-5: var(--x-govuk-ui-chart-5);
+    --x-govuk-ui-chart-ink-6: var(--x-govuk-ui-chart-6);
+    --x-govuk-ui-chart-muted: #5b6268;
+    /* On dark paper, the middle shades are dark. The fourth must be pale enough for dark ink. */
+    --x-govuk-ui-chart-heat-1: color-mix(
+      in srgb,
+      var(--x-govuk-ui-chart-1) 15%,
+      var(--x-govuk-ui-paper)
+    );
+    --x-govuk-ui-chart-heat-2: color-mix(
+      in srgb,
+      var(--x-govuk-ui-chart-1) 32%,
+      var(--x-govuk-ui-paper)
+    );
+    --x-govuk-ui-chart-heat-3: color-mix(
+      in srgb,
+      var(--x-govuk-ui-chart-1) 52%,
+      var(--x-govuk-ui-paper)
+    );
+    --x-govuk-ui-chart-heat-4: color-mix(
+      in srgb,
+      var(--x-govuk-ui-chart-1) 85%,
+      var(--x-govuk-ui-paper)
+    );
+    --x-govuk-ui-chart-heat-ink-strong: var(--x-govuk-ui-paper);
+  }
+}
+/* In forced colours, the page takes the reader's colours. A series' colour still tells it apart
+   from the next, and a shade still says what a heat map's figure is. The drawings therefore keep
+   the palette and the shades, set on the reader's own paper, with the reader's text colour for
+   their words, lines and grid. The shades mix the palette into the reader's paper, so they run from
+   it as they do from the page's paper. */
+@media (forced-colors: active) {
+  .x-govuk-ui-chart,
+  .x-govuk-ui-chart-set {
+    --x-govuk-ui-text: CanvasText;
+    --x-govuk-ui-paper: Canvas;
+    --x-govuk-ui-muted: CanvasText;
+    --x-govuk-ui-line: GrayText;
+    --x-govuk-ui-secondary: Canvas;
+  }
+  .x-govuk-ui-chart-plot,
+  .x-govuk-ui-chart-heat,
+  .x-govuk-ui-chart-brush-overview,
+  .x-govuk-ui-choropleth-map-drawing {
+    forced-color-adjust: none;
+  }
+  /* A series' name at its line's end is in its colour's ink, which was chosen to read on the page's
+     paper, not the reader's. Here it therefore takes the reader's text colour. Its place at the
+     line's end still says which line it names. */
+  .x-govuk-ui-chart-line-label {
+    fill: CanvasText;
+  }
+}

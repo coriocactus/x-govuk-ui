@@ -1,0 +1,69 @@
+/* Error summary. GOV.UK's red-edged box above a form, listing each error as a link. */
+.x-govuk-ui-error-summary {
+  box-sizing: border-box;
+  margin-bottom: 24px;
+  padding: 18px 20px 20px;
+  border: 4px solid var(--x-govuk-ui-error);
+  border-radius: 6px;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  animation: x-govuk-ui-error-summary-in var(--x-govuk-ui-duration-medium)
+    var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-error-summary-in {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+.x-govuk-ui-error-summary:focus {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+}
+.x-govuk-ui-error-summary-title {
+  margin: 0 0 12px;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+.x-govuk-ui-error-summary-description {
+  margin-bottom: 12px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.x-govuk-ui-error-summary-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-error-summary-link {
+  color: var(--x-govuk-ui-error);
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-error-summary-link:hover {
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-error-summary-link:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-error-summary {
+    border-color: CanvasText;
+  }
+  .x-govuk-ui-error-summary:focus {
+    outline-color: Highlight;
+  }
+}

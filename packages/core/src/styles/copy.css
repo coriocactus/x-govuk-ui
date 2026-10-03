@@ -1,0 +1,24 @@
+/* The copy button's icon and tick share one spot. The tick grows in as the copy icon shrinks away. */
+.x-govuk-ui-copy-icons {
+  display: grid;
+}
+.x-govuk-ui-copy-icons > svg {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-copy-icons > svg:last-child,
+.x-govuk-ui-copy-icons[data-copied] > svg:first-child {
+  opacity: 0;
+  scale: 0.5;
+}
+.x-govuk-ui-copy-icons[data-copied] > svg:last-child {
+  opacity: 1;
+  scale: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-copy-icons > svg {
+    transition: none;
+  }
+}

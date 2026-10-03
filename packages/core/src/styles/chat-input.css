@@ -1,0 +1,234 @@
+/* Chat input. A rounded box in Input's border, containing the message and a bar of tools with Send.
+   It grows with the message, and takes GOV.UK's focus around the whole box. */
+.x-govuk-ui-chat-input {
+  display: grid;
+  gap: 4px;
+  padding: 10px 10px 8px 14px;
+  border: 1.5px solid var(--x-govuk-ui-border);
+  border-radius: 14px;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  cursor: text;
+  transition:
+    border-color var(--x-govuk-ui-duration-fast) ease,
+    box-shadow var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-chat-input:hover:not(:focus-within, [data-disabled]) {
+  border-color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-chat-input:focus-within {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 1px;
+  border-color: var(--x-govuk-ui-focus-text);
+  box-shadow: inset 0 0 0 1px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-chat-input[data-disabled] {
+  opacity: 0.55;
+}
+.x-govuk-ui-chat-input-field {
+  box-sizing: border-box;
+  /* Block, so no space for a line's descenders sits beneath it. */
+  display: block;
+  width: 100%;
+  min-height: 26px;
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 17px;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  transition: height var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+/* The message scrolls in a Scroll area, whose thin scrollbar sits inside its right edge. */
+.x-govuk-ui-chat-input-scroll {
+  display: block;
+  min-width: 0;
+}
+.x-govuk-ui-chat-input-scroll > .x-govuk-ui-scroll-area-scrollbar {
+  margin-block: 2px;
+}
+/* When unframed, it takes its container's edges, such as a chat panel's, with no box of its own
+   until it has focus. */
+.x-govuk-ui-chat-input[data-plain]:not(:focus-within) {
+  border-color: transparent;
+  background: transparent;
+}
+/* Inline puts the message and Send on one row, one line tall until the message needs more. Send
+   stays at the foot of the row as the message grows, and attached files sit above both. */
+.x-govuk-ui-chat-input[data-layout="inline"] {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: 8px;
+  padding: 6px 6px 6px 14px;
+  /* Input's corners, a touch rounder, so Send's sit inside them. */
+  border-radius: 6px;
+}
+.x-govuk-ui-chat-input[data-layout="inline"] .x-govuk-ui-chat-input-attachments {
+  grid-column: 1 / -1;
+}
+.x-govuk-ui-chat-input[data-layout="inline"] .x-govuk-ui-chat-input-scroll {
+  align-self: center;
+}
+/* A line of the message is as tall as Send, with its words in the middle of it, so the two line
+   up on one row. */
+.x-govuk-ui-chat-input[data-layout="inline"] .x-govuk-ui-chat-input-field {
+  min-height: 32px;
+  padding-block: 3.25px;
+}
+.x-govuk-ui-chat-input[data-layout="inline"] .x-govuk-ui-chat-input-tools:empty {
+  display: none;
+}
+.x-govuk-ui-chat-input-field::placeholder {
+  color: var(--x-govuk-ui-placeholder);
+  opacity: 1;
+}
+.x-govuk-ui-chat-input-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.x-govuk-ui-chat-input-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+/* The tools take the start of the bar, so parts beside Send sit at its end. */
+.x-govuk-ui-chat-input-tools:first-child {
+  flex: 1;
+}
+/* In a narrow box, such as a tile, the parts beside Send take a line of their own beneath the tools
+   and Send, so a model's name never runs past the box. The stacked layout's bar spans the box, so
+   the bar is the container measured. If its parts still do not fit, they wrap, and Send stays at
+   the end. */
+.x-govuk-ui-chat-input:not([data-layout="inline"]) .x-govuk-ui-chat-input-bar {
+  flex-wrap: wrap;
+  row-gap: 4px;
+  container: x-govuk-ui-chat-input-bar / inline-size;
+}
+.x-govuk-ui-chat-input-bar > .x-govuk-ui-chat-input-send {
+  margin-inline-start: auto;
+}
+@container x-govuk-ui-chat-input-bar (max-width: 24rem) {
+  .x-govuk-ui-chat-input-tools:not(:first-child) {
+    order: 1;
+    flex-basis: 100%;
+  }
+}
+/* The model picker shows the chosen model's name with a chevron, and a menu of models with a few
+   words on each. */
+/* Its highlight has the same corners as the menu's items and the other quiet tools. */
+.x-govuk-ui-button.x-govuk-ui-chat-model-trigger {
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  border-radius: 5px;
+  color: var(--x-govuk-ui-text);
+  font-size: 15px;
+}
+.x-govuk-ui-chat-model-menu {
+  min-width: 260px;
+}
+.x-govuk-ui-chat-model {
+  display: grid;
+  gap: 1px;
+  white-space: normal;
+}
+.x-govuk-ui-chat-model-description {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.x-govuk-ui-button.x-govuk-ui-chat-input-send svg {
+  transition: translate var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-button.x-govuk-ui-chat-input-send:not([aria-disabled="true"]):hover svg {
+  translate: 0 -2px;
+}
+.x-govuk-ui-button.x-govuk-ui-chat-input-send[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: default;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-chat-input:focus-within {
+    outline-color: Highlight;
+  }
+}
+
+/* Streaming text. Each word fades in as it arrives, and a caret pulses at the end until the text is
+   complete. The fade has no blur, because a filter animated on many words at once crashes WebKit's
+   page on Linux. The words still to come are laid out unseen after the caret, so the lines break
+   where they will in the end, and the text keeps its full height throughout. */
+.x-govuk-ui-streaming-text {
+  white-space: pre-wrap;
+}
+.x-govuk-ui-streaming-rest {
+  visibility: hidden;
+}
+.x-govuk-ui-streaming-text:not([data-instant]) .x-govuk-ui-streaming-word {
+  animation: x-govuk-ui-word-in var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-word-in {
+  from {
+    opacity: 0;
+  }
+}
+/* The caret takes no space in the line, so the words break as they will once it has gone. */
+.x-govuk-ui-streaming-caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 0.5em;
+  vertical-align: 0.05em;
+}
+.x-govuk-ui-streaming-caret::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: currentColor;
+  animation: x-govuk-ui-caret 1s ease-in-out infinite;
+}
+@keyframes x-govuk-ui-caret {
+  50% {
+    opacity: 0.25;
+    scale: 0.8;
+  }
+}
+
+/* What goes with the message sits above it, as File chips. Each chip pops in as it is added. */
+.x-govuk-ui-file-chips.x-govuk-ui-chat-input-attachments {
+  margin-bottom: 4px;
+}
+.x-govuk-ui-chat-input-attachment {
+  animation: x-govuk-ui-chip-in var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-chip-in {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+/* Dictation turns brand blue and pulses a ring while it listens. */
+.x-govuk-ui-button.x-govuk-ui-chat-input-dictation[data-listening] {
+  color: var(--x-govuk-ui-brand);
+  animation: x-govuk-ui-listening 1.4s ease-out infinite;
+}
+@keyframes x-govuk-ui-listening {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--x-govuk-ui-brand) 40%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+.x-govuk-ui-button.x-govuk-ui-chat-input-dictation[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: default;
+}

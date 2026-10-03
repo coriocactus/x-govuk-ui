@@ -1,0 +1,31 @@
+/* Inset text. GOV.UK's bar along the start edge, in GOV.UK's border colour, drawn narrower with
+   rounded ends. */
+.x-govuk-ui-inset-text {
+  position: relative;
+  margin: 0;
+  padding: 2px 0 2px 19px;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 17px;
+  line-height: 1.6;
+}
+.x-govuk-ui-inset-text::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 5px;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-inset-text > :first-child {
+  margin-top: 0;
+}
+.x-govuk-ui-inset-text > :last-child {
+  margin-bottom: 0;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-inset-text::before {
+    background: CanvasText;
+  }
+}

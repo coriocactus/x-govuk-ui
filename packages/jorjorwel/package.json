@@ -1,0 +1,61 @@
+{
+  "name": "@x-govuk-ui/jorjorwel",
+  "description": "x-govuk-ui's writing components on Lexical: Editor, with its prompts, attachments and AI suggestions.",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://x-govuk-ui.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coriocactus/x-govuk-ui.git",
+    "directory": "packages/jorjorwel"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
+    },
+    "./styles.css": "./dist/lib/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/lib",
+    "src"
+  ],
+  "peerDependencies": {
+    "@base-ui/react": "1.8.0",
+    "motion": "14.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "x-govuk-ui": "0.1.0"
+  },
+  "dependencies": {
+    "@lexical/clipboard": "0.52.0",
+    "@lexical/code-core": "0.52.0",
+    "@lexical/history": "0.52.0",
+    "@lexical/html": "0.52.0",
+    "@lexical/link": "0.52.0",
+    "@lexical/list": "0.52.0",
+    "@lexical/markdown": "0.52.0",
+    "@lexical/plain-text": "0.52.0",
+    "@lexical/react": "0.52.0",
+    "@lexical/rich-text": "0.52.0",
+    "@lexical/selection": "0.52.0",
+    "@lexical/table": "0.52.0",
+    "@lexical/utils": "0.52.0",
+    "lexical": "0.52.0",
+    "marked": "18.1.0"
+  },
+  "devDependencies": {
+    "@base-ui/react": "1.8.0",
+    "motion": "14.0.0",
+    "x-govuk-ui": "workspace:*"
+  }
+}

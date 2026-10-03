@@ -1,0 +1,98 @@
+/* Tabs. Link-blue tabs above a keyline. A bar in the link colour glides beneath the open tab, as
+   GOV.UK's service navigation marks the current page. */
+.x-govuk-ui-tabs {
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-tabs-list {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  scrollbar-width: none;
+}
+.x-govuk-ui-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+.x-govuk-ui-tabs-trigger {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 12px 14px 14px;
+  border: 0;
+  border-radius: 5px 5px 0 0;
+  background: transparent;
+  color: var(--x-govuk-ui-link);
+  font: 17px / 1.4 var(--x-govuk-ui-font);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--x-govuk-ui-duration-fast) ease,
+    background var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-tabs-trigger:hover {
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-tabs-trigger[data-active] {
+  color: var(--x-govuk-ui-text);
+  font-weight: 700;
+}
+/* The label and its hidden bold copy share one cell, so a tab is always as wide as its bold label
+   and the label stays centred as its weight changes. */
+.x-govuk-ui-tabs-label {
+  display: inline-grid;
+  justify-items: center;
+}
+.x-govuk-ui-tabs-label > * {
+  grid-area: 1 / 1;
+}
+.x-govuk-ui-tabs-label-room {
+  font-weight: 700;
+  visibility: hidden;
+}
+.x-govuk-ui-tabs-trigger:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: inset 0 -4px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-tabs-trigger[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* The bar sits on the keyline under the open tab, as wide as the tab, so it lines up with the
+   focus underline, and glides between tabs. */
+.x-govuk-ui-tabs-indicator {
+  position: absolute;
+  bottom: 0;
+  left: var(--active-tab-left);
+  width: var(--active-tab-width);
+  height: 4px;
+  background: var(--x-govuk-ui-link);
+  transition:
+    left var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    width var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+/* The new panel replaces the old one at once. Fading it in from nothing would make the content
+   blink out on every change. The bar gliding beneath the tabs is the motion. */
+.x-govuk-ui-tabs-panel {
+  padding: 24px 0 8px;
+  outline: none;
+}
+.x-govuk-ui-tabs-panel:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 2px;
+}
+.x-govuk-ui-tabs-panel > :first-child {
+  margin-top: 0;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-tabs-indicator {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .x-govuk-ui-tabs-trigger:focus-visible {
+    outline: 3px solid Highlight;
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@x-govuk-ui/mcp",
+  "version": "0.1.0",
+  "description": "An MCP server for x-govuk-ui's documentation: its components, props, examples and styling.",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://x-govuk-ui.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coriocactus/x-govuk-ui.git",
+    "directory": "mcp"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "bin": {
+    "x-govuk-ui-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}

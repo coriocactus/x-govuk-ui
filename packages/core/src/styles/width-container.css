@@ -1,0 +1,99 @@
+/* Layout. The width container keeps content to GOV.UK's 960 pixels in the middle of the screen,
+   with space at its sides on smaller screens. The grid divides a row into twelfths, so it gives
+   GOV.UK's quarters, thirds and halves with the same 30 pixel gutter. */
+.x-govuk-ui-width-container {
+  --x-govuk-ui-gutter: 15px;
+  width: min(
+    var(--x-govuk-ui-container-width, var(--x-govuk-ui-page-width, 960px)),
+    100% -
+    2 *
+    var(--x-govuk-ui-gutter)
+  );
+  margin-inline: auto;
+}
+/* A container's own width applies only to it. Containers inside it follow the Page's width. */
+.x-govuk-ui-width-container > * {
+  --x-govuk-ui-container-width: initial;
+}
+@media (min-width: 40.0625em) {
+  .x-govuk-ui-width-container {
+    --x-govuk-ui-gutter: 30px;
+  }
+}
+.x-govuk-ui-width-container[data-gutters="none"] {
+  --x-govuk-ui-gutter: 0px;
+}
+
+/* The main content, with GOV.UK's spacing above and below, and more above when nothing sits
+   there. */
+.x-govuk-ui-main-wrapper {
+  display: block;
+  padding-block: 20px;
+}
+.x-govuk-ui-main-wrapper[data-size="large"] {
+  padding-top: 30px;
+}
+@media (min-width: 40.0625em) {
+  .x-govuk-ui-main-wrapper {
+    padding-block: 40px;
+  }
+  .x-govuk-ui-main-wrapper[data-size="large"] {
+    padding-top: 50px;
+  }
+}
+.x-govuk-ui-main-wrapper:focus {
+  outline: none;
+}
+
+/* Columns follow the row's width, not the screen's, so a row in a narrow space stacks. A row
+   reaches tablet width at 560 pixels and desktop width at 700.
+
+   Columns sit side by side from 560 pixels, with GOV.UK's gutter between them. Below that, each
+   takes the whole row, as on a phone, and there is no gutter. Eleven gutters would need 330
+   pixels, more than a small phone has, so a full row would run past the screen. The row cannot
+   query its own width, so the gutter is worked out from the width itself, as 30 pixels from 560
+   and none below. */
+.x-govuk-ui-grid-row {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 20px clamp(0px, (100% - 559px) * 1000, 30px);
+}
+.x-govuk-ui-grid-column {
+  grid-column: span 12;
+  min-width: 0;
+}
+@container (min-width: 560px) {
+  .x-govuk-ui-grid-column[data-from="tablet"][data-width="three-quarters"] {
+    grid-column: span 9;
+  }
+  .x-govuk-ui-grid-column[data-from="tablet"][data-width="two-thirds"] {
+    grid-column: span 8;
+  }
+  .x-govuk-ui-grid-column[data-from="tablet"][data-width="one-half"] {
+    grid-column: span 6;
+  }
+  .x-govuk-ui-grid-column[data-from="tablet"][data-width="one-third"] {
+    grid-column: span 4;
+  }
+  .x-govuk-ui-grid-column[data-from="tablet"][data-width="one-quarter"] {
+    grid-column: span 3;
+  }
+}
+@container (min-width: 700px) {
+  .x-govuk-ui-grid-column[data-from="desktop"][data-width="three-quarters"] {
+    grid-column: span 9;
+  }
+  .x-govuk-ui-grid-column[data-from="desktop"][data-width="two-thirds"] {
+    grid-column: span 8;
+  }
+  .x-govuk-ui-grid-column[data-from="desktop"][data-width="one-half"] {
+    grid-column: span 6;
+  }
+  .x-govuk-ui-grid-column[data-from="desktop"][data-width="one-third"] {
+    grid-column: span 4;
+  }
+  .x-govuk-ui-grid-column[data-from="desktop"][data-width="one-quarter"] {
+    grid-column: span 3;
+  }
+}

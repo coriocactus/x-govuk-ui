@@ -1,0 +1,73 @@
+/* Notification banner. GOV.UK's coloured title bar and border around the message, brand blue for
+   important and green for success. A success banner arrives from a little above. */
+.x-govuk-ui-notification-banner {
+  --x-govuk-ui-banner-colour: var(--x-govuk-ui-brand);
+  margin-bottom: 30px;
+  overflow: hidden;
+  border: 4px solid var(--x-govuk-ui-banner-colour);
+  border-radius: 8px;
+  background: var(--x-govuk-ui-banner-colour);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  outline: none;
+}
+.x-govuk-ui-notification-banner[data-type="success"] {
+  --x-govuk-ui-banner-colour: var(--x-govuk-ui-success);
+  animation: x-govuk-ui-banner-in var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-banner-in {
+  from {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+}
+.x-govuk-ui-notification-banner:focus-visible,
+.x-govuk-ui-notification-banner:focus {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+}
+.x-govuk-ui-notification-banner-header {
+  padding: 4px 16px 6px;
+}
+.x-govuk-ui-notification-banner-title {
+  margin: 0;
+  color: var(--x-govuk-ui-white);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-notification-banner-title {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+.x-govuk-ui-notification-banner-content {
+  padding: 16px 20px 20px;
+  border-radius: 4px 4px 4px 4px;
+  background: var(--x-govuk-ui-paper);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.x-govuk-ui-notification-banner-content > :first-child {
+  margin-top: 0;
+}
+.x-govuk-ui-notification-banner-content > :last-child {
+  margin-bottom: 0;
+}
+.x-govuk-ui-notification-banner-heading {
+  margin: 0 0 12px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.x-govuk-ui-notification-banner-content a {
+  color: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-notification-banner[data-type="success"] .x-govuk-ui-notification-banner-content a {
+  color: var(--x-govuk-ui-success);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-notification-banner {
+    border-color: CanvasText;
+  }
+}

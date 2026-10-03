@@ -1,0 +1,47 @@
+/* QR code. Dark dots and rounded corner squares on a white tile, in either theme, so phones can
+   read it. When it changes, its dots grow back in from the middle outwards. */
+.x-govuk-ui-qr-code {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  /* High contrast themes leave the code as it is, dark on white, so it still scans. */
+  forced-color-adjust: none;
+}
+.x-govuk-ui-qr-code-tile {
+  fill: #fff;
+}
+.x-govuk-ui-qr-code-modules {
+  fill: #0b0c0c;
+  stroke: #0b0c0c;
+}
+.x-govuk-ui-qr-code-modules circle {
+  stroke: none;
+}
+.x-govuk-ui-qr-code-modules :is(circle, .x-govuk-ui-qr-code-corner) {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: x-govuk-ui-qr-ripple var(--x-govuk-ui-qr-grow, 120ms) var(--x-govuk-ui-ease-out)
+    backwards;
+}
+.x-govuk-ui-qr-code[data-still]
+  .x-govuk-ui-qr-code-modules
+  :is(circle, .x-govuk-ui-qr-code-corner) {
+  animation: none;
+}
+.x-govuk-ui-qr-code-corner rect + rect {
+  stroke: none;
+}
+@keyframes x-govuk-ui-qr-ripple {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+  60% {
+    scale: 1.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-qr-code-modules :is(circle, .x-govuk-ui-qr-code-corner) {
+    animation: none;
+  }
+}

@@ -1,0 +1,70 @@
+/* Labels, hints and error messages shared by text input and one-time code. */
+.x-govuk-ui-field {
+  box-sizing: border-box;
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-field {
+  position: relative;
+  width: 100%;
+}
+/* GOV.UK marks a field with an error with a red bar down its left side. Ours sits in the space
+   beside the field, so nothing inside moves, and it grows into place as the error appears. */
+.x-govuk-ui-field::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -15px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--x-govuk-ui-error);
+  opacity: 0;
+  scale: 1 0;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+  pointer-events: none;
+}
+.x-govuk-ui-field[data-invalid]::before {
+  opacity: 1;
+  scale: 1 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-field::before {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-field::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
+.x-govuk-ui-label {
+  display: block;
+  color: var(--x-govuk-ui-text);
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+.x-govuk-ui-hint {
+  display: block;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.x-govuk-ui-error-container {
+  overflow: hidden;
+}
+/* GOV.UK's error message, bold, in the error colour, between the hint and the control. The space
+   below is padding, so the opening animation includes it. */
+.x-govuk-ui-error {
+  color: var(--x-govuk-ui-error);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+  padding: 0 0 10px;
+  margin: 0;
+}

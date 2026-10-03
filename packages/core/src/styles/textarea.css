@@ -1,0 +1,61 @@
+/* Textarea. Input's field, taller, and resizable by its corner. It is never shorter than its
+   starting rows, narrower than about twelve characters or wider than its container, so its text
+   does not scroll for lack of space, and the page never scrolls sideways. */
+.x-govuk-ui-textarea {
+  display: block;
+  height: auto;
+  min-width: min(12em, 100%);
+  max-width: 100%;
+  min-height: calc(var(--x-govuk-ui-textarea-rows, 3) * 1.5em + 23px);
+  line-height: 1.5;
+}
+.x-govuk-ui-textarea[data-resize="both"] {
+  resize: both;
+}
+.x-govuk-ui-textarea[data-resize="vertical"] {
+  resize: vertical;
+}
+.x-govuk-ui-textarea[data-resize="horizontal"] {
+  resize: horizontal;
+}
+.x-govuk-ui-textarea[data-resize="none"] {
+  resize: none;
+}
+/* It grows with its text where the browser can size a field to its content. */
+.x-govuk-ui-textarea[data-auto-resize] {
+  field-sizing: content;
+  max-height: 24em;
+}
+/* The scrollbar sits inside the field's border, along the textarea's right edge wherever its
+   corner is dragged, and stops short of the corner's grip. */
+.x-govuk-ui-textarea-scroll {
+  display: block;
+}
+.x-govuk-ui-textarea-scroll > .x-govuk-ui-scroll-area-scrollbar {
+  margin: 3px calc(100% - var(--x-govuk-ui-textarea-width, 100%) + 2px) 3px 0;
+}
+.x-govuk-ui-textarea-scroll:has(.x-govuk-ui-textarea:not([data-resize="none"]))
+  > .x-govuk-ui-scroll-area-scrollbar {
+  margin-bottom: 16px;
+}
+/* The character count's line beneath the field. Over the limit, it turns red and bold, and the
+   field's edge turns red with it. Below the threshold, it keeps its place, hidden. */
+.x-govuk-ui-character-count {
+  margin: 8px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  line-height: 1.4;
+  transition: color var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-character-count:not([data-shown]) {
+  visibility: hidden;
+}
+.x-govuk-ui-character-count[data-over] {
+  color: var(--x-govuk-ui-error);
+  font-weight: 700;
+}
+.x-govuk-ui-textarea[data-over-limit] {
+  border-color: var(--x-govuk-ui-error);
+  box-shadow: inset 0 0 0 0.5px var(--x-govuk-ui-error);
+}

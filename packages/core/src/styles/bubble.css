@@ -1,0 +1,327 @@
+/* Bubble. A message's surface, which is a rounded box as wide as its longest line, up to 80% of its
+   row, on the start or end side. The corner nearest its sender is tighter, as a tail. Reactions
+   overlap its edge, and consecutive bubbles in a group tighten the corners between them. */
+.x-govuk-ui-bubble {
+  --x-govuk-ui-bubble-radius: 16px;
+  --x-govuk-ui-bubble-tail: 4px;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-bubble[data-align="end"] {
+  justify-content: flex-end;
+}
+/* A bubble with reactions makes space for them beneath it, or above it, so they never cover the
+   next bubble. The space opens as the first reaction pops in, and closes once the last has gone. */
+.x-govuk-ui-bubble {
+  transition: padding var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-bubble:has(
+  .x-govuk-ui-bubble-reactions[data-side="bottom"] > .x-govuk-ui-bubble-reaction
+) {
+  padding-bottom: 14px;
+}
+.x-govuk-ui-bubble:has(
+  .x-govuk-ui-bubble-reactions[data-side="top"] > .x-govuk-ui-bubble-reaction
+) {
+  padding-top: 14px;
+}
+.x-govuk-ui-bubble-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  max-width: 80%;
+}
+.x-govuk-ui-bubble[data-align="end"] .x-govuk-ui-bubble-frame {
+  align-items: flex-end;
+}
+.x-govuk-ui-bubble[data-variant="ghost"] .x-govuk-ui-bubble-frame {
+  max-width: 100%;
+}
+.x-govuk-ui-bubble-content {
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 16px 11px;
+  border: 1px solid transparent;
+  border-radius: var(--x-govuk-ui-bubble-radius);
+  border-end-start-radius: var(--x-govuk-ui-bubble-tail);
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+  font: inherit;
+  font-size: 17px;
+  line-height: 1.5;
+  text-align: start;
+  text-decoration: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.x-govuk-ui-bubble[data-align="end"] .x-govuk-ui-bubble-content {
+  border-end-start-radius: var(--x-govuk-ui-bubble-radius);
+  border-end-end-radius: var(--x-govuk-ui-bubble-tail);
+}
+
+/* The variants, in GOV.UK's colours. On dark paper, the strong bubbles take dark text. */
+.x-govuk-ui-bubble[data-variant="default"] .x-govuk-ui-bubble-content {
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-white);
+}
+.x-govuk-ui-bubble[data-variant="muted"] .x-govuk-ui-bubble-content {
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-bubble[data-variant="tinted"] .x-govuk-ui-bubble-content {
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 12%, var(--x-govuk-ui-paper));
+}
+.x-govuk-ui-bubble[data-variant="outline"] .x-govuk-ui-bubble-content {
+  border-color: var(--x-govuk-ui-border);
+  background: var(--x-govuk-ui-paper);
+}
+.x-govuk-ui-bubble[data-variant="ghost"] .x-govuk-ui-bubble-content {
+  padding-inline: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.x-govuk-ui-bubble[data-variant="destructive"] .x-govuk-ui-bubble-content {
+  background: var(--x-govuk-ui-error);
+  color: var(--x-govuk-ui-white);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope
+    .x-govuk-ui-bubble:is([data-variant="default"], [data-variant="destructive"])
+    .x-govuk-ui-bubble-content {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+
+/* A bubble that is a link or a button darkens under the pointer, dips when pressed, and takes
+   GOV.UK's focus colours. */
+.x-govuk-ui-bubble-content:is(a, button) {
+  cursor: pointer;
+  transition:
+    background-color var(--x-govuk-ui-duration-fast) ease,
+    border-color var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-bubble-content:is(a, button):hover {
+  background-image: linear-gradient(rgb(11 12 12 / 8%), rgb(11 12 12 / 8%));
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-bubble-content:is(a, button):hover {
+    background-image: linear-gradient(rgb(255 255 255 / 8%), rgb(255 255 255 / 8%));
+  }
+}
+.x-govuk-ui-bubble-content:is(a, button):active {
+  scale: 0.97;
+}
+.x-govuk-ui-bubble-content:is(a, button):focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  background: var(--x-govuk-ui-focus);
+  box-shadow: 0 4px 0 var(--x-govuk-ui-focus-text);
+  color: var(--x-govuk-ui-focus-text);
+}
+
+/* Reactions overlap the bubble's edge, at its start or end, reaching into the space the bubble
+   makes for them. Each is a small pill on the paper. */
+.x-govuk-ui-bubble-reactions {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+.x-govuk-ui-bubble-reactions[data-side="bottom"] {
+  bottom: 0;
+  translate: 0 calc(100% - 10px);
+}
+.x-govuk-ui-bubble-reactions[data-side="top"] {
+  top: 0;
+  translate: 0 calc(-100% + 10px);
+}
+.x-govuk-ui-bubble-reactions[data-align="end"] {
+  right: 10px;
+}
+.x-govuk-ui-bubble-reactions[data-align="start"] {
+  left: 10px;
+}
+.x-govuk-ui-bubble-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 12px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 2px 6px rgb(11 12 12 / 8%);
+  color: var(--x-govuk-ui-text);
+  font-size: 14px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  pointer-events: auto;
+}
+.x-govuk-ui-bubble-reaction > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0 -6px;
+  padding: 0 6px;
+  min-height: 24px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.x-govuk-ui-bubble-reaction > button:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+}
+
+/* When held, a bubble with a reaction picker sinks a little over the hold. It then springs back
+   with a single overshoot as the picker opens. While it is held, its text is not selected. */
+.x-govuk-ui-bubble-frame:has(> .x-govuk-ui-bubble-react) .x-govuk-ui-bubble-content {
+  -webkit-touch-callout: none;
+  transition: scale var(--x-govuk-ui-duration-medium) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.x-govuk-ui-bubble-frame[data-holding] .x-govuk-ui-bubble-content {
+  scale: 0.98;
+  user-select: none;
+  transition: scale var(--x-govuk-ui-bubble-hold, 300ms) ease-out;
+}
+/* The picker's button shows only once the keyboard reaches it, beside the bubble. Under the
+   pointer, holding the bubble opens the picker. */
+.x-govuk-ui-bubble-react {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 50%;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  cursor: pointer;
+  clip-path: inset(50%);
+  translate: 0 -50%;
+}
+.x-govuk-ui-bubble[data-align="start"] .x-govuk-ui-bubble-react {
+  left: calc(100% + 6px);
+}
+.x-govuk-ui-bubble[data-align="end"] .x-govuk-ui-bubble-react {
+  right: calc(100% + 6px);
+}
+.x-govuk-ui-bubble-react:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  background: var(--x-govuk-ui-focus);
+  box-shadow: 0 0 0 5px var(--x-govuk-ui-focus-text);
+  color: var(--x-govuk-ui-focus-text);
+  clip-path: none;
+}
+/* The picker rises above the bubble as a pill of reactions, each popping in after the one before.
+   A chosen reaction sits on a tint of the brand colour. */
+.x-govuk-ui-bubble-picker {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 24px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 8px 28px rgb(11 12 12 / 16%);
+  outline: none;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    scale var(--x-govuk-ui-duration-medium) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.x-govuk-ui-bubble-picker:is([data-starting-style], [data-ending-style]) {
+  opacity: 0;
+  scale: 0.6;
+}
+.x-govuk-ui-bubble-picker[data-ending-style] {
+  transition-duration: var(--x-govuk-ui-duration-fast);
+  transition-timing-function: ease;
+}
+.x-govuk-ui-bubble-picker-item {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+  animation: x-govuk-ui-bubble-pick var(--x-govuk-ui-duration-slow)
+    cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--x-govuk-ui-pick, 0) * 30ms) backwards;
+}
+@keyframes x-govuk-ui-bubble-pick {
+  from {
+    opacity: 0;
+    scale: 0.3;
+    translate: 0 6px;
+  }
+}
+.x-govuk-ui-bubble-picker-item[data-highlighted] {
+  background: var(--x-govuk-ui-secondary);
+  scale: 1.15;
+}
+.x-govuk-ui-bubble-picker-item[data-checked] {
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 18%, var(--x-govuk-ui-paper));
+}
+.x-govuk-ui-bubble-picker-item:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-bubble-picker-item {
+    animation: none;
+  }
+  .x-govuk-ui-bubble-frame .x-govuk-ui-bubble-content,
+  .x-govuk-ui-bubble-frame[data-holding] .x-govuk-ui-bubble-content {
+    scale: 1;
+    transition: none;
+  }
+}
+
+/* Consecutive bubbles from one sender sit close, and the corners between them tighten. */
+.x-govuk-ui-bubble-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.x-govuk-ui-bubble-group
+  > .x-govuk-ui-bubble[data-align="start"]:not(:first-child)
+  .x-govuk-ui-bubble-content {
+  border-start-start-radius: var(--x-govuk-ui-bubble-tail);
+}
+.x-govuk-ui-bubble-group
+  > .x-govuk-ui-bubble[data-align="end"]:not(:first-child)
+  .x-govuk-ui-bubble-content {
+  border-start-end-radius: var(--x-govuk-ui-bubble-tail);
+}
+
+@media (forced-colors: active) {
+  /* Forced colours remove the fills, so every framed bubble keeps its shape with an edge, and the
+     chosen reaction is marked by the system's highlight. */
+  .x-govuk-ui-bubble:not([data-variant="ghost"]) .x-govuk-ui-bubble-content {
+    border-color: CanvasText;
+  }
+  .x-govuk-ui-bubble-picker-item[data-checked] {
+    outline: 2px solid Highlight;
+  }
+}

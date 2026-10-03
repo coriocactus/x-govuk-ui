@@ -1,0 +1,214 @@
+/* Radios and Checkboxes. GOV.UK's large targets, with a hover ring, rounder checkboxes, and a tick
+   and dot that grow in. */
+.x-govuk-ui-choices {
+  --x-govuk-ui-choice-size: 32px;
+  display: grid;
+  gap: 8px;
+  font-family: var(--x-govuk-ui-font);
+}
+/* Small answers keep 12px between them, so the hover ring around one never reaches the next. */
+.x-govuk-ui-choices[data-small] {
+  --x-govuk-ui-choice-size: 22px;
+  gap: 12px;
+}
+.x-govuk-ui-choices[data-inline] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+}
+.x-govuk-ui-choice {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--x-govuk-ui-choice-size) minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: start;
+}
+/* The native input lies over the drawn box, so pressing the box presses the input. */
+.x-govuk-ui-choice-input {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: var(--x-govuk-ui-choice-size);
+  height: var(--x-govuk-ui-choice-size);
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.x-govuk-ui-choice-box {
+  box-sizing: border-box;
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
+  width: var(--x-govuk-ui-choice-size);
+  height: var(--x-govuk-ui-choice-size);
+  border: 2px solid var(--x-govuk-ui-border);
+  border-radius: 5px;
+  background: var(--x-govuk-ui-paper);
+  transition:
+    box-shadow var(--x-govuk-ui-duration-fast) ease,
+    border-color var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-choices[data-kind="radio"] .x-govuk-ui-choice-box {
+  border-radius: 50%;
+}
+.x-govuk-ui-choices[data-small] .x-govuk-ui-choice-box {
+  border-radius: 4px;
+}
+.x-govuk-ui-choices[data-small][data-kind="radio"] .x-govuk-ui-choice-box {
+  border-radius: 50%;
+}
+/* The tick draws itself along its stroke when checked, and draws back when unchecked. */
+.x-govuk-ui-choice-box svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--x-govuk-ui-text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.x-govuk-ui-choice-box path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 80ms ease-out;
+}
+.x-govuk-ui-choice-input:checked + .x-govuk-ui-choice-box path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+/* One dot travels between the radios. It sits at the chosen box, set in from its edge. */
+.x-govuk-ui-choices[data-kind="radio"] {
+  position: relative;
+}
+.x-govuk-ui-radio-dot {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--x-govuk-ui-choice-size) * 0.22);
+  left: calc(var(--x-govuk-ui-choice-size) * 0.22);
+  width: calc(var(--x-govuk-ui-choice-size) * 0.56);
+  height: calc(var(--x-govuk-ui-choice-size) * 0.56);
+  border-radius: 50%;
+  background: var(--x-govuk-ui-text);
+  opacity: 0;
+  scale: 0.4;
+  pointer-events: none;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-radio-dot[data-shown] {
+  opacity: 1;
+  scale: 1;
+}
+/* GOV.UK rings the box while the pointer is over the box or its label. */
+.x-govuk-ui-choice:hover:not(:has(:disabled)) .x-govuk-ui-choice-box {
+  box-shadow: 0 0 0 6px var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-choices[data-small]
+  .x-govuk-ui-choice:hover:not(:has(:disabled))
+  .x-govuk-ui-choice-box {
+  box-shadow: 0 0 0 5px var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-choice-input:focus-visible + .x-govuk-ui-choice-box {
+  border-width: 3px;
+  border-color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 0 0 4px var(--x-govuk-ui-focus);
+}
+.x-govuk-ui-choice-label {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  padding-block: 4px;
+  color: var(--x-govuk-ui-text);
+  font-size: 17px;
+  line-height: 1.4;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.x-govuk-ui-choices[data-small] .x-govuk-ui-choice-label {
+  padding-block: 0;
+  font-size: 16px;
+}
+.x-govuk-ui-choice-hint {
+  grid-column: 2;
+  margin: 0;
+}
+.x-govuk-ui-choice-input:disabled,
+.x-govuk-ui-choice-input:disabled ~ * {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.x-govuk-ui-choices-divider {
+  width: var(--x-govuk-ui-choice-size);
+  color: var(--x-govuk-ui-text);
+  font-size: 17px;
+  text-align: center;
+}
+/* A follow-up question opens beneath its answer, along a guide line. */
+.x-govuk-ui-conditional {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    visibility 0s var(--x-govuk-ui-duration-slow);
+}
+.x-govuk-ui-conditional[data-open] {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    visibility 0s;
+}
+.x-govuk-ui-conditional-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+/* The bar beside a follow-up question has rounded ends, as Inset text's and the error bar do. */
+.x-govuk-ui-conditional-content {
+  position: relative;
+  margin: 4px 0 12px calc(var(--x-govuk-ui-choice-size) / 2 - 2px);
+  padding: 4px 0 4px calc(var(--x-govuk-ui-choice-size) / 2 + 14px);
+}
+.x-govuk-ui-conditional-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--x-govuk-ui-line);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-conditional-content::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-choice-box path,
+  .x-govuk-ui-radio-dot,
+  .x-govuk-ui-conditional {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-choice-box {
+    border-color: CanvasText;
+  }
+  .x-govuk-ui-choice-box svg {
+    stroke: CanvasText;
+  }
+  .x-govuk-ui-radio-dot {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+  .x-govuk-ui-choice-input:focus-visible + .x-govuk-ui-choice-box {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+}

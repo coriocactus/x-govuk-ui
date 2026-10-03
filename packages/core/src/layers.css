@@ -1,0 +1,4 @@
+/* Declares layer order before anything else. Unlayered application styles override them all. The
+   extensions' layer comes after x-govuk-ui's, so an extension's rules overrule core's at the same
+   specificity, whatever order the stylesheets load in. */
+@layer reset, govuk-frontend, x-govuk-ui, x-govuk-ui-extensions;

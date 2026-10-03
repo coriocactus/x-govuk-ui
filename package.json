@@ -1,0 +1,47 @@
+{
+  "name": "x-govuk-ui-repository",
+  "description": "x-govuk-ui and its extensions, jorjorwel, memetics and belsize, with their workbench.",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "BUN_PUBLIC_CHECKOUT=$(bun scripts/checkout.ts name) bun --hot site/server.ts",
+    "build": "bun scripts/build.ts",
+    "build:lib": "bun scripts/build-lib.ts",
+    "build:mcp": "bun scripts/build-mcp.ts",
+    "release": "bun scripts/release.ts",
+    "stage": "bun scripts/stage.ts",
+    "departments": "bun scripts/departments.ts",
+    "links": "bun scripts/links.ts",
+    "preview": "bun scripts/preview.ts",
+    "typecheck": "bun run --bun tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "bun test tests/unit",
+    "test:browser": "bunx --bun playwright test",
+    "check:static": "bun run lint && bun run typecheck && bun run test && bun run build && bun run build:lib && bun run build:mcp",
+    "check": "bun run check:static && bun run test:browser",
+    "checkout": "bun scripts/checkout.ts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@base-ui/react": "1.8.0",
+    "@biomejs/biome": "2.5.15",
+    "@fontsource-variable/roboto": "^5.3.0",
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@playwright/test": "1.63.0",
+    "@types/bun": "1.4.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "govuk-frontend": "6.5.1",
+    "motion": "14.0.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "sass": "1.105.1",
+    "typescript": "7.0.2",
+    "zod": "4.6.5"
+  }
+}

@@ -1,0 +1,175 @@
+/* Code in a keyline box. The header, when there is a filename, sits on GOV.UK's tinted surface.
+   The fill is the block's colour, which the floating actions' background also takes. */
+.x-govuk-ui-code-block {
+  --x-govuk-ui-code-font:
+    ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --x-govuk-ui-code-block-fill: var(--x-govuk-ui-paper);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  border: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-code-block-fill);
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-code-block > .x-govuk-ui-scroll-area {
+  flex: 1;
+}
+.x-govuk-ui-code-block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 4px 4px 14px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-surface);
+}
+.x-govuk-ui-code-block-filename {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 13px / 1.5 var(--x-govuk-ui-code-font);
+}
+.x-govuk-ui-code-block-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+/* Without a header, the actions float over the top corner, clear of the scrollbar, as bare buttons
+   with no box around them, as they look in the header. Their background is the block's own
+   colour, so code that scrolls beneath them is hidden without a visible edge. Code running towards
+   them fades out before them, instead of stopping part way through a letter. */
+.x-govuk-ui-code-block-actions[data-floating] {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  z-index: 1;
+  padding-left: 16px;
+  background: linear-gradient(to right, transparent, var(--x-govuk-ui-code-block-fill) 16px);
+}
+/* In an editable block, the code and the text box over it share one font, size, line height and
+   tab size. The box fills exactly the space the code takes, so each typed character sits on its
+   coloured copy. Neither wraps, and the box never scrolls by itself. The region scrolls both
+   together, and the browser scrolls the region to keep the caret in view. */
+.x-govuk-ui-code-block-text {
+  position: relative;
+  min-width: max-content;
+  font: 13px / 1.75 var(--x-govuk-ui-code-font);
+  tab-size: 2;
+}
+/* The browser's own style gives code its generic monospace face, which in Safari is not the code
+   font, so the code takes the block's font. */
+.x-govuk-ui-code-block-code,
+.x-govuk-ui-code-block-code code {
+  font: inherit;
+}
+.x-govuk-ui-code-block-code {
+  margin: 0;
+  padding: 14px 20px 16px 16px;
+}
+.x-govuk-ui-code-block[data-line-numbers] .x-govuk-ui-code-block-code {
+  padding-left: 0;
+}
+.x-govuk-ui-code-line {
+  display: block;
+}
+/* The typed text is transparent, so the coloured code shows through, with the caret and selection
+   drawn over it. The left padding is the numbers' column, as wide as the code sets it. */
+.x-govuk-ui-code-block-input {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 14px 20px 16px 16px;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--x-govuk-ui-text);
+  font: inherit;
+  letter-spacing: inherit;
+  tab-size: inherit;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow: hidden;
+  resize: none;
+  appearance: none;
+}
+.x-govuk-ui-code-block[data-line-numbers] .x-govuk-ui-code-block-input {
+  padding-left: calc(var(--x-govuk-ui-code-digits, 2) * 1ch + 30px);
+}
+.x-govuk-ui-code-block-input::selection {
+  background: color-mix(in srgb, var(--x-govuk-ui-focus) 45%, transparent);
+}
+/* An editable block is a field, so it has a field's keyline and a field's focus. */
+.x-govuk-ui-code-block[data-editable] {
+  border-color: var(--x-govuk-ui-border);
+}
+.x-govuk-ui-code-block[data-editable]:has(.x-govuk-ui-code-block-input:focus) {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 1px;
+  border-color: var(--x-govuk-ui-focus-text);
+  box-shadow: inset 0 0 0 1px var(--x-govuk-ui-focus-text);
+}
+/* With the system's colours, the floating actions' background is the system's, because a gradient
+   may be dropped. The code has no colours to show, so the text box shows its own text and the
+   browser's own selection. The copy beneath keeps only its numbers. */
+@media (forced-colors: active) {
+  .x-govuk-ui-code-block-actions[data-floating] {
+    background: Canvas;
+  }
+  .x-govuk-ui-code-block-input {
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+  }
+  .x-govuk-ui-code-block[data-editable] .x-govuk-ui-code-block-code code {
+    visibility: hidden;
+  }
+  .x-govuk-ui-code-block[data-editable] .x-govuk-ui-code-line-number {
+    visibility: visible;
+  }
+  .x-govuk-ui-code-block[data-editable]:has(.x-govuk-ui-code-block-input:focus) {
+    outline-color: Highlight;
+  }
+}
+/* Numbers are as wide as the longest number, and are left out of selections and copies. */
+.x-govuk-ui-code-line-number {
+  display: inline-block;
+  box-sizing: content-box;
+  width: calc(var(--x-govuk-ui-code-digits, 2) * 1ch);
+  padding: 0 16px 0 14px;
+  text-align: right;
+  color: var(--x-govuk-ui-muted);
+  user-select: none;
+}
+
+/* Syntax colours from the GOV.UK palette, each at least 4.5:1 on the block's background. */
+.x-govuk-ui-code-keyword {
+  color: var(--x-govuk-ui-code-keyword);
+}
+.x-govuk-ui-code-string {
+  color: var(--x-govuk-ui-code-string);
+}
+.x-govuk-ui-code-class,
+.x-govuk-ui-code-entity {
+  color: var(--x-govuk-ui-code-entity);
+}
+.x-govuk-ui-code-property {
+  color: var(--x-govuk-ui-code-property);
+}
+.x-govuk-ui-code-sign,
+.x-govuk-ui-code-comment {
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-code-comment {
+  font-style: italic;
+}

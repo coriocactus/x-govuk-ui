@@ -1,0 +1,4 @@
+[serve.static]
+plugins = ["./scripts/sass.ts"]
+# Bun writes these into the workbench's page in development, such as the checkout's name.
+env = "BUN_PUBLIC_*"

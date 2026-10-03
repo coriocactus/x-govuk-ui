@@ -1,0 +1,292 @@
+GOV.UK Frontend
+https://github.com/alphagov/govuk-frontend
+
+The stylesheet takes colour and typography settings from GOV.UK Frontend's Sass. Its licence follows.
+The library names the GDS Transport typeface, whose font files GOV.UK Frontend ships and licenses
+for www.gov.uk, *.service.gov.uk and *.blog.gov.uk only. The library includes no GDS Transport
+files, and the workbench's production build is set in Roboto and includes none either.
+The GOV.UK crown and logotype in src/logo.tsx come from GOV.UK Frontend's logo template, and the
+Royal Arms image the workbench serves comes from its assets. They are Crown copyright, and GOV.UK's
+brand rules allow them only on official GOV.UK services.
+The production build adds licence notices for the bundled JavaScript dependencies.
+
+The MIT License (MIT)
+
+Copyright (C) 2017 Crown Copyright (Government Digital Service)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Lexxy
+https://github.com/basecamp/lexxy
+
+jorjorwel's Editor is after Lexxy, 37signals' editor on Lexical: its defaults, and much of how it
+behaves as people write, attach files and use prompts, is ported from Lexxy's source. Its licence
+follows.
+
+Copyright Jorge Manrubia
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+Lexical
+https://github.com/facebook/lexical
+
+jorjorwel's Editor is built on Lexical, and the way it colours a code block again as code is typed
+is ported from Lexical's Prism highlighter. Its licence follows.
+
+MIT License
+
+Copyright (c) Meta Platforms, Inc. and affiliates.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+victory-vendor
+https://github.com/FormidableLabs/victory
+
+Chart draws with Recharts, which uses the d3 modules that victory-vendor bundles. Its package declares the MIT licence but
+ships without a licence file, so the standard MIT text follows. The build adds the licence of each d3 module it bundles.
+
+The MIT License (MIT)
+
+Copyright (c) Formidable Labs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+sugar-high
+https://github.com/huozhi/sugar-high
+
+Code block highlights code with sugar-high, and the workbench's usage panel is a Code block. Its package declares the MIT licence but
+ships without a licence file, so the standard MIT text follows.
+
+The MIT License (MIT)
+
+Copyright (c) huozhi (https://github.com/huozhi)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+@react-dnd/invariant and @react-dnd/shallowequal
+https://github.com/react-dnd/react-dnd
+
+Tiles drags its tiles with react-dnd, as react-mosaic does, and react-dnd uses these two helpers
+from its own repository. Their packages declare the MIT licence but ship without a licence file,
+so the standard MIT text follows.
+
+The MIT License (MIT)
+
+Copyright (c) Dan Abramov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+dnd-multi-backend, react-dnd-multi-backend, rdndmb-html5-to-touch and react-dnd-preview
+https://github.com/LouisBrunner/dnd-multi-backend
+
+Tiles drags with a mouse through HTML5's drag and drop and with a finger through touch events,
+switching between them with these packages, as react-mosaic does. Their packages declare the MIT
+licence but ship without a licence file, so the standard MIT text follows.
+
+The MIT License (MIT)
+
+Copyright (c) Louis Brunner
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Photos of London
+https://commons.wikimedia.org/
+
+The workbench's Lightbox, Carousel, Card and Aspect ratio examples show photos of London's structures, each the main image of its article in Wikipedia's List of structures in London. They come from Wikimedia Commons and are in workbench/assets/photos. Each is a smaller copy, at most 960 pixels on its longer side and recompressed, and each copy is shared under its photo's own licence. The examples credit each photographer by name.
+
+tower-bridge.jpg: Tower Bridge, by Fuzzypiggy. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:Tower_Bridge_at_Dawn.jpg
+
+big-ben.jpg: Big Ben, by Christian David. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:Elizabeth_Tower_and_the_north_front_of_the_Palace_of_Westminster,_London.jpg
+
+london-eye.jpg: London Eye, by Khamtran. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:London-Eye-2009.JPG
+
+the-shard.jpg: The Shard, by Colin. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:The_Shard_at_sunset_2017_(cropped).jpg
+
+tate-modern.jpg: Tate Modern, by Acabashi. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:Tate_Modern_-_Bankside_Power_Station.jpg
+
+royal-albert-hall.jpg: Royal Albert Hall, by Diliff. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:Royal_Albert_Hall,_London_-_Nov_2012.jpg
+
+battersea-power-station.jpg: Battersea Power Station, by Alberto Pascual. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:Battersea_Power_Station_from_the_river.jpg
+
+british-museum.jpg: British Museum, by Ham. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0/
+Source: https://commons.wikimedia.org/wiki/File:British_Museum_from_NE_2.JPG
+
+palace-of-westminster.jpg: Palace of Westminster, by ThatsTheBoss. Creative Commons CC0 1.0 Universal Public Domain Dedication (CC0), https://creativecommons.org/publicdomain/zero/1.0/deed.en
+Source: https://commons.wikimedia.org/wiki/File:Palace_of_Westminster_as_seen_from_Westminster_Bridge.jpg
+
+buckingham-palace.jpg: Buckingham Palace, by Julian Herzog. Creative Commons Attribution 4.0 International (CC BY 4.0), https://creativecommons.org/licenses/by/4.0
+Source: https://commons.wikimedia.org/wiki/File:Buckingham_Palace_London_Morning_2020_01_(cropped).jpg
+
+tower-of-london.jpg: Tower of London, by Duncan from Nottingham, UK. Creative Commons Attribution 2.0 Generic (CC BY 2.0), https://creativecommons.org/licenses/by/2.0
+Source: https://commons.wikimedia.org/wiki/File:Tower_of_London_from_the_Shard_(8515883950).jpg
+
+st-pauls-cathedral.jpg: St Paul's Cathedral, by Mark Fosh. Creative Commons Attribution 2.0 Generic (CC BY 2.0), https://creativecommons.org/licenses/by/2.0
+Source: https://commons.wikimedia.org/wiki/File:St_Pauls_aerial_(cropped).jpg
+
+westminster-abbey.jpg: Westminster Abbey, by Antiquary. Creative Commons Attribution 4.0 International (CC BY 4.0), https://creativecommons.org/licenses/by/4.0
+Source: https://commons.wikimedia.org/wiki/File:Westminster_Abbey,_Westminster.jpg
+
+hampton-court-palace.jpg: Hampton Court Palace, by Tilman2007. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:Hampton_Court_Palace,_West_Front_Richmond_upon_Thames_1193127_20230823_0050.jpg
+
+chiswick-house.jpg: Chiswick House, by Michael Coppins. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:Chiswick_House_from_SE_(cropped).jpg
+
+cutty-sark.jpg: Cutty Sark, by Ethan Doyle White. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:Northeast_View_of_the_Cutty_Sark_in_Greenwich.jpg
+
+bt-tower.jpg: BT Tower, by Tilman2007. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:1350342_II_BT_COMMUNICATION_TOWER,_CLEVELAND_MEWS_Camden_London_20250612_0003.jpg
+
+canary-wharf.jpg: Canary Wharf, by The wub. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:Canary_Wharf_from_entrance_to_Limehouse_Basin_-_2022-04-03.jpg
+
+barbican-estate.jpg: Barbican Estate, by Riodamascus. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:Barbican_towers.jpg
+
+nelsons-column.jpg: Nelson's Column, by Beata May. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:Nelson%27s_Column,_Trafalgar_Square,_London.JPG
+
+admiralty-arch.jpg: Admiralty Arch, by Diliff. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:Admiralty_Arch,_London,_England_-_June_2009.jpg
+
+albert-memorial.jpg: Albert Memorial, by Diliff. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:Albert_Memorial,_London_-_May_2008.jpg
+
+st-pancras.jpg: St Pancras railway station, by Colin. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:St_Pancras_Railway_Station_2012-06-23.jpg
+
+alexandra-palace.jpg: Alexandra Palace, by Jack Rose. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:APalace_1.jpg
+
+albert-bridge.jpg: Albert Bridge, London, by Iridescent. Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), https://creativecommons.org/licenses/by-sa/3.0
+Source: https://commons.wikimedia.org/wiki/File:Albert_Bridge_from_Chelsea_Embankment.jpg
+
+wellington-arch.jpg: Wellington Arch, by Ermell. Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0), https://creativecommons.org/licenses/by-sa/4.0
+Source: https://commons.wikimedia.org/wiki/File:London_Wellington_Arch_P1130942.jpg

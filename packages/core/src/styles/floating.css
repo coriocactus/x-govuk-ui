@@ -1,0 +1,105 @@
+/* Popover, Hover card and the menus share one floating surface, a keyline box on the page's colour
+   with a soft shadow. It grows out of what opened it, and shrinks back. */
+.x-govuk-ui-floating-positioner {
+  z-index: var(--x-govuk-ui-layer-overlay);
+  outline: none;
+}
+.x-govuk-ui-floating {
+  position: relative;
+  box-sizing: border-box;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 8px 28px rgb(11 12 12 / 16%);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  outline: none;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-floating:is([data-starting-style], [data-ending-style]) {
+  opacity: 0;
+  scale: 0.96;
+}
+.x-govuk-ui-floating[data-ending-style] {
+  transition-duration: var(--x-govuk-ui-duration-fast);
+}
+/* The arrow points at the trigger, with the surface's fill and keyline. */
+.x-govuk-ui-floating-arrow {
+  display: flex;
+  width: 20px;
+  height: 10px;
+}
+.x-govuk-ui-floating-arrow[data-side="top"] {
+  bottom: -8px;
+  rotate: 180deg;
+}
+.x-govuk-ui-floating-arrow[data-side="bottom"] {
+  top: -8px;
+}
+.x-govuk-ui-floating-arrow[data-side="left"] {
+  right: -13px;
+  rotate: 90deg;
+}
+.x-govuk-ui-floating-arrow[data-side="right"] {
+  left: -13px;
+  rotate: -90deg;
+}
+.x-govuk-ui-floating-arrow-fill {
+  fill: var(--x-govuk-ui-paper);
+}
+.x-govuk-ui-floating-arrow-edge {
+  fill: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-chevron {
+  flex-shrink: 0;
+}
+
+/* Popover. It has space for a heading, a sentence and a few controls, or more with
+   --x-govuk-ui-popover-width. */
+.x-govuk-ui-popover {
+  width: max-content;
+  max-width: min(var(--x-govuk-ui-popover-width, 340px), calc(100vw - 16px));
+  padding: 18px 20px 20px;
+}
+.x-govuk-ui-popover-title {
+  margin: 0 32px 6px 0;
+  font-size: 19px;
+  line-height: 1.3;
+}
+.x-govuk-ui-popover-description {
+  margin: 0 0 14px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.x-govuk-ui-popover-description:last-child {
+  margin-bottom: 0;
+}
+.x-govuk-ui-popover-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+/* Hover card. A preview of where its link goes. */
+.x-govuk-ui-hover-card {
+  width: min(300px, calc(100vw - 16px));
+  padding: 16px 18px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+@media (forced-colors: active) {
+  .x-govuk-ui-floating {
+    border-color: CanvasText;
+  }
+  .x-govuk-ui-floating-arrow-fill {
+    fill: Canvas;
+  }
+  .x-govuk-ui-floating-arrow-edge {
+    fill: CanvasText;
+  }
+}

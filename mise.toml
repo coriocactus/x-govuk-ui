@@ -1,0 +1,15 @@
+[tools]
+bun = "latest"
+
+[settings]
+lockfile = true
+
+[tasks.update]
+description = "Update Bun and packages, then run the checks"
+run = [
+  "mise lock --bump bun",
+  "mise install --locked",
+  "mise exec -- bun update --latest --exact",
+  "mise exec -- bunx --bun playwright install chromium firefox webkit",
+  "mise exec -- bun run check",
+]

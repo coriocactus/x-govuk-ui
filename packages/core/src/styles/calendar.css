@@ -1,0 +1,223 @@
+/* Calendar. Month grids of days, with the month's name above each and arrows that turn the months.
+   A chosen day is filled in brand blue and grows into place. A range fills the days between in a
+   light tint. The month slides in from the side it was turned to. */
+.x-govuk-ui-calendar {
+  --x-govuk-ui-calendar-range: color-mix(
+    in srgb,
+    var(--x-govuk-ui-brand) 14%,
+    var(--x-govuk-ui-paper)
+  );
+  position: relative;
+  display: inline-block;
+  padding: 12px;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-calendar-nav {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+/* The arrows are quiet small icon Buttons, in the text's colour. They stay pressable over the
+   Selects' layer. */
+.x-govuk-ui-button.x-govuk-ui-calendar-turn {
+  --x-govuk-ui-button-text: var(--x-govuk-ui-text);
+  pointer-events: auto;
+}
+/* The month and year, as quiet Selects between the arrows, over the first month. They have fixed
+   widths, so the year never moves as the month's name changes. */
+.x-govuk-ui-calendar-selects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  /* The box spans the arrows, so only the Selects take a press, and the arrows still work. */
+  pointer-events: none;
+}
+.x-govuk-ui-calendar-select {
+  pointer-events: auto;
+}
+.x-govuk-ui-calendar[data-months="2"] .x-govuk-ui-calendar-selects {
+  right: calc(50% + 12px);
+}
+.x-govuk-ui-calendar-select[data-part="month"] {
+  width: 120px;
+}
+.x-govuk-ui-calendar-select[data-part="year"] {
+  width: 78px;
+}
+.x-govuk-ui-calendar-select .x-govuk-ui-select-trigger {
+  justify-content: center;
+  height: 32px;
+  gap: 4px;
+  padding: 0 6px 0 8px;
+  border-color: transparent;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  transition: background var(--x-govuk-ui-duration-fast) ease;
+}
+/* They stay borderless under the pointer and while open, where a field would darken its border. */
+.x-govuk-ui-calendar-select
+.x-govuk-ui-select-trigger.x-govuk-ui-input:is(
+  :hover,
+  [data-popup-open],
+  :focus:not(:focus-visible)
+) {
+  border-color: transparent;
+}
+.x-govuk-ui-calendar-select .x-govuk-ui-select-trigger:is(:hover, [data-popup-open]) {
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-calendar-select .x-govuk-ui-select-icon svg {
+  width: 14px;
+  height: 14px;
+}
+.x-govuk-ui-calendar-months {
+  display: flex;
+  gap: 24px;
+  overflow: hidden;
+}
+.x-govuk-ui-calendar-month[data-direction="next"] {
+  animation: x-govuk-ui-calendar-next var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-calendar-month[data-direction="previous"] {
+  animation: x-govuk-ui-calendar-previous var(--x-govuk-ui-duration-medium)
+    var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-calendar-next {
+  from {
+    opacity: 0.4;
+    translate: 16px 0;
+  }
+}
+@keyframes x-govuk-ui-calendar-previous {
+  from {
+    opacity: 0.4;
+    translate: -16px 0;
+  }
+}
+/* Where the Selects stand in for it, the month's name keeps its place for screen readers. */
+.x-govuk-ui-calendar-caption[data-hidden] {
+  color: transparent;
+  user-select: none;
+}
+.x-govuk-ui-calendar-caption {
+  margin: 0;
+  height: 32px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 32px;
+  text-align: center;
+}
+.x-govuk-ui-calendar-grid {
+  margin-top: 8px;
+  border-collapse: collapse;
+}
+.x-govuk-ui-calendar-grid th {
+  width: 40px;
+  height: 30px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+.x-govuk-ui-calendar-grid td {
+  padding: 2px 0;
+  text-align: center;
+}
+.x-govuk-ui-calendar-day {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--x-govuk-ui-text);
+  font: inherit;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    color var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-calendar-day:hover:not([aria-disabled], [data-selected]) {
+  background: var(--x-govuk-ui-secondary);
+}
+/* Today is bold, with a short bar beneath its number. */
+.x-govuk-ui-calendar-day[data-today] {
+  font-weight: 700;
+}
+.x-govuk-ui-calendar-day[data-today]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  translate: -50% 0;
+}
+.x-govuk-ui-calendar-day[data-selected] {
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-white);
+  animation: x-govuk-ui-calendar-chosen var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-calendar-day[data-selected] {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+@keyframes x-govuk-ui-calendar-chosen {
+  from {
+    scale: 0.8;
+  }
+}
+.x-govuk-ui-calendar-day[aria-disabled] {
+  color: var(--x-govuk-ui-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.x-govuk-ui-calendar-day:focus-visible {
+  z-index: 1;
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  box-shadow: inset 0 0 0 2px var(--x-govuk-ui-focus-text);
+}
+/* A range fills the days between its ends in a tint of brand blue, and runs into the ends' halves
+   that face it. The fill keeps to the cell's content, so it is as tall as a chosen day. */
+.x-govuk-ui-calendar-cell[data-in-range] {
+  background: var(--x-govuk-ui-calendar-range);
+}
+.x-govuk-ui-calendar-cell[data-range-start] {
+  background: linear-gradient(to right, transparent 50%, var(--x-govuk-ui-calendar-range) 50%);
+}
+.x-govuk-ui-calendar-cell[data-range-end] {
+  background: linear-gradient(to left, transparent 50%, var(--x-govuk-ui-calendar-range) 50%);
+}
+/* After the fills, because the background shorthand would reset the clip. */
+.x-govuk-ui-calendar-cell:is([data-in-range], [data-range-start], [data-range-end]) {
+  background-clip: content-box;
+}
+@media (max-width: 40em) {
+  .x-govuk-ui-calendar-months {
+    flex-direction: column;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-calendar-day[data-selected] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+}

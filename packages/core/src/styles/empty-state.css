@@ -1,0 +1,70 @@
+/* Empty state. A centred column of an icon, a title, a sentence and the ways forward. It rises
+   gently into place. */
+.x-govuk-ui-empty-state {
+  display: grid;
+  justify-items: center;
+  padding: 32px 24px;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  text-align: center;
+  animation: x-govuk-ui-empty-state-in var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-empty-state-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+.x-govuk-ui-empty-state-media {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-empty-state-media svg {
+  width: 26px;
+  height: 26px;
+}
+.x-govuk-ui-empty-state-title {
+  margin: 0 0 8px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.x-govuk-ui-empty-state-description {
+  max-width: 36em;
+  margin: 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.x-govuk-ui-empty-state-actions.x-govuk-ui-button-group {
+  justify-content: center;
+  margin-top: 20px;
+}
+/* Small, for a panel or a list. */
+.x-govuk-ui-empty-state[data-size="small"] {
+  padding: 20px 12px;
+}
+.x-govuk-ui-empty-state[data-size="small"] .x-govuk-ui-empty-state-media {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+}
+.x-govuk-ui-empty-state[data-size="small"] .x-govuk-ui-empty-state-media svg {
+  width: 20px;
+  height: 20px;
+}
+.x-govuk-ui-empty-state[data-size="small"] .x-govuk-ui-empty-state-title {
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+.x-govuk-ui-empty-state[data-size="small"] .x-govuk-ui-empty-state-description {
+  font-size: 13px;
+}
+.x-govuk-ui-empty-state[data-size="small"] .x-govuk-ui-empty-state-actions.x-govuk-ui-button-group {
+  margin-top: 12px;
+}

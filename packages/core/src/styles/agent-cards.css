@@ -1,0 +1,57 @@
+/* Plan card. A bordered card on the page's paper, with a small eyebrow naming
+   the kind of card. */
+.x-govuk-ui-agent-card {
+  box-sizing: border-box;
+  padding: 18px 20px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 10px;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  overflow: clip;
+}
+.x-govuk-ui-agent-card-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+.x-govuk-ui-agent-card-title {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.32;
+}
+.x-govuk-ui-agent-card-description {
+  margin: 4px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.45;
+}
+.x-govuk-ui-plan-card-steps {
+  margin-top: 16px;
+}
+/* The footer keeps its height whatever it contains, such as buttons, a status or a tag. */
+.x-govuk-ui-agent-card-footer {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  margin: 2px -20px -18px;
+  padding: 0 20px;
+  border-top: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-surface);
+  font-size: 16px;
+}
+/* A Tag in the footer, such as Done, is as tall as the small buttons beside it. */
+.x-govuk-ui-agent-card-footer > .x-govuk-ui-tag {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 5px;
+}

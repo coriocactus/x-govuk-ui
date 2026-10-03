@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "module": "ESNext",
+    "allowImportingTsExtensions": false,
+    "rootDir": "src",
+    "outDir": "dist/lib",
+    "types": [],
+    "paths": {
+      "x-govuk-ui": ["../core/dist/lib/index.d.ts"],
+      "x-govuk-ui/internal": ["../core/dist/lib/internal.d.ts"]
+    }
+  },
+  "include": ["src"]
+}

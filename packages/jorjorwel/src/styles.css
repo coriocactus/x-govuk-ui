@@ -1,0 +1,5 @@
+/* The package's styles, in the extensions' cascade layer, which comes after x-govuk-ui's. The order
+   statement needs its own file because bundlers place imported content first. */
+@import "./layers.css";
+@import "./styles/editor.css" layer(x-govuk-ui-extensions);
+@import "./styles/editor-ai.css" layer(x-govuk-ui-extensions);

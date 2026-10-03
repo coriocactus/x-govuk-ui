@@ -1,0 +1,132 @@
+/* Conversation. A Message scroller laid out as a chat app, with messages in a centred column of
+   readable width. */
+.x-govuk-ui-conversation {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.x-govuk-ui-conversation > .x-govuk-ui-message-scroller {
+  flex: 1;
+}
+.x-govuk-ui-conversation .x-govuk-ui-message-scroller-content {
+  max-width: var(--x-govuk-ui-conversation-width, 44rem);
+  margin-inline: auto;
+  padding: 24px 20px calc(var(--x-govuk-ui-message-scroller-footer, 0px) + 8px);
+}
+/* The composer floats over the foot of the log, in the messages' column. The log scrolls beneath
+   it and fades out behind it, and the scrollbar still runs to the bottom. */
+.x-govuk-ui-conversation .x-govuk-ui-message-scroller-footer {
+  box-sizing: border-box;
+  max-width: var(--x-govuk-ui-conversation-width, 44rem);
+  margin-inline: auto;
+  padding: 24px 20px 20px;
+  background: linear-gradient(to bottom, transparent, var(--x-govuk-ui-paper) 24px);
+}
+.x-govuk-ui-conversation[data-placed] .x-govuk-ui-message-scroller-footer {
+  transition: transform 420ms var(--x-govuk-ui-ease-drawer);
+}
+/* Before anything is said, the composer waits in the middle of the empty log. It glides down to
+   the foot as the first message arrives. */
+.x-govuk-ui-conversation[data-empty]:not([data-start]) .x-govuk-ui-message-scroller-footer {
+  transform: translateY(calc(-1 * var(--x-govuk-ui-conversation-rise, 0px)));
+}
+/* What the empty log shows sits in the messages' column, above the composer at the foot. */
+.x-govuk-ui-conversation .x-govuk-ui-message-scroller-empty-content {
+  max-width: var(--x-govuk-ui-conversation-width, 44rem);
+  margin-inline: auto;
+  padding: 24px 20px;
+}
+/* A quiet note, such as a reply stopped before it was written. */
+.x-govuk-ui-message-note {
+  margin: 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+/* Each row opens to its message's height, so arrivals push the log up smoothly. Rows clip while
+   they open, so they reach 8px past the column on each side, where a message's tools overhang. */
+.x-govuk-ui-message-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-inline: -8px;
+  padding-inline: 8px;
+  overflow: hidden;
+}
+.x-govuk-ui-message-row[data-role="user"] {
+  align-items: flex-end;
+}
+/* The assistant writes as plain text across the column. The person's own messages sit in a bubble
+   on the other side. */
+.x-govuk-ui-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 22px;
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-message[data-role="user"] {
+  align-items: flex-end;
+}
+/* A message's tools take the space beneath it, so the gap to the next message closes up. They sit
+   under the start of a reply and under the end of the person's bubble. */
+.x-govuk-ui-message:has(.x-govuk-ui-message-actions) {
+  margin-bottom: 8px;
+}
+.x-govuk-ui-message-content {
+  max-width: 100%;
+  font-size: 17px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* The person's messages are secondary Bubbles, in the log's text size. */
+.x-govuk-ui-message[data-role="user"] .x-govuk-ui-message-content {
+  line-height: 1.6;
+}
+/* Consecutive bubbles from the person read as one run, as in a Bubble group. */
+.x-govuk-ui-message-row[data-role="user"]:has(+ .x-govuk-ui-message-row[data-role="user"])
+.x-govuk-ui-message {
+  margin-bottom: 6px;
+}
+.x-govuk-ui-message-row[data-role="user"]
+  + .x-govuk-ui-message-row[data-role="user"]
+  .x-govuk-ui-message-content {
+  border-start-end-radius: var(--x-govuk-ui-bubble-tail);
+}
+/* The latest message always shows its tools, whoever wrote it. Other messages show theirs when the
+   pointer is over them or a tool has focus. Touch screens have no hover, so tools always show
+   there. The thinking row is not a message, so a message just sent keeps its tools until the
+   reply. */
+.x-govuk-ui-message-actions {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+  margin-inline: -8px;
+  opacity: 0;
+  transition: opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-message:hover .x-govuk-ui-message-actions,
+.x-govuk-ui-message-actions:focus-within,
+.x-govuk-ui-message-row[data-message]:not(:has(~ .x-govuk-ui-message-row[data-message]))
+  .x-govuk-ui-message-actions {
+  opacity: 1;
+}
+@media (hover: none) {
+  .x-govuk-ui-message-actions {
+    opacity: 1;
+  }
+}
+/* While the assistant thinks, one status word shimmers, then gives way to the next. */
+.x-govuk-ui-thinking {
+  position: relative;
+  height: 24px;
+  margin: 2px 0 16px 2px;
+  font-size: 15px;
+  line-height: 24px;
+}
+.x-govuk-ui-thinking-word {
+  display: block;
+  white-space: nowrap;
+}

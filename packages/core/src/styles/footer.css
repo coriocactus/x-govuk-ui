@@ -1,0 +1,196 @@
+/* Footer. GOV.UK's footer on its tinted surface, under a band of brand blue. It shows the crown,
+   any navigation in sections over a rule, then the support links and the licence. Crown copyright
+   sits under the Royal Arms at the end of the row. */
+.x-govuk-ui-footer {
+  container-type: inline-size;
+  padding-block: 40px 25px;
+  border-top: 10px solid var(--x-govuk-ui-brand);
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 19px;
+  line-height: 1.32;
+}
+@container (max-width: 640px) {
+  .x-govuk-ui-footer-container {
+    font-size: 16px;
+  }
+}
+.x-govuk-ui-footer-crown {
+  display: block;
+  width: 36px;
+  height: auto;
+  margin-bottom: 25px;
+  color: var(--x-govuk-ui-text);
+}
+
+/* Sections stack on a phone, and share the row from tablet width up, by their widths. */
+.x-govuk-ui-footer-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 30px;
+}
+.x-govuk-ui-footer-section {
+  flex: 1 1 100%;
+  min-width: 0;
+  margin-bottom: 30px;
+}
+@container (min-width: 641px) {
+  .x-govuk-ui-footer-section[data-width="three-quarters"] {
+    flex: 0 0 calc(75% - 7.5px);
+  }
+  .x-govuk-ui-footer-section[data-width="two-thirds"] {
+    flex: 0 0 calc(66.666% - 10px);
+  }
+  .x-govuk-ui-footer-section[data-width="one-half"] {
+    flex: 0 0 calc(50% - 15px);
+  }
+  .x-govuk-ui-footer-section[data-width="one-third"] {
+    flex: 0 0 calc(33.333% - 20px);
+  }
+  .x-govuk-ui-footer-section[data-width="one-quarter"] {
+    flex: 0 0 calc(25% - 22.5px);
+  }
+}
+.x-govuk-ui-footer-heading {
+  margin: 0 0 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.x-govuk-ui-footer-list {
+  column-gap: 30px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@container (min-width: 769px) {
+  .x-govuk-ui-footer-list[data-columns="2"] {
+    column-count: 2;
+  }
+  .x-govuk-ui-footer-list[data-columns="3"] {
+    column-count: 3;
+  }
+}
+.x-govuk-ui-footer-list > li {
+  margin-bottom: 20px;
+  break-inside: avoid;
+}
+.x-govuk-ui-footer-list > li:last-child {
+  margin-bottom: 0;
+}
+@container (max-width: 640px) {
+  .x-govuk-ui-footer-heading {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    font-size: 19px;
+  }
+  .x-govuk-ui-footer-list > li {
+    margin-bottom: 15px;
+  }
+}
+.x-govuk-ui-footer-break {
+  margin: 0 0 40px;
+  border: 0;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+
+/* GOV.UK's links are blue and underlined. The underline thickens under the pointer, and focus is
+   GOV.UK's yellow. */
+.x-govuk-ui-footer-link {
+  /* When focus scrolls a link into view, the dark edge beneath it comes into view too. */
+  scroll-margin-block-end: 4px;
+  color: var(--x-govuk-ui-link);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-footer-link:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-footer-link:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}
+
+/* The support links and the licence take the row, and Crown copyright sits at its end, or below
+   them once the row is too narrow. */
+.x-govuk-ui-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0 30px;
+}
+.x-govuk-ui-footer-meta-main {
+  flex: 1 1 320px;
+  margin-bottom: 25px;
+}
+.x-govuk-ui-footer-meta-main > :not(.x-govuk-ui-footer-licence) {
+  margin: 0 0 20px;
+}
+.x-govuk-ui-footer-inline-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 15px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-footer-licence {
+  margin: 0;
+}
+.x-govuk-ui-footer-licence-logo {
+  display: inline-block;
+  margin: 0 10px 0 0;
+  vertical-align: top;
+}
+@container (max-width: 1019px) {
+  .x-govuk-ui-footer-licence-logo {
+    margin-bottom: 15px;
+  }
+}
+.x-govuk-ui-footer-licence-description {
+  display: inline-block;
+  text-wrap: balance;
+}
+.x-govuk-ui-footer-copyright {
+  display: inline-block;
+  margin-bottom: 25px;
+  color: var(--x-govuk-ui-text);
+  text-align: center;
+  white-space: nowrap;
+}
+.x-govuk-ui-footer-copyright:hover {
+  color: var(--x-govuk-ui-text);
+}
+/* The Royal Arms, drawn in the text's colour above Crown copyright. */
+.x-govuk-ui-footer-copyright[data-crest]::before {
+  content: "";
+  display: block;
+  height: 112px;
+  background: currentColor;
+  mask: var(--x-govuk-ui-footer-crest) no-repeat 50% 0 / 125px 102px;
+}
+.x-govuk-ui-footer-copyright[data-crest]:focus-visible::before {
+  background: var(--x-govuk-ui-focus-text);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-footer {
+    border-top-color: CanvasText;
+  }
+  .x-govuk-ui-footer-licence-logo {
+    forced-color-adjust: auto;
+  }
+  .x-govuk-ui-footer-copyright[data-crest]::before {
+    background: LinkText;
+  }
+}

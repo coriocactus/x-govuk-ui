@@ -1,0 +1,34 @@
+/* Carousel. */
+.x-govuk-ui-carousel {
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-carousel-viewport {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 7px;
+}
+.x-govuk-ui-carousel-viewport::-webkit-scrollbar {
+  display: none;
+}
+.x-govuk-ui-carousel-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+.x-govuk-ui-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-carousel-viewport:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 3px;
+}

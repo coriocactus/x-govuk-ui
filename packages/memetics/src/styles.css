@@ -1,0 +1,14 @@
+/* The package's styles, in x-govuk-ui's cascade layer, after x-govuk-ui's own stylesheet. The
+   palette comes first, as every chart reads it, then the frame every chart is set in. */
+@import "./styles/palette.css" layer(x-govuk-ui);
+@import "./styles/chart.css" layer(x-govuk-ui);
+@import "./styles/calendar-heatmap.css" layer(x-govuk-ui);
+@import "./styles/choropleth-map.css" layer(x-govuk-ui);
+@import "./styles/treemap.css" layer(x-govuk-ui);
+@import "./styles/sunburst.css" layer(x-govuk-ui);
+@import "./styles/sankey.css" layer(x-govuk-ui);
+@import "./styles/bar-list.css" layer(x-govuk-ui);
+@import "./styles/bullet-chart.css" layer(x-govuk-ui);
+@import "./styles/gauge.css" layer(x-govuk-ui);
+@import "./styles/waffle.css" layer(x-govuk-ui);
+@import "./styles/sparkline.css" layer(x-govuk-ui);

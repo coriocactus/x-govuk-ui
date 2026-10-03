@@ -1,0 +1,50 @@
+/* Figure. Set as GOV.UK's statistics set their figures, and as The Economist sets its charts. A
+   short rule in brand blue sits over a headline and a line that says what is measured. Then come
+   the content, the source at the foot, and the figures in a Details beneath. */
+.x-govuk-ui-figure {
+  margin: 0;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-figure-caption {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+.x-govuk-ui-figure-rule {
+  width: 40px;
+  height: 5px;
+  margin-bottom: 8px;
+  border-radius: 1px;
+  background: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-figure-title {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.x-govuk-ui-figure-subtitle {
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.4;
+}
+.x-govuk-ui-figure-source {
+  margin: 10px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.x-govuk-ui-figure-data {
+  margin-top: 12px;
+}
+/* Its tables follow one another, and the last ends with the Details. */
+.x-govuk-ui-figure-data .x-govuk-ui-table-scroll {
+  margin-bottom: 16px;
+}
+.x-govuk-ui-figure-data .x-govuk-ui-table-scroll:last-child {
+  margin-bottom: 0;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-figure-rule {
+    background: CanvasText;
+  }
+}

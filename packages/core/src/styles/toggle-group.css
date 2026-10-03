@@ -1,0 +1,82 @@
+/* Toggle group. Options in a tray. With one choice, a raised highlight glides to the pressed
+   item. With several, each pressed item is shaded. */
+.x-govuk-ui-toggle-group {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 6px;
+  background: var(--x-govuk-ui-secondary);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-toggle {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  height: 34px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--x-govuk-ui-muted);
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    color var(--x-govuk-ui-duration-fast) ease,
+    background var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-toggle-group[data-size="small"] .x-govuk-ui-toggle {
+  min-width: 28px;
+  height: 26px;
+  padding: 0 7px;
+  font-size: 14px;
+}
+.x-govuk-ui-toggle:hover,
+.x-govuk-ui-toggle[data-pressed] {
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-toggle-indicator {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 1px 3px rgb(11 12 12 / 10%);
+}
+.x-govuk-ui-toggle-content {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.x-govuk-ui-toggle-content svg {
+  display: block;
+}
+/* With several choices, pressed items are shaded. */
+.x-govuk-ui-toggle-group[data-multiple] .x-govuk-ui-toggle[data-pressed] {
+  background: var(--x-govuk-ui-paper);
+}
+.x-govuk-ui-toggle:focus-visible {
+  z-index: 1;
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  /* The dark edge sits beneath the item, as GOV.UK's does, not over its foot, so the item's words
+     stay in the middle of the yellow. */
+  box-shadow: 0 3px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-toggle:focus-visible .x-govuk-ui-toggle-indicator {
+  opacity: 0;
+}
+.x-govuk-ui-toggle[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-toggle[data-pressed] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}

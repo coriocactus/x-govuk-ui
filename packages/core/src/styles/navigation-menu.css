@@ -1,0 +1,162 @@
+/* Navigation menu. */
+.x-govuk-ui-navigation {
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-navigation-list,
+.x-govuk-ui-navigation-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.x-govuk-ui-navigation-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.x-govuk-ui-navigation-trigger,
+.x-govuk-ui-navigation-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 13px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--x-govuk-ui-link);
+  font: 700 15px / 1.5 var(--x-govuk-ui-font);
+  cursor: pointer;
+  text-decoration: none;
+}
+.x-govuk-ui-navigation-link {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.x-govuk-ui-navigation-trigger:hover,
+.x-govuk-ui-navigation-trigger[data-popup-open],
+.x-govuk-ui-navigation-link:hover {
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-navigation-trigger:focus-visible,
+.x-govuk-ui-navigation-link:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 2px;
+}
+.x-govuk-ui-navigation-trigger:disabled,
+.x-govuk-ui-navigation-link[aria-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* The current page has a straight bar, as in GOV.UK's service navigation. It is under the label at
+   the top level, and down the left edge in a menu. It stays clear of the rounded corners. */
+.x-govuk-ui-navigation-link {
+  position: relative;
+}
+.x-govuk-ui-navigation-link[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  right: 13px;
+  bottom: 0;
+  left: 13px;
+  height: 4px;
+  background: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-navigation-links .x-govuk-ui-navigation-link[aria-current="page"]::after {
+  top: 11px;
+  right: auto;
+  bottom: 11px;
+  left: 0;
+  width: 4px;
+  height: auto;
+}
+.x-govuk-ui-navigation-icon {
+  display: inline-flex;
+  transition: transform var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-navigation-icon[data-popup-open] {
+  transform: rotate(180deg);
+}
+.x-govuk-ui-navigation-positioner {
+  z-index: var(--x-govuk-ui-layer-overlay);
+  width: var(--positioner-width);
+  height: var(--positioner-height);
+  transition:
+    top var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    left var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    right var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    transform var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-navigation-positioner[data-instant] {
+  transition: none;
+}
+.x-govuk-ui-navigation-popup {
+  width: var(--popup-width);
+  height: var(--popup-height);
+  max-width: var(--available-width);
+  max-height: var(--available-height);
+  overflow: hidden;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 7px;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  box-shadow: 0 8px 28px #0002;
+  transform-origin: var(--transform-origin);
+  transition:
+    width var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    height var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    transform var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-navigation-popup[data-starting-style],
+.x-govuk-ui-navigation-popup[data-ending-style] {
+  opacity: 0;
+  transform: translateY(-5px) scale(0.98);
+}
+/* The viewport only clips. It is smaller than the content while the popup grows, so scrolling here
+   would flash a scrollbar mid-animation. The content scrolls instead, and only when it is taller
+   than the space available. */
+.x-govuk-ui-navigation-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.x-govuk-ui-navigation-content {
+  box-sizing: border-box;
+  max-height: calc(var(--available-height) - 2px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  width: max-content;
+  min-width: min(220px, calc(100vw - 48px));
+  max-width: min(380px, calc(100vw - 48px));
+  padding: 8px;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    transform var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+/* When moving between menus, only the panel moves. It glides and resizes to the new menu. The links
+   swap at once and never fade, slide or reflow. The panel clips them while it catches up. Opening
+   and closing the menu still fade. */
+.x-govuk-ui-navigation-content[data-starting-style]:not([data-activation-direction]),
+.x-govuk-ui-navigation-content[data-ending-style]:not([data-activation-direction]) {
+  opacity: 0;
+}
+.x-govuk-ui-navigation-content[data-activation-direction] {
+  transition: none;
+}
+.x-govuk-ui-navigation-content[data-activation-direction][data-ending-style] {
+  display: none;
+}
+.x-govuk-ui-navigation-description {
+  color: var(--x-govuk-ui-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-navigation-link[aria-current="page"]::after {
+    forced-color-adjust: none;
+    background: LinkText;
+  }
+}

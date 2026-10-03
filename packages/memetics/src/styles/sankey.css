@@ -1,0 +1,12 @@
+/* Sankey. The stages are in the palette's colours. Each flow is a band in its source's colour,
+   faint until the pointer is on it. */
+.x-govuk-ui-sankey-flow {
+  stroke-opacity: 0.28;
+  transition: stroke-opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-sankey-flow:hover {
+  stroke-opacity: 0.5;
+}
+.x-govuk-ui-sankey-name {
+  font-weight: 700;
+}

@@ -1,0 +1,954 @@
+:root {
+  font-family: var(--x-govuk-ui-font);
+  color-scheme: light;
+  /* The workbench uses the library's GOV.UK tokens, so both themes follow the GOV.UK palette. */
+  --paper: var(--x-govuk-ui-paper);
+  --canvas: var(--x-govuk-ui-surface);
+  --soft: var(--x-govuk-ui-secondary);
+  --text: var(--x-govuk-ui-text);
+  --muted: var(--x-govuk-ui-muted);
+  --line: var(--x-govuk-ui-line);
+  --blue: var(--x-govuk-ui-link);
+  --selected: var(--x-govuk-ui-blue-tint-95);
+  --green: var(--x-govuk-ui-success);
+  --focus: var(--x-govuk-ui-focus);
+  /* The preview shares the panels' colour. Keylines alone divide the sections. */
+  --preview: var(--x-govuk-ui-paper);
+
+  color: var(--text);
+  background: var(--paper);
+  font-synthesis: none;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --selected: color-mix(in srgb, var(--x-govuk-ui-blue) 30%, var(--x-govuk-ui-paper));
+}
+/* Element resets sit beneath the library layers, so they never restyle library components. */
+@layer reset {
+  /* The reset stops at the preview's examples. The parts are then measured and tested as they show
+     in a service with no box-sizing reset of its own, such as one on GOV.UK Frontend's template. */
+  @scope (:root) to (.preview-frame > *) {
+    * {
+      box-sizing: border-box;
+    }
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button,
+  a {
+    color: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [tabindex="0"]:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+/* The site's own layers stay within its root, beneath every overlay, as Base UI advises. */
+#root {
+  isolation: isolate;
+}
+body {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Hidden from the desktop layout. On a phone, it keeps its own display, so a library part, such as
+   an icon button, keeps its layout and its icon stays centred. */
+@media not (max-width: 900px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+/* The panels' sizes are not inherited, so a dragged divider changes the style of only the few
+   elements that use them, instead of everything inside the workbench. */
+@property --code-height {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 260px;
+}
+@property --inspector-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 320px;
+}
+.workbench {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 1px var(--inspector-width);
+  height: 100dvh;
+  overflow: hidden;
+}
+/* The workbench's own page has no playground, so the preview takes its space. */
+.workbench[data-playground="none"] {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.workbench[data-resizing] {
+  user-select: none;
+}
+.workbench[data-resizing] .preview-frame,
+.workbench[data-resizing] .component-main {
+  transition: none;
+}
+
+/* The site's front page, with the lock-up large in the middle of the window, and the workbench and
+   the workspace beneath it with the theme between them. On a phone, everything scales to the
+   width. */
+.home {
+  box-sizing: border-box;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: clamp(20px, 4vw, 32px);
+  height: 100%;
+  padding: 24px;
+  overflow-y: auto;
+  background: var(--paper);
+  color: var(--text);
+  font-family: var(--x-govuk-ui-font);
+}
+.home-heading {
+  margin: 0;
+  font-size: clamp(24px, 3.4vw, 32px);
+  line-height: 1.2;
+  text-align: center;
+}
+.home .home-lockup {
+  --brand-height: clamp(44px, 12vw, 104px);
+}
+/* The theme picker opens from its middle, so the links leave it space on either side. */
+.home-links {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  font-size: clamp(19px, 3vw, 24px);
+  line-height: 1.3;
+}
+.home-links a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.home-links a:hover {
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.home-links a:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}
+.home-theme.x-govuk-ui-button {
+  --x-govuk-ui-button-text: var(--text);
+}
+.home-note {
+  max-width: 32ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 19px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* The component list uses the library sidebar, on the workbench's own surface. */
+.workbench-sidebar {
+  --x-govuk-ui-sidebar-fill: var(--paper);
+}
+.workbench-sidebar .x-govuk-ui-sidebar-header {
+  min-height: 0;
+  justify-content: space-between;
+  padding: 23px 19px 14px;
+}
+/* The GOV/UK lock-up followed by the product name. The name is set small and hangs from the top
+   of the wordmark's capitals, instead of sitting on its baseline. */
+.brand {
+  display: inline-flex;
+  color: var(--text);
+  text-decoration: none;
+}
+/* The lock-up, in the colour of the text around it, so black in the light theme and white in the
+   dark. Its parts are in step with the logo's height. */
+.brand-lockup {
+  --brand-height: 22px;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: calc(var(--brand-height) * 0.27);
+}
+.brand-logo {
+  display: block;
+  width: auto;
+  height: var(--brand-height);
+}
+.brand-product {
+  /* Its capitals start where the wordmark's do, a little below the top of the logo. */
+  margin-top: calc(var(--brand-height) * 0.045);
+  font-size: calc(var(--brand-height) * 0.636);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+/* Command-K, beside the brand, opens the command menu. It is centred on the wordmark's capitals,
+   which sit lower in the logo than the crown, instead of on the whole logo. */
+.workbench-sidebar .brand-commands.x-govuk-ui-button {
+  padding: 3px 4px;
+  translate: 0 2.5px;
+}
+.sidebar-links {
+  padding: 9px 16px 6px;
+}
+
+.sidebar-links > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 6px;
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.sidebar-links > a:hover {
+  color: var(--blue);
+}
+
+.component-main {
+  /* Hiding and showing the usage panel takes a little longer than other movements, on a gentler
+     curve, so the panel can be followed as it shrinks towards Show code. */
+  --code-panel-duration: 340ms;
+  --code-panel-ease: cubic-bezier(0.45, 0, 0.25, 1);
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 1px var(--code-height);
+  outline: none;
+  transition: grid-template-rows var(--code-panel-duration) var(--code-panel-ease);
+}
+.component-main[data-code-open="false"] {
+  grid-template-rows: minmax(0, 1fr) 0px 0px;
+}
+/* Moving between the workbench's own page and a component, the code panel does not move. */
+.component-main[data-instant],
+.component-main[data-instant] :is(.code-section, .code-divider) {
+  transition: none;
+}
+.preview-section {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 48px minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--preview);
+}
+/* In development, the checkout's tag sits in the middle of the toolbar, in its own colours, with
+   the dark theme's set apart. It gives way to the tools on a narrow screen. */
+.checkout-tag {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--checkout-fill);
+  color: var(--checkout-text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+:root[data-theme="dark"] .checkout-tag {
+  background: var(--checkout-fill-dark);
+  color: var(--checkout-text-dark);
+}
+@media (max-width: 900px) {
+  .checkout-tag {
+    display: none;
+  }
+}
+.preview-toolbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--preview);
+}
+.preview-tools {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+/* GOV.UK's focus, as the library's quiet buttons have it. */
+.show-code-button:focus-visible {
+  background: var(--focus);
+  color: var(--x-govuk-ui-focus-text);
+}
+/* The toolbar's groups are divided by the library's Separator, sized to the toolbar. */
+.toolbar-divider.x-govuk-ui-separator {
+  align-self: center;
+  height: 15px;
+  margin: 0 6px;
+}
+.preview-canvas {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: var(--preview);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+/* The preview renders in the page, so menus, toasts and dialogs overlay the whole workbench. It
+   scrolls in a Scroll area. Its content is at least the preview's height, so an example can be
+   centred in it. */
+.preview-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  /* An example's fixed parts, such as toasts, belong to the whole window, as on a real site. The
+     preview has no fade, because a fade's mask would hide them outside the preview's box. */
+  background: var(--preview);
+}
+.preview-frame > .x-govuk-ui-scroll-area-viewport > .x-govuk-ui-scroll-area-content {
+  display: grid;
+  min-height: 100%;
+}
+
+/* The phone preview shows the example in a frame as wide as a phone and as tall as the preview, on
+   the canvas around it, with an edge to drag and its width beneath. While the edge is dragged, the
+   frame lets the pointer pass, so the drag is not lost in it. */
+.preview-canvas[data-phone] {
+  padding: 16px 24px 30px;
+  background: var(--canvas);
+}
+.preview-phone {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  max-width: 100%;
+}
+/* While loading, or loaded and not shown, the frame waits out of sight at the place and size it
+   will show at. It waits inside the space the canvas keeps around it then, so its example is laid
+   out once. */
+.preview-phone[data-waiting] {
+  position: absolute;
+  top: 16px;
+  bottom: 30px;
+  left: 50%;
+  max-width: calc(100% - 48px);
+  translate: -50% 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.preview-phone-screen {
+  flex: none;
+  box-sizing: border-box;
+  width: var(--phone-width);
+  height: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--preview);
+  box-shadow: 0 8px 28px rgb(11 12 12 / 12%);
+}
+.preview-phone[data-dragging] .preview-phone-screen {
+  pointer-events: none;
+}
+.preview-phone-width {
+  position: absolute;
+  bottom: -24px;
+  left: 0;
+  width: var(--phone-width);
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* The example alone, in the phone preview's frame, fills the frame. */
+.preview-alone {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+.preview-alone > .preview-frame {
+  flex: 1;
+}
+
+/* Each divider is the library's ResizableHandle, a 1px keyline between two panels, with a wider
+   area to grab. It sits above the usage panel, so the grab area on both sides responds to the
+   pointer. */
+.workbench .x-govuk-ui-resizable-handle {
+  z-index: 5;
+}
+
+.code-divider {
+  min-height: 0;
+  transition: opacity var(--x-govuk-ui-duration-medium) ease;
+}
+.code-slot {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+.code-section {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 4;
+  height: var(--code-height);
+  min-width: 0;
+  display: grid;
+  overflow: hidden;
+  background: var(--paper);
+  transform-origin: calc(100% + 76px) calc(100% - 32px);
+  transition:
+    transform var(--code-panel-duration) var(--code-panel-ease),
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    visibility 0s;
+}
+.component-main[data-code-open="false"] .code-section {
+  transform: scale(0.035);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* The fade trails the shrink, so the panel is seen going to the button. */
+  transition:
+    transform var(--code-panel-duration) var(--code-panel-ease),
+    opacity var(--x-govuk-ui-duration-medium) ease 140ms,
+    visibility 0s var(--code-panel-duration);
+}
+.component-main[data-code-open="false"] .code-divider {
+  opacity: 0;
+  pointer-events: none;
+}
+/* The usage panel is a Code block, edge to edge, in the workbench's smaller code size. */
+.code-panel {
+  min-width: 0;
+  min-height: 0;
+}
+.code-panel.x-govuk-ui-code-block {
+  border: 0;
+}
+.code-panel .x-govuk-ui-code-block-code {
+  font-size: 12px;
+  line-height: 1.85;
+  padding-block: 16px 20px;
+}
+.code-panel .x-govuk-ui-code-line-number {
+  padding-left: 20px;
+}
+/* Hide and Copy stand at the panel's top right as the preview's tools stand at the preview's, as
+   far in from the edge and as far apart. */
+.code-panel .x-govuk-ui-code-block-actions[data-floating] {
+  top: 8px;
+  right: 14px;
+  gap: 3px;
+}
+.code-status {
+  position: relative;
+}
+/* While the usage code loads, lines of Skeleton stand where it will be. If it cannot load, an
+   Empty state offers to try again. */
+.source-loading {
+  padding: 22px 24px;
+  font-size: 12px;
+}
+.source-skeleton .x-govuk-ui-skeleton-line {
+  width: 46%;
+}
+.source-skeleton .x-govuk-ui-skeleton-line:nth-child(3n + 2) {
+  width: 64%;
+}
+.source-skeleton .x-govuk-ui-skeleton-line:nth-child(4n + 1) {
+  width: 28%;
+}
+.source-status.x-govuk-ui-empty-state {
+  height: 100%;
+  align-content: center;
+  box-sizing: border-box;
+}
+
+.inspector {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--paper);
+  overflow: hidden;
+}
+.inspector-header {
+  padding: 27px 24px 22px;
+  flex-shrink: 0;
+}
+.inspector-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.inspector h2,
+.inspector h3 {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+}
+.inspector .component-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+/* An experimental component says so beside its name, and with a flask in the sidebar. */
+.component-experimental {
+  font-size: 13px;
+  letter-spacing: 0;
+}
+/* In the sidebar, the tag takes the badge's place. The badge loses its pill, and the tag's pill is
+   as tall and as wide as the badge was, square as a badge of one figure is. */
+.x-govuk-ui-sidebar-badge:has(> .sidebar-experimental) {
+  display: flex;
+  min-width: 0;
+  padding: 0;
+  background: none;
+}
+.x-govuk-ui-tag.sidebar-experimental {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+}
+.sidebar-experimental svg {
+  display: block;
+}
+/* A component's credits, under its name, as a colophon. Each debt's mark and words are in italic
+   serif, and the system is in the workbench's own face, as a link. What it was inspired by or
+   adapted from shares the first line, and what it is built on takes the next. */
+.inspector-credits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.inspector-credit {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.inspector-credit[data-debt="built"] {
+  flex-basis: 100%;
+}
+.inspector-credit dt {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-style: italic;
+}
+.inspector-credit-mark {
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--x-govuk-ui-brand);
+}
+.inspector-credit[data-debt="built"] .inspector-credit-mark {
+  color: var(--muted);
+}
+.inspector-credit dd {
+  margin: 0;
+}
+.inspector-credit a {
+  color: var(--x-govuk-ui-link);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.2em;
+}
+.inspector-credit a svg {
+  margin-left: 2px;
+  vertical-align: -1px;
+  opacity: 0.7;
+}
+.inspector-credit a:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.inspector-credit a:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--focus);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--focus),
+    0 4px var(--x-govuk-ui-focus-text);
+}
+.inspector-description {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 10px 0 0;
+}
+/* Props and Styling are two tabs below the heading. Each scrolls in a Scroll area, which fades
+   where more lies beyond. */
+.inspector-tabs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+.inspector-tablist.x-govuk-ui-tabs-list {
+  flex-shrink: 0;
+  margin: 0 24px;
+}
+/* The tabs take the playground's own size, so they sit beneath the component's name, not over
+   it. */
+.inspector-tablist .x-govuk-ui-tabs-trigger {
+  font-size: 15px;
+}
+.inspector-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+.inspector-scroll {
+  flex: 1;
+}
+.inspector-scroll > .x-govuk-ui-scroll-area-viewport > .x-govuk-ui-scroll-area-content {
+  padding: 0 24px 20px;
+}
+/* On the workbench's own page, the playground says what it will contain. */
+.inspector-landing {
+  padding: 4px 24px 20px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.inspector-landing p {
+  margin: 0 0 12px;
+}
+.inspector-footer {
+  flex-shrink: 0;
+  padding: 16px 24px;
+}
+.show-code-button {
+  height: 32px;
+  color: var(--muted);
+  font-size: 12px;
+}
+/* A tab's sections, one beneath another. The stack spaces them, not the sections themselves, so
+   the first sits where the tab's panel starts, beneath the tabs' own space. */
+.inspector-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+/* Props, with each prop's name and type, and a control when the playground can set it. */
+.prop-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.prop-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+.prop-row--stacked {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.props-section code {
+  font:
+    11px / 1.5 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+/* Props without a control are a Table, with each name, its type and note, and its default. */
+.prop-table.x-govuk-ui-table-scroll {
+  margin: 0;
+}
+.prop-table {
+  font-size: 11px;
+  line-height: 1.5;
+  table-layout: fixed;
+}
+.prop-table thead .x-govuk-ui-table-head {
+  padding-block: 14px 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+.prop-table .x-govuk-ui-table-head,
+.prop-table .x-govuk-ui-table-cell {
+  padding-block: 11px;
+  border-color: var(--line);
+}
+.prop-table tbody .x-govuk-ui-table-head {
+  font-weight: 400;
+}
+.prop-table tbody .x-govuk-ui-table-head > * {
+  display: block;
+}
+.prop-table tbody .x-govuk-ui-table-head > * + * {
+  margin-top: 2px;
+}
+.prop-table :is(th, td):last-child {
+  width: 34%;
+  text-align: right;
+}
+.prop-type,
+.prop-note {
+  color: var(--muted);
+  overflow-wrap: break-word;
+}
+.prop-note {
+  font-style: italic;
+}
+/* The examples, as small chips with at most one chosen, beneath the words that say what they do. */
+.prop-presets {
+  margin-top: 12px;
+}
+/* What a setting needs before it can be used, on its own line beneath its type. It is always
+   there, so the hint keeps its size, and darkens while the need is unmet. */
+.prop-needs {
+  display: block;
+  margin-top: 2px;
+  transition: color var(--x-govuk-ui-duration-fast) ease;
+}
+.prop-needs[data-unmet] {
+  color: var(--x-govuk-ui-text);
+}
+
+.props-section code.prop-default {
+  color: var(--muted);
+}
+/* Styling, with each part, data attribute and custom property on its own row. The name is first,
+   then where it applies, wrapping as the panel narrows. */
+.styling-intro {
+  margin: 0;
+}
+.styling-intro code,
+.styling-tokens code {
+  font:
+    11px / 1.5 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.styling-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.styling-row {
+  display: grid;
+  gap: 4px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.props-section code.styling-name {
+  font-weight: 700;
+}
+.styling-note {
+  color: var(--muted);
+}
+/* Each class, value and token on a line of its own, in full where the panel is wide enough, under
+   its label. */
+.styling-lines {
+  display: grid;
+  gap: 1px;
+}
+.styling-lines code {
+  display: block;
+}
+.styling-tokens {
+  margin: 10px 0 0;
+  line-height: 1.5;
+}
+.styling-status {
+  margin-top: 24px;
+}
+/* Every control in the props panel is a library control, sized for the panel. */
+.prop-row :is(.x-govuk-ui-label, .x-govuk-ui-legend, .x-govuk-ui-switch-label) {
+  margin-bottom: 2px;
+  font-size: 11px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+.prop-row .x-govuk-ui-hint {
+  margin-bottom: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.prop-row .x-govuk-ui-switch {
+  flex: 1;
+  align-items: center;
+}
+.prop-row .x-govuk-ui-switch .x-govuk-ui-hint {
+  margin: 0;
+}
+.prop-row .x-govuk-ui-switch-control {
+  zoom: 0.75;
+}
+.prop-row .x-govuk-ui-input {
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.prop-row .x-govuk-ui-input:hover {
+  border-color: var(--muted);
+}
+.prop-row .x-govuk-ui-select-control {
+  padding-inline-end: 30px;
+}
+.prop-row .x-govuk-ui-select > svg {
+  right: 10px;
+  width: 12px;
+  height: 12px;
+}
+.prop-row .x-govuk-ui-choices {
+  --x-govuk-ui-choice-size: 18px;
+  gap: 10px;
+}
+/* The hover ring stays inside the 10px between answers. */
+.prop-row .x-govuk-ui-choice:hover:not(:has(:disabled)) .x-govuk-ui-choice-box {
+  box-shadow: 0 0 0 4px var(--x-govuk-ui-secondary);
+}
+.prop-row .x-govuk-ui-choice {
+  column-gap: 8px;
+}
+.prop-row .x-govuk-ui-choice-label {
+  font-size: 12px;
+}
+.prop-row .x-govuk-ui-slider-value {
+  font-size: 11px;
+}
+.prop-row .x-govuk-ui-slider-control {
+  height: 24px;
+}
+.prop-row .x-govuk-ui-slider-thumb {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 900px) {
+  .workbench {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* The playground is a Sheet from the right. */
+  .inspector.x-govuk-ui-sheet {
+    width: min(340px, calc(100vw - 28px));
+    padding: 0;
+  }
+  .prop-row .x-govuk-ui-input {
+    font-size: 16px;
+  }
+  .inspector-header {
+    padding-top: 18px;
+  }
+  .code-section {
+    transform-origin: calc(100vw - min(340px, calc(100vw - 28px)) + 76px) calc(100% - 32px);
+  }
+}
+@media (max-width: 450px) {
+  .preview-toolbar {
+    padding-inline: 8px;
+    gap: 6px;
+  }
+  .preview-tools {
+    gap: 0;
+  }
+  .toolbar-divider.x-govuk-ui-separator {
+    margin-inline: 3px;
+  }
+  .code-panel .x-govuk-ui-code-block-actions[data-floating] {
+    right: 8px;
+    gap: 0;
+  }
+}
+@media (max-height: 450px) {
+  .workbench-sidebar .x-govuk-ui-sidebar-header {
+    padding-block: 12px;
+  }
+  .sidebar-links {
+    display: none;
+  }
+  .inspector-header {
+    padding-block: 14px;
+  }
+  .inspector-description {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

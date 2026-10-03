@@ -1,0 +1,163 @@
+/* Combobox and Multi-select. Input's field with a clear and a show-all button, or with chips, over
+   a floating list. The matching part of each option is bold, and one highlight glides between
+   options. */
+.x-govuk-ui-combobox-field {
+  padding-right: 4px;
+}
+.x-govuk-ui-combobox-button {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--x-govuk-ui-muted);
+  cursor: pointer;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    color var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-combobox-button:hover {
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-combobox-button:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-combobox-button svg {
+  transition: rotate var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-combobox-button[data-popup-open] svg {
+  rotate: 180deg;
+}
+.x-govuk-ui-combobox-popup {
+  display: flex;
+  width: var(--x-govuk-ui-combobox-width, var(--anchor-width));
+  max-height: min(320px, var(--available-height));
+  font-size: 17px;
+}
+/* The options scroll in a Scroll area. The highlight is placed in its viewport. */
+.x-govuk-ui-combobox-scroll {
+  flex: 1;
+}
+.x-govuk-ui-combobox-scroll > .x-govuk-ui-scroll-area-viewport {
+  position: relative;
+}
+.x-govuk-ui-combobox-scroll > .x-govuk-ui-scroll-area-viewport > .x-govuk-ui-scroll-area-content {
+  padding: 4px;
+}
+.x-govuk-ui-combobox-highlight {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  right: 4px;
+  height: 0;
+  border-radius: 4px;
+  background: var(--x-govuk-ui-secondary);
+  opacity: 0;
+  pointer-events: none;
+  /* A short glide between rows in view. Where the list scrolls, it moves at once, with the rows. */
+  transition:
+    transform var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
+    height var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-combobox-list {
+  outline: none;
+}
+.x-govuk-ui-combobox-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 4px;
+  color: var(--x-govuk-ui-text);
+  cursor: pointer;
+  user-select: none;
+}
+.x-govuk-ui-combobox-match {
+  background: none;
+  color: inherit;
+  font-weight: 700;
+}
+.x-govuk-ui-combobox-tick {
+  display: flex;
+  grid-column: 2;
+}
+.x-govuk-ui-combobox-empty:not(:empty) {
+  padding: 12px 10px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+}
+/* Multi-select's field wraps its chips on to more lines as it fills. The input takes whatever space
+   is left beside the last chip, however little, so a new line opens only when a chip needs it. */
+.x-govuk-ui-input-group.x-govuk-ui-multi-select-field {
+  flex-wrap: wrap;
+  column-gap: 0;
+  row-gap: 8px;
+  height: auto;
+  min-height: 46px;
+  padding-block: 6px;
+}
+/* Chips keep their own space after them, so no gap stands between the last chip and the input to
+   push it on to a line of its own. */
+.x-govuk-ui-multi-select-field > .x-govuk-ui-chip {
+  margin-right: 8px;
+}
+.x-govuk-ui-multi-select-field > .x-govuk-ui-input {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 32px;
+}
+.x-govuk-ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 10px;
+  border-radius: 999px;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+  font-size: 15px;
+  line-height: 1.4;
+  animation: x-govuk-ui-chip-in var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-chip-in {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+}
+.x-govuk-ui-chip[data-highlighted] {
+  outline: 2px solid var(--x-govuk-ui-link);
+}
+.x-govuk-ui-chip-remove {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--x-govuk-ui-muted);
+  cursor: pointer;
+}
+.x-govuk-ui-chip-remove:hover {
+  background: color-mix(in srgb, var(--x-govuk-ui-text) 12%, transparent);
+  color: var(--x-govuk-ui-text);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-combobox-item[data-highlighted] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .x-govuk-ui-chip {
+    border: 1px solid CanvasText;
+  }
+}

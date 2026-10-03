@@ -1,0 +1,71 @@
+/* Slider. Base UI's slider, with a rounded track filled in GOV.UK's brand blue. The thumb glides
+   between steps and keeps its shape until it comes to rest. Then it overshoots a little, squeezing
+   from side to side as it turns, and comes back. */
+.x-govuk-ui-slider {
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-slider-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.x-govuk-ui-slider-value {
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-slider-control {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  touch-action: none;
+  cursor: pointer;
+}
+.x-govuk-ui-slider-track {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-line);
+}
+/* The fill and the thumb glide from step to step, so a slider with large steps travels rather
+   than jumps. The glide is short, so a drag still follows the pointer closely. Base UI places the
+   thumb by its start edge, which is its left. */
+.x-govuk-ui-slider-indicator {
+  border-radius: 3px;
+  background: var(--x-govuk-ui-brand);
+  transition: width var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-slider-thumb {
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--x-govuk-ui-text);
+  border-radius: 50%;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 1px 3px rgb(11 12 12 / 18%);
+  transition: left var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-slider-thumb:has(:focus-visible) {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px var(--x-govuk-ui-focus-text);
+}
+/* When unavailable, the slider fades, and its hint stays readable, because it may say why. */
+.x-govuk-ui-slider[data-disabled] .x-govuk-ui-slider-control {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-slider-track {
+    outline: 1px solid CanvasText;
+  }
+  .x-govuk-ui-slider-indicator {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .x-govuk-ui-slider-thumb {
+    border-color: CanvasText;
+  }
+}

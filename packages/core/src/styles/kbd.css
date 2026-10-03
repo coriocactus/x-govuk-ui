@@ -1,0 +1,42 @@
+/* Keyboard key. A shortcut such as "⌘ K" shows each key as its own cap. */
+.x-govuk-ui-kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--x-govuk-ui-font);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 400;
+  white-space: nowrap;
+  color: var(--x-govuk-ui-muted);
+}
+/* A cap is never narrower than it is tall, which is a line, its padding and its edges. A cap of one
+   character has no padding at its sides, so it is square in any typeface. */
+.x-govuk-ui-kbd:not(:has(.x-govuk-ui-kbd-key)),
+.x-govuk-ui-kbd-key {
+  box-sizing: border-box;
+  min-width: calc(1em + 9px);
+  justify-content: center;
+  padding: 3px 5px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--x-govuk-ui-paper);
+  text-align: center;
+}
+.x-govuk-ui-kbd[data-single],
+.x-govuk-ui-kbd-key[data-single] {
+  padding-inline: 0;
+}
+/* A cap inside a shortcut is a kbd too, which the browser sets in its own monospace face. */
+.x-govuk-ui-kbd-key {
+  font: inherit;
+}
+/* Outline has a keyline and bottom edge in the text colour, as outline Buttons have. */
+.x-govuk-ui-kbd[data-variant="outline"] {
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-kbd[data-variant="outline"]:not(:has(.x-govuk-ui-kbd-key)),
+.x-govuk-ui-kbd[data-variant="outline"] .x-govuk-ui-kbd-key {
+  border-color: var(--x-govuk-ui-text);
+}

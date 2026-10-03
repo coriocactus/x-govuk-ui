@@ -1,0 +1,65 @@
+/* Spinner. A faint ring with an arc that turns, lengthening and shortening as it goes. It takes the
+   colour of the text around it. */
+.x-govuk-ui-spinner {
+  --x-govuk-ui-spinner-size: 24px;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: var(--x-govuk-ui-spinner-size);
+  height: var(--x-govuk-ui-spinner-size);
+  color: inherit;
+  vertical-align: middle;
+}
+.x-govuk-ui-spinner[data-size="small"] {
+  --x-govuk-ui-spinner-size: 16px;
+}
+.x-govuk-ui-spinner[data-size="large"] {
+  --x-govuk-ui-spinner-size: 40px;
+}
+.x-govuk-ui-spinner > svg {
+  width: 100%;
+  height: 100%;
+  animation: x-govuk-ui-spin 1.4s linear infinite;
+}
+.x-govuk-ui-spinner circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+}
+.x-govuk-ui-spinner[data-size="small"] circle {
+  stroke-width: 3.5;
+}
+.x-govuk-ui-spinner-track {
+  opacity: 0.2;
+}
+.x-govuk-ui-spinner-arc {
+  stroke-linecap: round;
+  stroke-dasharray: 25 100;
+  transform-origin: center;
+  animation: x-govuk-ui-spinner-arc 1.4s var(--x-govuk-ui-ease-out) infinite;
+}
+@keyframes x-govuk-ui-spinner-arc {
+  0% {
+    stroke-dasharray: 8 100;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 60 100;
+    stroke-dashoffset: -15;
+  }
+  100% {
+    stroke-dasharray: 8 100;
+    stroke-dashoffset: -92;
+  }
+}
+/* The spinner is the only sign that work is going on, so with reduced motion it still turns, slowly
+   and evenly, with a fixed arc. */
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-spinner > svg {
+    animation: x-govuk-ui-spin 2.4s linear infinite !important;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-spinner circle {
+    stroke: CanvasText;
+  }
+}

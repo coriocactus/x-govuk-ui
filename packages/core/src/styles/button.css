@@ -1,0 +1,260 @@
+/* Button. GOV.UK's green button with its bottom edge and regular-weight label, with rounder
+   corners and a quieter press. Other variants change the custom properties. */
+.x-govuk-ui-button {
+  --x-govuk-ui-button-fill: var(--x-govuk-ui-green);
+  --x-govuk-ui-button-hover: var(--x-govuk-ui-green-shade-25);
+  --x-govuk-ui-button-shadow: var(--x-govuk-ui-green-shade-50);
+  --x-govuk-ui-button-text: var(--x-govuk-ui-white);
+  appearance: none;
+  box-sizing: border-box;
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: var(--x-govuk-ui-button-fill);
+  box-shadow: 0 2px 0 var(--x-govuk-ui-button-shadow);
+  color: var(--x-govuk-ui-button-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 400;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    box-shadow var(--x-govuk-ui-duration-fast) ease,
+    color var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-button:hover {
+  background: var(--x-govuk-ui-button-hover);
+}
+.x-govuk-ui-button:active:not([aria-disabled="true"]) {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--x-govuk-ui-button-shadow);
+}
+/* A button that opens a menu or a popup stays put when pressed, because what it opens is anchored
+   to it and would follow it down. Its edge still flattens. */
+.x-govuk-ui-button[aria-haspopup]:active:not([aria-disabled="true"]) {
+  transform: none;
+}
+/* GOV.UK's focus, which is yellow with dark text and a dark bottom edge. */
+.x-govuk-ui-button:focus-visible {
+  outline: 3px solid transparent;
+  border-color: var(--x-govuk-ui-focus);
+  background: var(--x-govuk-ui-focus);
+  box-shadow: 0 2px 0 var(--x-govuk-ui-focus-text);
+  color: var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-button--secondary {
+  --x-govuk-ui-button-fill: var(--x-govuk-ui-secondary);
+  --x-govuk-ui-button-hover: color-mix(
+    in srgb,
+    var(--x-govuk-ui-secondary) 88%,
+    var(--x-govuk-ui-text)
+  );
+  --x-govuk-ui-button-text: var(--x-govuk-ui-text);
+  --x-govuk-ui-button-shadow: var(--x-govuk-ui-black-tint-50);
+}
+/* Outline, as in GOV.UK's "Is this page useful?" buttons, with a keyline and a bottom edge in the
+   text colour, on the page's paper. It stands out where secondary grey would disappear into a
+   tinted surface. */
+.x-govuk-ui-button--outline {
+  --x-govuk-ui-button-fill: var(--x-govuk-ui-paper);
+  --x-govuk-ui-button-hover: color-mix(
+    in srgb,
+    var(--x-govuk-ui-paper) 92%,
+    var(--x-govuk-ui-text)
+  );
+  --x-govuk-ui-button-text: var(--x-govuk-ui-text);
+  --x-govuk-ui-button-shadow: var(--x-govuk-ui-text);
+  border-color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-button--warning {
+  --x-govuk-ui-button-fill: var(--x-govuk-ui-red);
+  --x-govuk-ui-button-hover: var(--x-govuk-ui-red-shade-25);
+  --x-govuk-ui-button-shadow: var(--x-govuk-ui-red-shade-50);
+}
+.x-govuk-ui-button--small {
+  min-height: 36px;
+  padding: 6px 13px;
+  font-size: 16px;
+}
+.x-govuk-ui-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.x-govuk-ui-button[aria-busy="true"] {
+  cursor: progress;
+}
+/* An icon beside the words sits in their middle, as in a quiet button, whatever the variant. */
+.x-govuk-ui-button-label:has(> svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.x-govuk-ui-button-label {
+  transition:
+    opacity var(--x-govuk-ui-duration-instant) ease,
+    transform var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-button[data-loading] .x-govuk-ui-button-label {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+/* While saving, the label lifts away and the library's Spinner fades in its place. The Spinner
+   turns only while it shows. */
+.x-govuk-ui-spinner.x-govuk-ui-button-spinner {
+  position: absolute;
+  --x-govuk-ui-spinner-size: 18px;
+  opacity: 0;
+  transition: opacity var(--x-govuk-ui-duration-instant) ease;
+}
+.x-govuk-ui-button:not([data-loading]) .x-govuk-ui-button-spinner * {
+  animation-play-state: paused;
+}
+.x-govuk-ui-button[data-loading] .x-govuk-ui-button-spinner {
+  opacity: 1;
+}
+
+/* Quiet, for a tool in a toolbar, shaded on hover. */
+.x-govuk-ui-button--quiet {
+  --x-govuk-ui-button-fill: transparent;
+  --x-govuk-ui-button-hover: var(--x-govuk-ui-secondary);
+  --x-govuk-ui-button-text: var(--x-govuk-ui-muted);
+  min-height: 0;
+  padding: 6px 8px;
+  border: 0;
+  box-shadow: none;
+  font-size: inherit;
+  transition:
+    background var(--x-govuk-ui-duration-instant) ease,
+    color var(--x-govuk-ui-duration-instant) ease;
+}
+.x-govuk-ui-button--quiet .x-govuk-ui-button-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.x-govuk-ui-button--quiet:hover,
+.x-govuk-ui-button--quiet:active {
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-button--quiet:active:not([aria-disabled="true"]) {
+  background: color-mix(in srgb, var(--x-govuk-ui-secondary) 85%, var(--x-govuk-ui-text));
+}
+/* A quiet button that toggles, such as a toolbar's bold button, stays shaded while it is on. */
+.x-govuk-ui-button--quiet[aria-pressed="true"] {
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+}
+
+/* Link, for a lesser choice beside a button, styled as a GOV.UK link. */
+.x-govuk-ui-button--link {
+  --x-govuk-ui-button-fill: transparent;
+  --x-govuk-ui-button-hover: transparent;
+  --x-govuk-ui-button-text: var(--x-govuk-ui-link);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-button--link:hover {
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-button--quiet:active:not([aria-disabled="true"]),
+.x-govuk-ui-button--link:active:not([aria-disabled="true"]) {
+  transform: none;
+  box-shadow: none;
+}
+/* A quiet button takes every button's focus, with the dark edge beneath it instead of over its
+   foot. What it shows then stays in the middle of the yellow, however little space it has. */
+.x-govuk-ui-button--link:focus-visible {
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+}
+/* Icon buttons are square, for a single icon. They come after the variants, so a quiet icon button
+   stays square. */
+.x-govuk-ui-button--icon,
+.x-govuk-ui-button--small-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  min-height: 0;
+  padding: 0;
+}
+.x-govuk-ui-button--small-icon {
+  width: 32px;
+  height: 32px;
+}
+.x-govuk-ui-button--icon .x-govuk-ui-button-label,
+.x-govuk-ui-button--small-icon .x-govuk-ui-button-label {
+  display: grid;
+  place-items: center;
+}
+.x-govuk-ui-button--icon svg,
+.x-govuk-ui-button--small-icon svg {
+  display: block;
+}
+
+/* GOV.UK's button group, a row with space between the buttons, and a link button on the same line.
+   On small screens, the buttons stack and fill the width, and link buttons centre. */
+.x-govuk-ui-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 20px;
+}
+/* As in GOV.UK, a page's buttons take the full width on a phone, and fit their text from tablet
+   width up. Small, icon, quiet and link buttons keep their own width, because they sit in toolbars
+   and rows. The rule goes by the window, as GOV.UK's does, because a button cannot know its
+   column's width. */
+@media (max-width: 40.0525em) {
+  .x-govuk-ui-button:where(
+    :not(
+      .x-govuk-ui-button--small,
+      .x-govuk-ui-button--icon,
+      .x-govuk-ui-button--small-icon,
+      .x-govuk-ui-button--quiet,
+      .x-govuk-ui-button--link
+    )
+  ) {
+    width: 100%;
+  }
+}
+/* On a phone, a group stacks its buttons, each at full width, unless it keeps them in a row. In a
+   row, they fit their text and wrap only if they must. */
+@media (max-width: 40.0525em) {
+  .x-govuk-ui-button-group:not([data-inline]) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .x-govuk-ui-button-group[data-inline] > .x-govuk-ui-button {
+    width: auto;
+  }
+  .x-govuk-ui-button-group > .x-govuk-ui-button--link {
+    align-self: center;
+  }
+}
+
+@media (forced-colors: active) {
+  .x-govuk-ui-button {
+    border-color: ButtonText;
+  }
+  .x-govuk-ui-button:focus-visible {
+    outline: 3px solid Highlight;
+  }
+}

@@ -1,0 +1,21 @@
+/* Theme picker. One quiet icon button that shows the current theme, as a sun while it is light and
+   a moon while it is dark. The two share one spot. */
+.x-govuk-ui-theme-picker-icons {
+  display: grid;
+  place-items: center;
+}
+.x-govuk-ui-theme-picker-icons svg {
+  grid-area: 1 / 1;
+}
+.x-govuk-ui-theme-picker[data-theme-shown="light"] .x-govuk-ui-theme-picker-moon,
+.x-govuk-ui-theme-picker[data-theme-shown="dark"] .x-govuk-ui-theme-picker-sun {
+  visibility: hidden;
+}
+
+/* For the frame the theme changes in, nothing eases, so every colour changes together. */
+[data-theme-change],
+[data-theme-change] *,
+[data-theme-change] *::before,
+[data-theme-change] *::after {
+  transition: none !important;
+}

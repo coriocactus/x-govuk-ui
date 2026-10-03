@@ -1,0 +1,149 @@
+/* One-time code. */
+.x-govuk-ui-otp {
+  width: fit-content;
+  max-width: 100%;
+}
+/* input-otp draws its own input over the slots, with no class for the library's box-sizing. Its
+   padding and border stay inside the size input-otp gives it. */
+.x-govuk-ui-otp input {
+  box-sizing: border-box;
+}
+.x-govuk-ui-otp-slots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+.x-govuk-ui-otp-slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 1 50px;
+  width: 50px;
+  min-width: 0;
+  height: 58px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--x-govuk-ui-text) 6%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--x-govuk-ui-text) 7%, transparent);
+  color: var(--x-govuk-ui-text);
+  font: 700 24px / 1 var(--x-govuk-ui-font);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    box-shadow var(--x-govuk-ui-duration-fast) ease;
+}
+/* Entering and leaving characters overlap in one cell while they animate. */
+.x-govuk-ui-otp-slot > * {
+  grid-area: 1 / 1;
+}
+.x-govuk-ui-otp-placeholder {
+  color: color-mix(in srgb, var(--x-govuk-ui-text) 22%, transparent);
+  font-weight: 400;
+}
+.x-govuk-ui-otp-slot[data-filled] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--x-govuk-ui-text) 16%, transparent);
+}
+/* One ring marks the caret and glides between slots. While the code is wrong, only the ring turns
+   red, and the error message beneath says what went wrong. */
+.x-govuk-ui-otp-ring {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2.5px color-mix(in srgb, var(--x-govuk-ui-text) 72%, transparent);
+  pointer-events: none;
+}
+.x-govuk-ui-otp-slots[data-invalid] .x-govuk-ui-otp-ring {
+  box-shadow: inset 0 0 0 2.5px var(--x-govuk-ui-error);
+}
+/* Selected digits each show the ring, so a selection reads as one span. */
+.x-govuk-ui-otp-slot[data-selected] {
+  box-shadow: inset 0 0 0 2.5px color-mix(in srgb, var(--x-govuk-ui-text) 72%, transparent);
+}
+/* While the code is checked, a wave of light passes along the digits. */
+.x-govuk-ui-otp-slots[data-verifying] .x-govuk-ui-otp-char {
+  animation: x-govuk-ui-otp-wave 1.1s ease-in-out calc(var(--x-govuk-ui-otp-index) * 70ms) infinite
+    both;
+}
+@keyframes x-govuk-ui-otp-wave {
+  0%,
+  40%,
+  100% {
+    opacity: 1;
+  }
+  16% {
+    opacity: 0.28;
+  }
+}
+/* Once the code is accepted, the digits hop in turn. A green edge sweeps along them and stays. */
+.x-govuk-ui-otp-slots[data-success] .x-govuk-ui-otp-slot {
+  box-shadow: inset 0 0 0 1.5px var(--x-govuk-ui-success);
+  animation: x-govuk-ui-otp-hop 420ms linear calc(var(--x-govuk-ui-otp-index) * 48ms) both;
+}
+.x-govuk-ui-otp-slots[data-success] .x-govuk-ui-otp-slot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: x-govuk-ui-otp-sweep 360ms ease-out calc(var(--x-govuk-ui-otp-index) * 48ms) both;
+}
+/* Each segment of the hop has its own curve, so a digit rises, drops a little below and settles. */
+@keyframes x-govuk-ui-otp-hop {
+  0% {
+    translate: 0 0;
+    animation-timing-function: var(--x-govuk-ui-ease-out);
+  }
+  25% {
+    translate: 0 -7px;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.5, 1);
+  }
+  62% {
+    translate: 0 2px;
+    animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1);
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+@keyframes x-govuk-ui-otp-sweep {
+  0%,
+  25% {
+    box-shadow: 0 0 0 3px var(--x-govuk-ui-success);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.x-govuk-ui-otp-separator {
+  flex-shrink: 0;
+  width: 10px;
+  height: 2px;
+  margin-inline: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--x-govuk-ui-text) 30%, transparent);
+}
+.x-govuk-ui-otp-slots[data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.x-govuk-ui-otp-slots[data-readonly] .x-govuk-ui-otp-slot {
+  background: transparent;
+  color: var(--x-govuk-ui-muted);
+}
+@media (forced-colors: active) {
+  /* Forced colours remove box shadows, so the slots, caret and selection need outlines. */
+  .x-govuk-ui-otp-slot {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+  .x-govuk-ui-otp-ring,
+  .x-govuk-ui-otp-slot[data-selected] {
+    outline: 2.5px solid Highlight;
+  }
+  /* The native input sits over the slots with transparent text. Forced colours would paint that
+     text, so the input keeps its own colours. */
+  .x-govuk-ui-otp input {
+    forced-color-adjust: none;
+  }
+}

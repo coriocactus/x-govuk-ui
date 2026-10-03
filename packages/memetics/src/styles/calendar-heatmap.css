@@ -1,0 +1,56 @@
+/* Calendar heat map. The weeks sit side by side, with each day a small square shaded as a heat
+   map's cells are. The months are named over the top, and the days of the week down the side. */
+.x-govuk-ui-calendar-heatmap-plot {
+  position: relative;
+  /* The card stands close over its day, nearer than the next row up, so the pointer reaches it
+     from the day without crossing another. */
+  --x-govuk-ui-chart-float-gap: 1px;
+}
+.x-govuk-ui-calendar-heatmap-grid {
+  display: grid;
+  grid-template-columns: auto repeat(var(--x-govuk-ui-calendar-heatmap-weeks, 53), minmax(9px, 1fr));
+  grid-template-rows: auto;
+  grid-auto-rows: auto;
+  gap: 2px;
+  min-width: min-content;
+  padding-bottom: 4px;
+}
+.x-govuk-ui-calendar-heatmap-month,
+.x-govuk-ui-calendar-heatmap-weekday {
+  color: var(--x-govuk-ui-muted);
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.x-govuk-ui-calendar-heatmap-month {
+  grid-row: 1;
+  padding-bottom: 4px;
+}
+.x-govuk-ui-calendar-heatmap-weekday {
+  grid-column: 1;
+  align-self: center;
+  padding-right: 6px;
+  line-height: 1;
+}
+.x-govuk-ui-calendar-heatmap-day {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: var(--x-govuk-ui-secondary);
+}
+/* A day without a figure is hatched, like the key's No figure. */
+.x-govuk-ui-calendar-heatmap-day:not([data-step]) {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--x-govuk-ui-secondary) 0 2px,
+    var(--x-govuk-ui-muted) 2px 3px
+  );
+}
+.x-govuk-ui-calendar-heatmap-day:hover {
+  outline: 2px solid var(--x-govuk-ui-text);
+  outline-offset: 1px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-calendar-heatmap-day {
+    border: 1px solid CanvasText;
+  }
+}

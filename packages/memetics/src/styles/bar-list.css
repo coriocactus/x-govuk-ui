@@ -1,0 +1,64 @@
+/* Bar list. GOV.UK's table, with each name over a bar as long as its figure. The bar is a tint of
+   the palette's first colour, so the name reads on it in the page's ink, with a solid edge where
+   the bar ends. The bars mark out the rows, so the list has no keylines between them. */
+.x-govuk-ui-bar-list {
+  --x-govuk-ui-bar-list-tint: color-mix(
+    in srgb,
+    var(--x-govuk-ui-chart-1) 20%,
+    var(--x-govuk-ui-paper)
+  );
+  font-size: 16px;
+}
+.x-govuk-ui-bar-list thead .x-govuk-ui-table-head {
+  padding-block: 0 6px;
+  white-space: nowrap;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  font-weight: 400;
+}
+.x-govuk-ui-bar-list tbody :is(.x-govuk-ui-table-head, .x-govuk-ui-table-cell) {
+  padding-block: 2px;
+  border-bottom: 0;
+  vertical-align: middle;
+}
+.x-govuk-ui-bar-list .x-govuk-ui-bar-list-name {
+  position: relative;
+  font-weight: 400;
+}
+/* The bar lies behind the name, out of the flow, so as it grows and changes, it moves no text. It
+   is sized instead of scaled, so its edge and corners stay as drawn at any length. */
+.x-govuk-ui-bar-list-bar {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  width: calc((100% - 20px) * var(--x-govuk-ui-bar-list-share, 0));
+  border-right: 3px solid var(--x-govuk-ui-chart-1);
+  border-radius: 3px;
+  background: var(--x-govuk-ui-bar-list-tint);
+  transition: width var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+@starting-style {
+  .x-govuk-ui-bar-list-bar {
+    width: 0;
+  }
+}
+.x-govuk-ui-bar-list-label {
+  position: relative;
+  display: block;
+  padding: 6px 10px;
+}
+.x-govuk-ui-bar-list-value {
+  width: 1%;
+  padding-left: 0;
+  white-space: nowrap;
+  font-weight: 700;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-bar-list-bar {
+    forced-color-adjust: none;
+    background: Canvas;
+    border: 1px solid CanvasText;
+    border-right-width: 3px;
+  }
+}

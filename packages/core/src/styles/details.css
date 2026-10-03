@@ -1,0 +1,98 @@
+/* Details. GOV.UK's link with a turning triangle, and help text along a grey bar that opens
+   smoothly beneath it. */
+.x-govuk-ui-details {
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.x-govuk-ui-details-summary {
+  /* When focus scrolls the summary into view, the dark edge beneath it comes into view too. */
+  scroll-margin-block-end: 4px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--x-govuk-ui-link);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.x-govuk-ui-details-summary svg {
+  flex-shrink: 0;
+  transition: rotate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-details-summary[data-panel-open] svg {
+  rotate: 90deg;
+}
+.x-govuk-ui-details-summary-text {
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-details-summary:hover .x-govuk-ui-details-summary-text {
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-details-summary:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-details-summary:focus-visible .x-govuk-ui-details-summary-text {
+  text-decoration: none;
+}
+.x-govuk-ui-details-panel {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition: height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-details-panel[data-starting-style],
+.x-govuk-ui-details-panel[data-ending-style] {
+  height: 0;
+}
+/* The bar beside the text has rounded ends, as Inset text's and the error bar do. The text sits
+   where a 4px border would put it. */
+.x-govuk-ui-details-text {
+  position: relative;
+  margin: 10px 0 4px 5px;
+  padding: 2px 0 2px 22px;
+}
+.x-govuk-ui-details-text::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--x-govuk-ui-line);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-details-text::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
+.x-govuk-ui-details-text > :first-child {
+  margin-top: 0;
+}
+.x-govuk-ui-details-text > :last-child {
+  margin-bottom: 0;
+}
+/* The triangle has no class of its own, so base.css's reduced-motion rule does not reach it. */
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-details-summary svg {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-details-summary:focus-visible {
+    outline-color: Highlight;
+  }
+}

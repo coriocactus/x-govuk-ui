@@ -1,0 +1,67 @@
+/* Search box. Input's field joined to a square brand-blue button with a magnifying glass, like
+   GOV.UK's site search. */
+.x-govuk-ui-search-box {
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-search-box-field {
+  display: flex;
+}
+/* The field meets the button without a border between them. Its right border stays, transparent,
+   so focus can draw it without the field changing width. */
+.x-govuk-ui-input.x-govuk-ui-search-box-input {
+  flex: 1;
+  min-width: 0;
+  border-right-color: transparent;
+  border-radius: 5px 0 0 5px;
+}
+.x-govuk-ui-input.x-govuk-ui-search-box-input:hover:not(:focus) {
+  border-right-color: transparent;
+}
+.x-govuk-ui-input.x-govuk-ui-search-box-input:focus {
+  border-right-color: var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-search-box-input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+.x-govuk-ui-search-box-button {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 0 5px 5px 0;
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-white);
+  cursor: pointer;
+  transition: background var(--x-govuk-ui-duration-fast) ease;
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-search-box-button:not(:focus-visible) {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+.x-govuk-ui-search-box-button:hover {
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 85%, var(--x-govuk-ui-text));
+}
+.x-govuk-ui-search-box-button svg {
+  transition: scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-search-box-button:active svg {
+  scale: 0.9;
+}
+/* The yellow reaches past the button on every side, and the dark edge sits beneath that, so the
+   icon stays in the middle of the yellow. */
+.x-govuk-ui-search-box-button:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 7px var(--x-govuk-ui-focus-text);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-search-box-button {
+    border: 1px solid ButtonText;
+  }
+}

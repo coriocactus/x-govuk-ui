@@ -1,0 +1,136 @@
+/* Tooltip. One popup glides between the triggers in a group, morphing its size and text. It is
+   drawn in the page's text colour, so it inverts in the dark theme. */
+/* Set again on each themed part, because a value made from the theme's colours is computed where it
+   is set. */
+:root,
+[data-theme] {
+  --x-govuk-ui-tooltip-fill: var(--x-govuk-ui-text);
+  --x-govuk-ui-tooltip-text: var(--x-govuk-ui-paper);
+}
+.x-govuk-ui-tooltip-positioner {
+  z-index: var(--x-govuk-ui-layer-overlay);
+  /* The popup measures each hint, so the positioner keeps that size while the text changes. */
+  width: var(--positioner-width);
+  height: var(--positioner-height);
+  max-width: var(--available-width);
+  transition:
+    top var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    left var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    right var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    bottom var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    transform var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-tooltip {
+  box-sizing: border-box;
+  position: relative;
+  width: var(--popup-width, auto);
+  height: var(--popup-height, auto);
+  max-width: 320px;
+  border-radius: 4px;
+  background: var(--x-govuk-ui-tooltip-fill);
+  color: var(--x-govuk-ui-tooltip-text);
+  box-shadow: 0 4px 14px rgb(11 12 12 / 18%);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 13px;
+  line-height: 1.4;
+  transform-origin: var(--transform-origin);
+  transition:
+    width var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-instant) ease-out,
+    scale var(--x-govuk-ui-duration-instant) ease-out;
+}
+.x-govuk-ui-tooltip[data-starting-style],
+.x-govuk-ui-tooltip[data-ending-style] {
+  opacity: 0;
+  scale: 0.94;
+}
+.x-govuk-ui-tooltip-positioner[data-instant],
+.x-govuk-ui-tooltip[data-instant] {
+  transition: none;
+}
+/* The arrow points at the trigger, and glides with the tooltip in a group. */
+.x-govuk-ui-tooltip-arrow {
+  position: absolute;
+  width: 10px;
+  height: 5px;
+  background: var(--x-govuk-ui-tooltip-fill);
+  transition:
+    left var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    top var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-tooltip-arrow[data-side="top"] {
+  bottom: -5px;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+.x-govuk-ui-tooltip-arrow[data-side="bottom"] {
+  top: -5px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.x-govuk-ui-tooltip-arrow[data-side="left"],
+.x-govuk-ui-tooltip-arrow[data-side="right"] {
+  width: 5px;
+  height: 10px;
+}
+.x-govuk-ui-tooltip-arrow[data-side="left"] {
+  right: -5px;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.x-govuk-ui-tooltip-arrow[data-side="right"] {
+  left: -5px;
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+}
+.x-govuk-ui-tooltip[data-instant] .x-govuk-ui-tooltip-arrow {
+  transition: none;
+}
+.x-govuk-ui-tooltip-viewport {
+  --x-govuk-ui-tooltip-padding: 9px;
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: clip;
+  padding: 5px var(--x-govuk-ui-tooltip-padding) 6px;
+}
+/* Only the box moves. It glides to the new trigger and resizes to the new words. The words
+   themselves swap at once, and never fade, slide or reflow. The box clips them while it catches
+   up. */
+.x-govuk-ui-tooltip-viewport [data-current] {
+  width: calc(var(--popup-width) - 2 * var(--x-govuk-ui-tooltip-padding));
+}
+.x-govuk-ui-tooltip-viewport [data-previous] {
+  display: none;
+}
+[data-instant] .x-govuk-ui-tooltip-viewport [data-current],
+[data-instant] .x-govuk-ui-tooltip-viewport [data-previous] {
+  transition: none;
+}
+.x-govuk-ui-tooltip-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.x-govuk-ui-tooltip-shortcut {
+  color: inherit;
+  opacity: 0.72;
+}
+.x-govuk-ui-tooltip-shortcut .x-govuk-ui-kbd-key,
+.x-govuk-ui-tooltip-shortcut:not(:has(.x-govuk-ui-kbd-key)) {
+  min-width: 17px;
+  padding: 1px 4px;
+  border-color: color-mix(in srgb, currentColor 35%, transparent);
+  border-bottom-width: 1px;
+  background: transparent;
+  font-size: 11px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-tooltip {
+    border: 1px solid CanvasText;
+  }
+  /* The arrow takes the edge's colour, so it still points at the trigger. */
+  .x-govuk-ui-tooltip-arrow {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}

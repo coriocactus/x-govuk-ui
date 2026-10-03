@@ -1,0 +1,64 @@
+/* Sparkline. A line as small as a word, shaded beneath, with its latest figure marked. It is in the
+   palette's first colour, or GOV.UK's green or red for good or bad news. */
+.x-govuk-ui-sparkline {
+  --x-govuk-ui-sparkline-colour: var(--x-govuk-ui-chart-1);
+  position: relative;
+  display: block;
+  min-width: 64px;
+  color: var(--x-govuk-ui-sparkline-colour);
+}
+.x-govuk-ui-sparkline[data-sentiment="good"] {
+  --x-govuk-ui-sparkline-colour: var(--x-govuk-ui-success);
+}
+.x-govuk-ui-sparkline[data-sentiment="bad"] {
+  --x-govuk-ui-sparkline-colour: var(--x-govuk-ui-error);
+}
+/* The drawing stretches to the box, and its stroke keeps its width as it does. It draws in from the
+   left, uncovered instead of redrawn, so its stroke is never stretched. */
+.x-govuk-ui-sparkline-line {
+  position: absolute;
+  inset: 0 5px;
+  width: calc(100% - 10px);
+  height: 100%;
+  overflow: visible;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  animation: x-govuk-ui-sparkline-draw 700ms var(--x-govuk-ui-ease-out) backwards;
+}
+.x-govuk-ui-sparkline-area {
+  fill: currentColor;
+  fill-opacity: 0.14;
+  stroke: none;
+}
+.x-govuk-ui-sparkline-end {
+  position: absolute;
+  left: calc(5px + (100% - 10px) * var(--x-govuk-ui-sparkline-x, 1));
+  top: calc(100% * var(--x-govuk-ui-sparkline-y, 0));
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--x-govuk-ui-paper);
+  border-radius: 50%;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  animation: x-govuk-ui-sparkline-end 200ms 600ms var(--x-govuk-ui-ease-out) backwards;
+}
+@keyframes x-govuk-ui-sparkline-draw {
+  from {
+    clip-path: inset(-4px 100% -4px -4px);
+  }
+  to {
+    clip-path: inset(-4px -4px -4px -4px);
+  }
+}
+@keyframes x-govuk-ui-sparkline-end {
+  from {
+    opacity: 0;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-sparkline {
+    color: CanvasText;
+  }
+}

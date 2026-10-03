@@ -1,0 +1,297 @@
+/* Reasoning steps. A quiet title that opens the steps, which run down a line with a mark for each.
+   The mark is a tick once done, a spinner while under way, or a hollow dot before. New steps rise
+   into place. */
+.x-govuk-ui-reasoning {
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+}
+.x-govuk-ui-reasoning-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--x-govuk-ui-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.x-govuk-ui-reasoning-trigger:hover {
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-reasoning-trigger svg {
+  transition: rotate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-reasoning-trigger[data-panel-open] svg {
+  rotate: 180deg;
+}
+.x-govuk-ui-reasoning-trigger:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-reasoning-panel {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition: height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+.x-govuk-ui-reasoning-panel:is([data-starting-style], [data-ending-style]) {
+  height: 0;
+}
+.x-govuk-ui-reasoning-steps {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-reasoning-step {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding-bottom: 14px;
+  animation: x-govuk-ui-step-in var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-step-in {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+/* The line that joins each mark to the next. */
+.x-govuk-ui-reasoning-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  bottom: 2px;
+  left: 9px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-reasoning-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--x-govuk-ui-white);
+}
+.x-govuk-ui-reasoning-step[data-status="done"] .x-govuk-ui-reasoning-mark {
+  background: var(--x-govuk-ui-success);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-reasoning-step[data-status="done"] .x-govuk-ui-reasoning-mark {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+.x-govuk-ui-reasoning-step[data-status="active"] .x-govuk-ui-reasoning-mark {
+  color: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-reasoning-step[data-status="pending"] .x-govuk-ui-reasoning-mark {
+  border: 2px solid var(--x-govuk-ui-line);
+  box-sizing: border-box;
+}
+.x-govuk-ui-reasoning-step[data-status="pending"] .x-govuk-ui-reasoning-text {
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-reasoning-text {
+  display: grid;
+  gap: 2px;
+  padding-top: 1px;
+  line-height: 1.4;
+}
+.x-govuk-ui-reasoning-detail {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-reasoning-mark {
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+    background: Canvas !important;
+    color: CanvasText !important;
+  }
+}
+
+/* Inline citation. A small grey pill after a claim, with the site's mark and name, and +2 for a
+   stack. It turns brand blue under the pointer and while its card is open. */
+.x-govuk-ui-citation {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  margin: 0 2px;
+  padding: 0 7px 0 3px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-muted);
+  font: 400 12px / 1 var(--x-govuk-ui-font);
+  vertical-align: 0.12em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    color var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-citation:hover,
+.x-govuk-ui-citation[data-popup-open] {
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-white);
+}
+.x-govuk-ui-citation:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+}
+/* A site's mark, which is the crown for GOV.UK, or the site's initial on a GOV.UK colour. */
+.x-govuk-ui-citation-mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  overflow: hidden;
+}
+.x-govuk-ui-citation-mark > svg {
+  width: 10px;
+  height: auto;
+}
+.x-govuk-ui-citation-mark[data-tint] {
+  color: var(--x-govuk-ui-white);
+}
+.x-govuk-ui-citation-mark[data-tint="blue"] {
+  background: var(--x-govuk-ui-blue);
+}
+.x-govuk-ui-citation-mark[data-tint="teal"] {
+  background: var(--x-govuk-ui-teal);
+}
+.x-govuk-ui-citation-mark[data-tint="purple"] {
+  background: var(--x-govuk-ui-purple);
+}
+.x-govuk-ui-citation-mark[data-tint="green"] {
+  background: var(--x-govuk-ui-green);
+}
+.x-govuk-ui-citation-mark[data-tint="magenta"] {
+  background: var(--x-govuk-ui-magenta);
+}
+.x-govuk-ui-citation-mark[data-tint="red"] {
+  background: var(--x-govuk-ui-red);
+}
+
+/* The card has arrows and a count for a stack, then the source's site, title, summary and date. */
+.x-govuk-ui-floating.x-govuk-ui-citation-card {
+  width: min(320px, calc(100vw - 16px));
+  padding: 10px 14px 14px;
+  overflow: hidden;
+}
+.x-govuk-ui-citation-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: -2px -6px 6px;
+}
+.x-govuk-ui-citation-count {
+  margin-left: auto;
+  padding-right: 6px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-citation-source {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+.x-govuk-ui-citation-source[data-direction] {
+  animation: x-govuk-ui-citation-next var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-citation-source[data-direction="previous"] {
+  animation-name: x-govuk-ui-citation-previous;
+}
+@keyframes x-govuk-ui-citation-next {
+  from {
+    opacity: 0;
+    translate: 14px 0;
+  }
+}
+@keyframes x-govuk-ui-citation-previous {
+  from {
+    opacity: 0;
+    translate: -14px 0;
+  }
+}
+.x-govuk-ui-citation-from {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+}
+.x-govuk-ui-citation-from .x-govuk-ui-citation-mark {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 0 1px var(--x-govuk-ui-line);
+}
+.x-govuk-ui-citation-from .x-govuk-ui-citation-mark[data-tint] {
+  box-shadow: none;
+}
+.x-govuk-ui-citation-title {
+  color: var(--x-govuk-ui-link);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-citation-title:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-citation-title:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+}
+/* A source with no address names its title alone, in the words' colour. */
+.x-govuk-ui-citation-title[data-plain] {
+  color: var(--x-govuk-ui-text);
+  text-decoration: none;
+}
+/* Where in the source the claim comes from, such as its pages. */
+.x-govuk-ui-citation-detail {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.x-govuk-ui-citation-description {
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.x-govuk-ui-citation-date {
+  margin-top: 2px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 13px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-citation {
+    border: 1px solid ButtonText;
+  }
+}

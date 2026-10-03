@@ -1,0 +1,50 @@
+{
+  "name": "x-govuk-ui",
+  "description": "GOV.UK's design, extended with React: considered motion, feedback and sound.",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "homepage": "https://x-govuk-ui.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coriocactus/x-govuk-ui.git",
+    "directory": "packages/core"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
+    },
+    "./internal": {
+      "types": "./dist/lib/internal.d.ts",
+      "import": "./dist/lib/internal.js"
+    },
+    "./styles.css": "./dist/lib/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/lib",
+    "src"
+  ],
+  "peerDependencies": {
+    "@base-ui/react": "1.8.0",
+    "motion": "14.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@chenglou/pretext": "^0.0.9",
+    "input-otp": "1.5.0",
+    "marked": "18.1.0",
+    "sugar-high": "2.5.1",
+    "uqr": "^0.1.3"
+  },
+  "devDependencies": {
+    "@base-ui/react": "1.8.0",
+    "motion": "14.0.0"
+  }
+}

@@ -1,0 +1,105 @@
+/* Sheet. A panel that slides over the page from one edge, above a dimmed backdrop. The side is
+   physical, so these rules use physical properties. */
+.x-govuk-ui-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  background: rgb(11 12 12 / 40%);
+  /* The backdrop fades as the sheet is swiped away. */
+  opacity: calc(1 - var(--drawer-swipe-progress, 0));
+  transition: opacity var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+/* The drawer's viewport covers the window, and the sheet sits at its edge. */
+.x-govuk-ui-sheet-viewport {
+  position: fixed;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  inset: 0;
+  pointer-events: none;
+}
+.x-govuk-ui-sheet {
+  position: fixed;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  /* Space for a title, text and controls. A Sidebar or a Scroll area that fills the sheet removes
+     the padding. */
+  padding: 26px 24px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  box-shadow: 0 0 40px rgb(11 12 12 / 22%);
+  outline: none;
+  pointer-events: auto;
+  /* Base UI moves the sheet with a swipe towards its edge. When released, the sheet returns or
+     continues, faster for a stronger swipe. */
+  transition: translate calc(var(--x-govuk-ui-duration-slow) * var(--drawer-swipe-strength, 1))
+    var(--x-govuk-ui-ease-drawer);
+}
+/* A sheet at the side is --x-govuk-ui-sheet-width wide, such as wider for a tool's guide. */
+.x-govuk-ui-sheet:is([data-side="left"], [data-side="right"]) {
+  top: 0;
+  bottom: 0;
+  width: min(var(--x-govuk-ui-sheet-width, 360px), calc(100vw - 48px));
+}
+.x-govuk-ui-sheet[data-side="left"] {
+  left: 0;
+}
+.x-govuk-ui-sheet[data-side="right"] {
+  right: 0;
+}
+.x-govuk-ui-sheet:is([data-side="top"], [data-side="bottom"]) {
+  left: 0;
+  right: 0;
+  max-height: calc(100dvh - 48px);
+}
+.x-govuk-ui-sheet[data-side="top"] {
+  top: 0;
+}
+.x-govuk-ui-sheet[data-side="bottom"] {
+  bottom: 0;
+  border-radius: 12px 12px 0 0;
+}
+.x-govuk-ui-sheet-backdrop:is([data-starting-style], [data-ending-style]) {
+  opacity: 0;
+}
+.x-govuk-ui-sheet[data-side="left"]:is([data-starting-style], [data-ending-style]) {
+  translate: -100% 0;
+}
+.x-govuk-ui-sheet[data-side="right"]:is([data-starting-style], [data-ending-style]) {
+  translate: 100% 0;
+}
+.x-govuk-ui-sheet[data-side="top"]:is([data-starting-style], [data-ending-style]) {
+  translate: 0 -100%;
+}
+.x-govuk-ui-sheet[data-side="bottom"]:is([data-starting-style], [data-ending-style]) {
+  translate: 0 100%;
+}
+.x-govuk-ui-sheet-title {
+  margin: 0 40px 0 0;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.x-govuk-ui-sheet-description {
+  margin: 8px 0 24px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+/* Buttons sit at the foot of a sheet from the side. */
+.x-govuk-ui-sheet .x-govuk-ui-button-group {
+  margin-top: auto;
+  padding-top: 24px;
+}
+.x-govuk-ui-sheet-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-sheet {
+    border: 1px solid CanvasText;
+  }
+}

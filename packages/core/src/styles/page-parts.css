@@ -1,0 +1,401 @@
+/* A box easing to the height of its content clips the content while it eases. */
+.x-govuk-ui-auto-height[data-moving] {
+  overflow: hidden;
+}
+
+/* Attachment. A thumbnail of the document beside its title, details and any accessibility
+   notice. */
+.x-govuk-ui-attachment {
+  display: flex;
+  gap: 24px;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+/* The thumbnail lifts as one piece, its format label printed on the page, as the pointer reaches
+   the title. Its shadow falls from the whole page. */
+.x-govuk-ui-attachment-thumbnail {
+  position: relative;
+  flex: none;
+  align-self: flex-start;
+  width: 84px;
+  height: 120px;
+  filter: drop-shadow(0 2px 3px rgb(11 12 12 / 18%));
+  transition:
+    translate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    filter var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-attachment-thumbnail > :is(img, svg) {
+  display: block;
+  width: 84px;
+  height: 120px;
+}
+.x-govuk-ui-attachment:has(.x-govuk-ui-attachment-title a:hover) .x-govuk-ui-attachment-thumbnail {
+  translate: 0 -2px;
+  filter: drop-shadow(0 6px 7px rgb(11 12 12 / 22%));
+}
+.x-govuk-ui-attachment-page {
+  fill: var(--x-govuk-ui-paper);
+  stroke: var(--x-govuk-ui-line);
+  stroke-width: 2;
+}
+.x-govuk-ui-attachment-fold {
+  fill: var(--x-govuk-ui-secondary);
+  stroke: var(--x-govuk-ui-line);
+  stroke-width: 2;
+}
+.x-govuk-ui-attachment-line {
+  stroke: var(--x-govuk-ui-line);
+  stroke-width: 4;
+}
+.x-govuk-ui-attachment-format {
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-white);
+  font-size: 12px;
+  font-weight: 700;
+}
+/* Formats take the colours people know them by, such as red for PDF and green for spreadsheets. */
+.x-govuk-ui-attachment-format[data-format="pdf"] {
+  background: var(--x-govuk-ui-red);
+}
+.x-govuk-ui-attachment-format:is(
+  [data-format="csv"],
+  [data-format="xls"],
+  [data-format="xlsx"],
+  [data-format="ods"]
+) {
+  background: var(--x-govuk-ui-green);
+}
+/* Brand blue is lighter in the dark theme, so the label on it turns dark. */
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-attachment-format {
+    color: var(--x-govuk-ui-paper);
+  }
+  /* On dark paper, labels are light, with dark text, so PDF and spreadsheets take lighter tints. */
+  :scope .x-govuk-ui-attachment-format[data-format="pdf"] {
+    background: var(--x-govuk-ui-red-tint-50);
+  }
+  :scope
+    .x-govuk-ui-attachment-format:is(
+      [data-format="csv"],
+      [data-format="xls"],
+      [data-format="xlsx"],
+      [data-format="ods"]
+    ) {
+    background: var(--x-govuk-ui-green-tint-50);
+  }
+}
+.x-govuk-ui-attachment-details {
+  min-width: 0;
+}
+.x-govuk-ui-attachment-title {
+  margin: 0 0 8px;
+  font-size: 19px;
+  line-height: 1.32;
+}
+.x-govuk-ui-attachment-facts {
+  margin: 0 0 8px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+/* Cookie banner. GOV.UK's grey band, with the question or the confirmation in it. */
+.x-govuk-ui-cookie-banner {
+  overflow: hidden;
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-cookie-banner-message {
+  padding-block: 20px 24px;
+  overflow: hidden;
+  font-size: 19px;
+  line-height: 1.32;
+  outline: none;
+}
+.x-govuk-ui-cookie-banner-message p {
+  margin: 0 0 16px;
+}
+.x-govuk-ui-cookie-banner-heading {
+  margin: 0 0 16px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+/* Feedback. GOV.UK's band at the foot of a page, with outline buttons that stand out on its
+   tint. */
+.x-govuk-ui-feedback {
+  container-type: inline-size;
+  overflow: hidden;
+  border-top: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+/* The question and thanks are the same height, so Yes turns to thanks without the band moving. */
+.x-govuk-ui-feedback-row,
+.x-govuk-ui-feedback-thanks {
+  box-sizing: border-box;
+  min-height: 74px;
+}
+.x-govuk-ui-feedback-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 18px 24px;
+}
+.x-govuk-ui-feedback-answer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.x-govuk-ui-feedback-question {
+  margin: 0 4px 0 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+.x-govuk-ui-feedback-row .x-govuk-ui-button {
+  min-width: 90px;
+}
+.x-govuk-ui-feedback-report {
+  margin-left: auto;
+}
+/* On a narrow band, the layout follows GOV.UK's on a phone. The question and its answers take a row
+   of their own, then a keyline, then the report button across the band beneath. The rule goes by
+   the band's own width, so a band in a narrow column does the same. */
+@container (max-width: 40rem) {
+  .x-govuk-ui-feedback-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+  }
+  .x-govuk-ui-feedback-answer {
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--x-govuk-ui-line);
+  }
+  .x-govuk-ui-feedback-answer .x-govuk-ui-button {
+    min-width: 64px;
+  }
+  .x-govuk-ui-feedback-report {
+    margin-left: 0;
+  }
+  .x-govuk-ui-feedback-thanks {
+    padding: 16px;
+  }
+}
+.x-govuk-ui-feedback-thanks {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 18px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  outline: none;
+}
+/* The form keeps to a readable measure, about two-thirds of a GOV.UK page, as GOV.UK's does,
+   because a text box as wide as a desktop band is hard to read and to fill. In a narrower band, it
+   takes the full width. The measure is in the reader's text size, so it grows with their text, not
+   with the band. A service can set --x-govuk-ui-feedback-measure for another measure. */
+.x-govuk-ui-feedback-form {
+  padding: 20px 24px 24px;
+}
+.x-govuk-ui-feedback-form > * {
+  max-width: var(--x-govuk-ui-feedback-measure, 40rem);
+}
+/* A short form in a band has its own spacing below, instead of a page's spacing between fields. */
+.x-govuk-ui-feedback-form > .x-govuk-ui-form-fields {
+  gap: 0;
+  justify-items: stretch;
+}
+/* The fields and buttons stand apart, as on a form page. */
+.x-govuk-ui-feedback-form .x-govuk-ui-field {
+  margin-bottom: 20px;
+}
+.x-govuk-ui-feedback-form .x-govuk-ui-button-group {
+  margin-top: 4px;
+}
+.x-govuk-ui-feedback-form-heading {
+  margin: 0 0 8px;
+  font-size: 21px;
+}
+.x-govuk-ui-feedback-form-hint {
+  margin: 0 0 16px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+}
+
+/* Menubar. A row of quiet menu names, each shaded while its menu is open. */
+.x-govuk-ui-menubar {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  background: var(--x-govuk-ui-paper);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-menubar-trigger {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--x-govuk-ui-text);
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background var(--x-govuk-ui-duration-instant) ease;
+}
+.x-govuk-ui-menubar-trigger:hover,
+.x-govuk-ui-menubar-trigger[data-popup-open] {
+  background: var(--x-govuk-ui-secondary);
+}
+/* The dark edge sits beneath the trigger, as GOV.UK's does, so its name stays in the middle of
+   the yellow. */
+.x-govuk-ui-menubar-trigger:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 3px var(--x-govuk-ui-focus-text);
+}
+
+/* Filter chips. Rounded toggles with a plus that turns into a tick in place, so a chip keeps its
+   width as it turns on. Chosen chips side by side share one brand-blue shape behind them, which
+   grows out of a chip just chosen and draws back into a chip just turned off. */
+.x-govuk-ui-filter-chips {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.x-govuk-ui-filter-chips-track {
+  position: absolute;
+  z-index: 0;
+  border-radius: 17px;
+  background: var(--x-govuk-ui-brand);
+  pointer-events: none;
+}
+.x-govuk-ui-filter-chip {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px 0 10px;
+  border: 1px solid var(--x-govuk-ui-border);
+  border-radius: 17px;
+  background: transparent;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    border-color var(--x-govuk-ui-duration-fast) ease,
+    color var(--x-govuk-ui-duration-medium) ease,
+    scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+/* Small chips sit in a panel of settings. */
+.x-govuk-ui-filter-chips[data-size="small"] {
+  gap: 6px;
+}
+.x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chips-track,
+.x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chip {
+  border-radius: 14px;
+}
+.x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chip {
+  gap: 4px;
+  height: 28px;
+  padding: 0 11px 0 8px;
+  font-size: 14px;
+}
+.x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chip svg {
+  width: 12px;
+  height: 12px;
+}
+/* The hover tint is opaque and sits above the shape. A chip turned off under the pointer fades from
+   the shape's blue straight to the tint, and a chip chosen under it fades from the tint to blue,
+   never through the page's colour. */
+.x-govuk-ui-filter-chip:hover:not([data-pressed]) {
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-filter-chip:not([data-pressed]):active {
+  scale: 0.97;
+}
+/* A chosen chip shows the shape behind it. */
+.x-govuk-ui-filter-chip[data-pressed] {
+  border-color: transparent;
+  color: var(--x-govuk-ui-white);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-filter-chip[data-pressed] {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+.x-govuk-ui-filter-chip svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    stroke-dashoffset var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    rotate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+  transform-origin: center;
+}
+.x-govuk-ui-filter-chip-tick {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.x-govuk-ui-filter-chip[data-pressed] .x-govuk-ui-filter-chip-tick {
+  stroke-dashoffset: 0;
+}
+.x-govuk-ui-filter-chip[data-pressed] .x-govuk-ui-filter-chip-plus {
+  opacity: 0;
+  rotate: 45deg;
+}
+.x-govuk-ui-filter-chip-count {
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 9px;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition:
+    background var(--x-govuk-ui-duration-medium) ease,
+    color var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-filter-chip[data-pressed] .x-govuk-ui-filter-chip-count {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  color: inherit;
+}
+.x-govuk-ui-filter-chip:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  box-shadow: 0 0 0 5px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-filter-chip[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-filter-chips-track {
+    background: Highlight;
+  }
+  .x-govuk-ui-filter-chip[data-pressed] {
+    forced-color-adjust: none;
+    color: HighlightText;
+  }
+}

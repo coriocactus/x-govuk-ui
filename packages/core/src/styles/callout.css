@@ -1,0 +1,200 @@
+/* Callout and Tour. A card that points at part of the page with an arrow. Set its width with
+   --x-govuk-ui-callout-width. */
+.x-govuk-ui-callout {
+  width: max-content;
+  max-width: min(var(--x-govuk-ui-callout-width, 320px), calc(100vw - 16px));
+  padding: 16px 20px 18px;
+}
+/* A close button in the corner keeps the words clear of it. */
+.x-govuk-ui-callout:has(> .x-govuk-ui-callout-close) {
+  padding-right: 48px;
+}
+/* Brand is blue, so it reads apart from the page and from Popover's plain panels. It has GOV.UK's
+   inverse buttons in white, as on GOV.UK's blue backgrounds. In the dark theme, the blue is
+   lighter, so the words are in the page's dark colour. */
+.x-govuk-ui-callout[data-variant="brand"] {
+  --x-govuk-ui-callout-ink: var(--x-govuk-ui-white, #fff);
+  border-color: var(--x-govuk-ui-brand);
+  background: var(--x-govuk-ui-brand);
+  box-shadow: 0 10px 32px rgb(11 12 12 / 22%);
+  color: var(--x-govuk-ui-callout-ink);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-callout[data-variant="brand"] {
+    --x-govuk-ui-callout-ink: var(--x-govuk-ui-paper);
+  }
+}
+.x-govuk-ui-callout[data-variant="brand"] .x-govuk-ui-floating-arrow-fill,
+.x-govuk-ui-callout[data-variant="brand"] .x-govuk-ui-floating-arrow-edge {
+  fill: var(--x-govuk-ui-brand);
+}
+/* Plain has the page's paper and keyline, as Popover has, with the usual buttons. */
+.x-govuk-ui-callout[data-variant="plain"] .x-govuk-ui-callout-description {
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-callout-title {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.x-govuk-ui-callout-description {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.x-govuk-ui-callout-description p {
+  margin: 0 0 8px;
+}
+.x-govuk-ui-callout-description > :last-child {
+  margin-bottom: 0;
+}
+.x-govuk-ui-callout[data-variant="brand"] a {
+  color: inherit;
+}
+.x-govuk-ui-callout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.x-govuk-ui-callout-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+/* Inverse buttons are white with blue words. Quiet buttons take the card's own colours. */
+.x-govuk-ui-callout[data-variant="brand"] .x-govuk-ui-button--primary,
+.x-govuk-ui-callout[data-variant="brand"] .x-govuk-ui-button--secondary {
+  --x-govuk-ui-button-fill: var(--x-govuk-ui-callout-ink);
+  --x-govuk-ui-button-hover: color-mix(
+    in srgb,
+    var(--x-govuk-ui-callout-ink) 88%,
+    var(--x-govuk-ui-brand)
+  );
+  --x-govuk-ui-button-text: var(--x-govuk-ui-brand);
+  --x-govuk-ui-button-shadow: color-mix(in srgb, var(--x-govuk-ui-brand) 55%, #0b0c0c);
+}
+.x-govuk-ui-callout[data-variant="brand"] .x-govuk-ui-button--quiet {
+  --x-govuk-ui-button-hover: color-mix(in srgb, var(--x-govuk-ui-callout-ink) 16%, transparent);
+  --x-govuk-ui-button-text: var(--x-govuk-ui-callout-ink);
+}
+.x-govuk-ui-callout[data-variant="brand"] .x-govuk-ui-button--quiet:is(:hover, :active) {
+  color: var(--x-govuk-ui-callout-ink);
+}
+.x-govuk-ui-callout[data-variant="brand"]
+  .x-govuk-ui-button--quiet:active:not([aria-disabled="true"]) {
+  background: color-mix(in srgb, var(--x-govuk-ui-callout-ink) 24%, transparent);
+}
+
+/* The question mark that opens help, in the link colour beside what it explains. */
+.x-govuk-ui-callout-trigger {
+  --x-govuk-ui-button-text: var(--x-govuk-ui-link);
+  vertical-align: middle;
+}
+
+/* Tour. Each step's words fade in as it comes. How far along the tour is shows at the foot, as dots
+   and words. The card fades while the page scrolls to a step out of sight. */
+.x-govuk-ui-tour {
+  width: min(var(--x-govuk-ui-callout-width, 320px), calc(100vw - 16px));
+}
+.x-govuk-ui-tour-step {
+  animation: x-govuk-ui-tour-step var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-tour-step {
+  from {
+    opacity: 0;
+    translate: 0 3px;
+  }
+}
+.x-govuk-ui-tour-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+}
+/* The foot reaches under the close button, across the card. */
+.x-govuk-ui-tour:has(> .x-govuk-ui-callout-close) .x-govuk-ui-tour-foot {
+  margin-right: -28px;
+}
+.x-govuk-ui-tour-count {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-tour-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+.x-govuk-ui-tour-dots > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: currentColor;
+  opacity: 0.35;
+  transition:
+    width var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-tour-dots > [data-done] {
+  opacity: 0.6;
+}
+.x-govuk-ui-tour-dots > [data-current] {
+  width: 16px;
+  opacity: 1;
+}
+.x-govuk-ui-tour[data-moving] {
+  opacity: 0;
+  scale: 0.96;
+}
+/* The dimming is one rounded gap whose shadow covers the page. Only the gap moves, so the page
+   beneath it still takes presses. Set its colour with --x-govuk-ui-tour-dim, and the gap's corners
+   with --x-govuk-ui-tour-radius. It lies just beneath the overlays, as a layer of its own among
+   them, even when it is turned on after the step has opened. */
+.x-govuk-ui-tour-spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: calc(var(--x-govuk-ui-layer-overlay) - 1);
+  border-radius: var(--x-govuk-ui-tour-radius, 10px);
+  box-shadow: 0 0 0 200vmax var(--x-govuk-ui-tour-dim, rgb(11 12 12 / 48%));
+  pointer-events: none;
+  transition: opacity var(--x-govuk-ui-duration-medium) ease;
+}
+@starting-style {
+  .x-govuk-ui-tour-spotlight {
+    opacity: 0;
+  }
+}
+.x-govuk-ui-tour-spotlight[data-closing] {
+  opacity: 0;
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-tour-spotlight {
+    box-shadow: 0 0 0 200vmax var(--x-govuk-ui-tour-dim, rgb(0 0 0 / 58%));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-tour-step {
+    animation-name: x-govuk-ui-tour-step-fade;
+  }
+  @keyframes x-govuk-ui-tour-step-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}
+/* Forced colours drop shadows, so the card keeps a keyline, and the gap a ring, instead. */
+@media (forced-colors: active) {
+  .x-govuk-ui-callout {
+    border-color: CanvasText;
+  }
+  .x-govuk-ui-tour-spotlight {
+    outline: 3px solid Highlight;
+  }
+  .x-govuk-ui-tour-dots > span {
+    background: CanvasText;
+  }
+}

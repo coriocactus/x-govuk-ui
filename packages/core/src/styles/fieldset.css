@@ -1,0 +1,36 @@
+/* Fieldset. A legend over related fields. */
+.x-govuk-ui-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-legend {
+  box-sizing: border-box;
+  display: table;
+  max-width: 100%;
+  margin-bottom: 7px;
+  padding: 0;
+  color: var(--x-govuk-ui-text);
+  font-weight: 700;
+  white-space: normal;
+}
+.x-govuk-ui-legend--small {
+  font-size: 18px;
+  line-height: 1.4;
+}
+.x-govuk-ui-legend--medium {
+  margin-bottom: 12px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.x-govuk-ui-legend--large {
+  margin-bottom: 16px;
+  font-size: 32px;
+  line-height: 1.15;
+}
+.x-govuk-ui-legend-heading {
+  margin: 0;
+  font: inherit;
+}

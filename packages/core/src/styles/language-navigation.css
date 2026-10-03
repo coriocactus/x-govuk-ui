@@ -1,0 +1,39 @@
+/* Language navigation. Each language is named in itself, separated by keylines. The current
+   language is bold text, and the others are links. It starts where its container's content starts.
+   A service that puts it at the top right of its pages aligns it there. */
+.x-govuk-ui-language-navigation {
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  line-height: 1.4;
+}
+.x-govuk-ui-language-navigation-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-language-navigation-item + .x-govuk-ui-language-navigation-item {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--x-govuk-ui-text);
+}
+.x-govuk-ui-language-navigation-current {
+  font-weight: 700;
+}
+.x-govuk-ui-language-navigation-link {
+  color: var(--x-govuk-ui-link);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-language-navigation-link:hover {
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-language-navigation-link:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}

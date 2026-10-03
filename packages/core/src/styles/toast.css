@@ -1,0 +1,303 @@
+/* Toast. */
+.x-govuk-ui-toast {
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-toast:focus-visible,
+.x-govuk-ui-toast-close:focus-visible,
+.x-govuk-ui-toast-action:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 2px;
+}
+.x-govuk-ui-toast-scope {
+  display: contents;
+}
+/* A zero-height bar along one edge of the window. Toasts hang from it and stack along it. */
+.x-govuk-ui-toast-viewport {
+  --x-govuk-ui-toast-dir: 1;
+  position: fixed;
+  z-index: var(--x-govuk-ui-layer-notification);
+  inset-inline: 16px;
+  top: 16px;
+  height: 0;
+  outline: none;
+  interpolate-size: allow-keywords;
+}
+.x-govuk-ui-toast-viewport[data-side="bottom"] {
+  --x-govuk-ui-toast-dir: -1;
+  top: auto;
+  bottom: 16px;
+}
+.x-govuk-ui-toast {
+  --x-govuk-ui-toast-depth: min(var(--toast-index), 2);
+  position: absolute;
+  top: 0;
+  z-index: calc(100 - var(--toast-index));
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  max-width: min(480px, 100%);
+  /* A minimum, not a fixed height, because Base UI measures each toast at its natural height. */
+  min-height: 44px;
+  padding: 0 16px 0 13px;
+  /* Like a GOV.UK notification banner, a coloured edge shows the toast's type. */
+  border: 1px solid var(--x-govuk-ui-line);
+  border-inline-start: 5px solid var(--x-govuk-ui-toast-accent, var(--x-govuk-ui-link));
+  border-radius: 4px;
+  background: var(--x-govuk-ui-paper);
+  box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
+  color: var(--x-govuk-ui-text);
+  font: 14px / 1.4 var(--x-govuk-ui-font);
+  transform-origin: top center;
+  /* When the stack is collapsed, each toast peeks out from behind the one in front, smaller and
+     fainter. */
+  transform: translateX(var(--toast-swipe-movement-x, 0px))
+    translateY(
+      calc(
+        var(--x-govuk-ui-toast-dir) *
+        var(--x-govuk-ui-toast-depth) *
+        9px +
+        var(--toast-swipe-movement-y, 0px)
+      )
+    )
+    scale(calc(1 - var(--x-govuk-ui-toast-depth) * 0.04));
+  opacity: calc(clamp(0, 3 - var(--toast-index), 1) * (1 - var(--x-govuk-ui-toast-depth) * 0.2));
+  transition:
+    transform var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    width var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    scale var(--x-govuk-ui-duration-instant) ease-out;
+}
+.x-govuk-ui-toast-viewport[data-side="bottom"] .x-govuk-ui-toast {
+  top: auto;
+  bottom: 0;
+  transform-origin: bottom center;
+}
+.x-govuk-ui-toast-viewport[data-align="center"] .x-govuk-ui-toast {
+  left: 50%;
+  translate: -50% 0;
+}
+.x-govuk-ui-toast-viewport[data-align="start"] .x-govuk-ui-toast {
+  inset-inline-start: 0;
+}
+.x-govuk-ui-toast-viewport[data-align="end"] .x-govuk-ui-toast {
+  inset-inline-end: 0;
+}
+.x-govuk-ui-toast:not([data-expanded]):has(> .x-govuk-ui-toast-content[data-behind]) {
+  width: var(--x-govuk-ui-toast-front-width, max-content);
+}
+/* Hovering or focusing the stack fans the toasts out so each can be read. */
+.x-govuk-ui-toast[data-expanded] {
+  transform: translateX(var(--toast-swipe-movement-x, 0px))
+    translateY(
+      calc(
+        var(--x-govuk-ui-toast-dir) *
+        (var(--toast-offset-y) + var(--toast-index) * 8px) +
+        var(--toast-swipe-movement-y, 0px)
+      )
+    );
+  opacity: 1;
+}
+/* When fanned out, the toasts have gaps between them. Each toast extends an invisible bridge across
+   the gap to the next, so a pointer between two toasts still counts as hovering the stack. The
+   stack then does not close and reopen under it. */
+.x-govuk-ui-toast[data-expanded]::after {
+  content: "";
+  position: absolute;
+  inset-inline: -1px;
+  top: 100%;
+  height: 10px;
+}
+.x-govuk-ui-toast-viewport[data-side="bottom"] .x-govuk-ui-toast[data-expanded]::after {
+  top: auto;
+  bottom: 100%;
+}
+.x-govuk-ui-toast[data-starting-style] {
+  transform: translateY(calc(var(--x-govuk-ui-toast-dir) * -14px)) scale(0.96);
+  opacity: 0;
+}
+.x-govuk-ui-toast[data-ending-style] {
+  transform: translateY(calc(var(--x-govuk-ui-toast-dir) * -8px)) scale(0.96);
+  opacity: 0;
+  transition-duration: var(--x-govuk-ui-duration-medium);
+}
+.x-govuk-ui-toast[data-ending-style][data-swipe-direction="left"] {
+  transform: translateX(calc(var(--toast-swipe-movement-x) - 120%));
+}
+.x-govuk-ui-toast[data-ending-style][data-swipe-direction="right"] {
+  transform: translateX(calc(var(--toast-swipe-movement-x) + 120%));
+}
+.x-govuk-ui-toast[data-ending-style][data-swipe-direction="up"] {
+  transform: translateY(calc(var(--toast-swipe-movement-y) - 150%));
+}
+.x-govuk-ui-toast[data-ending-style][data-swipe-direction="down"] {
+  transform: translateY(calc(var(--toast-swipe-movement-y) + 150%));
+}
+/* A flicked toast continues in the direction it was thrown. */
+.x-govuk-ui-toast[data-ending-style][data-flick="left"] {
+  transform: translateX(-120%);
+}
+.x-govuk-ui-toast[data-ending-style][data-flick="right"] {
+  transform: translateX(120%);
+}
+.x-govuk-ui-toast[data-ending-style][data-flick="up"] {
+  transform: translateY(-150%);
+}
+.x-govuk-ui-toast[data-ending-style][data-flick="down"] {
+  transform: translateY(150%);
+}
+/* With drag to dismiss, the card follows the pointer exactly while dragged, and eases back if
+   released early. It slides away in the dragged direction once it passes the threshold.
+   Interactive parts, such as the action and the close button, never start a drag. */
+.x-govuk-ui-toast[data-dismiss="drag"] {
+  cursor: grab;
+  touch-action: none;
+}
+/* With tap to dismiss, the toast dips slightly under the pointer, like a button. */
+.x-govuk-ui-toast[data-dismiss="tap"] {
+  cursor: pointer;
+}
+.x-govuk-ui-toast[data-dismiss="tap"]:active:not(:has(button:active, a:active)) {
+  scale: 0.98;
+}
+.x-govuk-ui-toast[data-swiping] {
+  cursor: grabbing;
+  user-select: none;
+  box-shadow: 0 10px 28px rgb(11 12 12 / 20%);
+  transition:
+    opacity var(--x-govuk-ui-duration-medium) ease,
+    box-shadow var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-toast[data-limited] {
+  opacity: 0;
+  pointer-events: none;
+}
+.x-govuk-ui-toast[data-type="success"] {
+  --x-govuk-ui-toast-accent: var(--x-govuk-ui-success);
+}
+.x-govuk-ui-toast[data-type="error"] {
+  --x-govuk-ui-toast-accent: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-toast[data-type="warning"] {
+  --x-govuk-ui-toast-accent: var(--x-govuk-ui-warning);
+}
+.x-govuk-ui-toast[data-type="loading"] {
+  --x-govuk-ui-toast-accent: var(--x-govuk-ui-black-tint-50);
+}
+.x-govuk-ui-toast:has(.x-govuk-ui-toast-close) {
+  padding-inline-end: 8px;
+}
+.x-govuk-ui-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  transition: opacity var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-toast-content[data-behind]:not([data-expanded]) {
+  opacity: 0;
+}
+.x-govuk-ui-toast-glyph {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-toast-glyph svg {
+  width: 16px;
+  height: 16px;
+}
+.x-govuk-ui-toast-glyph[data-type="success"] {
+  color: var(--x-govuk-ui-success);
+}
+.x-govuk-ui-toast-glyph[data-type="error"] {
+  color: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-toast-glyph[data-type="warning"] {
+  color: var(--x-govuk-ui-warning);
+}
+.x-govuk-ui-toast-glyph[data-type="info"] {
+  color: var(--x-govuk-ui-link);
+}
+/* A loading toast's icon is the library's Spinner, at the icon's size. */
+.x-govuk-ui-spinner.x-govuk-ui-toast-spinner {
+  --x-govuk-ui-spinner-size: 14px;
+}
+/* Base UI renders the title as a heading, so it is reset to the pill's own text style. */
+.x-govuk-ui-toast-title,
+.x-govuk-ui-toast-description {
+  margin: 0;
+  font: inherit;
+}
+/* The title clips its text and animates its width, so outgoing text never spills past the toast. */
+.x-govuk-ui-toast-title {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+}
+.x-govuk-ui-toast-message {
+  grid-area: 1 / 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.x-govuk-ui-toast-title[data-morphing] .x-govuk-ui-toast-message,
+.x-govuk-ui-toast[data-resizing] :is(.x-govuk-ui-toast-message, .x-govuk-ui-toast-description) {
+  text-overflow: clip;
+}
+.x-govuk-ui-toast-description {
+  min-width: 0;
+  font-size: 16px;
+  overflow: hidden;
+  color: var(--x-govuk-ui-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.x-govuk-ui-toast-close {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-inline-start: 6px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--x-govuk-ui-muted);
+  cursor: pointer;
+}
+.x-govuk-ui-toast-close:hover {
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+}
+/* The action reads as a GOV.UK link, with GOV.UK's focus style. */
+.x-govuk-ui-toast-action {
+  flex-shrink: 0;
+  margin-inline-start: 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--x-govuk-ui-link);
+  font: 700 16px / 1.25 var(--x-govuk-ui-font);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+.x-govuk-ui-toast-action:hover {
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-toast-action:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+}

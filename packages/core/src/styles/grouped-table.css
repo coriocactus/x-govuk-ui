@@ -1,0 +1,198 @@
+/* Grouped table. A bordered card of bands, each over its rows. Every row and band sets its cells on
+   the same columns, so the columns line up across the groups. The columns are a mark, the title,
+   then each column as wide as its widest cell. Nothing is ever cut short or wrapped. As the table
+   narrows, columns give way in steps, each moving through the rows from the top down. Past the
+   last step, the groups scroll sideways. */
+.x-govuk-ui-grouped-table {
+  container-type: inline-size;
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 10px;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  line-height: 1.35;
+}
+.x-govuk-ui-grouped-table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+/* The groups are as wide as their widest row needs, and at least as wide as the table. */
+.x-govuk-ui-grouped-table-groups {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 100%;
+  padding: 6px;
+}
+.x-govuk-ui-grouped-table-band,
+.x-govuk-ui-grouped-table-row {
+  display: grid;
+  grid-template-columns: var(--x-govuk-ui-grouped-columns);
+  align-items: center;
+  column-gap: 12px;
+  padding: 0 10px;
+}
+/* The band is one button the width of the row, with the column headings laid over it. */
+.x-govuk-ui-grouped-table-band {
+  position: relative;
+  min-height: 40px;
+  margin-top: 4px;
+  border-radius: 7px;
+  background: var(--x-govuk-ui-surface);
+}
+.x-govuk-ui-grouped-table-group:first-child .x-govuk-ui-grouped-table-band {
+  margin-top: 0;
+}
+.x-govuk-ui-grouped-table-trigger {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  margin: 0 -10px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--x-govuk-ui-text);
+  font: inherit;
+  font-weight: 700;
+  text-align: start;
+  cursor: pointer;
+}
+.x-govuk-ui-grouped-table-trigger:hover {
+  background: color-mix(in srgb, var(--x-govuk-ui-secondary) 70%, transparent);
+}
+.x-govuk-ui-grouped-table-trigger:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  box-shadow: inset 0 0 0 2px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-grouped-table-band .x-govuk-ui-grouped-table-mark {
+  margin-right: 4px;
+}
+.x-govuk-ui-grouped-table-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-grouped-table-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-muted);
+  font-size: 13px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-grouped-table-chevron {
+  margin-left: auto;
+  color: var(--x-govuk-ui-muted);
+  transition: rotate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-grouped-table-trigger:not([data-panel-open]) .x-govuk-ui-grouped-table-chevron {
+  rotate: 180deg;
+}
+.x-govuk-ui-grouped-table-heading {
+  grid-row: 1;
+  display: flex;
+  color: var(--x-govuk-ui-muted);
+  pointer-events: none;
+}
+.x-govuk-ui-grouped-table-heading[data-align="end"] {
+  justify-content: flex-end;
+}
+/* A column without an icon is headed by its label, small and never wrapped. */
+.x-govuk-ui-grouped-table-heading-text {
+  font-size: 14px;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+.x-govuk-ui-grouped-table-panel {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition: height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+.x-govuk-ui-grouped-table-panel:is([data-starting-style], [data-ending-style]) {
+  height: 0;
+}
+.x-govuk-ui-grouped-table-rows {
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+}
+.x-govuk-ui-grouped-table-row {
+  position: relative;
+  min-height: 46px;
+  border-radius: 7px;
+  transition: background var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-grouped-table-row:hover {
+  background: color-mix(in srgb, var(--x-govuk-ui-secondary) 55%, transparent);
+}
+/* The title and anything that joined it keep to one line, never cut short. */
+.x-govuk-ui-grouped-table-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.x-govuk-ui-grouped-table-title-text {
+  flex: none;
+  white-space: nowrap;
+}
+.x-govuk-ui-grouped-table-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.x-govuk-ui-grouped-table-cell[data-place="inline"] {
+  flex: none;
+}
+.x-govuk-ui-grouped-table-cell[data-align="end"] {
+  justify-content: flex-end;
+}
+/* A cell's content, measured to size its column. A column merged into another sits before it. */
+.x-govuk-ui-grouped-table-content,
+.x-govuk-ui-grouped-table-part {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+/* At the last step, people in a cell stand closer. They move there by transform, as the rest do. */
+.x-govuk-ui-grouped-table[data-step="tight"]
+  .x-govuk-ui-avatar-group
+  > .x-govuk-ui-avatar
+  + .x-govuk-ui-avatar {
+  margin-left: calc(var(--x-govuk-ui-avatar-size) * -0.5);
+}
+/* The handle that narrows and widens the table runs down its right edge. */
+.x-govuk-ui-resizable-handle.x-govuk-ui-grouped-table-handle {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  right: -1px;
+  background: transparent;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-grouped-table-band {
+    border: 1px solid CanvasText;
+  }
+}

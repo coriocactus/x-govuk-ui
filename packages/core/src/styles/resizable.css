@@ -1,0 +1,140 @@
+/* The handle is a 1px line with a 13px grab area. Under the pointer, after a short pause so a
+   passing pointer does not flash it, the line thickens to 3px in link blue. With keyboard focus
+   it takes GOV.UK's focus colours, dark inside a yellow band. */
+.x-govuk-ui-resizable-handle {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--x-govuk-ui-line);
+  outline: none;
+  touch-action: none;
+  user-select: none;
+}
+.x-govuk-ui-resizable-handle[aria-orientation="vertical"] {
+  width: 1px;
+  align-self: stretch;
+  cursor: col-resize;
+}
+.x-govuk-ui-resizable-handle[aria-orientation="horizontal"] {
+  height: 1px;
+  align-self: stretch;
+  cursor: row-resize;
+}
+.x-govuk-ui-resizable-handle::before,
+.x-govuk-ui-resizable-handle::after {
+  content: "";
+  position: absolute;
+}
+.x-govuk-ui-resizable-handle[aria-orientation="vertical"]::before {
+  top: 0;
+  bottom: 0;
+  left: -6px;
+  right: -6px;
+}
+.x-govuk-ui-resizable-handle[aria-orientation="horizontal"]::before {
+  top: -6px;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+}
+.x-govuk-ui-resizable-handle::after {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  transition:
+    top var(--x-govuk-ui-duration-instant) ease,
+    bottom var(--x-govuk-ui-duration-instant) ease,
+    left var(--x-govuk-ui-duration-instant) ease,
+    right var(--x-govuk-ui-duration-instant) ease,
+    background var(--x-govuk-ui-duration-instant) ease;
+}
+.x-govuk-ui-resizable-handle:is(:hover, [data-dragging])::after {
+  background: var(--x-govuk-ui-link);
+  transition-delay: 100ms;
+}
+.x-govuk-ui-resizable-handle[data-dragging]::after {
+  transition-delay: 0s;
+}
+.x-govuk-ui-resizable-handle[aria-orientation="vertical"]:is(
+  :hover,
+  [data-dragging],
+  :focus-visible
+)::after {
+  left: -1px;
+  right: -1px;
+}
+.x-govuk-ui-resizable-handle[aria-orientation="horizontal"]:is(
+  :hover,
+  [data-dragging],
+  :focus-visible
+)::after {
+  top: -1px;
+  bottom: -1px;
+}
+.x-govuk-ui-resizable-handle:focus-visible::after {
+  background: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 0 0 3px var(--x-govuk-ui-focus);
+  transition-delay: 0s;
+}
+
+/* The grip is a pill across the line. It lengthens and turns link blue while in use. */
+.x-govuk-ui-resizable-grip {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  border: 1px solid var(--x-govuk-ui-border);
+  border-radius: 999px;
+  background: var(--x-govuk-ui-paper);
+  pointer-events: none;
+  transition:
+    width var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    height var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    background var(--x-govuk-ui-duration-fast) ease,
+    border-color var(--x-govuk-ui-duration-fast) ease;
+}
+[aria-orientation="vertical"] > .x-govuk-ui-resizable-grip {
+  width: 8px;
+  height: 28px;
+}
+[aria-orientation="horizontal"] > .x-govuk-ui-resizable-grip {
+  width: 28px;
+  height: 8px;
+}
+[aria-orientation="vertical"]:is(:hover, [data-dragging]) > .x-govuk-ui-resizable-grip {
+  height: 40px;
+}
+[aria-orientation="horizontal"]:is(:hover, [data-dragging]) > .x-govuk-ui-resizable-grip {
+  width: 40px;
+}
+.x-govuk-ui-resizable-handle:is(:hover, [data-dragging]) > .x-govuk-ui-resizable-grip {
+  border-color: var(--x-govuk-ui-link);
+  background: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-resizable-handle:focus-visible > .x-govuk-ui-resizable-grip {
+  border-color: var(--x-govuk-ui-focus-text);
+  background: var(--x-govuk-ui-focus);
+}
+
+@media (forced-colors: active) {
+  .x-govuk-ui-resizable-handle {
+    background: CanvasText;
+  }
+  .x-govuk-ui-resizable-handle:is(:hover, [data-dragging], :focus-visible)::after {
+    background: Highlight;
+  }
+  .x-govuk-ui-resizable-grip {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+}
+
+/* When disabled, the line stays as a keyline, with no resize cursor and no hover change. */
+.x-govuk-ui-resizable-handle[aria-disabled="true"] {
+  cursor: default;
+  pointer-events: none;
+}

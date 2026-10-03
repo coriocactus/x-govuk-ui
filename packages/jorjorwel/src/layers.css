@@ -1,0 +1,4 @@
+/* Declares the layer order, as core's stylesheet does, for whichever of the two loads first. The
+   extensions' layer comes after x-govuk-ui's, so the editor's rules overrule core's at the same
+   specificity, whatever order the stylesheets load in. */
+@layer reset, govuk-frontend, x-govuk-ui, x-govuk-ui-extensions;

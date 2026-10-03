@@ -1,0 +1,73 @@
+/* Progress. The label and value above a rounded track. The fill eases forward in GOV.UK's brand
+   blue, sweeps along the track while the amount is unknown, and turns green when complete. */
+.x-govuk-ui-progress {
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-progress-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.x-govuk-ui-progress-label {
+  color: var(--x-govuk-ui-text);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.x-govuk-ui-progress-value {
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+/* The track keeps its fill's movement to itself, so the page around it is not laid out again as
+   the fill eases forward. */
+.x-govuk-ui-progress-track {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  contain: layout paint;
+  border-radius: 4px;
+  background: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-progress-indicator {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--x-govuk-ui-brand);
+  transition:
+    width var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out),
+    background-color var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-progress[data-complete] .x-govuk-ui-progress-indicator {
+  background: var(--x-govuk-ui-success);
+}
+.x-govuk-ui-progress[data-indeterminate] .x-govuk-ui-progress-indicator {
+  position: absolute;
+  width: 40%;
+  animation: x-govuk-ui-progress-sweep 1.3s var(--x-govuk-ui-ease-drawer) infinite;
+}
+@keyframes x-govuk-ui-progress-sweep {
+  from {
+    left: -40%;
+  }
+  to {
+    left: 100%;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-progress-track {
+    outline: 1px solid CanvasText;
+  }
+  .x-govuk-ui-progress-indicator {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}
+/* Without motion, an unknown amount shows as a faint full track, not a part-filled one. */
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-progress[data-indeterminate] .x-govuk-ui-progress-indicator {
+    width: 100%;
+    opacity: 0.35;
+  }
+}

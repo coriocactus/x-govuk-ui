@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- On a phone, the keyboard resizes the page, not only what shows of it, so a chat that fills
+      the screen keeps its message box on the keyboard instead of scrolled partway up. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
+    <meta name="description" content="x-govuk-ui: a React component library based on the GOV.UK Design System." />
+    <meta name="theme-color" content="#ffffff" />
+    <title>GOV/UK UI</title>
+    <link rel="icon" href="./assets/brand/favicon.svg" type="image/svg+xml" />
+    <!-- The theme is set before the page is painted. It is dark if it was chosen in this browser,
+      and otherwise light, as GOV.UK is. -->
+    <script>{ let theme = null; try { theme = JSON.parse(localStorage.getItem("x-govuk-ui-theme")); } catch {} document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light"; }</script>
+    <!-- The fonts are linked by script so the bundler does not inline the font files. Local
+      development is set in GDS Transport, and the production build in Roboto. -->
+    <script>document.head.append(Object.assign(document.createElement("link"), { rel: "stylesheet", href: "/assets/fonts.css" }));</script>
+    <link rel="stylesheet" href="../packages/core/src/styles.css" />
+    <link rel="stylesheet" href="../packages/belsize/src/styles.css" />
+    <link rel="stylesheet" href="../packages/jorjorwel/src/styles.css" />
+    <link rel="stylesheet" href="../packages/memetics/src/styles.css" />
+    <link rel="stylesheet" href="./workbench.css" />
+    <link rel="stylesheet" href="./preview.css" />
+    <link rel="stylesheet" href="./workspace.css" />
+    <script type="module" src="./main.tsx"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>The component workbench needs JavaScript to run its interactive previews.</noscript>
+  </body>
+</html>

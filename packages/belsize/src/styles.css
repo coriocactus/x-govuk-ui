@@ -1,0 +1,2 @@
+/* The package's styles, in x-govuk-ui's cascade layer, after x-govuk-ui's own stylesheet. */
+@import "./styles/tiles.css" layer(x-govuk-ui);

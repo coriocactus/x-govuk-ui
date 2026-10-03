@@ -1,0 +1,64 @@
+/* Logo carousel. A row of places, each showing one logo, which rolls up and away as the next rises
+   in. Organisations without a logo show their name as GOV.UK sets an organisation's name, beside a
+   bar of its colour. */
+.x-govuk-ui-logo-carousel {
+  container-type: inline-size;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-logo-carousel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.x-govuk-ui-logo-carousel-label {
+  margin: 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+}
+.x-govuk-ui-button.x-govuk-ui-logo-carousel-pause {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 15px;
+}
+.x-govuk-ui-logo-carousel-wall {
+  display: grid;
+  grid-template-columns: repeat(var(--x-govuk-ui-logo-places), minmax(0, 1fr));
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+/* Every place is as tall as the tallest logo. The first place measures it from a hidden stack of
+   every logo. */
+.x-govuk-ui-logo-carousel-place {
+  position: relative;
+  display: grid;
+  min-height: 96px;
+  overflow: hidden;
+}
+.x-govuk-ui-logo-carousel-sizer {
+  grid-area: 1 / 1;
+  display: grid;
+  visibility: hidden;
+}
+.x-govuk-ui-logo-carousel-sizer > * {
+  grid-area: 1 / 1;
+}
+.x-govuk-ui-logo-carousel-place + .x-govuk-ui-logo-carousel-place {
+  border-left: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-logo-carousel-logo {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  padding: 12px 16px;
+}
+/* A name without a logo is an Organisation name. It is set at 15 pixels, so it fits a logo's
+   place. */
+.x-govuk-ui-logo-carousel-name {
+  display: block;
+  max-width: 10em;
+  font-size: 15px;
+}

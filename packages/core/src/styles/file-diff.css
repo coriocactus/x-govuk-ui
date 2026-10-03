@@ -1,0 +1,199 @@
+/* File diff. Code block's keyline box and header, with added lines on a green tint and removed
+   lines on a red one, each with a stronger tint behind its sign. */
+.x-govuk-ui-file-diff {
+  --x-govuk-ui-code-font:
+    ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --x-govuk-ui-diff-add: color-mix(in srgb, var(--x-govuk-ui-success) 12%, var(--x-govuk-ui-paper));
+  --x-govuk-ui-diff-add-strong: color-mix(
+    in srgb,
+    var(--x-govuk-ui-success) 24%,
+    var(--x-govuk-ui-paper)
+  );
+  --x-govuk-ui-diff-remove: color-mix(
+    in srgb,
+    var(--x-govuk-ui-error) 10%,
+    var(--x-govuk-ui-paper)
+  );
+  --x-govuk-ui-diff-remove-strong: color-mix(
+    in srgb,
+    var(--x-govuk-ui-error) 22%,
+    var(--x-govuk-ui-paper)
+  );
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 6px;
+  overflow: clip;
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+/* The header keeps its height whatever actions it contains, so the lines never move. The filename
+   comes first. Where the row has no space for both, the actions go to a line of their own beneath,
+   at the end. The name is then cut short only when it is wider than the whole row. */
+.x-govuk-ui-file-diff-header {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  min-height: 52px;
+  padding: 8px 8px 8px 14px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  background: var(--x-govuk-ui-surface);
+}
+/* Dark tints stay light enough that every syntax colour keeps 4.5:1 on them. */
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-file-diff {
+    --x-govuk-ui-diff-add: color-mix(
+      in srgb,
+      var(--x-govuk-ui-success) 12%,
+      var(--x-govuk-ui-paper)
+    );
+    --x-govuk-ui-diff-add-strong: color-mix(
+      in srgb,
+      var(--x-govuk-ui-success) 24%,
+      var(--x-govuk-ui-paper)
+    );
+    --x-govuk-ui-diff-remove: color-mix(
+      in srgb,
+      var(--x-govuk-ui-error) 11%,
+      var(--x-govuk-ui-paper)
+    );
+    --x-govuk-ui-diff-remove-strong: color-mix(
+      in srgb,
+      var(--x-govuk-ui-error) 22%,
+      var(--x-govuk-ui-paper)
+    );
+  }
+}
+.x-govuk-ui-file-diff-filename {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 700 13px / 1.5 var(--x-govuk-ui-code-font);
+}
+.x-govuk-ui-file-diff-counts {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  font: 700 13px / 1.5 var(--x-govuk-ui-code-font);
+}
+.x-govuk-ui-file-diff-counts [data-kind="add"] {
+  color: var(--x-govuk-ui-success);
+}
+.x-govuk-ui-file-diff-counts [data-kind="remove"] {
+  color: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-file-diff-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+/* A Tag among the actions, such as Accepted, is as tall as the small buttons beside it. */
+.x-govuk-ui-file-diff-actions > .x-govuk-ui-tag {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 5px;
+}
+.x-govuk-ui-file-diff-code {
+  min-width: max-content;
+  margin: 0;
+  padding: 6px 0;
+  font: 13px / 1.75 var(--x-govuk-ui-code-font);
+  tab-size: 2;
+}
+.x-govuk-ui-diff-line {
+  display: flex;
+  padding-right: 20px;
+}
+.x-govuk-ui-diff-line[data-kind="add"] {
+  background: var(--x-govuk-ui-diff-add);
+}
+.x-govuk-ui-diff-line[data-kind="remove"] {
+  background: var(--x-govuk-ui-diff-remove);
+}
+.x-govuk-ui-diff-line[data-revealed] {
+  animation: x-govuk-ui-diff-reveal var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-diff-reveal {
+  from {
+    opacity: 0;
+  }
+}
+/* Numbers and signs are left out of selections and copies. */
+.x-govuk-ui-diff-number {
+  flex: none;
+  box-sizing: content-box;
+  width: calc(var(--x-govuk-ui-code-digits, 2) * 1ch);
+  padding: 0 8px 0 10px;
+  color: var(--x-govuk-ui-muted);
+  text-align: right;
+  user-select: none;
+}
+.x-govuk-ui-diff-sign {
+  flex: none;
+  width: 2ch;
+  margin-right: 6px;
+  text-align: center;
+  user-select: none;
+}
+.x-govuk-ui-diff-line[data-kind="add"] .x-govuk-ui-diff-sign {
+  background: var(--x-govuk-ui-diff-add-strong);
+  color: var(--x-govuk-ui-success);
+}
+.x-govuk-ui-diff-line[data-kind="remove"] .x-govuk-ui-diff-sign {
+  background: var(--x-govuk-ui-diff-remove-strong);
+  color: var(--x-govuk-ui-error);
+}
+.x-govuk-ui-diff-code {
+  white-space: pre;
+}
+/* A folded run of unchanged lines, as one quiet row that opens them. */
+.x-govuk-ui-diff-fold {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 2px 0;
+  padding: 2px 14px;
+  border: 0;
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-muted);
+  font: 13px / 1.75 var(--x-govuk-ui-font);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    color var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-diff-fold:hover {
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+}
+/* The dark edge sits beneath the fold, over the line after it, so its words stay in the middle
+   of the yellow. */
+.x-govuk-ui-diff-fold:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 4px var(--x-govuk-ui-focus-text);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-diff-line[data-kind] .x-govuk-ui-diff-sign {
+    forced-color-adjust: none;
+    background: Canvas;
+    color: CanvasText;
+  }
+  .x-govuk-ui-diff-fold {
+    border: 1px solid ButtonText;
+  }
+}

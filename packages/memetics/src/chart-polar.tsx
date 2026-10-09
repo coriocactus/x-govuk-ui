@@ -2,7 +2,7 @@
 
 /**
  * Several measures of one thing, around a centre, as a radar or radial bars. Both are hard to read
- * exactly, so people read their figures in the table beneath.
+ * exactly, so users read their figures in the table beneath.
  * @internal
  */
 import {

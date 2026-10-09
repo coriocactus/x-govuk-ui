@@ -77,7 +77,7 @@ export type Placement = {
   /**
    * The example's column shrinks to its content, up to `width`, so something narrower, such as a
    * sentence or a row of avatars, sits in the middle. Only for content that keeps its width as
-   * people use it, since the column would follow it.
+   * users work with it, since the column would follow it.
    */
   fit?: boolean;
 };
@@ -283,7 +283,7 @@ const entries = {
     name: "File upload",
     width: 520,
     anchor: "top",
-    description: "Let people choose a file, or drop one onto the page.",
+    description: "Let users choose a file, or drop one onto the page.",
     upstream: "file-upload",
     dependencies: "React",
     changes:
@@ -303,11 +303,11 @@ const entries = {
     name: "Combobox",
     width: 460,
     anchor: "top",
-    description: "Let people choose from a long list by typing, such as a country.",
+    description: "Let users choose from a long list by typing, such as a country.",
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "GOV.UK's accessible autocomplete pattern, built on Base UI's Combobox with Input's field. Options narrow as people type, the part that matches is bold, and one highlight glides between them as the menus' does. Buttons in the field clear it and show every option. It submits the chosen value with a form.",
+      "GOV.UK's accessible autocomplete pattern, built on Base UI's Combobox with Input's field. Options narrow as users type, the part that matches is bold, and one highlight glides between them as the menus' does. Buttons in the field clear it and show every option. It submits the chosen value with a form.",
     props: [
       text("label", "Which country do you live in?", { type: "ReactNode", default: "Required" }),
       text("hint", "Start typing, then choose from the list.", { type: "ReactNode" }),
@@ -323,7 +323,7 @@ const entries = {
     name: "Multi-select",
     width: 460,
     anchor: "top",
-    description: "Let people choose several options from a long list by typing.",
+    description: "Let users choose several options from a long list by typing.",
     upstream: "",
     dependencies: "React · Base UI",
     changes:
@@ -342,7 +342,7 @@ const entries = {
   "search-box": {
     name: "Search box",
     width: 460,
-    description: "Let people search a site or a list, with the button attached to the field.",
+    description: "Let users search a site or a list, with the button attached to the field.",
     upstream: "",
     dependencies: "React",
     changes:
@@ -363,7 +363,7 @@ const entries = {
     name: "Textarea",
     width: 460,
     anchor: "top",
-    description: "Let people give a longer answer, such as a description of a problem.",
+    description: "Let users give a longer answer, such as a description of a problem.",
     upstream: "textarea",
     dependencies: "React",
     changes:
@@ -412,11 +412,11 @@ const entries = {
     width: 720,
     anchor: "top",
     description:
-      "Let people write formatted text, such as a note or a letter, with headings, lists, links and attachments.",
+      "Let users write formatted text, such as a note or a letter, with headings, lists, links and attachments.",
     upstream: "",
     dependencies: "React · Base UI · Lexical · Motion",
     changes:
-      "Textarea's field, built from the same Field parts, around a Lexical editor, after 37signals' Lexxy, with its defaults. The toolbar is Lexxy's, with images and files, bold, italic, strikethrough and underline, a formatting menu of normal text, the headings and Clear formatting, colour for the text and its background from GOV.UK's palette, a link, a quotation, code, bulleted and numbered lists, a table and a divider, with history at the end of the row. It is WAI-ARIA's toolbar, one Tab stop with the arrow keys moving between its controls. Each is a quiet icon Button, pressed where its formatting is on, with its name and shortcut in a Tooltip, and what has no space waits behind More. Markdown turns into formatting as it is typed, and pasted Markdown, links, Word's lists and other pages' HTML are made good. Code is a block, or inline around words on one line, coloured by its syntax with sugar-high as Code block colours code, with its language in a list at its corner. A table's tools come up over it, to add, remove and head rows and columns, and Enter and Backspace move through it as Lexxy's do. A link shows its address, which opens it in a new tab, with Edit and Unlink, under it while the pointer rests on it or the caret is in it, where Alt F10 reaches them. Each of these floating tools is a part EditorContent shows, which can be left out or joined by tools of a service's own, made with EditorTools. Given onUpload, images, video and files go in from the toolbar, a paste or a drop, drawn from the file with a progress bar while they are stored. Several images make a gallery, an image has a caption and a description, and an attachment can be dragged, or moved with Alt, Shift and the arrows, as screen readers hear. Typing with an attachment, a divider or a mention selected types after it. EditorPrompt opens a menu of suggestions on a trigger, such as `@` for mentions or `:` for emoji, filtered as people type, from a list or a service's search, and puts in a mention or text. EditorAI offers a model's suggestions for selected text, in a toolbar over it. The selection is kept while the suggestion is written, moving with the text, and the suggestion replaces the selection once approved. The model is sent the selection as plain text and as Markdown. A suggestion of text is fitted in word by word, so the words it keeps keep their formatting, links and colours, while one of Markdown comes in as written, shown formatted. A form around the editor waits while files upload. The Source control shows what the field submits in the document's place, in an editable Code block with the rest of the toolbar greyed, its HTML laid out one block on each line, and reads it back as the document. The field submits as HTML, or as Markdown, takes part in a Form by its name, and counts characters or words as the Textarea does. The box grows with the document, as Lexxy's does, the toolbar sticking to the top of the page, or with maxRows scrolls inside with the thin scrollbar. It can be plain text, or one line. Every word it says can be changed with labels.",
+      "Textarea's field, built from the same Field parts, around a Lexical editor, after 37signals' Lexxy, with its defaults. The toolbar is Lexxy's, with images and files, bold, italic, strikethrough and underline, a formatting menu of normal text, the headings and Clear formatting, colour for the text and its background from GOV.UK's palette, a link, a quotation, code, bulleted and numbered lists, a table and a divider, with history at the end of the row. It is WAI-ARIA's toolbar, one Tab stop with the arrow keys moving between its controls. Each is a quiet icon Button, pressed where its formatting is on, with its name and shortcut in a Tooltip, and what has no space waits behind More. Markdown turns into formatting as it is typed, and pasted Markdown, links, Word's lists and other pages' HTML are made good. Code is a block, or inline around words on one line, coloured by its syntax with sugar-high as Code block colours code, with its language in a list at its corner. A table's tools come up over it, to add, remove and head rows and columns, and Enter and Backspace move through it as Lexxy's do. A link shows its address, which opens it in a new tab, with Edit and Unlink, under it while the pointer rests on it or the caret is in it, where Alt F10 reaches them. Each of these floating tools is a part EditorContent shows, which can be left out or joined by tools of a service's own, made with EditorTools. Given onUpload, images, video and files go in from the toolbar, a paste or a drop, drawn from the file with a progress bar while they are stored. Several images make a gallery, an image has a caption and a description, and an attachment can be dragged, or moved with Alt, Shift and the arrows, as screen readers hear. Typing with an attachment, a divider or a mention selected types after it. EditorPrompt opens a menu of suggestions on a trigger, such as `@` for mentions or `:` for emoji, filtered as users type, from a list or a service's search, and puts in a mention or text. EditorAI offers a model's suggestions for selected text, in a toolbar over it. The selection is kept while the suggestion is written, moving with the text, and the suggestion replaces the selection once approved. The service connects its own model through onRequestEdit, which is sent the selection as plain text and as Markdown. The example makes its suggestions in the page, without a model. A suggestion of text is fitted in word by word, so the words it keeps keep their formatting, links and colours, while one of Markdown comes in as written, shown formatted. A form around the editor waits while files upload. The Source control shows what the field submits in the document's place, in an editable Code block with the rest of the toolbar greyed, its HTML laid out one block on each line, and reads it back as the document. The field submits as HTML, or as Markdown, takes part in a Form by its name, and counts characters or words as the Textarea does. The box grows with the document, as Lexxy's does, the toolbar sticking to the top of the page, or with maxRows scrolls inside with the thin scrollbar. It can be plain text, or one line. Every word it says can be changed with labels.",
     props: [
       text("label", "Notes for the caseworker", { type: "ReactNode", default: "Required" }),
       text(
@@ -460,7 +460,7 @@ const entries = {
       toggle("multiLine", true, {
         note: "Without it, the editor takes one line, and Enter does nothing.",
       }),
-      toggle("markdown", true, { note: "Markdown shortcuts as people type, and pasted Markdown." }),
+      toggle("markdown", true, { note: "Markdown shortcuts as users type, and pasted Markdown." }),
       toggle("checkLists", false, {
         restart: true,
         note: "Lists with boxes to tick. Add the Checklist control to see it. The example starts again.",
@@ -568,7 +568,7 @@ const entries = {
   select: {
     name: "Select",
     anchor: "top",
-    description: "Let people choose one option from a list that opens over the field.",
+    description: "Let users choose one option from a list that opens over the field.",
     upstream: "select",
     dependencies: "React · Base UI",
     changes:
@@ -596,7 +596,7 @@ const entries = {
     name: "Checkboxes",
     width: 460,
     anchor: "top",
-    description: "Let people choose any number of answers from a list.",
+    description: "Let users choose any number of answers from a list.",
     upstream: "checkboxes",
     dependencies: "React",
     changes:
@@ -645,7 +645,7 @@ const entries = {
     name: "Radios",
     width: 460,
     anchor: "top",
-    description: "Let people choose one answer from a short list.",
+    description: "Let users choose one answer from a short list.",
     upstream: "radios",
     dependencies: "React",
     changes:
@@ -1048,7 +1048,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "A card with an arrow, built on Base UI's Popover. It is brand blue with GOV.UK's inverse buttons in white, or plain, on the page's paper as Popover is. Given a trigger, such as the question mark beside a label, it is help that people ask for. Focus moves into it, and a press outside or Escape closes it. Given an anchor, an element, a ref or a selector, it is a notice that appears by itself with the notification sound, is read out without taking focus, and stays while people use the page, until they close it or its timeout passes, which stops while the pointer or focus is on it. The timeout works as Toast's does. 0, the default, keeps the notice until it is closed. The time stops while the notice is held and continues after, and a line along the foot shows the time left, which can be turned off. The × in the corner can be turned off too, as Popover's is. Whether a press outside closes it is yours to choose. It finds its own space. It measures the space on all four sides of what it points at, within the window and anything the anchor scrolls inside. Of the sides where it fits, it takes the one where it covers least, first of other open callouts, then of things people press, and then the one with the most space. It keeps that side while it still fits and covers nothing, and Base UI moves it to another if the page scrolls it out of space. Its width is --x-govuk-ui-callout-width.",
+      "A card with an arrow, built on Base UI's Popover. It is brand blue with GOV.UK's inverse buttons in white, or plain, on the page's paper as Popover is. Given a trigger, such as the question mark beside a label, it is help that users ask for. Focus moves into it, and a press outside or Escape closes it. Given an anchor, an element, a ref or a selector, it is a notice that appears by itself with the notification sound, is read out without taking focus, and stays while users work in the page, until they close it or its timeout passes, which stops while the pointer or focus is on it. The timeout works as Toast's does. 0, the default, keeps the notice until it is closed. The time stops while the notice is held and continues after, and a line along the foot shows the time left, which can be turned off. The × in the corner can be turned off too, as Popover's is. Whether a press outside closes it is yours to choose. It finds its own space. It measures the space on all four sides of what it points at, within the window and anything the anchor scrolls inside. Of the sides where it fits, it takes the one where it covers least, first of other open callouts, then of things users press, and then the one with the most space. It keeps that side while it still fits and covers nothing, and Base UI moves it to another if the page scrolls it out of space. Its width is --x-govuk-ui-callout-width.",
     props: [
       choice(
         "variant",
@@ -1106,7 +1106,7 @@ const entries = {
   tour: {
     name: "Tour",
     width: 560,
-    description: "Walk people through a page one step at a time, pointing at each part.",
+    description: "Walk users through a page one step at a time, pointing at each part.",
     upstream: "",
     dependencies: "React · Base UI",
     changes:
@@ -1340,7 +1340,7 @@ const entries = {
     width: "100%",
     anchor: "fill",
     description:
-      "Lay a service out in tiles that people arrange for themselves. They drag, split, resize, maximise and close them, as on a casework desk.",
+      "Lay a service out in tiles that users arrange for themselves. They drag, split, resize, maximise and close them, as on a casework desk.",
     upstream: "",
     dependencies: "React · Base UI · react-mosaic",
     changes:
@@ -1472,7 +1472,7 @@ const entries = {
     name: "Details",
     width: 460,
     anchor: "top",
-    description: "Offer help that most people do not need, behind a short link.",
+    description: "Offer help that most users do not need, behind a short link.",
     upstream: "details",
     dependencies: "React · Base UI",
     changes:
@@ -1562,8 +1562,7 @@ const entries = {
     name: "Accordion",
     width: 460,
     anchor: "top",
-    description:
-      "Let people reveal the detail they need, with panels that open and close smoothly.",
+    description: "Let users reveal the detail they need, with panels that open and close smoothly.",
     upstream: "accordion",
     dependencies: "React · Base UI",
     changes:
@@ -1606,7 +1605,7 @@ const entries = {
     upstream: "text-input",
     dependencies: "React · input-otp · Motion",
     changes:
-      "One input supports autofill, paste and keyboard selection. Digits animate into their slots, one ring glides with the caret, and even-length codes split into two groups. While the service checks the code, a wave passes along the digits. An accepted code hops and settles with a green edge. A wrong code is the application's to clear. Only the ring turns red, at the first slot, and it returns to black when the person types again.",
+      "One input supports autofill, paste and keyboard selection. Digits animate into their slots, one ring glides with the caret, and even-length codes split into two groups. While the service checks the code, a wave passes along the digits. An accepted code hops and settles with a green edge. A wrong code is the application's to clear. Only the ring turns red, at the first slot, and it returns to black when the user types again.",
     props: [
       text("label", "Security code", { type: "ReactNode", default: "Required" }),
       text("hint", "Enter the code we sent to your email address.", {
@@ -1761,11 +1760,11 @@ const entries = {
     name: "Bubble",
     width: 460,
     anchor: "top",
-    description: "Show a message in a bubble, on the side of the person who sent it.",
+    description: "Show a message in a bubble, on its sender's side.",
     upstream: "",
     dependencies: "React · Base UI · Motion",
     changes:
-      "shadcn's Bubble, in GOV.UK's colours. It is only the message's surface, and names, avatars and times belong around it. A bubble is as wide as its longest line, up to 80% of its row, measured by Pretext where CSS would leave a ragged gap beside its lines, and its corner nearest the sender is tighter, as a tail. Default is brand blue for the person's own messages, secondary is grey for the other side, muted is quieter, tinted is light blue, outline has an edge, ghost has no frame and takes the whole row, and destructive is red for a message that failed. With render, a bubble is a link or a button, which darkens under the pointer, dips when pressed and takes GOV.UK's focus colours. Holding a bubble opens a picker of reactions, as a phone's messages do. The bubble sinks a little while held, then springs back as the picker rises above it, each reaction popping in after the one before. A right-click opens it too, and keyboard users reach it by a button that shows once it has focus. Reactions overlap the bubble's edge, and the bubble makes space for them. Those added pop in with a single overshoot, and those removed shrink away as the others close up. Consecutive bubbles from one sender sit close in a BubbleGroup, the corners between them tightened. Conversation's bubbles are Bubbles. Hold any message in the example to react to it, and press the message that was not sent to send it again.",
+      "shadcn's Bubble, in GOV.UK's colours. It is only the message's surface, and names, avatars and times belong around it. A bubble is as wide as its longest line, up to 80% of its row, measured by Pretext where CSS would leave a ragged gap beside its lines, and its corner nearest the sender is tighter, as a tail. Default is brand blue for the user's own messages, secondary is grey for the other side, muted is quieter, tinted is light blue, outline has an edge, ghost has no frame and takes the whole row, and destructive is red for a message that failed. With render, a bubble is a link or a button, which darkens under the pointer, dips when pressed and takes GOV.UK's focus colours. Holding a bubble opens a picker of reactions, as a phone's messages do. The bubble sinks a little while held, then springs back as the picker rises above it, each reaction popping in after the one before. A right-click opens it too, and keyboard users reach it by a button that shows once it has focus. Reactions overlap the bubble's edge, and the bubble makes space for them. Those added pop in with a single overshoot, and those removed shrink away as the others close up. Consecutive bubbles from one sender sit close in a BubbleGroup, the corners between them tightened. Conversation's bubbles are Bubbles. Hold any message in the example to react to it, and press the message that was not sent to send it again.",
     props: [
       choice(
         "variant",
@@ -1779,7 +1778,7 @@ const entries = {
           ["destructive", "Destructive"],
         ],
         "default",
-        { default: "default", note: "The person's bubbles in the example." },
+        { default: "default", note: "The user's bubbles in the example." },
       ),
       reference("align", '"start" | "end"', "start"),
       reference("BubbleContent", "{ render, children }", "Part"),
@@ -1799,7 +1798,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Motion",
     changes:
-      "Built from parts, on a Message scroller. It is laid out like a chat app. The assistant writes as plain text in a centred column, and the person's messages sit in secondary Bubbles on the other side, with consecutive bubbles joined into one run. A bubble of several lines is as wide as its longest line, measured by Pretext, where CSS would leave a ragged gap beside its lines. Each message can have tools in a MessageActions row. Copy's icon turns to a tick once the text is copied, a thumb up and down fill and pop as one is chosen, and Try again's arrow turns once around as it asks for another reply. The latest message always shows its tools, so a message just sent shows them until the reply arrives, and other messages show theirs on hover. Before anything is said, the composer waits in the middle of the empty log, and glides down to the foot as the first message is sent. While the assistant writes, a shimmering status word changes every few seconds, such as Thinking or Working on a reply, or livelier words a service chooses, and screen readers hear one plain status instead. A reply that streams in as anything but plain text, such as Markdown into a Rich text, is a streaming message. Screen readers hear that it is being written, then all of it once it is done, as the example's Markdown setting shows. Each message grows out from its speaker's side. New messages are announced, and the log follows them only when the reader is near the bottom. Scrolled up, a button rises to go back to the newest message, with a dot once more has arrived. The example composes it with Chat input, Reasoning steps, Streaming text and Inline citation, and does not contact an AI service. A Callout above the composer suggests sending something, and disappears once the conversation starts.",
+      "Built from parts, on a Message scroller. It is laid out like a chat app. The assistant writes as plain text in a centred column, and the user's messages sit in secondary Bubbles on the other side, with consecutive bubbles joined into one run. A bubble of several lines is as wide as its longest line, measured by Pretext, where CSS would leave a ragged gap beside its lines. Each message can have tools in a MessageActions row. Copy's icon turns to a tick once the text is copied, a thumb up and down fill and pop as one is chosen, and Try again's arrow turns once around as it asks for another reply. The latest message always shows its tools, so a message just sent shows them until the reply arrives, and other messages show theirs on hover. Before anything is said, the composer waits in the middle of the empty log, and glides down to the foot as the first message is sent. While the assistant writes, a shimmering status word changes every few seconds, such as Thinking or Working on a reply, or livelier words a service chooses, and screen readers hear one plain status instead. A reply that streams in as anything but plain text, such as Markdown into a Rich text, is a streaming message. Screen readers hear that it is being written, then all of it once it is done, as the example's Markdown setting shows. Each message grows out from its speaker's side. New messages are announced, and the log follows them only when the reader is near the bottom. Scrolled up, a button rises to go back to the newest message, with a dot once more has arrived. The example composes it with Chat input, Reasoning steps, Streaming text and Inline citation, and does not contact an AI service. A Callout above the composer suggests sending something, and disappears once the conversation starts.",
     props: [
       text("label", "Conversation", {
         default: "Conversation",
@@ -2454,11 +2453,11 @@ const entries = {
   "summary-list": {
     name: "Summary list",
     width: 680,
-    description: "Show pairs of keys and values, such as answers people can check and change.",
+    description: "Show pairs of keys and values, such as answers users can check and change.",
     upstream: "summary-list",
     dependencies: "React",
     changes:
-      "GOV.UK's summary list and summary card, built from parts. Keys, values and actions line up in columns across every row, rows without actions included, and stack when the list is narrow. An action is a link, or a button that can open a Dialog to edit the answer in place. When a value changes, it glows for a moment in a tint of brand blue, so people see what they changed. A summary card puts the list under a tinted title band with actions for the whole card.",
+      "GOV.UK's summary list and summary card, built from parts. Keys, values and actions line up in columns across every row, rows without actions included, and stack when the list is narrow. An action is a link, or a button that can open a Dialog to edit the answer in place. When a value changes, it glows for a moment in a tint of brand blue, so users see what they changed. A summary card puts the list under a tinted title band with actions for the whole card.",
     props: [
       toggle("noBorder"),
       reference("SummaryListRow", "{ label, children, actions }", "Part"),
@@ -2470,7 +2469,7 @@ const entries = {
   "task-list": {
     name: "Task list",
     width: 680,
-    description: "Show the tasks people need to complete, or the ones an agent is working through.",
+    description: "Show the tasks users need to complete, or the ones an agent is working through.",
     upstream: "task-list",
     dependencies: "React",
     changes:
@@ -2497,7 +2496,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI · Motion",
     changes:
-      "shadcn's Message scroller, with Conversation's scrolling, in a framed box. At the end of the log it follows new messages and streamed text in the same frame they arrive, so nothing jumps. Scrolled away, it stays put, and a button rises to go back, with a dot once more arrives. A new turn, such as the person's question, glides to near the top with the end of the turn before peeking above it, and its reply streams into the space left below, so the log stays still until the reply fills the box, then follows again. Rows loaded above keep the reader's row where it was. It opens at the newest message, or at the start, or at the last turn from its start with the reply below. From outside, it can go to a message by its id, which glows in the focus colour for a moment. Screen readers hear new messages in a log, and with busy they wait for a streaming reply to finish. Conversation is a Message scroller laid out as a chat. The example is a service's help chat docked at the foot of a page in the middle, as a documentation site's assistant is. It starts folded, with a one-row Chat input and a Callout suggesting a question. The conversation opens up out of the message box and folds back down into it, keeping its place, and sending from the folded chat opens it. The log is unframed inside it. Its messages are Bubbles, its replies Streaming text and its composer a Chat input, which floats over the foot of the log. Suggested questions follow the office's latest reply, on its side, and a pinned question under the header goes to it among the earlier messages. The office's replies have tools beneath them, which are Copy, a thumb up and down, and Try again, which writes the answer out again. On an earlier message, Try again stays in its place but refuses a press, with the refusing sound and a shake.",
+      "shadcn's Message scroller, with Conversation's scrolling, in a framed box. At the end of the log it follows new messages and streamed text in the same frame they arrive, so nothing jumps. Scrolled away, it stays put, and a button rises to go back, with a dot once more arrives. A new turn, such as the user's question, glides to near the top with the end of the turn before peeking above it, and its reply streams into the space left below, so the log stays still until the reply fills the box, then follows again. Rows loaded above keep the reader's row where it was. It opens at the newest message, or at the start, or at the last turn from its start with the reply below. From outside, it can go to a message by its id, which glows in the focus colour for a moment. Screen readers hear new messages in a log, and with busy they wait for a streaming reply to finish. Conversation is a Message scroller laid out as a chat. The example is a service's help chat docked at the foot of a page in the middle, as a documentation site's assistant is. It starts folded, with a one-row Chat input and a Callout suggesting a question. The conversation opens up out of the message box and folds back down into it, keeping its place, and sending from the folded chat opens it. The log is unframed inside it. Its messages are Bubbles, its replies Streaming text and its composer a Chat input, which floats over the foot of the log. Suggested questions follow the office's latest reply, on its side, and a pinned question under the header goes to it among the earlier messages. The office's replies have tools beneath them, which are Copy, a thumb up and down, and Try again, which writes the answer out again. On an earlier message, Try again stays in its place but refuses a press, with the refusing sound and a shake.",
     props: [
       toggle("autoScroll", true, {
         default: "true",
@@ -2546,7 +2545,7 @@ const entries = {
     name: "Plan card",
     width: 480,
     anchor: "top",
-    description: "Ask people to approve a plan before an agent runs it.",
+    description: "Ask users to approve a plan before an agent runs it.",
     upstream: "",
     dependencies: "React",
     changes:
@@ -2655,7 +2654,7 @@ const entries = {
   "qr-code": {
     name: "QR code",
     width: 460,
-    description: "Give people a code their phone can scan, such as for a web address.",
+    description: "Give users a code their phone can scan, such as for a web address.",
     upstream: "",
     dependencies: "React · uqr",
     changes:
@@ -2698,7 +2697,7 @@ const entries = {
     fit: true,
     name: "Link",
     width: 560,
-    description: "Take people to another page, in GOV.UK's link style.",
+    description: "Take users to another page, in GOV.UK's link style.",
     upstream: "",
     dependencies: "React · Base UI",
     changes:
@@ -2728,7 +2727,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Web Audio",
     changes:
-      "Not in GOV.UK. Every sound is made as it plays, with the Web Audio API, from a tone or a burst of noise or two, each shaped by an envelope and sometimes a filter, so the library ships no audio files, and each play is detuned a little at random, so a repeat never sounds mechanical. The cues come in six families, which are presses, toggles, surfaces, values, outcomes and small moments. SoundScope plays the one for each interaction inside it, from what was pressed. A toggle rises turning on and falls turning off, a warning button sounds weightier, a row sounds a step higher down its list, and outcomes that arrive by themselves, such as an error or a toast, play theirs too. data-sound names a cue for a part of the page, or turns sound off there, and data-sound-enter names one for content that arrives. Nothing plays until the person has used the page, as browsers ask. The example is every cue on a card, with a drawing of what plays it beside a drawing of the sound itself. The sound's pitch runs from left to right, as thick as it is loud, on one scale for every cue. The cards run in their families, which only their colour tells apart. A press plays the cue, the icon acts out what plays it, and the drawing lights at the sound's own pace. A card that steps, such as a row in a list, moves on a step each press, and a drag across the cards plays each in turn. The board has a SoundScope of its own, whose play sets every cue at the playground's volume, pitch and softness, and each card plays through it with useScopeSound. The workbench's mute silences it.",
+      "Not in GOV.UK. Every sound is made as it plays, with the Web Audio API, from a tone or a burst of noise or two, each shaped by an envelope and sometimes a filter, so the library ships no audio files, and each play is detuned a little at random, so a repeat never sounds mechanical. The cues come in six families, which are presses, toggles, surfaces, values, outcomes and small moments. SoundScope plays the one for each interaction inside it, from what was pressed. A toggle rises turning on and falls turning off, a warning button sounds weightier, a row sounds a step higher down its list, and outcomes that arrive by themselves, such as an error or a toast, play theirs too. data-sound names a cue for a part of the page, or turns sound off there, and data-sound-enter names one for content that arrives. Nothing plays until the user has used the page, as browsers ask. The example is every cue on a card, with a drawing of what plays it beside a drawing of the sound itself. The sound's pitch runs from left to right, as thick as it is loud, on one scale for every cue. The cards run in their families, which only their colour tells apart. A press plays the cue, the icon acts out what plays it, and the drawing lights at the sound's own pace. A card that steps, such as a row in a list, moves on a step each press, and a drag across the cards plays each in turn. The board has a SoundScope of its own, whose play sets every cue at the playground's volume, pitch and softness, and each card plays through it with useScopeSound. The workbench's mute silences it.",
     props: [
       range("volume", 0.5, 0, 1, 0.05),
       range("detune", 0, -1200, 1200, 100),
@@ -2745,11 +2744,11 @@ const entries = {
   "theme-picker": {
     name: "Theme picker",
     width: 460,
-    description: "Let people switch between a light and a dark theme.",
+    description: "Let users switch between a light and a dark theme.",
     upstream: "",
     dependencies: "React",
     changes:
-      "Not in GOV.UK. It starts light, as GOV.UK is, until people switch. In the example, it sets the theme of the card beneath it, so the workbench keeps its own. In a dark workbench, the card can be light, and in a light one, dark. The workbench's own toolbar uses one.",
+      "Not in GOV.UK. It starts light, as GOV.UK is, until users switch. In the example, it sets the theme of the card beneath it, so the workbench keeps its own. In a dark workbench, the card can be light, and in a light one, dark. The workbench's own toolbar uses one.",
     props: [
       reference("value / defaultValue / onValueChange", '"light" | "dark"', "light"),
       reference("storageKey", "string", "None"),
@@ -2902,7 +2901,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "As GOV.UK lists its attachments, with a thumbnail of the document with its format, the title as a link, and its format, size and pages. A file that may not suit assistive technology says so, with a Details that explains how to ask for an accessible format. The format on the thumbnail takes the colour people know it by, red for PDF and green for a spreadsheet. The thumbnail lifts as the pointer reaches the title.",
+      "As GOV.UK lists its attachments, with a thumbnail of the document with its format, the title as a link, and its format, size and pages. A file that may not suit assistive technology says so, with a Details that explains how to ask for an accessible format. The format on the thumbnail takes the colour users know it by, red for PDF and green for a spreadsheet. The thumbnail lifts as the pointer reaches the title.",
     props: [
       reference("title / href", "ReactNode / string", "Required"),
       reference("format / size / pages", "string / string / number"),
@@ -2919,11 +2918,11 @@ const entries = {
     name: "Cookie banner",
     width: 680,
     anchor: "top",
-    description: "Ask people whether they accept analytics cookies.",
+    description: "Ask users whether they accept analytics cookies.",
     upstream: "cookie-banner",
     dependencies: "React · Motion",
     changes:
-      "GOV.UK's cookie banner, with its question and buttons. Once people choose, the question gives way at once to a message saying what they chose, as the banner eases to its new height, which takes focus so screen readers hear it, with an outline button to hide it. Hiding it folds the banner away.",
+      "GOV.UK's cookie banner, with its question and buttons. Once users choose, the question gives way at once to a message saying what they chose, as the banner eases to its new height, which takes focus so screen readers hear it, with an outline button to hide it. Hiding it folds the banner away.",
     props: [
       text("serviceName", "Apply for a licence", { type: "ReactNode", default: "GOV.UK" }),
       reference("cookiesHref", "string", "/help/cookies"),
@@ -2936,11 +2935,11 @@ const entries = {
     // The foot of a page, with the band in the page's column, above the footer.
     width: "100%",
     anchor: "foot",
-    description: "Ask people at the foot of a page whether it was useful.",
+    description: "Ask users at the foot of a page whether it was useful.",
     upstream: "",
     dependencies: "React · Motion",
     changes:
-      "GOV.UK's “Is this page useful?” band, with outline Yes and No buttons and one to report a problem, which stand out on its tint. It shows one stage at a time, as GOV.UK's does. Once people answer, the question gives way. Yes turns to thanks. No and the report button turn to a short Form built from Textarea, whose Cancel brings the question back with focus on the button that opened it, and what was typed is kept. Sending turns to thanks, which takes focus so screen readers hear it. The band eases to each stage's height with the AutoHeight that FormSteps' card uses, and its words never fade or move. The example is the foot of a service's page, with the band at the end of the page's content, then the Footer.",
+      "GOV.UK's “Is this page useful?” band, with outline Yes and No buttons and one to report a problem, which stand out on its tint. It shows one stage at a time, as GOV.UK's does. Once users answer, the question gives way. Yes turns to thanks. No and the report button turn to a short Form built from Textarea, whose Cancel brings the question back with focus on the button that opened it, and what was typed is kept. Sending turns to thanks, which takes focus so screen readers hear it. The band eases to each stage's height with the AutoHeight that FormSteps' card uses, and its words never fade or move. The example is the foot of a service's page, with the band at the end of the page's content, then the Footer.",
     props: [
       text("question", "Is this page useful?", { default: "Is this page useful?" }),
       reference("onAnswer", "(useful: boolean) => void"),
@@ -2950,7 +2949,7 @@ const entries = {
   "filter-chips": {
     name: "Filter chips",
     width: 680,
-    description: "Let people narrow a list by turning filters on and off.",
+    description: "Let users narrow a list by turning filters on and off.",
     upstream: "",
     dependencies: "React · Base UI",
     changes:
@@ -2982,7 +2981,7 @@ const entries = {
   "chat-input": {
     name: "Chat input",
     width: 560,
-    description: "Let people write to an assistant, and stop its reply.",
+    description: "Let users write to an assistant, and stop its reply.",
     upstream: "",
     dependencies: "React",
     changes:
@@ -3131,7 +3130,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "A small grey pill after the claim with the site's mark and name, which turns brand blue under the pointer. GOV.UK pages get the crown, and other sites their initial, by its address, unless crown says otherwise. Several sources stack in one pill, as GOV.UK +2. Resting on it, or pressing it, opens a card with each source's site, title, summary and date, and arrows step through a stack, each source sliding in from its side. The card is a Base UI Popover, so it opens from the keyboard too, focus moves into it, and each title is a link. Copying a message leaves the pills out. A source with no address, such as a passage from a document the person uploaded, names where it is instead of a site, and its title is not a link. Its detail says where in the source the claim comes from, such as its pages, and a source's render takes a router's link for its title.",
+      "A small grey pill after the claim with the site's mark and name, which turns brand blue under the pointer. GOV.UK pages get the crown, and other sites their initial, by its address, unless crown says otherwise. Several sources stack in one pill, as GOV.UK +2. Resting on it, or pressing it, opens a card with each source's site, title, summary and date, and arrows step through a stack, each source sliding in from its side. The card is a Base UI Popover, so it opens from the keyboard too, focus moves into it, and each title is a link. Copying a message leaves the pills out. A source with no address, such as a passage from a document the user uploaded, names where it is instead of a site, and its title is not a link. Its detail says where in the source the claim comes from, such as its pages, and a source's render takes a router's link for its title.",
     props: [
       reference(
         "sources",
@@ -3142,7 +3141,7 @@ const entries = {
     example: [
       toggle("stacked", true, { note: "Stacks three sources behind the second claim." }),
       toggle("document", false, {
-        note: "Cites a passage from a document the person uploaded, which has no address, by its pages.",
+        note: "Cites a passage from a document the user uploaded, which has no address, by its pages.",
       }),
     ],
   },
@@ -3150,7 +3149,7 @@ const entries = {
   header: {
     name: "Header",
     width: 860,
-    description: "Show people they are on GOV.UK, with the logo linking to its homepage.",
+    description: "Show users they are on GOV.UK, with the logo linking to its homepage.",
     upstream: "header",
     dependencies: "React",
     changes:
@@ -3270,7 +3269,7 @@ const entries = {
   "phase-banner": {
     name: "Phase banner",
     width: 860,
-    description: "Tell people the service is new and ask for their feedback.",
+    description: "Tell users the service is new and ask for their feedback.",
     upstream: "phase-banner",
     dependencies: "React",
     changes: "GOV.UK's phase banner, with the phase as the library's Tag.",
@@ -3315,7 +3314,7 @@ const entries = {
   },
   "back-link": {
     name: "Back link",
-    description: "Take people back one page in a journey.",
+    description: "Take users back one page in a journey.",
     upstream: "back-link",
     dependencies: "React",
     changes:
@@ -3364,7 +3363,7 @@ const entries = {
   "language-navigation": {
     name: "Language navigation",
     width: 560,
-    description: "Let people switch the service's language, such as to Welsh.",
+    description: "Let users switch the service's language, such as to Welsh.",
     upstream: "language-navigation",
     dependencies: "React",
     changes:
@@ -3381,7 +3380,7 @@ const entries = {
   "exit-this-page": {
     name: "Exit this page",
     width: 560,
-    description: "Let people leave a sensitive service at once, for an ordinary site.",
+    description: "Let users leave a sensitive service at once, for an ordinary site.",
     upstream: "exit-this-page",
     dependencies: "React",
     changes:
@@ -3404,7 +3403,7 @@ const entries = {
     name: "Notification banner",
     width: 540,
     anchor: "top",
-    description: "Tell people about something important, or confirm that what they did worked.",
+    description: "Tell users about something important, or confirm that what they did worked.",
     upstream: "notification-banner",
     dependencies: "React",
     changes:
@@ -3432,7 +3431,7 @@ const entries = {
     fit: true,
     name: "Warning text",
     width: 540,
-    description: "Warn people about something they must know, such as a penalty.",
+    description: "Warn users about something they must know, such as a penalty.",
     upstream: "warning-text",
     dependencies: "React",
     changes:
@@ -3627,7 +3626,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI · Motion",
     changes:
-      "Collapses to icons, off the screen or not at all, on either side. The edge drags to resize, and the rows scroll in a Scroll area. Groups and items with sub-items can fold. One highlight glides to the row under the pointer, on the same curve as the current item's line, which glides when it changes. On small screens, the sidebar opens as a sheet that a swipe closes. It can remember whether it was open, and its width. Command-B or Control-B toggles it. People can arrange it for themselves. useSidebarArrangement keeps which items are pinned to the top, hidden and in what order. SidebarItemMenu gives each item a menu from three dots at the end of its row to pin, move or hide it. SidebarCustomise is a sheet of lists to show, pin and move every item and group, with Reset. An item's action, such as that menu or a SidebarItemAction, shows while the row is under the pointer or the action has keyboard focus, and rides the highlight from row to row. The workbench's own sidebar is arranged this way.",
+      "Collapses to icons, off the screen or not at all, on either side. The edge drags to resize, and the rows scroll in a Scroll area. Groups and items with sub-items can fold. One highlight glides to the row under the pointer, on the same curve as the current item's line, which glides when it changes. On small screens, the sidebar opens as a sheet that a swipe closes. It can remember whether it was open, and its width. Command-B or Control-B toggles it. Users can arrange it for themselves. useSidebarArrangement keeps which items are pinned to the top, hidden and in what order. SidebarItemMenu gives each item a menu from three dots at the end of its row to pin, move or hide it. SidebarCustomise is a sheet of lists to show, pin and move every item and group, with Reset. An item's action, such as that menu or a SidebarItemAction, shows while the row is under the pointer or the action has keyboard focus, and rides the highlight from row to row. The workbench's own sidebar is arranged this way.",
     props: [
       reference(
         "SidebarItem action",

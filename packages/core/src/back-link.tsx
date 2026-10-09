@@ -11,7 +11,7 @@ export type BackLinkProps = ComponentPropsWithRef<"a"> & {
 };
 
 /**
- * Takes people back one page, at the top of a page in a journey. Its arrow leans back a little
+ * Takes users back one page, at the top of a page in a journey. Its arrow leans back a little
  * under the pointer.
  */
 export function BackLink({

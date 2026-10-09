@@ -85,7 +85,7 @@ export type TourProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
    */
   closeOnPressOutside?: boolean;
   /**
-   * Shows a × button in the corner, as Popover's `closeButton` does. Without it, people close the
+   * Shows a × button in the corner, as Popover's `closeButton` does. Without it, users close the
    * tour with Escape, by finishing it, or by a press outside if you allow that.
    */
   closeButton?: boolean;
@@ -359,7 +359,7 @@ export function Tour({
       <Primitive.Root
         open={open && target !== null}
         onOpenChange={(opening, details) => {
-          // The tour stays while people use the page, unless it closes on a press outside.
+          // The tour stays while users work in the page, unless it closes on a press outside.
           if (opening) return;
           const pressed =
             details.reason === "outside-press" ||

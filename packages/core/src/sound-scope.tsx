@@ -168,7 +168,7 @@ export function SoundScope({ children, play }: SoundScopeProps) {
         onInputCapture={(event) => {
           const target = event.target;
           // Libraries such as input-otp dispatch synthetic input events to sync their state.
-          // Only a person's input that changes the value should make a sound.
+          // Only a user's input that changes the value should make a sound.
           if (!(target instanceof HTMLInputElement) || !event.nativeEvent.isTrusted) return;
           const previous = values.current.get(target) ?? target.defaultValue;
           values.current.set(target, target.value);

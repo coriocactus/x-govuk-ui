@@ -365,7 +365,7 @@ const within = ([from, to]: readonly [number, number], count: number): [number, 
  * short rule and a headline sit over a line that says what is measured. It has a key in squares,
  * only horizontal gridlines, the figures on the right, and the source at the foot.
  *
- * The colours are the Government Analysis Function's, which people with colour blindness can tell
+ * The colours are the Government Analysis Function's, which users with colour blindness can tell
  * apart. The chart follows its guidance. Bars can run across and rank, a stack can show shares, a
  * line can mark a target, a band can show uncertainty, and the series can be named on the plot
  * itself.

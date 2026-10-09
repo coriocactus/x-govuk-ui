@@ -7,7 +7,7 @@ export type WarningTextProps = ComponentPropsWithRef<"div"> & {
 
 /**
  * GOV.UK's warning text, which is bold text beside an exclamation mark in a circle, for something
- * people must know, such as a penalty.
+ * users must know, such as a penalty.
  */
 export function WarningText({
   iconFallbackText = "Warning",

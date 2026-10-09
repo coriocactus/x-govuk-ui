@@ -2,7 +2,7 @@ import { type CitationSource, InlineCitation } from "x-govuk-ui";
 
 type Props = {
   stacked?: boolean;
-  /** Cites a passage from a document the person uploaded, which has no address of its own. */
+  /** Cites a passage from a document the user uploaded, which has no address of its own. */
   document?: boolean;
 };
 
@@ -39,7 +39,7 @@ const photos: CitationSource[] = [
   },
 ];
 
-// A document the person uploaded has no address, so it names where it is, and which pages.
+// A document the user uploaded has no address, so it names where it is, and which pages.
 const letter: CitationSource = {
   title: "Your passport renewal letter",
   site: "Your documents",

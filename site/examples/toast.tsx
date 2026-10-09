@@ -41,7 +41,7 @@ function Triggers({ persistent }: { persistent: boolean }) {
           timeout: persistent ? 0 : 6000,
           actionProps: {
             children: "Undo",
-            // The same toast changes in place, so the person sees their undo take effect.
+            // The same toast changes in place, so the user sees their undo take effect.
             onClick: () =>
               toasts.update(id, {
                 title: "Draft restored",

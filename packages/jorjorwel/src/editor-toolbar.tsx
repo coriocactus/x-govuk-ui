@@ -197,7 +197,7 @@ const shown = (shortcut: string | undefined) => shortcut?.replace("Mod", modifie
 
 /**
  * Runs a control's command. A press keeps the caret in the document. A key keeps focus on the
- * toolbar, so people can continue through it, without the document taking the selection back.
+ * toolbar, so users can continue through it, without the document taking the selection back.
  */
 function runControl(context: EditorShared, run: () => void, event: MouseEvent) {
   const byKey = event.detail === 0;
@@ -802,7 +802,7 @@ function ColourControl({ label, blocked, className, ...props }: ChoiceControlPro
   );
 }
 
-/** An address as people type one. A domain alone is taken as a web page's address. */
+/** An address as users type one. A domain alone is taken as a web page's address. */
 function normaliseAddress(text: string) {
   const address = text.trim();
   if (!address) return null;

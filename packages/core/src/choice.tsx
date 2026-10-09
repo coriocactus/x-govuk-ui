@@ -216,7 +216,7 @@ export type CheckboxesProps = GroupProps & {
   onValueChange?: (value: string[]) => void;
 };
 
-/** Lets people choose any number of answers. Compose it from `Checkbox` items. */
+/** Lets users choose any number of answers. Compose it from `Checkbox` items. */
 export function Checkboxes({
   name,
   value: controlled,
@@ -268,7 +268,7 @@ export type RadiosProps = GroupProps & {
 
 const noExclusive = () => () => {};
 
-/** Lets people choose one answer. Compose it from `Radio` items. */
+/** Lets users choose one answer. Compose it from `Radio` items. */
 export function Radios({
   name,
   value: controlled,

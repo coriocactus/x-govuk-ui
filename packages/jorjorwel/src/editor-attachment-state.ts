@@ -58,7 +58,7 @@ export function attachmentKind({
   return "file";
 }
 
-/** An attachment's file size, as people read one. */
+/** An attachment's file size, as users read one. */
 export function humanSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   const units = ["KB", "MB", "GB", "TB"];

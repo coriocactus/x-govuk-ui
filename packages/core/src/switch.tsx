@@ -8,7 +8,7 @@ export type SwitchProps = Omit<ComponentPropsWithRef<"input">, "type" | "role" |
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
-  /** Called with the new state when the person turns it on or off. */
+  /** Called with the new state when the user turns it on or off. */
   onCheckedChange?: (checked: boolean) => void;
   /** `small` suits a dense list, such as a row of settings beside other controls. */
   size?: "medium" | "small";

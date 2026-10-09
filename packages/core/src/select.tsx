@@ -94,7 +94,7 @@ function centreChosen(viewport: HTMLDivElement | null) {
 }
 
 /**
- * Lets people choose one option from a list. Base UI provides the behaviour, including keyboard
+ * Lets users choose one option from a list. Base UI provides the behaviour, including keyboard
  * movement and type-ahead. A short list opens with the chosen option over the field, as a native
  * select does on a Mac. A long list, such as of years, opens beneath the field instead, at most 320
  * pixels tall, with the chosen option in the middle. It scrolls in a Scroll area, as Combobox's

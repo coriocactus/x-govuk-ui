@@ -40,7 +40,7 @@ export function resolveAnchor(anchor: CalloutAnchor | undefined): Element | null
 const GAP = 12;
 const EDGE = 8;
 // The order in which to try the sides when several have the same room. Below and above come first,
-// because people read them first.
+// because users read them first.
 const SIDES: readonly Side[] = ["bottom", "top", "right", "left"];
 
 /** The cards of callouts that are open, which a callout choosing its side keeps clear of. */
@@ -67,7 +67,7 @@ function boundaryOf(anchor: Element): Box {
   return box;
 }
 
-/** Things people press, which a card would rather not cover. */
+/** Things users press, which a card would rather not cover. */
 const CONTROLS =
   'a[href], button, input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])';
 
@@ -88,7 +88,7 @@ function controlsIn(boundary: Box, anchor: Element, card: HTMLElement | null) {
  * The side of its anchor where a card finds the best space, measured on all four sides within the
  * anchor's boundary. A side counts only if the whole card fits there. Among those sides, the card
  * prefers the one that covers the fewest other open callouts. Next, it prefers the one that covers
- * the fewest things people press, such as the question it explains or the buttons beside it. After
+ * the fewest things users press, such as the question it explains or the buttons beside it. After
  * that, it prefers the side with the most room.
  *
  * A card keeps its current side while it still fits there and covers nothing, so it does not hop
@@ -223,7 +223,7 @@ export type CalloutProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
   anchor?: CalloutAnchor;
   /**
    * A button that opens and closes it, such as a CalloutTrigger beside a question, for help that
-   * people ask for.
+   * users ask for.
    */
   trigger?: ReactElement;
   open?: boolean;
@@ -239,7 +239,7 @@ export type CalloutProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
   side?: CalloutSide;
   align?: "start" | "center" | "end";
   /**
-   * Closes it when someone presses outside it. By default, help that people asked for closes, and
+   * Closes it when someone presses outside it. By default, help that users asked for closes, and
    * a notice stays while they use the page.
    */
   closeOnPressOutside?: boolean;
@@ -256,7 +256,7 @@ export type CalloutProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
    */
   countdown?: boolean;
   /**
-   * Shows a × button in the corner, as Popover's `closeButton` does. Without it, give people
+   * Shows a × button in the corner, as Popover's `closeButton` does. Without it, give users
    * another way to close it, such as an action, a timeout or a press outside.
    */
   closeButton?: boolean;
@@ -268,11 +268,11 @@ export type CalloutProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
  * A card with an arrow that points at something on the page, for help, a notice or a step in a
  * Tour. It is brand blue unless you choose plain.
  *
- * Given a `trigger`, it is help that people ask for. The button opens it, focus moves into it, and
+ * Given a `trigger`, it is help that users ask for. The button opens it, focus moves into it, and
  * a press outside or Escape closes it.
  *
  * Given an `anchor`, it is a notice that appears by itself, with the notification sound. Screen
- * readers read it out without it taking focus. It stays while people use the page, until they
+ * readers read it out without it taking focus. It stays while users work in the page, until they
  * close it or its `timeout` passes.
  *
  * Unless told otherwise, it takes the side where it finds the best space. It keeps clear of other
@@ -411,7 +411,7 @@ export function Callout({
     <Primitive.Root
       open={open}
       onOpenChange={(next, details) => {
-        // A notice stays while people use the page around it, unless told otherwise.
+        // A notice stays while users work in the page around it, unless told otherwise.
         const outside = details.reason === "outside-press" || details.reason === "focus-out";
         if (!next && outside && !(closeOnPressOutside ?? asked)) return;
         sound(next, details.reason);

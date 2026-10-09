@@ -44,7 +44,7 @@ export type AccordionProps = Omit<
 };
 
 /**
- * Sections that people open to read. Compose it from `AccordionItem`, `AccordionTrigger` and
+ * Sections that users open to read. Compose it from `AccordionItem`, `AccordionTrigger` and
  * `AccordionPanel`, and add `AccordionShowAll` above the sections for GOV.UK's "Show all sections".
  */
 export function Accordion({

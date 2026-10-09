@@ -24,7 +24,7 @@ test("a page's skip link comes first and goes to the main content, which lines u
 
 test("the cookie banner confirms and hides", async ({ frame, open }) => {
   await open("cookie-banner");
-  // The example offers the banner again only once people have chosen.
+  // The example offers the banner again only once users have chosen.
   await expect(frame.getByRole("button", { name: "Show the banner again" })).toHaveCount(0);
   await frame.getByRole("button", { name: "Reject analytics cookies" }).click();
   const confirmation = frame.getByRole("alert");

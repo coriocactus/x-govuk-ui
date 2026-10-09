@@ -75,7 +75,7 @@ export type Question = {
   options?: readonly QuestionOption[];
   /** For a choice, adds a last answer that takes any words, with these words as its placeholder. */
   other?: string;
-  /** For a choice, lets people choose more than one answer. */
+  /** For a choice, lets users choose more than one answer. */
   multiple?: boolean;
   /** Removes Skip, so the question must be answered. */
   required?: boolean;

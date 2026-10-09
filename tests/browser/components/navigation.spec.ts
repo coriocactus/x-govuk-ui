@@ -51,7 +51,7 @@ test("sidebar sub-items fold, and icons open the sidebar and the submenu togethe
   const applications = frame.getByRole("button", { name: "Applications" });
   await expect(applications).toHaveAttribute("aria-expanded", "false");
   await applications.click();
-  // The submenu opens before a sub-item is pressed, as a person waits for it to.
+  // The submenu opens before a sub-item is pressed, as a user waits for it to.
   await expect(applications).toHaveAttribute("aria-expanded", "true");
   await frame.getByRole("button", { name: "Submitted" }).click();
   await expect(frame.getByRole("button", { name: "Submitted" })).toHaveAttribute(

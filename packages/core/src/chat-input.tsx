@@ -91,7 +91,7 @@ export type ChatInputProps = Omit<
 };
 
 /**
- * What in the box handles its own presses. That is a control, or a file chip's name, which people
+ * What in the box handles its own presses. That is a control, or a file chip's name, which users
  * select and copy. A press anywhere else focuses the message.
  */
 const PRESSABLE =
@@ -119,7 +119,7 @@ const stopIcon = (
 );
 
 /**
- * Where people write to an assistant. It grows with the message, up to `maxRows` lines. Enter
+ * Where users write to an assistant. It grows with the message, up to `maxRows` lines. Enter
  * sends, and Shift with Enter starts a new line. While the assistant replies, Send becomes Stop.
  * Send is the library's outline icon Button.
  *

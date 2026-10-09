@@ -28,10 +28,10 @@ import {
   type LexicalEditor,
 } from "lexical";
 
-// Tables as people write in them, after Lexxy's, and the commands their tools run.
+// Tables as users write in them, after Lexxy's, and the commands their tools run.
 
 /**
- * How a table behaves as people write in it. Its cells take the theme's colours, whatever was
+ * How a table behaves as users write in it. Its cells take the theme's colours, whatever was
  * pasted, and a column of headers is marked as one. Enter goes down a column. From the last row, it
  * makes a new row, or leaves the table from an empty row. Backspace in an empty cell goes to the
  * cell before. In the first cell of an empty row, it removes the row.

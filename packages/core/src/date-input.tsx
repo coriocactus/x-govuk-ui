@@ -67,8 +67,8 @@ const calendarIcon = (
 );
 
 /**
- * GOV.UK's date input. Day, Month and Year are three short numeric fields in a fieldset, so people
- * type a date they know, such as their date of birth, without a picker. For a date people need to
+ * GOV.UK's date input. Day, Month and Year are three short numeric fields in a fieldset, so users
+ * type a date they know, such as their date of birth, without a picker. For a date users need to
  * find, such as an appointment, a calendar button opens a Calendar beside the fields. Choosing a
  * day fills the fields in. Each field is also a Dial. Drag it up or down, scroll over it, or press
  * the arrow keys, and it turns a step at a time from today's date.

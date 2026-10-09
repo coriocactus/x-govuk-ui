@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, CookieBanner } from "x-govuk-ui";
 
 export default function CookieBannerExample({ serviceName = "Apply for a licence" }) {
-  // Once people have chosen, each round shows the banner again, as on a first visit.
+  // Once users have chosen, each round shows the banner again, as on a first visit.
   const [round, setRound] = useState(0);
   const [chosen, setChosen] = useState(false);
   return (

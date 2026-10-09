@@ -108,7 +108,7 @@ function centre(link: HTMLElement, reduced: boolean) {
 }
 
 /**
- * Every component as a sidebar entry, in the catalogue's order, for people to arrange. An
+ * Every component as a sidebar entry, in the catalogue's order, for users to arrange. An
  * experimental component has its flask in Customise the sidebar too, after its name.
  */
 const sidebarEntries = componentOrder.map((key) => ({
@@ -338,7 +338,7 @@ export function Workbench() {
   const stage = useRef<HTMLDivElement>(null);
   const [inspectorTab, setInspectorTab] = useState("props");
 
-  // The phone preview shows the example in a frame as wide as a phone, which people can widen or
+  // The phone preview shows the example in a frame as wide as a phone, which users can widen or
   // narrow from its edge. The frame is a page of its own, so rules that depend on the window's
   // width apply in it as on a phone. It takes the component and the playground's props by message,
   // and asks for them when it is ready. Whether it is on, and its width, are kept in this browser.
@@ -685,7 +685,7 @@ export function Workbench() {
                           icon="phone"
                           aria-pressed={phone}
                           onClick={() => setPhone(!phone)}
-                          // The frame starts loading as people reach for the button.
+                          // The frame starts loading as users reach for the button.
                           onPointerEnter={() => setPhoneWarm(true)}
                           onFocus={() => setPhoneWarm(true)}
                         />

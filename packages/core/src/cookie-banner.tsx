@@ -13,7 +13,7 @@ export type CookieChoice = "accepted" | "rejected";
 export type CookieBannerProps = Omit<HTMLMotionProps<"div">, "onChoose"> & {
   /** The service's name, as in the banner's heading, "Cookies on …". */
   serviceName?: ReactNode;
-  /** Where people can read about the cookies and change their choice. */
+  /** Where users can read about the cookies and change their choice. */
   cookiesHref?: string;
   /** Called with the choice, so the service can save it, such as in a cookie of its own. */
   onChoose?: (choice: CookieChoice) => void;
@@ -22,7 +22,7 @@ export type CookieBannerProps = Omit<HTMLMotionProps<"div">, "onChoose"> & {
 };
 
 /**
- * GOV.UK's cookie banner, which asks whether people accept analytics cookies. Once they choose, it
+ * GOV.UK's cookie banner, which asks whether users accept analytics cookies. Once they choose, it
  * folds into a message that says what they chose, with a button to hide it. The message takes
  * focus, so screen readers hear it. Hiding the message folds the banner away.
  */

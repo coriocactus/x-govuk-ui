@@ -61,7 +61,7 @@ import {
 import type { EditorLabels } from "./editor-controls";
 import { $isProvisionalParagraphNode, ProvisionalParagraphNode } from "./editor-nodes";
 
-// How the editor behaves as people write, after Lexxy's extensions. Each is registered on the
+// How the editor behaves as users write, after Lexxy's extensions. Each is registered on the
 // Lexical editor, and each returns its own function to unregister it.
 
 /** Ctrl or Cmd with Enter is left to the page, such as to send a form. One line takes no Enter. */
@@ -366,7 +366,7 @@ export function registerSelectionLabel(editor: LexicalEditor, labels: () => Edit
   const label = document.createElement("span");
   label.className = "x-govuk-ui-editor-fake-selection";
   // The node the selection was last put on. The selection is put there once, as the node is
-  // selected, and never pulled back from where the person has since moved it.
+  // selected, and never pulled back from where the user has since moved it.
   let parked: string | null = null;
   return mergeRegister(
     editor.registerUpdateListener(({ editorState }) => {
@@ -454,7 +454,7 @@ export function $caretAfter(node: LexicalNode) {
 /**
  * Backspace in an empty list item with items after it removes it, and the caret goes to the end
  * of the item before, instead of the item becoming a paragraph above the list. At the top of a
- * list, it becomes a paragraph above the list, as people expect. Inside a quotation, it is removed.
+ * list, it becomes a paragraph above the list, as users expect. Inside a quotation, it is removed.
  */
 function $removeEmptyListItem() {
   const selection = $getSelection();
@@ -495,7 +495,7 @@ function $collapseListItemToParagraph(decorator: LexicalNode) {
 }
 
 /**
- * The keys that format as people type. Right at the end of inline code leaves the code. Tab indents
+ * The keys that format as users type. Right at the end of inline code leaves the code. Tab indents
  * a list item, and Shift Tab lifts a nested one. Enter in a quotation of paragraphs finds a
  * paragraph to go in.
  */
@@ -585,7 +585,7 @@ export function registerKeys(editor: LexicalEditor) {
 }
 
 /**
- * Leaving a quotation and a code block as people expect. Enter on a blank line in a quotation
+ * Leaving a quotation and a code block as users expect. Enter on a blank line in a quotation
  * leaves it, splitting it if lines follow, and Enter at its start puts a paragraph before it. Down
  * on a code block's last line, with nothing after it, adds a paragraph to go to.
  */

@@ -131,7 +131,7 @@ export type ComboboxProps = Shared & {
 };
 
 /**
- * A field that suggests options as people type, as GOV.UK's accessible autocomplete does, for a
+ * A field that suggests options as users type, as GOV.UK's accessible autocomplete does, for a
  * long list such as countries. The part of each option that matches is bold. One highlight glides
  * between the options. The arrow keys and Enter choose one. Base UI provides the behaviour.
  */
@@ -208,7 +208,7 @@ export type MultiSelectProps = Shared & {
 };
 
 /**
- * Lets people choose several options from a long list by typing, such as the languages they
+ * Lets users choose several options from a long list by typing, such as the languages they
  * speak. Each choice becomes a chip in the field, with a button to remove it, and Backspace in an
  * empty field removes the last. The list stays open, with ticks by the choices.
  */

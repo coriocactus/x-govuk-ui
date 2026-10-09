@@ -163,7 +163,7 @@
   background: var(--x-govuk-ui-line);
 }
 
-/* The document, where people write. Lexical's element takes focus, and the box around it shows
+/* The document, where users write. Lexical's element takes focus, and the box around it shows
    the focus. The body is never shorter than the document's rows. With a cap, it is no taller than
    the cap, and scrolls inside, with the thin scrollbar along the box's edge. */
 .x-govuk-ui-editor-scroll {

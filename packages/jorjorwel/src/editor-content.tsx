@@ -78,7 +78,7 @@ export type EditorContentProps = Omit<ComponentPropsWithRef<"div">, "children"> 
 };
 
 /**
- * The document itself, where people write. Its body is a scroll area's viewport, so a document
+ * The document itself, where users write. Its body is a scroll area's viewport, so a document
  * capped at `maxRows` scrolls inside the box, with the library's thin scrollbar. The table's tools,
  * the code block's language and a link's tools come up over what the caret is in. An attachment's
  * tools come up over the selected attachment. It can be given `tools` of its own instead. While
@@ -219,7 +219,7 @@ function EditorSource({ height }: { height: number }) {
 }
 
 /**
- * The document's text as a person counts it, as a textarea's would be. It counts the words, and one
+ * The document's text as a user counts it, as a textarea's would be. It counts the words, and one
  * character for each line break and each break between blocks. An attachment is not text, so it
  * counts for nothing, and a mention counts as its name. It is null for a node that is not text.
  */

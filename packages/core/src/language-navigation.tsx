@@ -4,7 +4,7 @@ import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef, ReactNode } from "react";
 
 /**
- * Lets people switch the service's language, as GOV.UK's language navigation does. Compose it from
+ * Lets users switch the service's language, as GOV.UK's language navigation does. Compose it from
  * `LanguageNavigationItem` parts, each written in its own language.
  */
 export function LanguageNavigation({

@@ -219,7 +219,7 @@ function AltTextPopover({
           <Popover.Popup
             className="x-govuk-ui-floating x-govuk-ui-editor-popup"
             aria-label={labels.altText}
-            // Focus goes back to the image, selected, unless the person has moved focus elsewhere
+            // Focus goes back to the image, selected, unless the user has moved focus elsewhere
             // by the time the popover has closed, such as by pressing the text.
             finalFocus={() => {
               requestAnimationFrame(() => {

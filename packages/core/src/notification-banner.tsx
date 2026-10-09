@@ -5,7 +5,7 @@ import { useMergedRef } from "./refs";
 
 export type NotificationBannerProps = Omit<ComponentPropsWithRef<"div">, "title" | "autoFocus"> & {
   /**
-   * `important` tells people about something that affects them. `success` confirms that something
+   * `important` tells users about something that affects them. `success` confirms that something
    * they did has worked.
    */
   type?: "important" | "success";

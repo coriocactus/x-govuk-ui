@@ -19,7 +19,7 @@ export type CopyLabels = {
 };
 
 /**
- * The text of an element as people see it, with its paragraphs. Text meant only for screen readers
+ * The text of an element as users see it, with its paragraphs. Text meant only for screen readers
  * is left out, as are parts marked `data-copy="skip"`, such as citations.
  * @internal
  */

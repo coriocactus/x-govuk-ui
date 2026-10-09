@@ -1,5 +1,5 @@
 /* Countdown. A thin line along the foot of a Callout or a toast that closes by itself. It shrinks
-   as the time runs out, in step with the timer, and stops whenever the timer stops. People can then
+   as the time runs out, in step with the timer, and stops whenever the timer stops. Users can then
    see that it will close, and that holding it keeps it open. Set its colour with
    --x-govuk-ui-countdown-colour and its thickness with --x-govuk-ui-countdown-height. */
 .x-govuk-ui-countdown {

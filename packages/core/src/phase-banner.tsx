@@ -9,7 +9,7 @@ export type PhaseBannerProps = ComponentPropsWithRef<"div"> & {
 };
 
 /**
- * Tells people a service is still being worked on, with a way to give feedback, under the header.
+ * Tells users a service is still being worked on, with a way to give feedback, under the header.
  * The phase is a Tag.
  */
 export function PhaseBanner({

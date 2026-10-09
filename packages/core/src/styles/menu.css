@@ -80,7 +80,7 @@
   font-size: 13px;
   font-weight: 700;
 }
-/* A menu's head, such as the person signed in. It sits at the menu's edge, in the words' own size.
+/* A menu's head, such as the user signed in. It sits at the menu's edge, in the words' own size.
    Anything beside the words, such as an avatar, is centred on them. */
 .x-govuk-ui-menu-header {
   display: flex;

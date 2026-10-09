@@ -17,7 +17,7 @@ export type SummaryListProps = ComponentPropsWithRef<"dl"> & {
 };
 
 /**
- * Pairs of keys and values, such as a person's answers on a check answers page. Compose it from
+ * Pairs of keys and values, such as a user's answers on a check answers page. Compose it from
  * `SummaryListRow` parts. Keys, values and actions line up in columns across every row, and stack
  * when the list is narrow. Put it in a `SummaryCard` to summarise one of several things.
  */
@@ -34,7 +34,7 @@ export function SummaryList({ noBorder = false, className = "", ...props }: Summ
 export type SummaryListRowProps = ComponentPropsWithRef<"div"> & {
   /** The key, such as Name. It is `label` because React keeps `key` for itself. */
   label: ReactNode;
-  /** The value. When its text changes, it glows for a moment, so people see what they changed. */
+  /** The value. When its text changes, it glows for a moment, so users see what they changed. */
   children: ReactNode;
   /** `SummaryListAction` parts, such as Change. */
   actions?: ReactNode;

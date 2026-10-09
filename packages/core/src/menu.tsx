@@ -338,7 +338,7 @@ export function MenuGroup({ label, children, className = "", ...props }: MenuGro
 }
 
 /**
- * Who or what a menu is for, at its head, such as the person signed in, with their avatar. It is
+ * Who or what a menu is for, at its head, such as the user signed in, with their avatar. It is
  * the label of the group it starts, so it names the items that follow. It is set at the menu's
  * edge, in the words' own size. Put it first in a MenuGroup that has no `label`.
  */

@@ -81,7 +81,7 @@ export function InputOTP({
           const complete = slots.every((slot) => slot.char !== null);
           const active = slots.filter((slot) => slot.isActive).length;
           // One ring marks the caret and glides between slots. Once every slot is filled, the caret
-          // rests after the last digit, so the ring shows again only when the person selects
+          // rests after the last digit, so the ring shows again only when the user selects
           // digits.
           const caret = isFocused && active === 1 && !complete && !verifying && !success;
           return (

@@ -58,7 +58,7 @@
   font-size: 12px;
   font-weight: 700;
 }
-/* Formats take the colours people know them by, such as red for PDF and green for spreadsheets. */
+/* Formats take the colours users know them by, such as red for PDF and green for spreadsheets. */
 .x-govuk-ui-attachment-format[data-format="pdf"] {
   background: var(--x-govuk-ui-red);
 }

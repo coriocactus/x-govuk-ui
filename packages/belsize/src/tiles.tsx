@@ -70,7 +70,7 @@ import {
 // a divider or a menu, goes through this file's own helpers, by the tiles' ids. A drag and the
 // keyboard therefore do the same thing, and nothing depends on how react-mosaic changes a tree.
 
-/** The arrangement people leave, kept between visits. */
+/** The arrangement users leave, kept between visits. */
 type Saved = { version: 1; layout: TilesLayout | null };
 
 /** A tile the Tiles can show, open or not, and its title. */
@@ -357,16 +357,16 @@ export type TilesProviderProps = {
   /** The arrangement, for Tiles you keep track of. Null means no tiles. */
   value?: TilesLayout | null;
   /**
-   * The arrangement uncontrolled Tiles start with, unless people left another under `storageKey`.
+   * The arrangement uncontrolled Tiles start with, unless users left another under `storageKey`.
    */
   defaultValue?: TilesLayout | null;
   /**
-   * Called with each arrangement people make, by dragging a tile or a divider, by a menu's move, by
+   * Called with each arrangement users make, by dragging a tile or a divider, by a menu's move, by
    * splitting or by closing. A divider calls it as its drag ends, not at every step.
    */
   onValueChange?: (layout: TilesLayout | null) => void;
   /**
-   * For uncontrolled Tiles, keeps the arrangement people make under this key, in this browser.
+   * For uncontrolled Tiles, keeps the arrangement users make under this key, in this browser.
    * Controlled Tiles keep theirs with `useTilesLayout`, which checks it the same way.
    */
   storageKey?: string;
@@ -1081,7 +1081,7 @@ export type TilesProps = TilesProviderProps &
   };
 
 /**
- * A tiling window manager, on react-mosaic, with tiles that share a space. People resize them from
+ * A tiling window manager, on react-mosaic, with tiles that share a space. Users resize them from
  * the dividers between them, and drag them by their bars to another tile's edge or the space's own
  * edge. They can split, maximise and close them. The arrangement is react-mosaic's tree of splits,
  * controlled or uncontrolled, and can be kept in the browser. Each tile's menu does from the
@@ -1158,13 +1158,13 @@ export type TileProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
    * it from `TileBar`, `TileGrip`, `TileTitle` and `TileControls`.
    */
   bar?: ReactNode;
-  /** Lets people drag the tile by its grip, to another tile's edge or an edge of the board. */
+  /** Lets users drag the tile by its grip, to another tile's edge or an edge of the board. */
   draggable?: boolean;
 };
 
 /**
  * One tile, as a board's `renderTile` returns it. It has a bar with its heading and controls, which
- * people drag to move it, above its content. Put the content in a `TileContent`.
+ * users drag to move it, above its content. Put the content in a `TileContent`.
  */
 export function Tile({
   title: ownTitle,
@@ -1256,7 +1256,7 @@ export function TileBar({ className = "", ...props }: ComponentPropsWithRef<"div
 }
 
 /**
- * What people drag the tile by, with a grip of dots that shows it can be dragged. It contains the
+ * What users drag the tile by, with a grip of dots that shows it can be dragged. It contains the
  * tile's title. Put links and buttons beside it in the bar, not in it.
  */
 export function TileGrip({

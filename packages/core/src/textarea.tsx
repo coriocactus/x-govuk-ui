@@ -20,7 +20,7 @@ export type TextareaProps = ComponentPropsWithRef<"textarea"> & {
   hideLabel?: boolean;
   errorMessage?: string;
   /**
-   * Which way people can drag its corner to resize it. It never gets shorter than `rows` lines,
+   * Which way users can drag its corner to resize it. It never gets shorter than `rows` lines,
    * narrower than about twelve characters, or wider than its container.
    */
   resize?: "both" | "vertical" | "horizontal" | "none";
@@ -31,7 +31,7 @@ export type TextareaProps = ComponentPropsWithRef<"textarea"> & {
   autoResize?: boolean;
   /**
    * Counts the characters, as GOV.UK's character count does, and says how many are left or how
-   * many are over. People can go over the limit, so they can see what to cut.
+   * many are over. Users can go over the limit, so they can see what to cut.
    */
   characterLimit?: number;
   /** Counts words instead of characters. */

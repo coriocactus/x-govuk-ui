@@ -48,7 +48,7 @@ export type BubbleProps = ComponentPropsWithRef<"div"> & {
   /**
    * How the bubble looks.
    *
-   * - `default` is a strong brand-blue bubble, usually for the person's own messages.
+   * - `default` is a strong brand-blue bubble, usually for the user's own messages.
    * - `secondary` is the standard grey bubble, for the other side.
    * - `muted` is a quieter bubble, and `tinted` a light blue one.
    * - `outline` has an edge, for richer content.
@@ -58,7 +58,7 @@ export type BubbleProps = ComponentPropsWithRef<"div"> & {
   variant?: BubbleVariant;
   /**
    * Which side of the conversation it sits on. Use the start for others, and the end for the
-   * person.
+   * user.
    */
   align?: Side;
 };

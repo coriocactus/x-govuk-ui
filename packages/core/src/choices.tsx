@@ -17,7 +17,7 @@ export type ChoicesProps = Omit<
    */
   name: string;
   options: readonly ChoicesOption[];
-  /** Lets people choose more than one answer. */
+  /** Lets users choose more than one answer. */
   multiple?: boolean;
   /** Adds a last answer that takes any words, with these words as its placeholder. */
   other?: string;

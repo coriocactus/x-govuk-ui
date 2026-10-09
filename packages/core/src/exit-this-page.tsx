@@ -30,7 +30,7 @@ const SHIFT_WINDOW = 5000;
 
 /**
  * GOV.UK's Exit this page. It is a red button that leaves the service at once for an ordinary site,
- * for people who may be at risk if someone sees what they are reading. Pressing Shift three times
+ * for users who may be at risk if someone sees what they are reading. Pressing Shift three times
  * does the same, and three dots under the button count the presses. The page is covered as it
  * leaves. It makes no sound, because a sound could give it away.
  */

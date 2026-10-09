@@ -51,7 +51,7 @@ const boxOf = (chips: HTMLElement[]): Box => {
 };
 
 /**
- * Filters people turn on and off, such as statuses above a list. Each chip is a toggle button. Any
+ * Filters users turn on and off, such as statuses above a list. Each chip is a toggle button. Any
  * number can be on, or at most one with `multiple` off. Chosen chips side by side join into one
  * shape, drawn behind them. A chip just chosen grows its colour out across its chosen neighbours.
  * A chip just turned off draws the colour back into itself before it fades. Chips never move, and

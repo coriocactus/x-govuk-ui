@@ -79,7 +79,7 @@ export type ToastProviderProps = {
   /** How many toasts can show at once. Older ones wait until there is room. */
   limit?: number;
   /**
-   * How people dismiss a toast with a pointer, by tapping it or by dragging it off the screen.
+   * How users dismiss a toast with a pointer, by tapping it or by dragging it off the screen.
    * Keyboard users press F6 to reach the stack, then Escape.
    */
   dismiss?: "tap" | "drag";

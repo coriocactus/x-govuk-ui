@@ -398,7 +398,7 @@ export function resizeTiles(
 
 /** A divider's sizes in pixels, which are the tiles before it, its limits, and its even point. */
 type DividerPixels = {
-  /** The size of the tiles before the line, as people see it. */
+  /** The size of the tiles before the line, as users see it. */
   size: number;
   min: number;
   max: number;

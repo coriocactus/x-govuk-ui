@@ -33,7 +33,7 @@ type CalendarBase = Omit<ComponentPropsWithRef<"section">, "defaultValue"> & {
   /** Names the calendar for screen readers. */
   label?: string;
   /**
-   * Shows the month and year as Selects, so people can go straight to another month or year, as
+   * Shows the month and year as Selects, so users can go straight to another month or year, as
    * for a date of birth. With two months, only the first has them.
    */
   monthYearSelects?: boolean;
@@ -105,7 +105,7 @@ function weeksOf(month: Date, weekStartsOn: number) {
 }
 
 /**
- * A month of dates, from which people choose one date, a range or several dates. The arrow keys
+ * A month of dates, from which users choose one date, a range or several dates. The arrow keys
  * move by a day or a week, Page Up and Page Down by a month, and Home and End to the ends of the
  * week. A chosen date's fill grows into place, and a range fills the days between its ends. The
  * month slides in the direction it turns. Date input opens a Calendar from its button.

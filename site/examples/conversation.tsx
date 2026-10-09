@@ -336,7 +336,7 @@ export default function ConversationExample({
             if (index < step || wrote) return "done";
             return message.phase === "steps" ? "active" : "pending";
           };
-          // The person's words and any files, or a note that the reply was stopped before it wrote,
+          // The user's words and any files, or a note that the reply was stopped before it wrote,
           // or the reply writing itself out, with its sources once done.
           let content: ReactNode;
           if (message.from === "user")

@@ -25,7 +25,7 @@ export default function CalloutExample({
   const outside = closeOnPressOutside === "default" ? undefined : closeOnPressOutside === "true";
   return (
     <div className="preview-callout">
-      {/* Help that people ask for, from the question mark beside the question. */}
+      {/* Help that users ask for, from the question mark beside the question. */}
       <Field>
         <div className="preview-callout-label">
           <Label htmlFor="callout-reference">Reference number</Label>

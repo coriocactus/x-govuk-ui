@@ -33,7 +33,7 @@ function withCode(text: string): ReactNode {
 /**
  * What a setting needs of the others, such as "Only with `dim` on", or nothing when it needs
  * nothing. It shows whether or not the needs are met now, so the hint keeps its size as other
- * settings change, and people learn the dependency before they meet it.
+ * settings change, and users learn the dependency before they meet it.
  */
 function needsOf(prop: PropDoc, all: readonly PropDoc[]): ReactNode {
   const needs = prop.needs ?? [];
@@ -330,7 +330,7 @@ function ReferenceTable({ props }: { props: readonly PropDoc[] }) {
  *
  * 1. The examples, which are named starting points that each set the props for one use. They are
  *    filter chips, with at most one on. Picked again, an example starts over. Changing any setting
- *    deselects it, because the settings are then the person's own.
+ *    deselects it, because the settings are then the user's own.
  * 2. The example's own settings, each shown only while what it needs is set.
  * 3. The props the playground can set, each always shown, and disabled while what it needs is not
  *    set.

@@ -20,7 +20,7 @@ export type TaskListProps = ComponentPropsWithRef<"ul"> & {
 };
 
 /**
- * The tasks people need to complete, and where they are with each, as GOV.UK's task list does. An
+ * The tasks users need to complete, and where they are with each, as GOV.UK's task list does. An
  * agent can work through one too. Its current task shows a spinner, and each status that changes
  * rises into place. Compose it from `TaskListItem` parts.
  */

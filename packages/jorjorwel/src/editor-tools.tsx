@@ -263,10 +263,10 @@ export function EditorTools({
 
 /**
  * Where focus goes as a control's menu or popover closes. It goes back to the document, with the
- * caret where it was. If the person came by the keyboard and pressed Escape, it goes back to the
+ * caret where it was. If the user came by the keyboard and pressed Escape, it goes back to the
  * control instead, as Lexxy's do. The editor restores its own selection, because the browser would
  * put the caret at the document's start. Base UI asks once the popup has finished closing. By then
- * focus is on the page's body, unless the person has moved it elsewhere, such as to another
+ * focus is on the page's body, unless the user has moved it elsewhere, such as to another
  * control, where it stays. @internal
  */
 export function finalFocusFor(
@@ -776,7 +776,7 @@ function $codeBlock() {
 const sameBlock = (a: ReturnType<typeof $codeBlock>, b: ReturnType<typeof $codeBlock>) =>
   a === b || (a !== null && b !== null && a.key === b.key && a.language === b.language);
 
-/** The languages' names as people know them. */
+/** The languages' names as users know them. */
 const languageNames: Record<string, string> = {
   javascript: "JavaScript",
   typescript: "TypeScript",

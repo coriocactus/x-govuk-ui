@@ -192,7 +192,7 @@ export const EditorContext = createContext<EditorShared | null>(null);
  * does not focus it once a button has taken focus. Once the selection is set, the document is
  * therefore given focus if it has not taken it. Focus comes after the selection, not before,
  * because a document focused with no selection gets a caret at its start, which the editor would
- * take for the person's caret.
+ * take for the user's caret.
  */
 export function focusDocument(editor: LexicalEditor) {
   editor.focus(() => {

@@ -11,7 +11,7 @@ export type FeedbackReport = { doing: string; wrong: string };
 export type FeedbackProps = Omit<ComponentPropsWithRef<"div">, "onAnswer" | "onReport"> & {
   /** Called with whether the page was useful. */
   onAnswer?: (useful: boolean) => void;
-  /** Called with what people were doing and what went wrong. */
+  /** Called with what users were doing and what went wrong. */
   onReport?: (report: FeedbackReport) => void;
   /** The question, as GOV.UK asks it at the foot of every page. */
   question?: string;
@@ -21,7 +21,7 @@ type Stage = "ask" | "report" | "thanks";
 
 /**
  * GOV.UK's "Is this page useful?" at the foot of a page, with Yes and No, and a button to report a
- * problem. It shows one stage at a time, as GOV.UK's does, so once people answer, the question
+ * problem. It shows one stage at a time, as GOV.UK's does, so once users answer, the question
  * gives way. Yes turns to thanks. No and the report button turn to a short Form. The Form's Cancel
  * brings the question back, and sending the Form turns to thanks. The thanks take focus, so screen
  * readers hear them. The band eases to each stage's height while its words change at once, with
@@ -36,7 +36,7 @@ export function Feedback({
   ...props
 }: FeedbackProps) {
   const [stage, setStage] = useState<Stage>("ask");
-  // What people typed is kept if they cancel and come back.
+  // What users typed is kept if they cancel and come back.
   const [doing, setDoing] = useState("");
   const [wrong, setWrong] = useState("");
   // The button that opened the form takes focus back if the form is cancelled.
@@ -45,7 +45,7 @@ export function Feedback({
   const report = useRef<HTMLButtonElement>(null);
   const thanks = useRef<HTMLParagraphElement>(null);
   const form = useRef<HTMLFormElement>(null);
-  // Focus moves only once people have answered, not as the band first appears.
+  // Focus moves only once users have answered, not as the band first appears.
   const answered = useRef(false);
   useEffect(() => {
     if (!answered.current) return;

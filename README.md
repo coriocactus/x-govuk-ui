@@ -78,7 +78,7 @@ The tests check every page of the site. These are the front page, the workbench,
 - axe checks each page against the WCAG 2.0, 2.1 and 2.2 A and AA rules it runs by default, in Chromium and in WebKit.
 - In Chromium, axe checks each page again in the dark theme. It checks that text contrasts with its background, and that links can be told apart from the words around them.
 - On each component's page, no box may cut off its text, in Roboto or in a wide typeface. The wide typeface stands in for whatever typeface a service chooses.
-- In Chromium, Firefox and WebKit, behaviour tests use the components as people do, with the keyboard and the pointer. They check where focus goes.
+- In Chromium, Firefox and WebKit, behaviour tests use the components as users do, with the keyboard and the pointer. They check where focus goes.
 
 Automated tests find some accessibility failures, but not all. Passing them does not mean that the components conform to WCAG.
 

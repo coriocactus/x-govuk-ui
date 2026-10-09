@@ -261,7 +261,7 @@ test("a message scroller anchors turns, loads earlier messages in place, and fol
     .locator('[data-message-id="e4"]')
     .getByRole("button", { name: "Try again" });
   await expect(earlier).toHaveAttribute("aria-disabled", "true");
-  // Playwright will not press an unavailable button, so it presses with force, as a person can.
+  // Playwright will not press an unavailable button, so it presses with force, as a user can.
   await earlier.click({ force: true });
   await expect(
     frame.locator('[data-message-id="e4"] .x-govuk-ui-message-retry-icon'),

@@ -14,7 +14,7 @@ export type DetailsProps = ComponentPropsWithRef<"div"> & {
 };
 
 /**
- * GOV.UK's details, a short link that opens help most people do not need. It opens and closes
+ * GOV.UK's details, a short link that opens help most users do not need. It opens and closes
  * smoothly. When closed, its text stays in the page, so the browser's find in page can reach the
  * text and open the details.
  */

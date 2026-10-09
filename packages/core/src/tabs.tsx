@@ -14,7 +14,7 @@ export type TabsProps = ComponentPropsWithRef<"div"> & {
 /**
  * Sections of related content, one shown at a time, such as an application's details, documents
  * and history. Compose it from `TabsList`, `TabsTrigger` and `TabsPanel`. GOV.UK advises tabs only
- * when people need to switch between sections, not read them in order.
+ * when users need to switch between sections, not read them in order.
  */
 export function Tabs({
   children,

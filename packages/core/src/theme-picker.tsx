@@ -32,7 +32,7 @@ function applyTheme(target: HTMLElement, theme: Theme, change: boolean) {
 export type UseThemeOptions = {
   /** Keeps the theme in local storage under this key, for every page of the site. */
   storageKey?: string;
-  /** The theme before people choose one. By default, light, as GOV.UK is. */
+  /** The theme before users choose one. By default, light, as GOV.UK is. */
   defaultTheme?: Theme;
   /**
    * Where `data-theme` goes, which the components' colours follow. By default, it is the page's
@@ -79,7 +79,7 @@ export type ThemePickerProps = Omit<
 > & {
   /** The theme, for a picker you keep track of, such as with useTheme. */
   value?: Theme;
-  /** Where an uncontrolled picker starts, before people choose. By default, light. */
+  /** Where an uncontrolled picker starts, before users choose. By default, light. */
   defaultValue?: Theme;
   onValueChange?: (theme: Theme) => void;
   /**

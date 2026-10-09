@@ -84,7 +84,7 @@ export type SidebarProps = ComponentPropsWithRef<"nav"> & {
   /** Marks the current item with a line along the sidebar's edge. */
   activeLine?: boolean;
   /**
-   * Keeps a trigger where the sidebar was while it is collapsed off the screen, so people can bring
+   * Keeps a trigger where the sidebar was while it is collapsed off the screen, so users can bring
    * it back. Turn it off when the page has its own SidebarTrigger.
    */
   collapsedTrigger?: boolean;
@@ -98,7 +98,7 @@ export type SidebarGroupProps = ComponentPropsWithRef<"div"> & {
   label?: ReactNode;
   /** Shown beside the label of a group that folds. */
   icon?: ReactNode;
-  /** Lets people fold the group away by pressing its label. */
+  /** Lets users fold the group away by pressing its label. */
   collapsible?: boolean;
   defaultOpen?: boolean;
 };
@@ -145,7 +145,7 @@ type SidebarState = {
   openMobile: boolean;
   setOpenMobile: (open: boolean) => void;
   toggleSidebar: () => void;
-  /** The shortcut as people type it on this device, such as "⌘ B". */
+  /** The shortcut as users type it on this device, such as "⌘ B". */
   shortcut: string | undefined;
 };
 
@@ -196,7 +196,7 @@ function useFrame() {
 /**
  * Keeps whether the sidebar is open, for the Sidebar, its triggers and `useSidebar` to share. On a
  * small screen, the sidebar is a sheet, with an open state of its own. Command or Control with the
- * `shortcut` key toggles it. With a `storageKey`, it is as people left it on their next visit.
+ * `shortcut` key toggles it. With a `storageKey`, it is as users left it on their next visit.
  */
 export function SidebarProvider({
   children,
@@ -265,7 +265,7 @@ export function SidebarProvider({
 
 /**
  * The sidebar itself, a column at the page's side. It contains a header, scrolling content of
- * groups and items, and a footer. It collapses to a column of icons or off the edge, and people can
+ * groups and items, and a footer. It collapses to a column of icons or off the edge, and users can
  * resize it. On a small screen, it is a Sheet.
  *
  * One highlight glides between its rows under the pointer. A line marks the current item and
@@ -488,7 +488,7 @@ export function SidebarHeader({ className = "", ...props }: ComponentPropsWithRe
   return <div {...props} className={`x-govuk-ui-sidebar-header ${className}`.trim()} />;
 }
 
-/** The foot of the sidebar, such as for the person's account. It stays as the content scrolls. */
+/** The foot of the sidebar, such as for the user's account. It stays as the content scrolls. */
 export function SidebarFooter({ className = "", ...props }: ComponentPropsWithRef<"div">) {
   return <div {...props} className={`x-govuk-ui-sidebar-footer ${className}`.trim()} />;
 }

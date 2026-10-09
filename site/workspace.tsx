@@ -101,7 +101,7 @@ import { Icon, type IconName } from "./icon";
  * casework for rod fishing licences.
  *
  * - The sidebar has the GOV/UK UI lock-up, a switcher for the workspaces to come, the parts of the
- *   work and the caseworker's own menu. People pin, move and hide the parts for themselves.
+ *   work and the caseworker's own menu. Users pin, move and hide the parts for themselves.
  * - The Overview is Tiles that caseworkers arrange for themselves. It shows the week's licences in
  *   a chart, the latest activity, and the applications waiting in a grouped table.
  * - Piscine Assist, the licensing team's assistant, sits beside the work, as wide as its handle is
@@ -393,7 +393,7 @@ function Shell() {
   // Whether the sounds are muted, kept in this browser for every page of the site.
   const [muted, setMuted] = useStoredState("x-govuk-ui-muted", false);
   const play = useSound({ muted });
-  // Turning the sounds back on plays one, so people hear that they are on.
+  // Turning the sounds back on plays one, so users hear that they are on.
   const wasMuted = useRef(muted);
   useEffect(() => {
     if (wasMuted.current && !muted) void play("swoosh").catch(() => {});
@@ -441,7 +441,7 @@ function Shell() {
     requestAnimationFrame(() => assistShow.current?.focus());
   };
   const footerRow = useRef<HTMLDivElement>(null);
-  // People pin, move and hide the parts of the work, and the arrangement is kept in this browser.
+  // Users pin, move and hide the parts of the work, and the arrangement is kept in this browser.
   const arranger = useSidebarArrangement({
     entries,
     groups: groupNames,

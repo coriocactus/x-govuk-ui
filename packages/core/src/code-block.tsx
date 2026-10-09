@@ -15,7 +15,7 @@ import { ScrollArea } from "./scroll-area";
 
 export type CodeBlockProps = ComponentPropsWithRef<"figure"> & {
   /**
-   * Lets people change the code. They type in a text box laid over the coloured code, which is
+   * Lets users change the code. They type in a text box laid over the coloured code, which is
    * coloured again as they type. The caret, selection, undo and screen reader support are then the
    * browser's own. Tab leaves the box, as it leaves any text box.
    */

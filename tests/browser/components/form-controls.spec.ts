@@ -60,7 +60,7 @@ const settled = (document: Locator) =>
     () => new Promise<void>((done) => requestAnimationFrame(() => setTimeout(done, 0))),
   );
 
-/** Selects a run of text inside an element of the document, as a person dragging would. */
+/** Selects a run of text inside an element of the document, as a user dragging would. */
 async function selectText(document: Locator, selector: string, from: number, to: number, nth = 0) {
   await document.evaluate(
     (element, [selector, from, to, nth]) => {
@@ -686,7 +686,7 @@ test("the editor offers a model's suggestions for selected text, held as it is w
   await expect(toolbar.getByText("12 words")).toBeVisible();
   await toolbar.getByRole("button", { name: "Shorten" }).click();
   await expect(toolbar.getByText("Writing a suggestion…")).toBeVisible();
-  // The selection is kept while the suggestion is written, and moves with the text as the person
+  // The selection is kept while the suggestion is written, and moves with the text as the user
   // keeps typing before it.
   expect(await highlighted("x-govuk-ui-editor-held")).toEqual([sentence]);
   await page.keyboard.press("ArrowLeft");

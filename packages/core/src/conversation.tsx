@@ -81,7 +81,7 @@ export type ConversationProps = ComponentPropsWithRef<"div"> & {
    */
   assistantName?: string;
   /**
-   * Where people write, such as a Chat input. It floats over the foot of the log, which scrolls
+   * Where users write, such as a Chat input. It floats over the foot of the log, which scrolls
    * beneath it and always keeps its newest message clear of it.
    */
   composer?: ReactNode;
@@ -99,7 +99,7 @@ export type ConversationProps = ComponentPropsWithRef<"div"> & {
 };
 
 /**
- * A scrolling log of messages between a person and a service's assistant, with an optional
+ * A scrolling log of messages between a user and a service's assistant, with an optional
  * composer floating over its foot. It is a Message scroller laid out as a chat. It follows the
  * newest message while the reader is at the bottom. When the reader scrolls up, a button appears
  * to take them back, with a dot once more messages arrive. Before anything is said, the composer
@@ -200,7 +200,7 @@ function useArrival() {
 }
 
 export type ConversationMessageProps = HTMLMotionProps<"div"> & {
-  /** Who wrote the message. The person's messages sit in a bubble on the other side. */
+  /** Who wrote the message. The user's messages sit in a bubble on the other side. */
   from: Speaker;
   children: ReactNode;
   /**
@@ -267,7 +267,7 @@ export function ConversationMessage({
 }
 
 /**
- * The message's text. It is plain for the assistant, and in a secondary Bubble for the person.
+ * The message's text. It is plain for the assistant, and in a secondary Bubble for the user.
  * Pretext measures a bubble of plain text, so the bubble is as wide as its longest line, not as
  * wide as it may be. No ragged gap is then left beside its lines.
  *
@@ -309,7 +309,7 @@ export function ConversationNote({ className = "", ...props }: ComponentPropsWit
 /**
  * Tools for one message, as a `MessageActions` row of parts such as `ConversationCopy`,
  * `MessageRating` and `MessageRetry`. They sit under the start of a reply, and under the end of the
- * person's bubble. The latest message always shows its tools, whoever wrote it, so a message just
+ * user's bubble. The latest message always shows its tools, whoever wrote it, so a message just
  * sent shows them until the reply arrives. Earlier messages show their tools when the pointer is
  * over them or a tool has focus, and always on touch screens.
  */

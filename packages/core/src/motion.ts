@@ -99,7 +99,7 @@ const moving = timingFor(false);
 const still = timingFor(true);
 
 /**
- * Transitions that become instant when the person prefers reduced motion. The setting is followed
+ * Transitions that become instant when the user prefers reduced motion. The setting is followed
  * as it changes. Motion's own useReducedMotion reads it only once, as each component mounts, so a
  * part that stays on the page would keep moving after the setting changed.
  *

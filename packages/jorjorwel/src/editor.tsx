@@ -150,7 +150,7 @@ export type EditorProps = Omit<
   required?: boolean;
   /**
    * Counts the characters, as GOV.UK's character count does, and says how many are left or how
-   * many are over. People can go over the limit, so they can see what to cut. It counts as a
+   * many are over. Users can go over the limit, so they can see what to cut. It counts as a
    * textarea would. A line break, or a break between paragraphs, is one character, and a mention is
    * its name. An attachment, which is not text, counts for nothing.
    */
@@ -291,7 +291,7 @@ const richNodes: readonly (Klass<LexicalNode> | LexicalNodeReplacement)[] = [
 /**
  * A field for rich text, such as a caseworker's note or a letter, built on Lexical, after
  * 37signals' Lexxy and with its defaults. It has a toolbar of formatting over the document, and
- * Markdown shortcuts as people type. It cleans up pasted Markdown, links and Word's lists.
+ * Markdown shortcuts as users type. It cleans up pasted Markdown, links and Word's lists.
  *
  * Its colours are GOV.UK's. It takes quotations, code coloured by its syntax, lists and tables.
  * Given `onUpload`, it also takes images, video and files, with captions and galleries.

@@ -36,7 +36,7 @@ export type FormStepProps = {
   /** Checks the step's answers as it is sent, and returns a message for each that needs fixing. */
   validate?: (data: FormData) => FormErrors;
   /**
-   * Runs once the step's answers pass, before the next step, such as to save the answers as people
+   * Runs once the step's answers pass, before the next step, such as to save the answers as users
    * go. If it returns messages, such as the server's, the form stays on the step and shows them.
    * The button shows a spinner while it runs.
    */
@@ -100,7 +100,7 @@ export type FormStepsProps = Omit<
   /** Each step is a place in the browser's history, so Back in the browser goes back a step. */
   history?: boolean;
   /**
-   * Keeps the answers and the step in local storage under this key, so people continue where they
+   * Keeps the answers and the step in local storage under this key, so users continue where they
    * left off. They are cleared once the form is sent. Answers stay in the browser, so leave out
    * anything sensitive.
    */
@@ -294,7 +294,7 @@ function rowsOf(step: HTMLElement, index: number, notAnswered: string): Row[] {
  * answers. There, Change asks a question again and then returns.
  *
  * Its progress, its Back, its errors, its keys and its history can each be turned on or off. With
- * a `storageKey`, it remembers how far people got. Focus moves to each step as it comes, and a card
+ * a `storageKey`, it remembers how far users got. Focus moves to each step as it comes, and a card
  * eases to each step's height.
  */
 export function FormSteps({
@@ -715,7 +715,7 @@ export function FormSteps({
         <p className="x-govuk-ui-form-steps-progress">{progressLabel(position + 1, plan.length)}</p>
       )}
       {steps.map((each, index) => (
-        // Every step stays in the form, so answers are kept as people move back and forth. Steps
+        // Every step stays in the form, so answers are kept as users move back and forth. Steps
         // skipped or not asked are disabled while out of sight, so their answers are not sent.
         <fieldset
           // biome-ignore lint/suspicious/noArrayIndexKey: steps are places in the form's order.

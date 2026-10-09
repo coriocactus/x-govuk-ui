@@ -48,7 +48,7 @@ export function WorkbenchSidebar({
   onNavigate: (name: ComponentName) => void;
   /** Opens the command menu, which finds any component or action. */
   onOpenCommands: () => void;
-  /** How the sidebar is arranged, with the person's own pins, hidden entries and order. */
+  /** How the sidebar is arranged, with the user's own pins, hidden entries and order. */
   arranger: SidebarArranger;
 }) {
   const sidebar = useSidebar();

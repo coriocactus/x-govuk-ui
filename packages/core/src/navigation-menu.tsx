@@ -131,7 +131,7 @@ export type NavigationMenuLinkProps = Omit<Primitive.Link.Props, "className" | "
   children: ReactNode;
   /** A line beneath the label, in a menu. */
   description?: ReactNode;
-  /** Marks the page the person is on, with `aria-current="page"`. */
+  /** Marks the page the user is on, with `aria-current="page"`. */
   current?: boolean;
   className?: string;
 };

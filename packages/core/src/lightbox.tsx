@@ -18,7 +18,7 @@ import { useScopeSound } from "./sound-scope";
 
 export type LightboxImage = {
   src: string;
-  /** Describes the photo, for people who cannot see it. */
+  /** Describes the photo, for users who cannot see it. */
   alt: string;
   /**
    * The photo's own size, or any size with its proportions, so rows are laid out before it loads.

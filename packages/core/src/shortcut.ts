@@ -5,7 +5,7 @@ export function modifierKey() {
     : "Ctrl";
 }
 
-/** A Command-or-Control shortcut as people type it on this device, such as "⌘ K". */
+/** A Command-or-Control shortcut as users type it on this device, such as "⌘ K". */
 export function shortcutKeys(key: string) {
   return `${modifierKey()} ${key.toUpperCase()}`;
 }

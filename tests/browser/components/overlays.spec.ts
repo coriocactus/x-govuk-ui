@@ -148,7 +148,7 @@ test("a callout shows the time left, which stops while held, and its closing is 
   await expect(line).toHaveCount(0);
   await playground.set("closeButton", false);
   await expect(notice.getByRole("button", { name: "Close" })).toHaveCount(0);
-  // Help can be kept open when people press outside it.
+  // Help can be kept open when users press outside it.
   await playground.set("closeOnPressOutside", "false: both stay");
   await frame.getByRole("button", { name: "Help with your reference number" }).click();
   const help = page.getByRole("dialog", { name: "Your reference number" });

@@ -54,7 +54,7 @@ export function summary(application: Application) {
 `;
 
 export default function FileDiffExample({ context = 3 }: Props) {
-  // An agent proposes the change, and people accept or reject it.
+  // An agent proposes the change, and users accept or reject it.
   const [decision, setDecision] = useState<"accepted" | "rejected" | null>(null);
   return (
     <FileDiff

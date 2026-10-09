@@ -114,7 +114,7 @@ const sections: Section[] = [
 const services = ["Apply for a licence", "Renew a licence", "Report a change"];
 
 /**
- * The items, for people to pin, move and hide, each in its section, with the first section
+ * The items, for users to pin, move and hide, each in its section, with the first section
  * untitled.
  */
 const entries = sections.flatMap((section) =>
@@ -146,7 +146,7 @@ export default function SidebarExample({
 }: Props) {
   const [current, setCurrent] = useState("Overview");
   const [service, setService] = useState(services[0]);
-  // With item menus, people pin, move and hide the items, and arrange the whole sidebar in a sheet.
+  // With item menus, users pin, move and hide the items, and arrange the whole sidebar in a sheet.
   const menus = show.includes("menus");
   const arranger = useSidebarArrangement({ entries });
   const [customising, setCustomising] = useState(false);

@@ -18,7 +18,7 @@ export type InputProps = Omit<ComponentPropsWithRef<"input">, "prefix"> & {
   /** Shown inside the end of the field, such as "per item" or a keyboard shortcut. */
   suffix?: ReactNode;
   /**
-   * For a password, shows how strong it is beneath the field, as four bars and a word, so people
+   * For a password, shows how strong it is beneath the field, as four bars and a word, so users
    * can make it stronger before they continue.
    */
   strength?: boolean;

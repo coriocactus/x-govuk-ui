@@ -56,7 +56,7 @@
 .x-govuk-ui-message-row[data-role="user"] {
   align-items: flex-end;
 }
-/* The assistant writes as plain text across the column. The person's own messages sit in a bubble
+/* The assistant writes as plain text across the column. The user's own messages sit in a bubble
    on the other side. */
 .x-govuk-ui-message {
   display: flex;
@@ -70,7 +70,7 @@
   align-items: flex-end;
 }
 /* A message's tools take the space beneath it, so the gap to the next message closes up. They sit
-   under the start of a reply and under the end of the person's bubble. */
+   under the start of a reply and under the end of the user's bubble. */
 .x-govuk-ui-message:has(.x-govuk-ui-message-actions) {
   margin-bottom: 8px;
 }
@@ -81,11 +81,11 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-/* The person's messages are secondary Bubbles, in the log's text size. */
+/* The user's messages are secondary Bubbles, in the log's text size. */
 .x-govuk-ui-message[data-role="user"] .x-govuk-ui-message-content {
   line-height: 1.6;
 }
-/* Consecutive bubbles from the person read as one run, as in a Bubble group. */
+/* Consecutive bubbles from the user read as one run, as in a Bubble group. */
 .x-govuk-ui-message-row[data-role="user"]:has(+ .x-govuk-ui-message-row[data-role="user"])
 .x-govuk-ui-message {
   margin-bottom: 6px;

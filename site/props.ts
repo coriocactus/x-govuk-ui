@@ -153,7 +153,7 @@ export const checklist = (
 /**
  * The preset the settings match, if any. That is the preset whose settings, over the starting ones,
  * equal every current setting. A preset that sets some of what another sets is not mistaken for
- * it. Any change of a setting leaves the preset, because the settings are then the person's own.
+ * it. Any change of a setting leaves the preset, because the settings are then the user's own.
  */
 export function presetAt(
   presets: readonly Preset[],

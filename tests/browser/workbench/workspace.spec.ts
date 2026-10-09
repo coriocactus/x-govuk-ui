@@ -339,7 +339,7 @@ test("in a short window each tile scrolls in its own room, Piscine Assist keeps 
   expect(rowBox.x + rowBox.width).toBeLessThanOrEqual(switchBox!.x);
   await sound.hover();
   expect(await caseworker.evaluate((element) => element.matches(":hover"))).toBe(false);
-  // Turning the sounds on plays one, so people hear that they are on. The fixtures send it into
+  // Turning the sounds on plays one, so users hear that they are on. The fixtures send it into
   // silence. Turning them off makes no sound, not even the press's own.
   await expect(sound).toHaveAttribute("aria-pressed", "true");
   const before = await voices();

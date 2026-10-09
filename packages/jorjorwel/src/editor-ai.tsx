@@ -59,7 +59,7 @@ import { $getValue, parseHtml, pastedMarkdownToHtml } from "./editor-html";
 // selection once it is approved.
 
 export type EditorAIRequest = {
-  /** What to do with the selection, from an action or the person's own words. */
+  /** What to do with the selection, from an action or the user's own words. */
   instruction: string;
   /** The tool that sent the request, such as "ask" for the prompt, for routing or analytics. */
   tool?: string;
@@ -78,7 +78,7 @@ export type EditorAIRequest = {
    */
   from: number;
   to: number;
-  /** Aborted when the person discards the request or makes a new selection. */
+  /** Aborted when the user discards the request or makes a new selection. */
   signal: AbortSignal;
 };
 
@@ -103,7 +103,7 @@ export type EditorAIState = {
   suggestion: EditorAISuggestionValue | null;
   error: string | null;
   disabled: boolean;
-  /** Opens the prompt, so the person can describe the change. */
+  /** Opens the prompt, so the user can describe the change. */
   ask: () => void;
   /** Asks for a suggestion for the selection. */
   request: (instruction: string, tool?: string) => void;
@@ -551,13 +551,13 @@ export type EditorAIProps = {
 };
 
 /**
- * Suggestions from a model for the text people select, as a feature of the Editor. Put it inside
- * an Editor. When people select some text, a toolbar comes up over it with whatever tools are
+ * Suggestions from a model for the text users select, as a feature of the Editor. Put it inside
+ * an Editor. When users select some text, a toolbar comes up over it with whatever tools are
  * composed into it. These can be Ask AI with a prompt, actions with fixed instructions, or tools
  * of your own through `useEditorAI`.
  *
  * The selection is kept, and drawn as kept, while the suggestion is written. It moves with the
- * text as the person keeps typing. The suggestion shows in the toolbar for approval, then replaces
+ * text as the user keeps typing. The suggestion shows in the toolbar for approval, then replaces
  * the selection, keeping the formatting of the words it leaves unchanged. Your application
  * supplies the suggestions.
  */
@@ -803,7 +803,7 @@ export function EditorAI({ onRequestEdit, disabled: off = false, children }: Edi
   const accept = () => {
     const target = selected.current;
     if (!target || !held || phase.kind !== "result") return;
-    // Never overwrite text the person changed while the suggestion was loading. The kept range has
+    // Never overwrite text the user changed while the suggestion was loading. The kept range has
     // moved with their edits around it, and what is inside it must still be what was sent.
     const now = editor.read(() => $textOf(held));
     if (now !== target.text) {
@@ -1009,7 +1009,7 @@ export function EditorAIToolbar({
 
 export type EditorAIToolsProps = ComponentPropsWithRef<"div"> & { children: ReactNode };
 
-/** The row of tools. The prompt takes its place while the person describes a change. */
+/** The row of tools. The prompt takes its place while the user describes a change. */
 export function EditorAITools({ children, className = "", ...props }: EditorAIToolsProps) {
   const shared = useShared();
   return (
@@ -1111,7 +1111,7 @@ export type EditorAIPromptProps = ComponentPropsWithRef<"div"> & {
 };
 
 /**
- * Where the person describes the change they want, with an Input and a Button. `EditorAIAsk` opens
+ * Where the user describes the change they want, with an Input and a Button. `EditorAIAsk` opens
  * it. It is not a form, because it sits inside the form around the editor. Enter or the Button
  * sends it.
  */

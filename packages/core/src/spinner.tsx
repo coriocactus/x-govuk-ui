@@ -11,7 +11,7 @@ export type SpinnerProps = ComponentPropsWithRef<"span"> & {
 
 /**
  * Shows that something is happening without saying how long it will take. The arc turns, and
- * lengthens and shortens as it goes. When people prefer reduced motion, it turns slowly at an even
+ * lengthens and shortens as it goes. When users prefer reduced motion, it turns slowly at an even
  * pace, because it is the only sign that work is going on. Button and Toast use it.
  */
 export function Spinner({ size = "medium", label, className = "", ...props }: SpinnerProps) {

@@ -77,7 +77,7 @@ const atEnd = (scroller: HTMLElement) =>
  * A scrolling log of messages, like shadcn's Message scroller, that never moves the reader against
  * their will. At the end of the log, it follows new messages and streamed text. When the reader
  * scrolls away, it stays put, and a button rises to go back, with a dot once more messages arrive.
- * A new turn, such as the person's question, rises to near the top, with a peek of the turn
+ * A new turn, such as the user's question, rises to near the top, with a peek of the turn
  * before. Its reply streams into the space below. Earlier messages loaded above keep the reader
  * where they were.
  *
@@ -442,7 +442,7 @@ function keyed(children: ReactNode) {
 export type MessageScrollerItemProps = Omit<HTMLMotionProps<"div">, "id"> & {
   /** A stable id, so the log can keep the reader's place and jump to the row. */
   id: string;
-  /** Starts a turn, such as the person's question. A new anchor rises to near the top. */
+  /** Starts a turn, such as the user's question. A new anchor rises to near the top. */
   anchor?: boolean;
   children: ReactNode;
 };

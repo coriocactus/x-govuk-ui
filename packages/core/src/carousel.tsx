@@ -200,7 +200,7 @@ export function CarouselNext({ label = "Next slide", ...props }: CarouselButtonP
   );
 }
 
-/** Where the person is, such as "2 of 3". Screen readers hear it change. */
+/** Where the user is, such as "2 of 3". Screen readers hear it change. */
 export function CarouselPosition({ className = "", ...props }: ComponentPropsWithRef<"span">) {
   const { index, count } = useCarousel("CarouselPosition");
   return (

@@ -18,7 +18,7 @@ export type SliderProps = Omit<
   value?: number;
   defaultValue?: number;
   onValueChange?: (value: number) => void;
-  /** Called once the person lets go, for work that should not run on every step. */
+  /** Called once the user lets go, for work that should not run on every step. */
   onValueCommitted?: (value: number) => void;
   min?: number;
   max?: number;

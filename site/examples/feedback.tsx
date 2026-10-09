@@ -5,7 +5,7 @@ const support = ["Help", "Privacy", "Cookies", "Accessibility statement", "Conta
 
 /** The foot of a service's page, which is the band at the end of its content, then the footer. */
 export default function FeedbackExample({ question = "Is this page useful?" }) {
-  // Once people have answered, the example can ask again.
+  // Once users have answered, the example can ask again.
   const [round, setRound] = useState(0);
   const [said, setSaid] = useState("");
   return (

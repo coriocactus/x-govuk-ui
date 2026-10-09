@@ -119,7 +119,7 @@ export type FigureDataProps = Omit<DetailsProps, "summary"> & {
 
 /**
  * The figure's figures as tables, in a Details that a reader opens. GOV.UK asks this of every
- * chart, for people who cannot see it and people who want the exact figures.
+ * chart, for users who cannot see it and users who want the exact figures.
  */
 export function FigureData({
   summary = "Show the figures as a table",

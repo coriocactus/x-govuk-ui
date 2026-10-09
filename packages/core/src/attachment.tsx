@@ -23,7 +23,7 @@ export type AttachmentProps = Omit<ComponentPropsWithRef<"section">, "title"> & 
 };
 
 /**
- * A file people can download, listed as GOV.UK lists attachments. It shows a thumbnail of the
+ * A file users can download, listed as GOV.UK lists attachments. It shows a thumbnail of the
  * document, its title as a link, and its format, size and pages. A file that may not suit assistive
  * technology says so, in a Details that explains how to ask for an accessible format.
  */

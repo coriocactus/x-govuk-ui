@@ -65,7 +65,7 @@ export type ChartDatum = Record<string, string | number | null>;
  * - For part to whole, use `pie`, `donut` for a pie with the whole in its middle, or `funnel` for
  *   how many are left at each step.
  * - For several measures of one thing, use `radar`, or `radial` for bars bent around a centre.
- *   Both are hard to read exactly, so people read their figures in the table beneath.
+ *   Both are hard to read exactly, so users read their figures in the table beneath.
  */
 export type ChartType =
   | "line"

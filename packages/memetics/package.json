@@ -1,7 +1,7 @@
 {
   "name": "@x-govuk-ui/memetics",
-  "description": "x-govuk-ui's charts, on Recharts.",
-  "version": "0.1.0",
+  "description": "Charts for x-govuk-ui, built on Recharts.",
+  "version": "0.2.0",
   "license": "MIT",
   "homepage": "https://x-govuk-ui.org",
   "repository": {
@@ -31,7 +31,7 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "x-govuk-ui": "0.1.0"
+    "x-govuk-ui": "0.2.0"
   },
   "dependencies": {
     "recharts": "3.10.1"

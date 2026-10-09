@@ -93,7 +93,7 @@ function fit(
 }
 
 /**
- * A sidebar that people arrange for themselves. They pin entries to the top, hide the ones they do
+ * A sidebar that users arrange for themselves. They pin entries to the top, hide the ones they do
  * not use, and move entries and groups up or down. It returns the arrangement and the ways to
  * change it, for SidebarItemMenu, SidebarCustomise and the sidebar's own groups to share. Every
  * part that uses the same `storageKey` sees the same arrangement.
@@ -388,7 +388,7 @@ export type SidebarCustomiseProps = Omit<SheetContentProps, "children" | "label"
 };
 
 /**
- * A sheet where people arrange a sidebar. It lists the pinned entries first, then each group, with
+ * A sheet where users arrange a sidebar. It lists the pinned entries first, then each group, with
  * its entries. Each group moves up or down. Each row has a small Switch at its end to show or hide
  * the entry.
  *

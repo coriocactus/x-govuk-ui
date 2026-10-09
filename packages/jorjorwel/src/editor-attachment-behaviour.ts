@@ -50,7 +50,7 @@ import type { EditorLabels } from "./editor-controls";
 import { $isProvisionalParagraphNode } from "./editor-nodes";
 import { $attachmentsWaitingOn, $settle } from "./editor-uploads";
 
-// What attachments do as people write, after Lexxy's. This covers galleries that gather and part,
+// What attachments do as users write, after Lexxy's. This covers galleries that gather and part,
 // captions reached by Tab, moves by drag and by key, files dropped in, and what screen readers
 // hear.
 
@@ -61,7 +61,7 @@ type AttachmentBehaviour = {
 };
 
 /**
- * What attachments do as people write, after Lexxy's. An attachment that Lexical put in a paragraph
+ * What attachments do as users write, after Lexxy's. An attachment that Lexical put in a paragraph
  * is moved out to stand on its own. Backspace by a gallery takes the image next to it in, and Tab
  * from a selected image edits its caption. A dropped file goes in where it was dropped. An
  * attachment can be dragged to another place, or moved with Alt, Shift and the arrows. Screen

@@ -690,7 +690,7 @@
   justify-content: center;
 }
 /* Feedback, the foot of a service's page, with the band at the end of the content, then the
-   footer. What people said, and Ask again, sit above the band without moving it. */
+   footer. What users said, and Ask again, sit above the band without moving it. */
 .preview-page-foot-content {
   position: relative;
   padding-top: 40px;

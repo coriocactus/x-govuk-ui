@@ -196,9 +196,9 @@ export type MessageSuggestionsProps = ComponentPropsWithRef<"ul"> & {
 };
 
 /**
- * Questions or replies the person might send next, as the latest reply's own offer of what to ask.
+ * Questions or replies the user might send next, as the latest reply's own offer of what to ask.
  * Put them after that reply, in its row of the log, so they sit on the replier's side. On the
- * person's side, they would read as messages already sent. Docked above the message box, they
+ * user's side, they would read as messages already sent. Docked above the message box, they
  * would stay while the conversation moved past them, and take up its space. Leave them out while a
  * reply is on its way, and offer them again once it has arrived. Before anything is said, they can
  * sit in the empty log.

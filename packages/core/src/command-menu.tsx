@@ -156,7 +156,7 @@ export function CommandMenu({
   // Every command on the open page, in the order the page shows them.
   const [order, setOrder] = useState<string[]>([]);
   const [stack, setStack] = useState<string[]>([]);
-  // False until the person moves to another page, so the first page arrives with the dialog.
+  // False until the user moves to another page, so the first page arrives with the dialog.
   const [navigated, setNavigated] = useState(false);
   const popup = useRef<HTMLDivElement>(null);
   const entries = useRef(new Map<string, Entry>()).current;
@@ -395,7 +395,7 @@ export function CommandMenuGroup({
 
 export type CommandMenuItemProps = Omit<ComponentPropsWithRef<"div">, "onSelect"> & {
   children: ReactNode;
-  /** Runs when the person chooses the command, with a press or Enter. The menu closes first. */
+  /** Runs when the user chooses the command, with a press or Enter. The menu closes first. */
   onSelect?: () => void;
   /** Opens the `CommandMenuPage` with this id instead of running a command. */
   page?: string;

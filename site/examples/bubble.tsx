@@ -29,7 +29,7 @@ const messages = [
 ] as const;
 
 /**
- * A short exchange with the Passport Office. The office's bubbles are secondary, and the person's
+ * A short exchange with the Passport Office. The office's bubbles are secondary, and the user's
  * take the chosen variant. Hold any message to react to it. Press the message that failed to send
  * it again, after which it can take reactions too.
  */

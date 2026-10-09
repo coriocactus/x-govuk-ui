@@ -1,7 +1,7 @@
 {
   "name": "@x-govuk-ui/jorjorwel",
-  "description": "x-govuk-ui's writing components on Lexical: Editor, with its prompts, attachments and AI suggestions.",
-  "version": "0.1.0",
+  "description": "A rich text editor for x-govuk-ui, built on Lexical.",
+  "version": "0.2.0",
   "license": "MIT",
   "homepage": "https://x-govuk-ui.org",
   "repository": {
@@ -33,7 +33,7 @@
     "motion": "14.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "x-govuk-ui": "0.1.0"
+    "x-govuk-ui": "0.2.0"
   },
   "dependencies": {
     "@lexical/clipboard": "0.52.0",

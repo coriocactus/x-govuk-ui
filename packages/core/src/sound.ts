@@ -444,7 +444,7 @@ export function isSoundCue(value: unknown): value is SoundCue {
 /** The quietest level an exponential fade can reach. Web Audio cannot fade to exactly zero. */
 const QUIET = 0.0001;
 
-// One AudioContext for the page, made on the first play, after a person has interacted with it.
+// One AudioContext for the page, made on the first play, after a user has interacted with it.
 let context: AudioContext | null = null;
 function audio() {
   if (!context || context.state === "closed") context = new AudioContext();
@@ -559,7 +559,7 @@ function play(cue: SoundCue, volume: number, detune: number, velocity: number) {
 
 /**
  * A function that plays a cue, for a SoundScope to respond to presses with, or for you to play a
- * cue yourself. It waits until the person has interacted with the page, as browsers require, and
+ * cue yourself. It waits until the user has interacted with the page, as browsers require, and
  * never throws for a cue that cannot play.
  */
 export function useSound({ muted = false, volume = 0.5 }: SoundOptions = {}): PlaySound {
@@ -568,7 +568,7 @@ export function useSound({ muted = false, volume = 0.5 }: SoundOptions = {}): Pl
       if (muted || !(volume > 0)) return;
       if (typeof AudioContext === "undefined")
         throw new Error("Audio is not supported in this browser.");
-      // Browsers keep audio suspended until a person interacts with the page. Skip until then,
+      // Browsers keep audio suspended until a user interacts with the page. Skip until then,
       // so cues cannot queue up and play together on the first press.
       if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
       // A little variation in level also stops repeated presses sounding mechanical.

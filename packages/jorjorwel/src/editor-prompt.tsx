@@ -239,7 +239,7 @@ export type EditorPromptProps = Omit<ComponentPropsWithRef<"div">, "children"> &
   /** The prompt's name, written on each mention it makes, such as "person". */
   name: string;
   /**
-   * The suggestions, filtered as people type, by matching the start of words in each suggestion's
+   * The suggestions, filtered as users type, by matching the start of words in each suggestion's
    * label and `search`. It can instead be a function that loads them once, when the prompt first
    * opens.
    */

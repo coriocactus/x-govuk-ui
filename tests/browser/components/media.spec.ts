@@ -41,16 +41,27 @@ test("a logo carousel lists each logo once, shows as many as have room, and paus
   );
 });
 
-test("an organisation's name is set as GOV.UK's organisation logo sets it, in the regular weight beside a thin bar", async ({
+test("an organisation's name is set as GOV.UK's organisation logo sets it, in the regular weight beside a thin bar, or small", async ({
   frame,
   open,
+  playground,
 }) => {
   await open("organisation-name");
   const name = frame.locator(".x-govuk-ui-organisation-name");
+  const crest = () =>
+    name.evaluate((element) => {
+      const style = getComputedStyle(element, "::before");
+      return [style.width, style.height];
+    });
   await expect(name).toHaveCSS("font-weight", "400");
   await expect(name).toHaveCSS("font-size", "19px");
   await expect(name).toHaveCSS("border-left-width", "2px");
   await expect(name).toHaveCSS("border-left-color", "rgb(255, 67, 40)");
+  expect(await crest()).toEqual(["33px", "27px"]);
+  // Small, for a sidebar or a footer, the name and the Royal Arms are smaller.
+  await playground.set("size", "Small");
+  await expect(name).toHaveCSS("font-size", "15px");
+  await expect.poll(crest).toEqual(["26px", "21px"]);
 });
 
 test("a QR code redraws for a new address", async ({ frame, open }) => {

@@ -49,6 +49,10 @@ test("an organisation's name sits beside a bar of its colour, under the Royal Ar
     /^<a href="\/government\/organisations\/[^"]+" class="x-govuk-ui-organisation-name"/,
   );
   expect(html).toContain('data-crest=""');
+  expect(html).toContain('data-size="medium"');
+  expect(
+    renderToStaticMarkup(<OrganisationName size="small">Cabinet Office</OrganisationName>),
+  ).toContain('data-size="small"');
   expect(html).toContain("--x-govuk-ui-organisation-colour:#ff4328");
   expect(html).toContain(
     "--x-govuk-ui-organisation-crest:url(&quot;/assets/images/govuk-crest.svg&quot;)",

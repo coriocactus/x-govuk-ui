@@ -196,7 +196,7 @@ export function LogoCarousel({
 function Logo({ item }: { item: LogoCarouselItem }) {
   if (item.logo) return <>{item.logo}</>;
   return (
-    <OrganisationName colour={item.colour} className="x-govuk-ui-logo-carousel-name">
+    <OrganisationName colour={item.colour} size="small" className="x-govuk-ui-logo-carousel-name">
       {item.name}
     </OrganisationName>
   );

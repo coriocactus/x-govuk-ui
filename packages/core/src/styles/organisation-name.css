@@ -23,6 +23,15 @@
   background: currentColor;
   mask: var(--x-govuk-ui-organisation-crest) no-repeat 0 0 / contain;
 }
+/* Small, for a sidebar or a footer, the name is 15 pixels, and the Royal Arms shrinks with it. */
+.x-govuk-ui-organisation-name[data-size="small"] {
+  font-size: 15px;
+}
+.x-govuk-ui-organisation-name[data-size="small"][data-crest]::before {
+  width: 26px;
+  height: 21px;
+  margin-bottom: 3px;
+}
 /* As a link, it is GOV.UK's link in the text's colour. It is underlined, and the underline thickens
    under the pointer. */
 a.x-govuk-ui-organisation-name {

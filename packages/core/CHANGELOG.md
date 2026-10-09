@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Changed RichText's types so that `html` and `markdown` cannot both be given. TypeScript now reports passing both, which drew only the HTML and ignored the Markdown. Give the document as one or the other.
+
 ### Added
 
 - Added `size` to OrganisationName. `small` sets the name at 15 pixels, with a smaller Royal Arms, for a sidebar or a footer. `medium`, the size of GOV.UK's organisation logo, is the default.

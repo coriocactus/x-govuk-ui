@@ -169,10 +169,6 @@ export function renderTree(nodes: HtmlNode[], options: DrawOptions = {}): ReactN
 }
 
 export type RichTextProps = ComponentPropsWithRef<"div"> & {
-  /** The document as HTML, as an Editor writes it. */
-  html?: string;
-  /** The document as Markdown, such as an assistant's reply, in place of HTML. */
-  markdown?: string;
   /**
    * Parts to draw elements with in place of the plain ones, such as Link for a link, Code block
    * for code, Table's parts for a table, or Inline citation for a reply's source.
@@ -183,12 +179,24 @@ export type RichTextProps = ComponentPropsWithRef<"div"> & {
    * heading does not compete with the page's. Each stops at h6.
    */
   headingOffset?: number;
-};
+} & (
+    | {
+        /** The document as HTML, as an Editor writes it. Give it or `markdown`, not both. */
+        html?: string;
+        markdown?: never;
+      }
+    | {
+        html?: never;
+        /** The document as Markdown, such as an assistant's reply. Give it or `html`, not both. */
+        markdown?: string;
+      }
+  );
 
 /**
  * A document drawn as React elements, from HTML or from Markdown, so it renders on the server and
  * brings no editor to the browser. It can be an assistant's reply, a page's content from Markdown,
- * or a document written in the Editor.
+ * or a document written in the Editor. Give the document as `html` or as `markdown`, not both.
+ * TypeScript reports both. If both reach it anyway, such as from JavaScript, it draws the HTML.
  *
  * It is set in Prose, with GOV.UK's body text, headings, lists and links. Code is coloured by its
  * syntax, tables scroll across, and images keep their captions. It also draws galleries and

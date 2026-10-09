@@ -202,3 +202,11 @@ test("an empty state can be the whole page, headed at level 1", () => {
     ),
   ).toContain('<h1 class="x-govuk-ui-empty-state-title">Redbox is not answering</h1>');
 });
+
+test("rich text takes its document as html or as markdown, not both", () => {
+  // @ts-expect-error TypeScript reports a document given both ways.
+  const both = renderToStaticMarkup(<RichText html="<p>As HTML</p>" markdown="As Markdown" />);
+  // If both reach it anyway, as from JavaScript, it draws the HTML.
+  expect(both).toContain("<p>As HTML</p>");
+  expect(both).not.toContain("As Markdown");
+});

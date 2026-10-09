@@ -13,6 +13,7 @@
     "build:lib": "bun scripts/build-lib.ts",
     "build:mcp": "bun scripts/build-mcp.ts",
     "release": "bun scripts/release.ts",
+    "api-diff": "bun run build:lib && bun scripts/api-diff.ts",
     "stage": "bun scripts/stage.ts",
     "departments": "bun scripts/departments.ts",
     "links": "bun scripts/links.ts",

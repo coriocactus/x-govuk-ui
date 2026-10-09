@@ -103,6 +103,30 @@ function withoutComments(code: string) {
   return kept;
 }
 
+/**
+ * Each of the library's custom properties a value reads, with the fallback it is read with, if any.
+ * A fallback can itself read a property, as in `var(--a, var(--b))`, so brackets are matched.
+ */
+function varsIn(value: string): [string, string | undefined][] {
+  const found: [string, string | undefined][] = [];
+  for (const match of value.matchAll(/var\((--x-govuk-ui-[\w-]+)\s*/g)) {
+    const name = match[1] ?? "";
+    let at = (match.index ?? 0) + match[0].length;
+    if (value[at] !== ",") {
+      found.push([name, undefined]);
+      continue;
+    }
+    let depth = 0;
+    const start = at + 1;
+    for (; at < value.length; at++) {
+      if (value[at] === "(") depth++;
+      else if (value[at] === ")" && depth-- === 0) break;
+    }
+    found.push([name, value.slice(start, at).trim()]);
+  }
+  return found;
+}
+
 /** The index of the bracket that closes the one at `at`. */
 function close(code: string, at: number): number {
   const pairs: Record<string, string> = { "{": "}", "(": ")", "[": "]" };
@@ -533,10 +557,8 @@ export async function stylingContracts(): Promise<Record<ComponentName, StylingC
         const classes = parts.at(-1)?.classes.filter(mine) ?? [];
         if (!classes.length) continue;
         for (const [property, value] of rule.declarations) {
-          for (const [, used, fallback] of value.matchAll(
-            /var\((--x-govuk-ui-[\w-]+)\s*(?:,\s*([^)]+))?\)/g,
-          ))
-            if (used && !read.get(used)) read.set(used, fallback?.trim());
+          for (const [used, fallback] of varsIn(value))
+            if (!read.get(used)) read.set(used, fallback);
           if (!property.startsWith("--x-govuk-ui-")) continue;
           const known = declared.get(property);
           if (!known || parts.length < known.depth)

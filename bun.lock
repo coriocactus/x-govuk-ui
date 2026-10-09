@@ -38,7 +38,7 @@
       "peerDependencies": {
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "x-govuk-ui": "^0.1.0",
+        "x-govuk-ui": "0.2.0",
       },
     },
     "packages/core": {
@@ -92,7 +92,7 @@
         "motion": "14.0.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "x-govuk-ui": "^0.1.0",
+        "x-govuk-ui": "0.2.0",
       },
     },
     "packages/memetics": {
@@ -107,7 +107,7 @@
       "peerDependencies": {
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "x-govuk-ui": "^0.1.0",
+        "x-govuk-ui": "0.2.0",
       },
     },
   },

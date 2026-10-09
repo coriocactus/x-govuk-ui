@@ -17,7 +17,8 @@
     "x-govuk-ui-mcp": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=20"

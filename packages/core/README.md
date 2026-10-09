@@ -37,6 +37,10 @@ The components with large dependencies are in packages of their own. Each is rel
 - `@x-govuk-ui/memetics`, the charts, on Recharts
 - `@x-govuk-ui/belsize`, Tiles, on react-mosaic
 
+## Versions
+
+The library and its extensions are released together, at one version. Before 1.0, a minor version, such as 0.3.0, can break what a service relies on, including how a part looks. A patch version, such as 0.2.1, only fixes and adds. [CHANGELOG.md](https://github.com/coriocactus/x-govuk-ui/blob/main/packages/core/CHANGELOG.md) lists what changed in each version.
+
 ## For AI tools
 
 The site serves its documentation for language models at [x-govuk-ui.org/llms.txt](https://x-govuk-ui.org/llms.txt). `@x-govuk-ui/mcp` answers an agent's questions about the components.

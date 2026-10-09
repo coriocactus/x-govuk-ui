@@ -2,9 +2,9 @@ name: Release
 
 # A push to main whose version has no GitHub release yet. Once the push's checks pass, each
 # package is staged on npm, for a maintainer to approve with 2FA, and the version gets a GitHub
-# release, with no notes until someone writes them. Any other push stops in seconds. It runs on the
-# push itself, and waits there for Check, because npm's trusted publishing names a push as an event
-# it accepts.
+# release, with the changelogs' entries as its notes. Any other push stops in seconds. It runs on
+# the push itself, and waits there for Check, because npm's trusted publishing names a push as an
+# event it accepts.
 on:
   push:
     branches: [main]
@@ -86,11 +86,13 @@ jobs:
       - if: steps.version.outputs.release
         run: bun run stage
 
-      # The release marks the version as staged, so a later push stages nothing again.
+      # The release marks the version as staged, so a later push stages nothing again. Its notes
+      # are the version's entries in each package's changelog.
       - if: steps.version.outputs.release
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          options=(--target "$GITHUB_SHA" --title "$VERSION" --notes "")
+          bun scripts/changelog.ts notes "$VERSION" > "$RUNNER_TEMP/notes.md"
+          options=(--target "$GITHUB_SHA" --title "$VERSION" --notes-file "$RUNNER_TEMP/notes.md")
           if [[ "$VERSION" == *-* ]]; then options+=(--prerelease); fi
           gh release create "v$VERSION" "${options[@]}"

@@ -68,6 +68,15 @@ Each package is on npm. The library is [`x-govuk-ui`](https://www.npmjs.com/pack
 
 The MCP server, [`@x-govuk-ui/mcp`](https://www.npmjs.com/package/@x-govuk-ui/mcp), is in the same scope.
 
+## Versions
+
+All five packages are released together, at one version. Before 1.0, the version says what a service can expect:
+
+- A minor version, such as 0.3.0, can break what a service relies on. That includes a renamed or removed export, prop or option. It also includes a renamed or removed class, data attribute or custom property in a component's styling contract, and a change to how a part looks.
+- A patch version, such as 0.2.1, only fixes and adds.
+
+npm saves a dependency as `^0.2.0`, which takes patches but not the next minor version. A service therefore takes fixes without taking a breaking change. Each package's `CHANGELOG.md` lists what changed in each version, with breaking and visual changes in sections of their own. Read it before you take a new minor version.
+
 ## Commands
 
 ```sh

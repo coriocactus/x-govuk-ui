@@ -2,7 +2,6 @@
   "name": "@x-govuk-ui/belsize",
   "description": "x-govuk-ui's tiling: Tiles that people resize, fold away and hide.",
   "version": "0.1.0",
-  "private": true,
   "license": "MIT",
   "homepage": "https://x-govuk-ui.org",
   "repository": {

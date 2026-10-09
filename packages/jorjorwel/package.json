@@ -2,7 +2,6 @@
   "name": "@x-govuk-ui/jorjorwel",
   "description": "x-govuk-ui's writing components on Lexical: Editor, with its prompts, attachments and AI suggestions.",
   "version": "0.1.0",
-  "private": true,
   "license": "MIT",
   "homepage": "https://x-govuk-ui.org",
   "repository": {

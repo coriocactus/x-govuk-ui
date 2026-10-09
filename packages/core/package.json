@@ -2,7 +2,6 @@
   "name": "x-govuk-ui",
   "description": "GOV.UK's design, extended with React: considered motion, feedback and sound.",
   "version": "0.1.0",
-  "private": true,
   "license": "MIT",
   "homepage": "https://x-govuk-ui.org",
   "repository": {

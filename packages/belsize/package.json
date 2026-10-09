@@ -1,7 +1,7 @@
 {
   "name": "@x-govuk-ui/belsize",
   "description": "A tiling layout for x-govuk-ui, built on react-mosaic.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "homepage": "https://x-govuk-ui.org",
   "repository": {
@@ -32,7 +32,7 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "x-govuk-ui": "0.2.0"
+    "x-govuk-ui": "0.2.1"
   },
   "dependencies": {
     "rdndmb-html5-to-touch": "9.0.0",

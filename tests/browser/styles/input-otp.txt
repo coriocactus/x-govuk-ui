@@ -1,0 +1,40 @@
+.x-govuk-ui-otp-placeholder
+  display: block
+  font-size: 24px
+  font-weight: 400
+  line-height: 1
+  color: color(srgb 0.0431373 0.0470588 0.0470588 / 0.22)
+.x-govuk-ui-otp-separator
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: color(srgb 0.0431373 0.0470588 0.0470588 / 0.3)
+  margin-right: 2px
+  margin-left: 2px
+  border-top-left-radius: 1px
+  border-top-right-radius: 1px
+  border-bottom-right-radius: 1px
+  border-bottom-left-radius: 1px
+.x-govuk-ui-otp-slot
+  display: grid
+  font-size: 24px
+  font-weight: 700
+  line-height: 1
+  color: rgb(11, 12, 12)
+  background-color: color(srgb 0.0431373 0.0470588 0.0470588 / 0.06)
+  border-top-left-radius: 11px
+  border-top-right-radius: 11px
+  border-bottom-right-radius: 11px
+  border-bottom-left-radius: 11px
+  box-shadow: color(srgb 0.0431373 0.0470588 0.0470588 / 0.07) 0px 0px 0px 1px inset
+.x-govuk-ui-otp-slots
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 8px
+  column-gap: 8px
+  max-width: 100%

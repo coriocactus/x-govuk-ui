@@ -1,0 +1,12 @@
+.x-govuk-ui-prose
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+.x-govuk-ui-rich-text
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)

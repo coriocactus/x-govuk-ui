@@ -1,0 +1,77 @@
+.x-govuk-ui-calendar-heatmap
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-calendar-heatmap-day
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: color(srgb 0.888471 0.911529 0.931294)
+  border-top-left-radius: 2px
+  border-top-right-radius: 2px
+  border-bottom-right-radius: 2px
+  border-bottom-left-radius: 2px
+.x-govuk-ui-calendar-heatmap-grid
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-bottom: 4px
+  row-gap: 2px
+  column-gap: 2px
+  min-width: min-content
+.x-govuk-ui-calendar-heatmap-month
+  display: block
+  font-size: 12px
+  font-weight: 400
+  line-height: 1.2
+  color: rgb(72, 73, 73)
+  padding-bottom: 4px
+.x-govuk-ui-calendar-heatmap-plot
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-calendar-heatmap-scroll
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-calendar-heatmap-weekday
+  display: block
+  font-size: 12px
+  font-weight: 400
+  line-height: 1
+  color: rgb(72, 73, 73)
+  padding-right: 6px
+.x-govuk-ui-chart
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-chart-heat
+  display: block
+  font-size: 15px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: color(srgb 0.888471 0.911529 0.931294)
+  border-top-left-radius: 2px
+  border-top-right-radius: 2px
+  border-bottom-right-radius: 2px
+  border-bottom-left-radius: 2px
+  box-shadow: rgb(206, 206, 206) 0px 0px 0px 1px inset
+.x-govuk-ui-figure
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)

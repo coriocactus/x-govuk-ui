@@ -23,6 +23,9 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: "list",
+  // Style snapshots are text, the same on every platform, so each component has one file, which
+  // the changelog's Visual entries can be read against.
+  snapshotPathTemplate: "{testDir}/styles/{arg}{ext}",
   // One run at a time on this machine. A run from another checkout waits for this one to finish.
   globalSetup: "./tests/browser/lock.ts",
   use: {

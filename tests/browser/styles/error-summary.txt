@@ -1,0 +1,42 @@
+.x-govuk-ui-error-summary
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 18px
+  padding-right: 20px
+  padding-bottom: 20px
+  padding-left: 20px
+  border-top-left-radius: 6px
+  border-top-right-radius: 6px
+  border-bottom-right-radius: 6px
+  border-bottom-left-radius: 6px
+  border-top: 4px solid rgb(202, 53, 53)
+  border-right: 4px solid rgb(202, 53, 53)
+  border-bottom: 4px solid rgb(202, 53, 53)
+  border-left: 4px solid rgb(202, 53, 53)
+.x-govuk-ui-error-summary-link
+  display: inline
+  font-size: 17px
+  font-weight: 700
+  line-height: 1.5
+  text-decoration-line: underline
+  text-decoration-thickness: 1px
+  text-underline-offset: 2.55px
+  color: rgb(202, 53, 53)
+.x-govuk-ui-error-summary-list
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 6px
+  column-gap: 6px
+.x-govuk-ui-error-summary-title
+  display: block
+  font-size: 24px
+  font-weight: 700
+  line-height: 1.25
+  color: rgb(11, 12, 12)
+  margin-bottom: 12px

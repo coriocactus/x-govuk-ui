@@ -1,0 +1,54 @@
+.x-govuk-ui-button-group
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 20px
+  row-gap: 16px
+  column-gap: 20px
+.x-govuk-ui-empty-state
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 32px
+  padding-right: 24px
+  padding-bottom: 32px
+  padding-left: 24px
+.x-govuk-ui-empty-state-actions
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 20px
+  row-gap: 16px
+  column-gap: 20px
+.x-govuk-ui-empty-state-description
+  display: block
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(72, 73, 73)
+  max-width: 612px
+.x-govuk-ui-empty-state-media
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(72, 73, 73)
+  background-color: rgb(243, 243, 243)
+  margin-bottom: 16px
+  border-top-left-radius: 50%
+  border-top-right-radius: 50%
+  border-bottom-right-radius: 50%
+  border-bottom-left-radius: 50%
+.x-govuk-ui-empty-state-title
+  display: block
+  font-size: 24px
+  font-weight: 700
+  line-height: 1.25
+  color: rgb(11, 12, 12)
+  margin-bottom: 8px

@@ -1,0 +1,81 @@
+.x-govuk-ui-figure
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-stat
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 10px
+  padding-right: 24px
+  padding-bottom: 12px
+  padding-left: 20px
+  border-top: 1px solid rgb(206, 206, 206)
+  border-left: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-stat-body
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 6px
+  column-gap: 6px
+.x-govuk-ui-stat-change
+  display: flex
+  font-size: 14px
+  font-weight: 700
+  line-height: 1.4
+  color: rgb(15, 122, 82)
+  row-gap: 4px
+  column-gap: 4px
+.x-govuk-ui-stat-description
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-stat-label
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-stat-value
+  display: block
+  font-size: 26.6475px
+  font-weight: 700
+  line-height: 1.1
+  letter-spacing: -0.5px
+  color: rgb(11, 12, 12)
+.x-govuk-ui-stat-words
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 2px
+  column-gap: 2px
+.x-govuk-ui-stats
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-stats-grid
+  display: flow-root
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-stats-row
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: -1px
+  margin-left: -21px

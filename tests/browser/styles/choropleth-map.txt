@@ -1,0 +1,36 @@
+.x-govuk-ui-chart
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-choropleth-map
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-choropleth-map-area
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-choropleth-map-drawing
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-choropleth-map-plot
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-figure
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)

@@ -1,0 +1,33 @@
+.x-govuk-ui-button
+  display: grid
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(255, 255, 255)
+  background-color: rgb(15, 122, 82)
+  padding-top: 10px
+  padding-right: 20px
+  padding-bottom: 10px
+  padding-left: 20px
+  min-height: 44px
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+  box-shadow: rgb(8, 61, 41) 0px 2px 0px 0px
+  border-top: 1px solid rgba(0, 0, 0, 0)
+  border-right: 1px solid rgba(0, 0, 0, 0)
+  border-bottom: 1px solid rgba(0, 0, 0, 0)
+  border-left: 1px solid rgba(0, 0, 0, 0)
+.x-govuk-ui-button-label
+  display: block
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(255, 255, 255)
+.x-govuk-ui-button-spinner
+  display: flex
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(255, 255, 255)

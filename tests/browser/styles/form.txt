@@ -1,0 +1,28 @@
+.x-govuk-ui-form
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-form-fields
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 30px
+  column-gap: 30px
+.x-govuk-ui-form-summary
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 4px
+  padding-right: 4px
+  padding-bottom: 4px
+  padding-left: 4px
+  margin-top: -4px
+  margin-right: -4px
+  margin-bottom: -4px
+  margin-left: -4px

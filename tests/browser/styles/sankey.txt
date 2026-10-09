@@ -1,0 +1,48 @@
+.x-govuk-ui-chart
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-chart-label
+  display: block
+  font-size: 13px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-chart-plot
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-figure
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-sankey
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-sankey-flow
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-sankey-name
+  display: inline
+  font-size: 13px
+  font-weight: 700
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-sankey-stage
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)

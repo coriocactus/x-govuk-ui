@@ -1,0 +1,7 @@
+.x-govuk-ui-visually-hidden
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.5
+  text-underline-offset: 2.85px
+  color: rgb(26, 101, 166)

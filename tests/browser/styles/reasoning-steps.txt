@@ -1,0 +1,64 @@
+.x-govuk-ui-reasoning
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-reasoning-detail
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-reasoning-mark
+  display: grid
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(255, 255, 255)
+  background-color: rgb(15, 122, 82)
+  border-top-left-radius: 50%
+  border-top-right-radius: 50%
+  border-bottom-right-radius: 50%
+  border-bottom-left-radius: 50%
+.x-govuk-ui-reasoning-panel
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-reasoning-step
+  display: flex
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-bottom: 14px
+  row-gap: 12px
+  column-gap: 12px
+.x-govuk-ui-reasoning-steps
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 10px
+.x-govuk-ui-reasoning-text
+  display: grid
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  padding-top: 1px
+  row-gap: 2px
+  column-gap: 2px
+.x-govuk-ui-reasoning-trigger
+  display: inline-flex
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(72, 73, 73)
+  padding-top: 2px
+  padding-bottom: 2px
+  row-gap: 6px
+  column-gap: 6px

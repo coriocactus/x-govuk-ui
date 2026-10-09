@@ -1,0 +1,70 @@
+.x-govuk-ui-waffle
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-waffle-body
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 28px
+  column-gap: 28px
+.x-govuk-ui-waffle-cell
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: rgb(18, 67, 109)
+  border-top-left-radius: 2px
+  border-top-right-radius: 2px
+  border-bottom-right-radius: 2px
+  border-bottom-left-radius: 2px
+.x-govuk-ui-waffle-figure
+  display: block
+  font-size: 16px
+  font-weight: 700
+  line-height: 1.3
+  color: rgb(11, 12, 12)
+.x-govuk-ui-waffle-grid
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 3px
+  column-gap: 3px
+.x-govuk-ui-waffle-key
+  display: grid
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(11, 12, 12)
+  row-gap: 8px
+  column-gap: 8px
+.x-govuk-ui-waffle-label
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(11, 12, 12)
+.x-govuk-ui-waffle-share
+  display: inline
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(72, 73, 73)
+.x-govuk-ui-waffle-swatch
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(11, 12, 12)
+  background-color: rgb(18, 67, 109)
+  border-top-left-radius: 2px
+  border-top-right-radius: 2px
+  border-bottom-right-radius: 2px
+  border-bottom-left-radius: 2px

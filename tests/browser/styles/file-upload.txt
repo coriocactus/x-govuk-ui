@@ -1,0 +1,79 @@
+.x-govuk-ui-file-upload
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 20px
+  padding-right: 20px
+  padding-bottom: 20px
+  padding-left: 20px
+  min-height: 132px
+  border-top-left-radius: 8px
+  border-top-right-radius: 8px
+  border-bottom-right-radius: 8px
+  border-bottom-left-radius: 8px
+  border-top: 2px dashed rgb(11, 12, 12)
+  border-right: 2px dashed rgb(11, 12, 12)
+  border-bottom: 2px dashed rgb(11, 12, 12)
+  border-left: 2px dashed rgb(11, 12, 12)
+.x-govuk-ui-file-upload-body
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 10px
+  column-gap: 10px
+.x-govuk-ui-file-upload-choose
+  display: inline-block
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  background-color: rgb(255, 255, 255)
+  padding-top: 6px
+  padding-right: 12px
+  padding-bottom: 6px
+  padding-left: 12px
+  margin-right: 4px
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+  box-shadow: rgb(11, 12, 12) 0px 2px 0px 0px
+  border-top: 1px solid rgb(11, 12, 12)
+  border-right: 1px solid rgb(11, 12, 12)
+  border-bottom: 1px solid rgb(11, 12, 12)
+  border-left: 1px solid rgb(11, 12, 12)
+.x-govuk-ui-file-upload-empty
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(72, 73, 73)
+.x-govuk-ui-file-upload-files
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 12px
+.x-govuk-ui-file-upload-icon
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(72, 73, 73)
+.x-govuk-ui-file-upload-input
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-file-upload-text
+  display: block
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)

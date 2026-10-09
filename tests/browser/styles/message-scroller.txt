@@ -1,0 +1,170 @@
+.x-govuk-ui-button
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(72, 73, 73)
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+.x-govuk-ui-copy-button
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(72, 73, 73)
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+.x-govuk-ui-copy-icons
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(72, 73, 73)
+.x-govuk-ui-message-rate
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(72, 73, 73)
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+.x-govuk-ui-message-rating
+  display: contents
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-message-retry
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(72, 73, 73)
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+.x-govuk-ui-message-retry-icon
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(72, 73, 73)
+.x-govuk-ui-message-scroller
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-message-scroller-content
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 16px
+  padding-right: 16px
+  padding-bottom: 8px
+  padding-left: 16px
+.x-govuk-ui-message-scroller-item
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-message-scroller-latest
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: rgb(255, 255, 255)
+  border-top-left-radius: 50%
+  border-top-right-radius: 50%
+  border-bottom-right-radius: 50%
+  border-bottom-left-radius: 50%
+  box-shadow: rgba(11, 12, 12, 0.14) 0px 4px 14px 0px
+  border-top: 1px solid rgb(206, 206, 206)
+  border-right: 1px solid rgb(206, 206, 206)
+  border-bottom: 1px solid rgb(206, 206, 206)
+  border-left: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-message-scroller-rows
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-message-scroller-scroll
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-message-scroller-spacer
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-message-suggestion
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-message-suggestion-button
+  display: grid
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(11, 12, 12)
+  background-color: rgb(255, 255, 255)
+  padding-top: 6px
+  padding-right: 13px
+  padding-bottom: 6px
+  padding-left: 13px
+  min-height: 36px
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+  box-shadow: rgb(11, 12, 12) 0px 2px 0px 0px
+  border-top: 1px solid rgb(11, 12, 12)
+  border-right: 1px solid rgb(11, 12, 12)
+  border-bottom: 1px solid rgb(11, 12, 12)
+  border-left: 1px solid rgb(11, 12, 12)
+.x-govuk-ui-message-suggestions
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 8px
+  row-gap: 8px
+  column-gap: 8px
+.x-govuk-ui-message-tool
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(72, 73, 73)
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+.x-govuk-ui-message-tools
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 2px
+  margin-left: -6px
+  row-gap: 2px
+  column-gap: 2px

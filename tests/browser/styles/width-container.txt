@@ -1,0 +1,20 @@
+.x-govuk-ui-grid-column
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-grid-row
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 20px
+  column-gap: clamp(0px, 100000% - 559000px, 30px)
+.x-govuk-ui-width-container
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)

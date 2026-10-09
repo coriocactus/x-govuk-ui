@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { componentNames } from "../../site/catalogue";
@@ -49,6 +50,82 @@ async function violations(page: Page, rules?: string[], sidebar = true) {
   if (!sidebar) builder = builder.exclude(".workbench-sidebar");
   builder = rules ? builder.withRules(rules) : builder.withTags(wcag);
   return (await builder.analyze()).violations;
+}
+
+// The computed properties that make up how a part looks, as a style snapshot records them. Layout's
+// own sizes, transforms and opacity are left out, because they follow the content and the motion.
+const looks = [
+  "display",
+  "font-size",
+  "font-weight",
+  "font-style",
+  "line-height",
+  "letter-spacing",
+  "text-transform",
+  "text-decoration-line",
+  "text-decoration-thickness",
+  "text-underline-offset",
+  "color",
+  "background-color",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
+  "row-gap",
+  "column-gap",
+  "min-width",
+  "min-height",
+  "max-width",
+  "border-top-left-radius",
+  "border-top-right-radius",
+  "border-bottom-right-radius",
+  "border-bottom-left-radius",
+  "box-shadow",
+];
+
+/**
+ * How each part of a component looks in its example, as the computed styles of the first element
+ * with each class in its styling contract. They are CSS's computed values, not the sizes the layout
+ * resolves them to, so an `auto` margin stays `auto` on every platform. Values that say nothing is
+ * set, such as 0px or none, are left out, and a border is recorded only on a side that has one. The
+ * text is a style snapshot. A change to it is a change to how a part looks, which the changelog
+ * lists under Visual.
+ */
+async function styles(page: Page, name: string) {
+  const contract = JSON.parse(readFileSync(`dist/docs/${name}.json`, "utf8")).styling as {
+    parts: { classes: string[]; inner: string[] }[];
+  };
+  const classes = [
+    ...new Set(contract.parts.flatMap((part) => [...part.classes, ...part.inner])),
+  ].filter((name) => !name.includes("{"));
+  return page.evaluate(
+    ({ classes, looks }) => {
+      const empty = new Set(["0px", "none", "normal", "auto", "rgba(0, 0, 0, 0)"]);
+      const lines: string[] = [];
+      for (const name of [...classes].sort()) {
+        const element = document.querySelector(`.preview-stage .${name}`);
+        if (!element) continue;
+        const style = element.computedStyleMap();
+        const value = (property: string) => style.get(property)?.toString() ?? "";
+        lines.push(`.${name}`);
+        for (const property of looks)
+          if (!empty.has(value(property))) lines.push(`  ${property}: ${value(property)}`);
+        for (const side of ["top", "right", "bottom", "left"]) {
+          const kind = value(`border-${side}-style`);
+          if (kind === "none") continue;
+          lines.push(
+            `  border-${side}: ${value(`border-${side}-width`)} ${kind} ${value(`border-${side}-color`)}`,
+          );
+        }
+      }
+      return `${lines.join("\n")}\n`;
+    },
+    { classes, looks },
+  );
 }
 
 /**
@@ -161,6 +238,25 @@ for (const [name, path] of pages) {
       expect(await violations(page, undefined, sidebar)).toEqual([]);
     });
     if (browserName !== "chromium") return;
+    // Engines compute styles alike, so Chromium alone records them, in light. They are recorded in
+    // a page of their own, where an example that changes by itself, such as Task list working
+    // through its tasks, stays as it starts, on a fast machine or a slow one. Such an example paces
+    // itself with intervals and long timeouts, which do nothing there. Stopping the clock instead
+    // would also stop CSS's transitions, which never finish.
+    if (example)
+      await test.step("looks as its style snapshot records", async () => {
+        const still = await page.context().newPage();
+        await still.addInitScript(() => {
+          const timeout = window.setTimeout;
+          window.setInterval = (() => 0) as unknown as typeof window.setInterval;
+          window.setTimeout = ((handler: TimerHandler, delay?: number, ...rest: unknown[]) =>
+            (delay ?? 0) >= 500 ? 0 : timeout(handler, delay, ...rest)) as typeof window.setTimeout;
+        });
+        await still.goto(path);
+        await ready(still);
+        expect(await styles(still, name)).toMatchSnapshot(`${name}.txt`);
+        await still.close();
+      });
     await test.step("colours contrast in dark", async () => {
       // The theme is kept in the browser. A component's page follows it as it changes, such as when
       // it is chosen in another tab. The page therefore turns dark where it is, with nothing

@@ -1,0 +1,76 @@
+.x-govuk-ui-chart
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-chart-baseline
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-chart-drawing
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-chart-grid
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-chart-key
+  display: flex
+  font-size: 15px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-bottom: 12px
+  row-gap: 4px
+  column-gap: 18px
+.x-govuk-ui-chart-key-mark
+  display: block
+  font-size: 15px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(18, 67, 109)
+  background-color: rgb(18, 67, 109)
+  border-top-left-radius: 2px
+  border-top-right-radius: 2px
+  border-bottom-right-radius: 2px
+  border-bottom-left-radius: 2px
+.x-govuk-ui-chart-plot
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-chart-tick
+  display: block
+  font-size: 13px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-details
+  display: block
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 12px
+.x-govuk-ui-figure
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-figure-data
+  display: block
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 12px

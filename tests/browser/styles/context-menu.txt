@@ -1,0 +1,20 @@
+.x-govuk-ui-context-menu-trigger
+  display: grid
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 12px
+  padding-right: 14px
+  padding-bottom: 12px
+  padding-left: 14px
+  row-gap: 2px
+  column-gap: 2px
+  border-top-left-radius: 6px
+  border-top-right-radius: 6px
+  border-bottom-right-radius: 6px
+  border-bottom-left-radius: 6px
+  border-top: 1px solid rgb(206, 206, 206)
+  border-right: 1px solid rgb(206, 206, 206)
+  border-bottom: 1px solid rgb(206, 206, 206)
+  border-left: 1px solid rgb(206, 206, 206)

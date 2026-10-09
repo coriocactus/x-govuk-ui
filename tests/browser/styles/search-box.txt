@@ -1,0 +1,37 @@
+.x-govuk-ui-search-box
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-search-box-button
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(255, 255, 255)
+  background-color: rgb(29, 112, 184)
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+.x-govuk-ui-search-box-field
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-search-box-input
+  display: block
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.25
+  color: rgb(11, 12, 12)
+  padding-top: 10px
+  padding-right: 12px
+  padding-bottom: 10px
+  padding-left: 12px
+  border-top-left-radius: 5px
+  border-bottom-left-radius: 5px
+  border-top: 1px solid rgb(11, 12, 12)
+  border-right: 1px solid rgba(0, 0, 0, 0)
+  border-bottom: 1px solid rgb(11, 12, 12)
+  border-left: 1px solid rgb(11, 12, 12)

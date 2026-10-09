@@ -1,0 +1,13 @@
+.x-govuk-ui-back-link
+  display: flex
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.25
+  text-decoration-line: underline
+  text-decoration-thickness: 1px
+  text-underline-offset: 2.4px
+  color: rgb(11, 12, 12)
+  margin-top: 15px
+  margin-bottom: 15px
+  row-gap: 6px
+  column-gap: 6px

@@ -1,0 +1,55 @@
+.x-govuk-ui-file-chip
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  background-color: rgb(243, 243, 243)
+  padding-right: 8px
+  padding-left: 8px
+  row-gap: 6px
+  column-gap: 6px
+  min-height: 28px
+  max-width: 220px
+  border-top-left-radius: 6px
+  border-top-right-radius: 6px
+  border-bottom-right-radius: 6px
+  border-bottom-left-radius: 6px
+.x-govuk-ui-file-chip-end
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+.x-govuk-ui-file-chip-kind
+  display: block
+  font-size: 13px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-file-chip-name
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+.x-govuk-ui-file-chip-start
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+.x-govuk-ui-file-chip-whole
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+.x-govuk-ui-file-chips
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 6px
+  column-gap: 6px

@@ -1,0 +1,18 @@
+.x-govuk-ui-spinner
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(29, 112, 184)
+.x-govuk-ui-spinner-arc
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(29, 112, 184)
+.x-govuk-ui-spinner-track
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(29, 112, 184)

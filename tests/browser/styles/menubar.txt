@@ -1,0 +1,35 @@
+.x-govuk-ui-menubar
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: rgb(255, 255, 255)
+  padding-top: 3px
+  padding-right: 3px
+  padding-bottom: 3px
+  padding-left: 3px
+  row-gap: 2px
+  column-gap: 2px
+  border-top-left-radius: 8px
+  border-top-right-radius: 8px
+  border-bottom-right-radius: 8px
+  border-bottom-left-radius: 8px
+  border-top: 1px solid rgb(206, 206, 206)
+  border-right: 1px solid rgb(206, 206, 206)
+  border-bottom: 1px solid rgb(206, 206, 206)
+  border-left: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-menubar-trigger
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 6px
+  padding-right: 12px
+  padding-bottom: 6px
+  padding-left: 12px
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px

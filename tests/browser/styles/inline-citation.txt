@@ -1,0 +1,40 @@
+.x-govuk-ui-citation
+  display: inline-flex
+  font-size: 12px
+  font-weight: 400
+  line-height: 1
+  color: rgb(72, 73, 73)
+  background-color: rgb(243, 243, 243)
+  padding-right: 7px
+  padding-left: 3px
+  margin-right: 2px
+  margin-left: 2px
+  row-gap: 4px
+  column-gap: 4px
+  border-top-left-radius: 10px
+  border-top-right-radius: 10px
+  border-bottom-right-radius: 10px
+  border-bottom-left-radius: 10px
+.x-govuk-ui-citation-mark
+  display: grid
+  font-size: 9px
+  font-weight: 700
+  line-height: 1
+  color: rgb(11, 12, 12)
+  background-color: rgb(255, 255, 255)
+  border-top-left-radius: 50%
+  border-top-right-radius: 50%
+  border-bottom-right-radius: 50%
+  border-bottom-left-radius: 50%
+.x-govuk-ui-citation-more
+  display: block
+  font-size: 12px
+  font-weight: 400
+  line-height: 1
+  color: rgb(72, 73, 73)
+.x-govuk-ui-citation-site
+  display: block
+  font-size: 12px
+  font-weight: 400
+  line-height: 1
+  color: rgb(72, 73, 73)

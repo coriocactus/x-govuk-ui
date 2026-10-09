@@ -1,0 +1,20 @@
+.x-govuk-ui-field
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-hint
+  display: block
+  font-size: 15px
+  font-weight: 400
+  line-height: 1.6
+  color: rgb(72, 73, 73)
+  margin-bottom: 14px
+.x-govuk-ui-label
+  display: block
+  font-size: 18px
+  font-weight: 700
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  margin-bottom: 7px

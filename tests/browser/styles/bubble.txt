@@ -1,0 +1,85 @@
+.x-govuk-ui-bubble
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-bubble-content
+  display: block
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: rgb(243, 243, 243)
+  padding-top: 10px
+  padding-right: 16px
+  padding-bottom: 11px
+  padding-left: 16px
+  max-width: 100%
+  border-top-left-radius: 16px
+  border-top-right-radius: 16px
+  border-bottom-right-radius: 16px
+  border-bottom-left-radius: 4px
+  border-top: 1px solid rgba(0, 0, 0, 0)
+  border-right: 1px solid rgba(0, 0, 0, 0)
+  border-bottom: 1px solid rgba(0, 0, 0, 0)
+  border-left: 1px solid rgba(0, 0, 0, 0)
+.x-govuk-ui-bubble-frame
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  max-width: 80%
+.x-govuk-ui-bubble-group
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 4px
+  column-gap: 4px
+.x-govuk-ui-bubble-react
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: rgb(255, 255, 255)
+  border-top-left-radius: 50%
+  border-top-right-radius: 50%
+  border-bottom-right-radius: 50%
+  border-bottom-left-radius: 50%
+  border-top: 1px solid rgb(206, 206, 206)
+  border-right: 1px solid rgb(206, 206, 206)
+  border-bottom: 1px solid rgb(206, 206, 206)
+  border-left: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-bubble-reaction
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1
+  color: rgb(11, 12, 12)
+  background-color: rgb(255, 255, 255)
+  padding-right: 6px
+  padding-left: 6px
+  row-gap: 3px
+  column-gap: 3px
+  min-height: 24px
+  border-top-left-radius: 12px
+  border-top-right-radius: 12px
+  border-bottom-right-radius: 12px
+  border-bottom-left-radius: 12px
+  box-shadow: rgba(11, 12, 12, 0.08) 0px 2px 6px 0px
+  border-top: 1px solid rgb(206, 206, 206)
+  border-right: 1px solid rgb(206, 206, 206)
+  border-bottom: 1px solid rgb(206, 206, 206)
+  border-left: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-bubble-reactions
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 4px
+  column-gap: 4px

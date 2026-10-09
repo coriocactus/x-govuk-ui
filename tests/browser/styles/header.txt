@@ -1,0 +1,32 @@
+.x-govuk-ui-header
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(255, 255, 255)
+  background-color: rgb(29, 112, 184)
+.x-govuk-ui-header-container
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(255, 255, 255)
+  padding-top: 16px
+  padding-bottom: 16px
+  row-gap: 10px
+  column-gap: 24px
+.x-govuk-ui-header-link
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(255, 255, 255)
+  row-gap: 8px
+  column-gap: 8px
+  border-bottom: 3px solid rgba(0, 0, 0, 0)
+.x-govuk-ui-header-logo
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(255, 255, 255)

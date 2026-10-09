@@ -1,0 +1,104 @@
+.x-govuk-ui-summary-card
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  border-top-left-radius: 8px
+  border-top-right-radius: 8px
+  border-bottom-right-radius: 8px
+  border-bottom-left-radius: 8px
+  border-top: 1px solid rgb(206, 206, 206)
+  border-right: 1px solid rgb(206, 206, 206)
+  border-bottom: 1px solid rgb(206, 206, 206)
+  border-left: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-summary-card-actions
+  display: flex
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-summary-card-content
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 6px
+  padding-right: 20px
+  padding-bottom: 6px
+  padding-left: 20px
+.x-govuk-ui-summary-card-title
+  display: block
+  font-size: 19px
+  font-weight: 700
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+.x-govuk-ui-summary-card-title-band
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  background-color: rgb(244, 248, 251)
+  padding-top: 14px
+  padding-right: 20px
+  padding-bottom: 14px
+  padding-left: 20px
+  row-gap: 8px
+  column-gap: 20px
+  border-bottom: 1px solid rgba(0, 0, 0, 0)
+.x-govuk-ui-summary-list
+  display: grid
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+.x-govuk-ui-summary-list-action
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.5
+  text-decoration-line: underline
+  text-decoration-thickness: 1px
+  text-underline-offset: 2.85px
+  color: rgb(26, 101, 166)
+.x-govuk-ui-summary-list-actions
+  display: flex
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  padding-top: 10px
+  padding-bottom: 10px
+.x-govuk-ui-summary-list-key
+  display: block
+  font-size: 19px
+  font-weight: 700
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  padding-top: 10px
+  padding-right: 20px
+  padding-bottom: 10px
+.x-govuk-ui-summary-list-row
+  display: grid
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  border-bottom: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-summary-list-value
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  padding-top: 10px
+  padding-right: 20px
+  padding-bottom: 10px
+  padding-left: 6px
+  margin-left: -6px
+  border-top-left-radius: 4px
+  border-top-right-radius: 4px
+  border-bottom-right-radius: 4px
+  border-bottom-left-radius: 4px

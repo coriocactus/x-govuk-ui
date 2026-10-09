@@ -1,0 +1,67 @@
+.x-govuk-ui-attachment
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 24px
+  column-gap: 24px
+.x-govuk-ui-attachment-details
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-attachment-facts
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.45
+  color: rgb(72, 73, 73)
+  margin-bottom: 8px
+.x-govuk-ui-attachment-fold
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-attachment-format
+  display: block
+  font-size: 12px
+  font-weight: 700
+  line-height: 1.5
+  color: rgb(255, 255, 255)
+  background-color: rgb(202, 53, 53)
+  padding-top: 2px
+  padding-right: 5px
+  padding-bottom: 2px
+  padding-left: 5px
+  border-top-left-radius: 3px
+  border-top-right-radius: 3px
+  border-bottom-right-radius: 3px
+  border-bottom-left-radius: 3px
+.x-govuk-ui-attachment-line
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-attachment-page
+  display: inline
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-attachment-thumbnail
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-attachment-title
+  display: block
+  font-size: 19px
+  font-weight: 700
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  margin-bottom: 8px

@@ -1,0 +1,121 @@
+.x-govuk-ui-footer
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  background-color: rgb(244, 248, 251)
+  padding-top: 40px
+  padding-bottom: 25px
+  border-top: 10px solid rgb(29, 112, 184)
+.x-govuk-ui-footer-break
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(128, 128, 128)
+  margin-bottom: 40px
+  border-bottom: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-footer-container
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+.x-govuk-ui-footer-copyright
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  text-decoration-line: underline
+  text-decoration-thickness: 1px
+  text-underline-offset: 2.85px
+  color: rgb(11, 12, 12)
+  margin-bottom: 25px
+.x-govuk-ui-footer-crown
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  margin-bottom: 25px
+.x-govuk-ui-footer-heading
+  display: block
+  font-size: 24px
+  font-weight: 700
+  line-height: 1.25
+  color: rgb(11, 12, 12)
+  padding-bottom: 20px
+  margin-bottom: 30px
+  border-bottom: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-footer-inline-list
+  display: flex
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  row-gap: 5px
+  column-gap: 15px
+.x-govuk-ui-footer-licence
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+.x-govuk-ui-footer-licence-description
+  display: inline-block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+.x-govuk-ui-footer-link
+  display: inline
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  text-decoration-line: underline
+  text-decoration-thickness: 1px
+  text-underline-offset: 2.85px
+  color: rgb(26, 101, 166)
+.x-govuk-ui-footer-links
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  margin-bottom: 20px
+.x-govuk-ui-footer-list
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  column-gap: 30px
+.x-govuk-ui-footer-meta
+  display: flex
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  column-gap: 30px
+.x-govuk-ui-footer-meta-main
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  margin-bottom: 25px
+.x-govuk-ui-footer-navigation
+  display: flex
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  column-gap: 30px
+.x-govuk-ui-footer-section
+  display: block
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)
+  margin-bottom: 30px

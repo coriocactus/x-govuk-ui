@@ -123,6 +123,7 @@ The tests check every page of the site. These are the front page, the workbench,
 - In Chromium, axe checks each page again in the dark theme. It checks that text contrasts with its background, and that links can be told apart from the words around them.
 - On each component's page, no box may cut off its text, in Roboto or in a wide typeface. The wide typeface stands in for whatever typeface a service chooses.
 - In Chromium, Firefox and WebKit, behaviour tests use the components as users do, with the keyboard and the pointer. They check where focus goes.
+- In Chromium, a style snapshot records how each component's parts look, from their computed styles. A change to how a part looks fails it, until the snapshot and the changelog record the change.
 
 Automated tests find some accessibility failures, but not all. Passing them does not mean that the components conform to WCAG.
 

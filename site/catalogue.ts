@@ -3588,13 +3588,28 @@ const entries = {
     dependencies: "React · Marked",
     changes:
       "Draws HTML, or Markdown through Marked, as React elements, so it renders on the server and brings no editor to the browser. A small reader of its own takes only what a document may contain, with its attributes, and drops the rest. It keeps no script, frame or style other than colour, and no link that is not to a page, an address or a number. It is set in Prose, with code coloured by its syntax, as Code block and the Editor colour it, tables that scroll across, images with their captions, and the Editor's galleries and mentions. Given components, it draws chosen elements with parts, such as a link with Link, code with Code block, or a reply's source with Inline citation, each handed the element's attributes, what it contains and its text. A heading offset moves a document's headings down the page's outline, so a reply's top heading does not compete with the page's.",
+    example: [
+      choice(
+        "format",
+        [
+          ["html", "HTML"],
+          ["markdown", "Markdown"],
+        ],
+        "html",
+        { note: "Which the example gives, the document as HTML or as Markdown." },
+      ),
+    ],
     props: [
       text(
         "html",
         '<h2>Who can apply</h2><p>You can apply for a <strong>rod fishing licence</strong> if you are 13 or over. Children under 13 do not need one.</p><p>A licence covers:</p><ul><li>salmon and sea trout, or</li><li>trout, coarse fish and eels</li></ul><p>Read the <a href="https://www.gov.uk/">byelaws for your region</a> before you fish.</p>',
-        { rows: 8 },
+        { rows: 8, needs: [when("format", "html")] },
       ),
-      reference("markdown", "string", "In place of html"),
+      text(
+        "markdown",
+        "## Who can apply\n\nYou can apply for a **rod fishing licence** if you are 13 or over. Children under 13 do not need one.\n\nA licence covers:\n\n- salmon and sea trout, or\n- trout, coarse fish and eels\n\nRead the [byelaws for your region](https://www.gov.uk/) before you fish.\n",
+        { rows: 8, default: "In place of html", needs: [when("format", "markdown")] },
+      ),
       reference(
         "components",
         "{ a, pre, table, … }, each ({ attributes, children, text }) => ReactNode",

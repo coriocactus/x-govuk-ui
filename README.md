@@ -23,15 +23,50 @@ The workbench credits each system under the name of each component that owes it.
 
 > I take credit for the synthesis, not the source.
 
+## Get started
+
+The library needs React 19. It takes Base UI and Motion as peer dependencies, which npm installs with it.
+
+```sh
+npm install x-govuk-ui
+```
+
+Import the stylesheet once, then the components:
+
+```tsx
+import "x-govuk-ui/styles.css";
+import { Button } from "x-govuk-ui";
+
+export function Continue() {
+  return <Button>Save and continue</Button>;
+}
+```
+
+Give your app's root element `isolation: isolate`, so nothing in the page rises above a dialog or a menu.
+
+Install an extension beside the library, at the same version, and import its stylesheet after the library's:
+
+```sh
+npm install x-govuk-ui @x-govuk-ui/memetics
+```
+
+```tsx
+import "x-govuk-ui/styles.css";
+import "@x-govuk-ui/memetics/styles.css";
+import { Chart } from "@x-govuk-ui/memetics";
+```
+
+[x-govuk-ui.org](https://x-govuk-ui.org/) shows every component, with its props and its code.
+
 ## Packages
 
-The library is `x-govuk-ui`. Its extensions, in the `@x-govuk-ui` scope, contain the components with large dependencies:
+Each package is on npm. The library is [`x-govuk-ui`](https://www.npmjs.com/package/x-govuk-ui). Its extensions, in the `@x-govuk-ui` scope, contain the components with large dependencies:
 
-- `@x-govuk-ui/jorjorwel`, the Editor, built on Lexical
-- `@x-govuk-ui/memetics`, the charts, built on Recharts
-- `@x-govuk-ui/belsize`, Tiles, built on react-mosaic
+- [`@x-govuk-ui/jorjorwel`](https://www.npmjs.com/package/@x-govuk-ui/jorjorwel), the Editor, built on Lexical
+- [`@x-govuk-ui/memetics`](https://www.npmjs.com/package/@x-govuk-ui/memetics), the charts, built on Recharts
+- [`@x-govuk-ui/belsize`](https://www.npmjs.com/package/@x-govuk-ui/belsize), Tiles, built on react-mosaic
 
-The MCP server, `@x-govuk-ui/mcp`, is in the same scope.
+The MCP server, [`@x-govuk-ui/mcp`](https://www.npmjs.com/package/@x-govuk-ui/mcp), is in the same scope.
 
 ## Commands
 

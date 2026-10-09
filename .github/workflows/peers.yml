@@ -1,0 +1,52 @@
+name: Peers
+
+# The packages take Base UI and Motion as peers at a patch range, such as ~1.8.0, so a service can
+# take a patch of either without waiting for a release. Each day, this checks whether either has a
+# newer patch than the version the repository pins. If one has, it runs the static checks and the
+# Chromium behaviour tests with it. A failure means a published range admits a patch that breaks
+# the library, so the next release should fix the library or narrow the range.
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  newer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      patches: ${{ steps.newer.outputs.patches }}
+      playwright: ${{ steps.newer.outputs.playwright }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+        with:
+          install_args: --locked
+      - id: newer
+        run: |
+          patches=$(bun scripts/peers.ts newer | tr '\n' ' ')
+          echo "${patches:-No newer patches.}"
+          echo "patches=$patches" >> "$GITHUB_OUTPUT"
+          echo "playwright=$(jq -r '.devDependencies["@playwright/test"]' package.json)" >> "$GITHUB_OUTPUT"
+
+  # In Playwright's own image, as the browser checks run, as the runner's user.
+  test:
+    needs: newer
+    if: needs.newer.outputs.patches != ''
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.newer.outputs.playwright }}-noble
+      options: --user 1001
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+        with:
+          install_args: --locked
+      - run: bun scripts/peers.ts use
+      - run: bun install
+      - run: bun run check:static
+      - run: bunx --bun playwright test --project chromium

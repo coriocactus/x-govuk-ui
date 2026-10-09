@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { notes, parse, SECTIONS, stamp } from "../../scripts/changelog";
+import { PEERS, patchRange } from "../../scripts/peers";
 import { isPatch, releaseManifest } from "../../scripts/release";
 import { packages } from "../../scripts/stage";
 
@@ -26,23 +27,24 @@ test("each extension takes core at exactly core's version", async () => {
   }
 });
 
-test("each package takes Base UI and Motion at the versions the repository is tested with", async () => {
+test("each package takes Base UI and Motion as peers at the patches of the versions it is tested with", async () => {
   const { devDependencies: tested } = await Bun.file("package.json").json();
   const found: string[] = [];
   for (const directory of packages) {
     const manifest = await Bun.file(`${directory}/package.json`).json();
     for (const field of ["dependencies", "peerDependencies", "devDependencies"])
-      for (const name of ["@base-ui/react", "motion"]) {
+      for (const name of PEERS) {
         const version = manifest[field]?.[name];
-        if (version) found.push(`${directory} ${field} ${name}@${version === tested[name]}`);
+        const wanted = field === "peerDependencies" ? patchRange(tested[name]) : tested[name];
+        if (version) found.push(`${directory} ${field} ${name}@${version === wanted}`);
       }
   }
   expect(found.filter((entry) => entry.endsWith("@false"))).toEqual([]);
   // Core takes Base UI and Motion as peers, so a service that uses them has one copy of each,
   // whose contexts the library's parts and its own share.
   const core = await Bun.file("packages/core/package.json").json();
-  for (const name of ["@base-ui/react", "motion"]) {
-    expect(core.peerDependencies[name]).toBe(tested[name]);
+  for (const name of PEERS) {
+    expect(core.peerDependencies[name]).toBe(patchRange(tested[name]));
     expect(core.dependencies[name]).toBeUndefined();
   }
 });

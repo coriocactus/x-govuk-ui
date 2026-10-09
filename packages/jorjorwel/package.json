@@ -30,8 +30,8 @@
     "CHANGELOG.md"
   ],
   "peerDependencies": {
-    "@base-ui/react": "1.8.0",
-    "motion": "14.0.0",
+    "@base-ui/react": "~1.8.0",
+    "motion": "~14.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "x-govuk-ui": "0.2.0"

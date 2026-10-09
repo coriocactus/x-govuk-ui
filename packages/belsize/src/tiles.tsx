@@ -386,7 +386,15 @@ export type TilesProviderProps = {
   maximised?: string | null;
   onMaximisedChange?: (id: string | null) => void;
   /**
-   * Called with the tile in use, which is the one focus or the pointer entered last, as it changes.
+   * The tile in use, for Tiles you keep track of. Null means none. Left out, the tile in use is the
+   * one focus or the pointer entered last. Given, it is this tile, and on a small screen it is the
+   * tile the board shows. Focus or the pointer entering another tile then calls `onActiveChange`,
+   * and the tile stays as it is until you give the new one.
+   */
+  active?: string | null;
+  /**
+   * Called with the tile in use as it changes, from focus, the pointer or a tile's pager, and with
+   * null when it closes.
    */
   onActiveChange?: (id: string | null) => void;
   /**
@@ -412,6 +420,7 @@ export function TilesProvider({
   createTile,
   maximised: maximisedValue,
   onMaximisedChange,
+  active: activeValue,
   onActiveChange,
   mobileBreakpoint,
   children,
@@ -453,15 +462,31 @@ export function TilesProvider({
     [maximisedValue, onMaximisedChange],
   );
 
-  // The tile in use, while it is open. The service is told as it changes.
-  const [used, use] = useState<string | null>(null);
-  const active = used !== null && ids.includes(used) ? used : null;
+  // The tile in use, while it is open. The service is told as a user changes it, and as it closes,
+  // but not when the service gives a new one itself.
+  const [ownActive, setOwnActive] = useState<string | null>(null);
+  const wantedActive = activeValue !== undefined ? activeValue : ownActive;
+  const active = wantedActive !== null && ids.includes(wantedActive) ? wantedActive : null;
   const told = useRef<string | null>(null);
+  const activeNow = useRef(active);
+  activeNow.current = active;
+  // A user's change is told at once, and again each time, even if the service kept the tile it
+  // gave.
+  const use = useCallback(
+    (id: string) => {
+      if (id === activeNow.current) return;
+      if (activeValue === undefined) setOwnActive(id);
+      told.current = id;
+      onActiveChange?.(id);
+    },
+    [activeValue, onActiveChange],
+  );
+  // The tile in use can also change as it closes, or as the service gives one that is not open.
   useEffect(() => {
     if (told.current === active) return;
     told.current = active;
-    onActiveChange?.(active);
-  }, [active, onActiveChange]);
+    if (activeValue === undefined || active !== activeValue) onActiveChange?.(active);
+  }, [active, activeValue, onActiveChange]);
   // On a small screen, one tile fills the board, which is the one in use, or else the first.
   const small = useMediaQuery(
     mobileBreakpoint === undefined ? "not all" : `(max-width: ${mobileBreakpoint}px)`,
@@ -776,6 +801,7 @@ export function TilesProvider({
       shown,
       active,
       small,
+      use,
       announce,
       createTile,
       message,
@@ -1097,6 +1123,7 @@ export function Tiles({
   createTile,
   maximised,
   onMaximisedChange,
+  active,
   onActiveChange,
   mobileBreakpoint,
   renderTile,
@@ -1120,6 +1147,7 @@ export function Tiles({
       createTile={createTile}
       maximised={maximised}
       onMaximisedChange={onMaximisedChange}
+      active={active}
       onActiveChange={onActiveChange}
       mobileBreakpoint={mobileBreakpoint}
     >

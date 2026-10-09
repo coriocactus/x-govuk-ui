@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Added
+
+- Added `active` to Tiles and TilesProvider, so a service can keep the tile in use itself, with `onActiveChange`. On a small screen, the tile it gives is the one the board shows.
+
 ## [0.2.1] - 2026-10-09
 
 No changes of its own.

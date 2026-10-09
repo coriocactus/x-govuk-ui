@@ -71,6 +71,9 @@ export default function TilesExample({
   mobileBreakpoint,
 }: Props) {
   const [layout, setLayout] = useState<TilesLayout | null>(desk);
+  // The tile in use is the example's own, so the desk opens on the history. On a small screen,
+  // that is the tile the board shows.
+  const [active, setActive] = useState<string | null>("history");
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [added, setAdded] = useState(1);
   // Each split adds a new note, which waits in the dock once it is closed, as the papers do. The
@@ -94,6 +97,8 @@ export default function TilesExample({
     <Tiles
       value={layout}
       onValueChange={setLayout}
+      active={active}
+      onActiveChange={setActive}
       tiles={tiles}
       createTile={newNote}
       dropBehaviour={dropBehaviour}

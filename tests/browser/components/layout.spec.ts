@@ -223,7 +223,13 @@ test("on a small screen the tiles show one at a time, the one in use, with a pag
   await open("tiles");
   const board = frame.locator(".x-govuk-ui-tiles-board");
   const tile = (id: string) => frame.locator(`[data-tile-id="${id}"]`);
-  // The tile that focus enters is the one in use.
+  // The example keeps the tile in use itself, and starts with the history in use.
+  await expect(tile("history")).toHaveAttribute("data-active", "true");
+  await expect(frame.locator("[data-active]")).toHaveCount(1);
+  // The tile that focus enters is the one in use, which the example is told and keeps.
+  await tile("application").locator(".x-govuk-ui-tile-controls button").first().focus();
+  await expect(tile("application")).toHaveAttribute("data-active", "true");
+  await expect(tile("history")).not.toHaveAttribute("data-active");
   await tile("history").locator(".x-govuk-ui-tile-controls button").first().focus();
   await expect(tile("history")).toHaveAttribute("data-active", "true");
   await expect(board).toHaveAttribute("data-several", "true");

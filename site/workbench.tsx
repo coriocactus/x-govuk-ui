@@ -174,7 +174,7 @@ export function Workbench() {
   const [sourceSlow, setSourceSlow] = useState(false);
   const [sourceError, setSourceError] = useState(false);
   const [sourceAttempt, setSourceAttempt] = useState(0);
-  // The theme, which is system, light or dark, kept in this browser for every page of the site.
+  // The theme, light or dark, kept in this browser for every page of the site.
   const appearance = useTheme({ storageKey: "x-govuk-ui-theme" });
   const theme = appearance.theme;
   const { reduced } = useMotionTiming();

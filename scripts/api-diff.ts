@@ -58,16 +58,31 @@ function choices(type: string) {
   return parts.length > 1 && parts.every((part) => /^[\w-]+$/.test(part)) ? parts : null;
 }
 
+/**
+ * A component's props, one for each name. The documentation lists some props together, such as
+ * `value / defaultValue / onValueChange`, with one type for the group, so a grouped prop is
+ * compared by its name alone.
+ */
+function propsOf(doc: Doc) {
+  const props = new Map<string, Prop & { grouped: boolean }>();
+  for (const prop of doc.props) {
+    const names = prop.name.split(" / ");
+    for (const name of names) props.set(name, { ...prop, name, grouped: names.length > 1 });
+  }
+  return props;
+}
+
 /** The changes between two versions of a component's documentation. */
 function compareDocs(before: Doc, after: Doc | undefined, add: (change: ApiChange) => void) {
   const where = before.package;
   const breaking = (what: string) => add({ package: where, kind: "breaking", what });
   if (!after) return breaking(`removed ${before.name}`);
-  const props = new Map(after.props.map((prop) => [prop.name, prop]));
-  for (const prop of before.props) {
+  const props = propsOf(after);
+  const was = propsOf(before);
+  for (const prop of was.values()) {
     const now = props.get(prop.name);
     if (!now) breaking(`removed ${before.name}'s \`${prop.name}\` prop`);
-    else {
+    else if (!prop.grouped && !now.grouped) {
       const was = choices(prop.type);
       const is = choices(now.type);
       const lost = was && is ? was.filter((choice) => !is.includes(choice)) : [];
@@ -85,8 +100,7 @@ function compareDocs(before: Doc, after: Doc | undefined, add: (change: ApiChang
         );
     }
   }
-  const was = new Set(before.props.map((prop) => prop.name));
-  for (const prop of after.props)
+  for (const prop of props.values())
     if (!was.has(prop.name))
       add({ package: where, kind: "added", what: `added ${after.name}'s \`${prop.name}\` prop` });
 

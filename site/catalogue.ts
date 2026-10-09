@@ -1383,8 +1383,8 @@ const entries = {
       reference("tiles", "{ id, title }[]", "Optional"),
       reference("maximised / onMaximisedChange", "string | null / (id) => void", "Optional"),
       reference(
-        "onActiveChange",
-        "(id: string | null) => void, as the tile in use changes",
+        "active / onActiveChange",
+        "string | null / (id) => void, the tile in use, which a small screen shows",
         "Optional",
       ),
       {
@@ -2616,7 +2616,7 @@ const entries = {
     upstream: "",
     dependencies: "React",
     changes:
-      "GOV.UK's organisation logo for an organisation that has no image. Its name is in the regular weight, beside a bar of its colour, under the Royal Arms in the words' colour when given them, as a department's lock-up is. The library ships no Royal Arms. A service gives the address of GOV.UK Frontend's image, as it gives Footer's, and the workbench serves the example's. On dark paper, a dark colour, such as the Ministry of Justice's black, is lightened to show. With render, it is a link to the organisation's page, underlined in the text's colour as GOV.UK's is. Logo carousel names an organisation without a logo with it.",
+      "GOV.UK's organisation logo for an organisation that has no image. Its name is in the regular weight, beside a bar of its colour, under the Royal Arms in the words' colour when given them, as a department's lock-up is. The library ships no Royal Arms. A service gives the address of GOV.UK Frontend's image, as it gives Footer's, and the workbench serves the example's. On dark paper, a dark colour, such as the Ministry of Justice's black, is lightened to show. With render, it is a link to the organisation's page, underlined in the text's colour as GOV.UK's is. Small sets the name at 15 pixels, with a smaller Royal Arms, for a sidebar or a footer. Logo carousel names an organisation without a logo with it, at the small size.",
     props: [
       text("children", "Department for Business, Innovation, Science and Trade", {
         type: "ReactNode",
@@ -2624,6 +2624,15 @@ const entries = {
       }),
       text("colour", "#ff4328", { default: "The words' colour" }),
       text("crest", "/assets/images/govuk-crest.svg", { default: "None" }),
+      choice(
+        "size",
+        [
+          ["medium", "Medium"],
+          ["small", "Small"],
+        ],
+        "medium",
+        { default: '"medium"' },
+      ),
       reference("render", "A link, such as to the organisation's page", "<span>"),
     ],
   },

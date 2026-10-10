@@ -107,6 +107,20 @@ test("a form in stages saves as it goes, shows server errors, reveals follow-ups
   await yes.check();
   await frame.getByLabel("Tell us about the technical issues").fill("The page froze once.");
   await frame.getByLabel("How could we improve this service?").fill("Faster search.");
+  // The card grows as the follow-up question opens, and moves Send feedback down. Playwright can
+  // find the button still for two frames while it moves, and press where it was. The test waits
+  // until nothing in the card moves. The button's spinner stays paused while it is not loading.
+  await expect
+    .poll(() =>
+      survey.evaluate(
+        (element) =>
+          element
+            .getAnimations({ subtree: true })
+            .filter((animation) => animation.playState === "running").length +
+          element.querySelectorAll("[data-moving]").length,
+      ),
+    )
+    .toBe(0);
   await frame.getByRole("button", { name: "Send feedback" }).click();
   await expect(frame.getByText("Thank you for your feedback.")).toBeVisible();
   await expect(survey).toHaveAttribute("data-done", "true");

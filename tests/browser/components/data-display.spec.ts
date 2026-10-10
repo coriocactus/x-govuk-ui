@@ -299,6 +299,11 @@ test("a file diff wraps its lines at its width, and scrolls inside at its most r
   playground,
 }) => {
   await open("file-diff");
+  // Narrower than its longest line in any typeface, so it runs past the side until it wraps. At
+  // the frame's width, Linux's monospace font fits every line.
+  await frame.locator(".x-govuk-ui-file-diff").evaluate((element: HTMLElement) => {
+    element.style.width = "320px";
+  });
   const viewport = frame.locator(".x-govuk-ui-file-diff .x-govuk-ui-scroll-area-viewport");
   const beyond = () => viewport.evaluate((element) => element.scrollWidth - element.clientWidth);
   expect(await beyond()).toBeGreaterThan(0);

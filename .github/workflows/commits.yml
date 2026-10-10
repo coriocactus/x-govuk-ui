@@ -1,0 +1,47 @@
+name: Commits
+
+# Each new commit's message, against the repository's rules for commit messages. jj runs no Git
+# hooks, so a message is first checked here, or by bun run commits before a push. It is a workflow
+# of its own, apart from Check, so a message that breaks the rules holds back no deploy or release.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  messages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The whole history, so the range of new commits can be found in it.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+        with:
+          install_args: --locked
+      - env:
+          EVENT: ${{ github.event_name }}
+          # The pull request's base, or the commit before the push.
+          BEFORE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          AFTER: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # A pull request's own commits. A push's new commits, when the commit before it is under
+          # the new one. Otherwise only the newest commit is checked, as for a run by hand, a
+          # branch's first push, for which GitHub sends zeros, or a push that rewrote main.
+          if [ "$EVENT" = pull_request ]; then
+            range="$(git merge-base "$BEFORE" "$AFTER")..$AFTER"
+          elif [ -n "${BEFORE//0}" ] && git merge-base --is-ancestor "$BEFORE" "$AFTER" 2>/dev/null; then
+            range="$BEFORE..$AFTER"
+          else
+            range="$AFTER^!"
+          fi
+          bun scripts/commits.ts "$range"

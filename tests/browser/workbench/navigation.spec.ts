@@ -6,6 +6,28 @@ test("the site's front page leads to the workbench and the workspace, with the t
   await page.goto("/");
   await expect(page).toHaveTitle("GOV/UK UI");
   await expect(page.getByRole("heading", { level: 1, name: "GOV/UK UI" })).toBeVisible();
+  // GitHub's mark dots the lock-up's I and links to the source. It is centred on the I, and stands
+  // just clear of the I's ink, which the font's own measure of the I finds.
+  const source = page.getByRole("link", { name: "Source on GitHub" });
+  await expect(source).toHaveAttribute("href", "https://github.com/coriocactus/x-govuk-ui");
+  const dot = await page.evaluate(async () => {
+    await document.fonts.ready;
+    const box = (selector: string) =>
+      document.querySelector(selector)?.getBoundingClientRect() ?? new DOMRect();
+    const letter = document.querySelector(".brand-product-i") ?? document.body;
+    const context = document.createElement("canvas").getContext("2d");
+    if (!context) throw new Error("No canvas.");
+    context.font = getComputedStyle(letter).font;
+    const ink = context.measureText("I").actualBoundingBoxAscent;
+    const mark = box(".brand-source");
+    const i = box(".brand-product-i");
+    // The empty anchor sits on the baseline.
+    const top = box(".brand-source-anchor").bottom - ink;
+    return { offset: mark.x + mark.width / 2 - (i.x + i.width / 2), gap: top - mark.bottom };
+  });
+  expect(Math.abs(dot.offset)).toBeLessThan(0.25);
+  expect(dot.gap).toBeGreaterThan(3);
+  expect(dot.gap).toBeLessThan(12);
   const site = page.getByRole("navigation", { name: "x-govuk-ui" });
   await expect(site.getByRole("link")).toHaveText(["workbench", "workspace"]);
   // The theme switches here, and the workbench keeps it.
@@ -23,7 +45,8 @@ test("the site's front page leads to the workbench and the workspace, with the t
   await page.getByRole("link", { name: "workbench" }).click();
   await expect(page).toHaveURL(/\/workbench$/);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  // The workbench's brand leads back to the front page.
+  // The workbench's brand leads back to the front page. It is a link, so its I has no dot.
+  await expect(page.getByRole("link", { name: "Source on GitHub" })).toHaveCount(0);
   await page.getByRole("link", { name: "GOV/UK UI" }).click();
   await expect(page).toHaveURL(/\/$/);
 });

@@ -8,8 +8,8 @@ type SiteLink = { label: string; href: string };
 /**
  * The site's own pages share one layout. It has the GOV/UK UI lock-up, large in the middle of the
  * window, the page's heading, a message if it has one, and links beneath. On the front page, the
- * theme comes after the first link. A page without the theme picker still opens in the chosen
- * theme, which index.html sets before the page is drawn.
+ * theme comes after the first link, and GitHub's mark dots the lock-up's I. A page without the
+ * theme picker still opens in the chosen theme, which index.html sets before the page is drawn.
  *
  * The heading names the page for screen readers and in the window's title. It shows unless the
  * lock-up already says it. The front page's heading is the mark's own words, GOV/UK UI. The pages
@@ -21,6 +21,7 @@ function SitePage({
   message,
   links,
   theme = false,
+  source = false,
 }: {
   heading: string;
   showHeading?: boolean;
@@ -28,6 +29,8 @@ function SitePage({
   links: readonly SiteLink[];
   /** Whether the theme picker follows the first link. */
   theme?: boolean;
+  /** Whether GitHub's mark dots the lock-up's I, as a link to the source. */
+  source?: boolean;
 }) {
   // Whether the sounds are muted, as chosen on any page of the site.
   const [muted] = useStoredState("x-govuk-ui-muted", false);
@@ -39,7 +42,7 @@ function SitePage({
     <SoundScope play={play}>
       <TooltipProvider>
         <main className="home">
-          <BrandLockup className="home-lockup" />
+          <BrandLockup className="home-lockup" source={source} />
           <h1 className={showHeading ? "home-heading" : "visually-hidden"}>{heading}</h1>
           {message && <p className="home-note">{message}</p>}
           <nav className="home-links" aria-label="x-govuk-ui">
@@ -71,6 +74,7 @@ export function Home() {
       heading="GOV/UK UI"
       showHeading={false}
       theme
+      source
       links={[
         { label: "workbench", href: "/workbench" },
         { label: "workspace", href: "/workspace" },

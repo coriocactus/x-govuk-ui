@@ -228,6 +228,54 @@ body {
   font-weight: 700;
   letter-spacing: 0.02em;
 }
+/* The I that GitHub's mark dots, and the box the mark is centred across. Letter-spacing would add
+   space after the I and move the centre to the right. */
+.brand-product-i {
+  position: relative;
+  letter-spacing: 0;
+}
+/* An empty box that sits on the I's baseline. The mark's top and bottom are auto, so the mark
+   starts where this box is. Nothing in the box is in flow, so its baseline is its bottom. */
+.brand-source-anchor {
+  display: inline-block;
+  width: 0;
+  height: 0;
+}
+/* GitHub's mark, as the I's dot. It is a little wider than the I's stem, as a bold i's dot is. Its
+   size is in em, so it scales with the lock-up, with a floor so it stays clear on a phone. It rises
+   from the baseline by the font's capital height, so it clears the I in any typeface. */
+.brand-source {
+  --brand-source-size: max(11px, 0.3em);
+  /* The focus style reaches 4px below the mark, and this gap keeps it off the I. */
+  --brand-source-gap: max(5px, 0.1em);
+  position: absolute;
+  /* Auto margins cannot centre the mark, because it is wider than the I. */
+  left: 50%;
+  width: var(--brand-source-size);
+  height: var(--brand-source-size);
+  translate: -50% calc(-100% - 1cap - var(--brand-source-gap));
+  color: inherit;
+}
+/* The target is at least 24px square, as WCAG 2.2 asks, without making the mark larger. */
+.brand-source::before {
+  content: "";
+  position: absolute;
+  inset: min(0px, (var(--brand-source-size) - 24px) / 2);
+}
+.brand-source svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* GOV.UK's focus, as a Button has it. The yellow reaches 2px past the round mark, so it shows. */
+.brand-source:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow:
+    0 0 0 2px var(--x-govuk-ui-focus),
+    0 2px 0 2px var(--x-govuk-ui-focus-text);
+}
 /* Command-K, beside the brand, opens the command menu. It is centred on the wordmark's capitals,
    which sit lower in the logo than the crown, instead of on the whole logo. */
 .workbench-sidebar .brand-commands.x-govuk-ui-button {

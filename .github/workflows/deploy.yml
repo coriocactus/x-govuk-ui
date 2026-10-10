@@ -1,9 +1,9 @@
 name: Deploy
 
-# The site is deployed each time main passes its checks, so it shows main instead of the last
-# release. A service's tools read the docs of the version it installed, which ship inside each
-# package, and the MCP server reads those first. Run by hand from the Actions tab, it deploys main
-# again.
+# The site shows main instead of the last release. A service's tools read the docs of the version it
+# installed, which ship inside each package, and the MCP server reads those first. Each time main
+# passes its checks, the site is deployed if main has changed what it is built or deployed from.
+# Run by hand from the Actions tab, the workflow deploys main again, changed or not.
 on:
   workflow_run:
     workflows: [Check]
@@ -38,8 +38,66 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # v1.6
+
+      # Whether the commit changes what the site is built or deployed from, compared with the
+      # commit the live site was built from. A deploy that failed or never ran therefore happens on
+      # the next push. If the live commit cannot be told, as after a deploy by hand, the site is
+      # deployed.
+      - id: changes
+        env:
+          EVENT: ${{ github.event_name }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          deploy() { echo "$1"; echo "deploy=true" >> "$GITHUB_OUTPUT"; exit 0; }
+
+          if [ "$EVENT" = workflow_dispatch ]; then
+            deploy "Run by hand, so the site is deployed again."
+          fi
+
+          # The commit each machine's image was built from, as the deploy step below labels it.
+          # flyctl's own GH_SHA label is the newest commit on main, which may be newer than the
+          # commit this workflow built. While a deploy runs, the old and the new machine may
+          # differ, and then the live commit cannot be told.
+          live=$(flyctl image show --json | jq -r '
+            [.[] | (.Labels | fromjson? // {}) | .["org.opencontainers.image.revision"] // ""]
+            | unique | if length == 1 then .[0] else "" end') || live=""
+          if [ -z "$live" ] || ! git fetch --quiet --no-tags --depth=1 origin "$live"; then
+            deploy "The live site's commit cannot be told, so the site is deployed."
+          fi
+
+          # The build context is every file that .dockerignore does not exclude. Each of its
+          # patterns becomes a pathspec that excludes the same files, because git's glob pathspecs
+          # match as Docker's patterns do. A pathspec cannot include a file again, as a pattern
+          # that starts with ! does.
+          excludes=()
+          while read -r pattern || [ -n "$pattern" ]; do
+            case "$pattern" in
+              "" | "#"*) ;;
+              "!"*) deploy ".dockerignore includes files again with !, so the site is deployed." ;;
+              *) pattern=${pattern#/} && excludes+=(":(exclude,glob)${pattern%/}") ;;
+            esac
+          done < .dockerignore
+
+          # The build context, then the files that build and deploy it, which .dockerignore
+          # keeps out of the context. Bash ignores -e inside $(...), so a diff that failed, as for
+          # a pattern git rejects, would look like no change without the set -e.
+          changed=$(
+            set -e
+            git diff --name-only "$live" HEAD -- . "${excludes[@]}"
+            git diff --name-only "$live" HEAD -- Dockerfile fly.toml .github/workflows/deploy.yml
+          ) || deploy "git could not compare the commits, so the site is deployed."
+          if [ -n "$changed" ]; then
+            echo "$changed"
+            deploy "These files changed since $live, so the site is deployed."
+          fi
+          echo "Nothing the site is built or deployed from changed since $live."
+
       # Built from the Dockerfile on Fly's builder, as a deploy by hand is. The token deploys only
-      # this app.
-      - run: flyctl deploy --remote-only --ha=false
+      # this app. The label overrides the Bun image's own, so the image names the commit it was
+      # built from.
+      - if: steps.changes.outputs.deploy == 'true'
+        run: >-
+          flyctl deploy --remote-only --ha=false
+          --label "org.opencontainers.image.revision=$(git rev-parse HEAD)"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

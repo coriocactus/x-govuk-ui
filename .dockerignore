@@ -1,6 +1,8 @@
 # Only what `bun run build` reads goes to the image. That is the source, the site, the scripts,
-# the package files and the licences. Docs and the tools' settings stay out, so editing them does
-# not rebuild the image.
+# the package files and the licences. Docs and the tools' settings stay out, so editing them neither
+# rebuilds the image nor deploys the site. The Deploy workflow reads these patterns to tell whether
+# a push changes the image. It cannot follow a pattern that starts with !, so with one, every push
+# deploys.
 .git
 .jj
 .github
@@ -10,7 +12,7 @@ tests
 test-results
 playwright-report
 .DS_Store
-*.md
+**/*.md
 biome.json
 playwright.config.ts
 mise.toml

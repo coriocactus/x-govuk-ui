@@ -6,6 +6,16 @@ Try each component on [x-govuk-ui.org](https://x-govuk-ui.org/).
 
 This is not an official GOV.UK project.
 
+## Packages
+
+Each package is on npm. The library is [`x-govuk-ui`](https://www.npmjs.com/package/x-govuk-ui). Its extensions, in the `@x-govuk-ui` scope, contain the components with large dependencies:
+
+- [`@x-govuk-ui/jorjorwel`](https://www.npmjs.com/package/@x-govuk-ui/jorjorwel), the Editor, built on Lexical
+- [`@x-govuk-ui/memetics`](https://www.npmjs.com/package/@x-govuk-ui/memetics), the charts, built on Recharts
+- [`@x-govuk-ui/belsize`](https://www.npmjs.com/package/@x-govuk-ui/belsize), Tiles, built on react-mosaic
+
+The MCP server, [`@x-govuk-ui/mcp`](https://www.npmjs.com/package/@x-govuk-ui/mcp), is in the same scope.
+
 ## Credits
 
 Its components owe ideas, designs and code to other systems:
@@ -58,16 +68,6 @@ import { Chart } from "@x-govuk-ui/memetics";
 
 [x-govuk-ui.org](https://x-govuk-ui.org/) shows every component, with its props and its code.
 
-## Packages
-
-Each package is on npm. The library is [`x-govuk-ui`](https://www.npmjs.com/package/x-govuk-ui). Its extensions, in the `@x-govuk-ui` scope, contain the components with large dependencies:
-
-- [`@x-govuk-ui/jorjorwel`](https://www.npmjs.com/package/@x-govuk-ui/jorjorwel), the Editor, built on Lexical
-- [`@x-govuk-ui/memetics`](https://www.npmjs.com/package/@x-govuk-ui/memetics), the charts, built on Recharts
-- [`@x-govuk-ui/belsize`](https://www.npmjs.com/package/@x-govuk-ui/belsize), Tiles, built on react-mosaic
-
-The MCP server, [`@x-govuk-ui/mcp`](https://www.npmjs.com/package/@x-govuk-ui/mcp), is in the same scope.
-
 ## Versions
 
 All five packages are released together, at one version. Before 1.0, the version says what a service can expect:
@@ -115,6 +115,17 @@ bunx --bun playwright install chromium firefox webkit
 bun run check
 ```
 
+## For AI tools
+
+The site serves its documentation for language models at [x-govuk-ui.org/llms.txt](https://x-govuk-ui.org/llms.txt). Each component has a Markdown page at `/llms/<name>.md`, and `/llms-full.txt` has every page in one file.
+
+The MCP server in `mcp/` answers an agent's questions about the components. Its six tools are `get_usage`, `list_components`, `search_docs`, `get_component`, `get_props` and `get_styling`. It reads the documents inside the project's installed x-govuk-ui, so they match the project's version. Without an installed copy, it reads the site's documents. `X_GOVUK_UI_DOCS` names another place to read them from, such as a build's `dist/docs`.
+
+```sh
+# Add it to Claude Code from a build. Other clients take the same command and arguments.
+claude mcp add x-govuk-ui -e X_GOVUK_UI_DOCS=$PWD/dist/docs -- node $PWD/mcp/dist/index.js
+```
+
 ## Accessibility
 
 The tests check every page of the site. These are the front page, the workbench, the page of each of the 119 components, and the workspace.
@@ -126,17 +137,6 @@ The tests check every page of the site. These are the front page, the workbench,
 - In Chromium, a style snapshot records how each component's parts look, from their computed styles. A change to how a part looks fails it, until the snapshot and the changelog record the change.
 
 Automated tests find some accessibility failures, but not all. Passing them does not mean that the components conform to WCAG.
-
-## For AI tools
-
-The site serves its documentation for language models at [x-govuk-ui.org/llms.txt](https://x-govuk-ui.org/llms.txt). Each component has a Markdown page at `/llms/<name>.md`, and `/llms-full.txt` has every page in one file.
-
-The MCP server in `mcp/` answers an agent's questions about the components. Its six tools are `get_usage`, `list_components`, `search_docs`, `get_component`, `get_props` and `get_styling`. It reads the documents inside the project's installed x-govuk-ui, so they match the project's version. Without an installed copy, it reads the site's documents. `X_GOVUK_UI_DOCS` names another place to read them from, such as a build's `dist/docs`.
-
-```sh
-# Add it to Claude Code from a build. Other clients take the same command and arguments.
-claude mcp add x-govuk-ui -e X_GOVUK_UI_DOCS=$PWD/dist/docs -- node $PWD/mcp/dist/index.js
-```
 
 ## Branding
 

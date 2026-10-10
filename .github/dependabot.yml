@@ -14,6 +14,7 @@ updates:
     groups:
       actions:
         patterns: ["*"]
-    # The prefix follows the repository's commit style, as in "workflows: bump the actions group".
+    # The prefix is the Conventional Commits type for a workflow change. Dependabot adds the colon,
+    # as in "ci: bump the actions group".
     commit-message:
-      prefix: workflows
+      prefix: ci

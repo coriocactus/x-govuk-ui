@@ -1,0 +1,27 @@
+name: Audit
+
+# The published packages pin their dependencies exactly, and the MCP server bundles the MCP SDK and
+# what it depends on. A fix to any of them therefore reaches services only through a release. Each
+# day, this checks every package in bun.lock against npm's advisories, including the packages the
+# repository depends on indirectly. Dependabot cannot do this for a Bun repository. Its security
+# updates do not support Bun, and GitHub's dependency graph does not read bun.lock. RUNBOOK.md says
+# what to do when it fails.
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
+        with:
+          install_args: --locked
+      # bun audit reads bun.lock, so nothing needs installing first.
+      - run: bun audit

@@ -25,7 +25,8 @@
     "test:browser": "bunx --bun playwright test",
     "check:static": "bun run lint && bun run typecheck && bun run test && bun run build && bun run build:lib && bun run build:mcp",
     "check": "bun run check:static && bun run test:browser",
-    "checkout": "bun scripts/checkout.ts"
+    "checkout": "bun scripts/checkout.ts",
+    "commits": "bun scripts/commits.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

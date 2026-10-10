@@ -1,0 +1,19 @@
+# Dependabot keeps the actions that the workflows use up to date. Each action is pinned to a
+# commit, with its version in a comment beside it, and Dependabot updates both.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # Dependabot proposes a version only once it is a week old. A compromised release is usually
+    # found and withdrawn within days.
+    cooldown:
+      default-days: 7
+    # The week's updates share one pull request, so Check runs once for them all.
+    groups:
+      actions:
+        patterns: ["*"]
+    # The prefix follows the repository's commit style, as in "workflows: bump the actions group".
+    commit-message:
+      prefix: workflows

@@ -52,8 +52,13 @@ export type DataTableProps<Row> = ComponentPropsWithRef<"div"> & {
   onSelectedChange?: (selected: string[]) => void;
   /** Says how many rows there are, at the foot of the first column. */
   count?: (rows: number) => ReactNode;
-  /** The tallest the table grows before it scrolls, in pixels. */
-  maxHeight?: number;
+  /** The table's least height, in rows of data. `rows` is the data itself. */
+  minRows?: number;
+  /**
+   * The most rows of data the table shows before they scroll, between the headings and the foot.
+   * By default, 8. Every row is 44 pixels tall, as the headings and the foot are.
+   */
+  maxRows?: number;
 };
 
 type Sort = { id: string; direction: "ascending" | "descending" } | null;
@@ -82,8 +87,10 @@ export function DataTable<Row>({
   selected: controlled,
   onSelectedChange,
   count,
-  maxHeight = 440,
+  minRows,
+  maxRows = 8,
   className = "",
+  style,
   ...props
 }: DataTableProps<Row>) {
   const [widths, setWidths] = useState(() =>
@@ -120,8 +127,10 @@ export function DataTable<Row>({
     });
   }, [rows, sort, columns]);
   const keys = rows.map(rowKey);
-  const all = keys.length > 0 && keys.every((key) => chosen.includes(key));
-  const some = !all && keys.some((key) => chosen.includes(key));
+  // Looked up once for each row, so a set keeps a table of thousands of rows quick to render.
+  const chosenKeys = useMemo(() => new Set(chosen), [chosen]);
+  const all = keys.length > 0 && keys.every((key) => chosenKeys.has(key));
+  const some = !all && keys.some((key) => chosenKeys.has(key));
 
   // Where each pinned column sits from the left, past the checkboxes and the columns before it.
   // The places are custom properties on the table, so resizing a column changes them without
@@ -192,7 +201,7 @@ export function DataTable<Row>({
       <TableBody>
         {ordered.map((row) => {
           const key = rowKey(row);
-          const on = chosen.includes(key);
+          const on = chosenKeys.has(key);
           return (
             <TableRow key={key} data-selected={on || undefined}>
               {selectable && (
@@ -226,7 +235,7 @@ export function DataTable<Row>({
         })}
       </TableBody>
     ),
-    [ordered, chosen, columns, pinned, selectable, rowKey, rowName],
+    [ordered, chosen, chosenKeys, columns, pinned, selectable, rowKey, rowName],
   );
 
   return (
@@ -234,13 +243,20 @@ export function DataTable<Row>({
       {...props}
       className={`x-govuk-ui-data-table ${className}`.trim()}
       data-scrolled={scrolled || undefined}
+      data-min-rows={minRows ? "" : undefined}
+      style={
+        {
+          ...style,
+          "--x-govuk-ui-data-table-min-rows": minRows || undefined,
+          "--x-govuk-ui-data-table-max-rows": maxRows,
+        } as CSSProperties
+      }
     >
       <ScrollArea
         orientation="both"
         label={label}
         className="x-govuk-ui-data-table-scroll"
         viewportRef={viewport}
-        style={{ maxHeight }}
       >
         <table
           className="x-govuk-ui-table x-govuk-ui-data-table-table"

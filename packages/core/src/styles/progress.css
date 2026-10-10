@@ -42,17 +42,22 @@
 .x-govuk-ui-progress[data-complete] .x-govuk-ui-progress-indicator {
   background: var(--x-govuk-ui-success);
 }
+/* The sweep moves the fill by a transform, which the browser animates off the main thread. It
+   keeps moving while the page is busy, which is when it is most likely to show. A percentage in
+   translate is of the fill's own width, so -100% to 250% runs from just before the track to just
+   past it. */
 .x-govuk-ui-progress[data-indeterminate] .x-govuk-ui-progress-indicator {
   position: absolute;
+  left: 0;
   width: 40%;
   animation: x-govuk-ui-progress-sweep 1.3s var(--x-govuk-ui-ease-drawer) infinite;
 }
 @keyframes x-govuk-ui-progress-sweep {
   from {
-    left: -40%;
+    translate: -100% 0;
   }
   to {
-    left: 100%;
+    translate: 250% 0;
   }
 }
 @media (forced-colors: active) {

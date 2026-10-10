@@ -85,22 +85,26 @@ export function TableBody({ ref, ...props }: ComponentPropsWithRef<"tbody">) {
   // Runs after every render, so it catches rows reordered by any change of their data.
   useLayoutEffect(() => {
     const rows = Array.from(body.current?.rows ?? []);
-    rows.forEach((row, index) => {
+    // Every place is read before any row starts to glide. Starting a glide changes the row's
+    // style, so a place read after it would make the browser work out the styles and layout of
+    // the whole table again, once for each row. Sorting 1,000 rows would then take seconds.
+    const moves = rows.flatMap((row, index) => {
       const top = row.offsetTop;
       const last = places.current.get(row);
       places.current.set(row, { index, top });
-      if (reduced || !last || last.index === index || last.top === top) return;
+      if (reduced || !last || last.index === index || last.top === top) return [];
       // A row still gliding from an earlier change starts from where it shows, not where it sits.
-      const seen = new DOMMatrixReadOnly(getComputedStyle(row).transform).m42;
-      for (const animation of row.getAnimations()) animation.cancel();
-      row.animate(
-        [{ transform: `translateY(${last.top + seen - top}px)` }, { transform: "none" }],
-        {
-          duration: duration.slow * 1000,
-          easing: `cubic-bezier(${easeOut.join(",")})`,
-        },
-      );
+      const gliding = row.getAnimations();
+      const seen = gliding.length ? new DOMMatrixReadOnly(getComputedStyle(row).transform).m42 : 0;
+      return [{ row, by: last.top + seen - top, gliding }];
     });
+    for (const { row, by, gliding } of moves) {
+      for (const animation of gliding) animation.cancel();
+      row.animate([{ transform: `translateY(${by}px)` }, { transform: "none" }], {
+        duration: duration.slow * 1000,
+        easing: `cubic-bezier(${easeOut.join(",")})`,
+      });
+    }
   });
   return (
     <SectionContext value="body">

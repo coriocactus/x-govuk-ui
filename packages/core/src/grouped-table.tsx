@@ -403,12 +403,13 @@ export function GroupedTable({
         timing(place.row),
       );
     }
-    // What went fades out where it was, as a copy laid over the row.
-    for (const [key, was] of places) {
-      if (now.has(key) || was.holder) continue;
-      const row = rows.get(was.row)?.row;
-      if (!row) continue;
-      const box = row.getBoundingClientRect();
+    // What went fades out where it was, as a copy laid over the row. Every row is measured before
+    // any copy is added, because measuring a row after adding a copy lays out the table again.
+    const gone = [...places].flatMap(([key, was]) => {
+      const row = now.has(key) || was.holder ? undefined : rows.get(was.row)?.row;
+      return row ? [{ was, row, box: row.getBoundingClientRect() }] : [];
+    });
+    for (const { was, row, box } of gone) {
       const ghost = was.element.cloneNode(true) as HTMLElement;
       ghost.removeAttribute("data-flip");
       ghost.setAttribute("aria-hidden", "true");

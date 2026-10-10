@@ -136,7 +136,23 @@ function useHoldsFocusable(element: RefObject<HTMLDivElement | null>) {
     if (!current) return;
     const read = () => setHolds(current.querySelector(FOCUSABLE) !== null);
     read();
-    const observer = new MutationObserver(read);
+    // The content is searched again only when what changed can take focus, or holds something that
+    // can. Searching at every change would walk the whole content at each key typed in a Code
+    // block, which is 28,000 elements in a block of 2,000 lines.
+    const focusable = (node: Node) =>
+      node instanceof Element &&
+      (node.matches(FOCUSABLE) || node.querySelector(FOCUSABLE) !== null);
+    const observer = new MutationObserver((records) => {
+      if (
+        records.some(
+          (record) =>
+            record.type === "attributes" ||
+            [...record.addedNodes].some(focusable) ||
+            [...record.removedNodes].some(focusable),
+        )
+      )
+        read();
+    });
     observer.observe(current, {
       childList: true,
       subtree: true,

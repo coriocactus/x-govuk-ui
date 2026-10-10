@@ -1,5 +1,21 @@
 /* A scrolling region with its own thin scrollbars. The viewport fills the region, which takes its
    height from its container. */
+
+/* The fade's gradients are worked out on the viewport from how far the content runs past each
+   edge, which Base UI writes there at each step of a scroll and each change of the content. A
+   custom property is inherited unless it is registered. A new gradient would then make the browser
+   work out the style of everything in the viewport again. In a Code block of 2,000 lines, that is
+   28,000 elements at each step of a scroll. Registered as not inherited, a new gradient restyles
+   the viewport alone. Base UI's own properties change at the same time, but in Chromium they cost
+   nothing more, so they are left unregistered, as a service's own Base UI scroll areas expect. */
+@property --x-govuk-ui-fade-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --x-govuk-ui-fade-y {
+  syntax: "*";
+  inherits: false;
+}
 .x-govuk-ui-scroll-area {
   position: relative;
   display: flex;
@@ -22,11 +38,21 @@
 .x-govuk-ui-scroll-area[data-has-overflow-y] > .x-govuk-ui-scroll-area-viewport {
   overscroll-behavior-y: contain;
 }
-/* A focused region takes GOV.UK's focus colours as an inset band, so nothing outside it moves. */
-.x-govuk-ui-scroll-area-viewport:focus-visible {
+/* A focused region takes GOV.UK's focus colours as an inset band, so nothing outside it moves. The
+   region draws the band over what it contains, because the region does not scroll. Drawn on the
+   viewport, the band would sit under anything inside with a background of its own, such as File
+   diff's lines, and the fade would hide it where the content runs on. It sits above a Data
+   table's sticky cells, the highest of which are at 3. */
+.x-govuk-ui-scroll-area:has(> .x-govuk-ui-scroll-area-viewport:focus-visible)::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  border-radius: inherit;
   box-shadow:
     inset 0 0 0 3px var(--x-govuk-ui-focus),
     inset 0 0 0 5px var(--x-govuk-ui-focus-text);
+  pointer-events: none;
 }
 .x-govuk-ui-scroll-area[data-orientation="vertical"] .x-govuk-ui-scroll-area-content {
   min-width: 0 !important;
@@ -124,7 +150,7 @@
   .x-govuk-ui-scroll-area-thumb {
     background: CanvasText;
   }
-  .x-govuk-ui-scroll-area-viewport:focus-visible {
+  .x-govuk-ui-scroll-area:has(> .x-govuk-ui-scroll-area-viewport:focus-visible)::after {
     outline: 3px solid Highlight;
     outline-offset: -3px;
   }

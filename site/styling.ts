@@ -237,10 +237,14 @@ async function readSources(): Promise<Source[]> {
     files.map(async (file) => {
       const code = withoutComments(await Bun.file(file).text());
       const functions: Source["functions"] = new Map();
-      for (const match of code.matchAll(/^(export )?function ([A-Z]\w*)\s*(?:<[^(]*>)?\(/gm)) {
+      // A function wrapped in React's memo, as `const Run = memo(function Run(…) {…})`, is a
+      // component too, by the name it renders as.
+      for (const match of code.matchAll(
+        /^(?:(export )?function ([A-Z]\w*)|const ([A-Z]\w*) = memo\(\s*function \3)\s*(?:<[^(]*>)?\(/gm,
+      )) {
         const params = (match.index ?? 0) + match[0].length - 1;
         const open = code.indexOf("{", close(code, params));
-        const name = match[2] ?? "";
+        const name = match[2] ?? match[3] ?? "";
         functions.set(name, {
           body: code.slice(open, close(code, open) + 1),
           exported: Boolean(match[1]) && published.has(`${file}:${name}`),

@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Button, FileDiff, Tag } from "x-govuk-ui";
 
-type Props = { context?: number };
+type Props = {
+  context?: number;
+  wrap?: boolean;
+  rows?: number;
+  maxRows?: number;
+  /** Repeats the file to about 2,000 lines, with its change in every part. */
+  long?: boolean;
+};
 
 const before = `import { formatDate } from "./dates";
 
@@ -53,16 +60,29 @@ export function summary(application: Application) {
 }
 `;
 
-export default function FileDiffExample({ context = 3 }: Props) {
+/** The file over and over, to about 2,000 lines. */
+const lengthen = (code: string) =>
+  Array.from({ length: Math.ceil(2000 / code.split("\n").length) }, () => code).join("");
+
+export default function FileDiffExample({
+  context = 3,
+  wrap = false,
+  rows = 17,
+  maxRows = 17,
+  long = false,
+}: Props) {
   // An agent proposes the change, and users accept or reject it.
   const [decision, setDecision] = useState<"accepted" | "rejected" | null>(null);
   return (
     <FileDiff
       filename="src/summary.ts"
       language="ts"
-      before={before}
-      after={after}
+      before={long ? lengthen(before) : before}
+      after={long ? lengthen(after) : after}
       context={context}
+      wrap={wrap}
+      rows={rows || undefined}
+      maxRows={maxRows || undefined}
     >
       {decision ? (
         <>

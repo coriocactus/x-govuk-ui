@@ -59,6 +59,40 @@ test("a data table sorts, chooses rows, resizes its columns and sums a column", 
   );
 });
 
+test("a data table's rows scroll between its headings and its foot, with the scrollbar beside them", async ({
+  frame,
+  open,
+  playground,
+}) => {
+  await open("data-table");
+  const scroll = frame.locator(".x-govuk-ui-data-table-scroll");
+  const viewport = scroll.locator("> .x-govuk-ui-scroll-area-viewport");
+  // Eight rows of data show, under the headings and above the foot, each 44 pixels tall.
+  const height = () => viewport.evaluate((element) => element.clientHeight);
+  expect(await height()).toBe((8 + 2) * 44);
+  // The scrollbar runs from the foot of the headings to the top of the foot.
+  const edges = await scroll.evaluate((element) => {
+    const bar = element
+      .querySelector('.x-govuk-ui-scroll-area-scrollbar[data-orientation="vertical"]')!
+      .getBoundingClientRect();
+    // The cells stick, not their rows, so the cells say where the headings and the foot show.
+    const head = element.querySelector("thead th")!.getBoundingClientRect();
+    const foot = element.querySelector("tfoot td")!.getBoundingClientRect();
+    return [Math.round(bar.top - head.bottom), Math.round(foot.top - bar.bottom)];
+  });
+  expect(edges).toEqual([0, 0]);
+  // The rows stop at either end without a bounce, which would move the headings and the foot.
+  expect(await viewport.evaluate((element) => getComputedStyle(element).overscrollBehaviorY)).toBe(
+    "none",
+  );
+  // A thousand rows scroll in the same box.
+  await playground.set("long", true);
+  await expect(frame.getByText("1008 organisations")).toBeVisible();
+  expect(await height()).toBe((8 + 2) * 44);
+  await viewport.evaluate((element) => element.scrollBy(0, 20000));
+  expect(await viewport.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+});
+
 test("a grouped table folds its bands, and gives way step by step as it narrows", async ({
   page,
   frame,
@@ -73,7 +107,11 @@ test("a grouped table folds its bands, and gives way step by step as it narrows"
   await expect(frame.locator(".x-govuk-ui-grouped-table")).toHaveAttribute("data-step", "full");
   const placed = await headings();
   expect(placed.length).toBeGreaterThan(1);
-  // A band folds its rows away.
+  // To do starts folded, and a band folds its rows away.
+  await expect(frame.getByRole("button", { name: /To do/ })).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
   const band = frame.getByRole("button", { name: /In review/ });
   await band.click();
   await expect(band).toHaveAttribute("aria-expanded", "false");
@@ -88,7 +126,7 @@ test("a grouped table folds its bands, and gives way step by step as it narrows"
   await narrow.focus();
   await page.keyboard.press("Home");
   await expect(frame.locator(".x-govuk-ui-grouped-table")).toHaveAttribute("data-step", "tight");
-  for (const each of bands) await each.click();
+  for (const each of bands.slice(0, 2)) await each.click();
   await expect(frame.locator(".x-govuk-ui-grouped-table-row")).toHaveCount(0);
   await narrow.focus();
   await page.keyboard.press("End");
@@ -205,6 +243,80 @@ test("an editable code block colours what is typed, keeps the text on its colour
   await playground.set("editable", false);
   await expect(code).not.toHaveAttribute("aria-hidden");
   await expect(code).toContainText("spellCheck={false}");
+});
+
+test("a code block wraps its lines where its text box does, and scrolls inside at its most rows", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  await open("code-block");
+  await playground.set("language", "HTML");
+  await playground.set("editable", true);
+  await playground.set("wrap", true);
+  const input = frame.getByRole("textbox", { name: "national-insurance.html" });
+  const viewport = frame.locator(".x-govuk-ui-code-block .x-govuk-ui-scroll-area-viewport");
+  // The lines the text box breaks its text into are the lines of coloured code. Its text is as
+  // tall as the code, whatever is typed, even a word too long for a line.
+  // The text box's height is a whole number of pixels, so the two may differ by less than one. A
+  // line broken in another place would make them differ by a line, 23 pixels.
+  const lines = () =>
+    input.evaluate((element: HTMLTextAreaElement) => {
+      const code = element.previousElementSibling!.getBoundingClientRect().height;
+      element.style.height = "0px";
+      const text = element.scrollHeight;
+      element.style.height = "";
+      return { apart: Math.abs(text - code) < 1.5, code };
+    });
+  const wrapped = await lines();
+  expect(wrapped.apart).toBe(true);
+  await input.evaluate((element: HTMLTextAreaElement) => {
+    const at = element.value.indexOf("spellcheck");
+    element.setSelectionRange(at, at);
+    element.focus();
+  });
+  await page.keyboard.type(`${"x".repeat(130)} `);
+  const typed = await lines();
+  expect(typed.apart).toBe(true);
+  expect(typed.code).toBeGreaterThan(wrapped.code);
+  // Nothing runs past the side, so the block never scrolls sideways.
+  expect(await viewport.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
+  // With as many rows as its most rows, the block is that many lines tall, and scrolls inside.
+  await playground.set("long", true);
+  await playground.set("rows", 10);
+  await playground.set("maxRows", 10);
+  await expect
+    .poll(() => viewport.evaluate((element) => Math.round(element.clientHeight)))
+    .toBe(Math.round(10 * 13 * 1.75 + 30));
+  await viewport.evaluate((element) => element.scrollBy(0, 4000));
+  expect(await viewport.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+});
+
+test("a file diff wraps its lines at its width, and scrolls inside at its most rows", async ({
+  frame,
+  open,
+  playground,
+}) => {
+  await open("file-diff");
+  const viewport = frame.locator(".x-govuk-ui-file-diff .x-govuk-ui-scroll-area-viewport");
+  const beyond = () => viewport.evaluate((element) => element.scrollWidth - element.clientWidth);
+  expect(await beyond()).toBeGreaterThan(0);
+  await playground.set("wrap", true);
+  await expect.poll(beyond).toBe(0);
+  // A wrapped line's code starts beside its numbers and sign on every line it takes.
+  const code = frame.locator(".x-govuk-ui-diff-line[data-kind='add'] .x-govuk-ui-diff-code");
+  const rects = await code
+    .first()
+    .evaluate((element) => [...element.getClientRects()].map((rect) => Math.round(rect.left)));
+  expect(new Set(rects).size).toBe(1);
+  await playground.set("long", true);
+  await playground.set("maxRows", 12);
+  await expect
+    .poll(() => viewport.evaluate((element) => Math.round(element.clientHeight)))
+    .toBe(Math.round(12 * 13 * 1.75 + 12));
+  await viewport.evaluate((element) => element.scrollBy(0, 4000));
+  expect(await viewport.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
 });
 
 test("a timeline takes a new event at its head, dated as GOV.UK does", async ({ frame, open }) => {

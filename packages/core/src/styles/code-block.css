@@ -54,8 +54,8 @@
 }
 /* In an editable block, the code and the text box over it share one font, size, line height and
    tab size. The box fills exactly the space the code takes, so each typed character sits on its
-   coloured copy. Neither wraps, and the box never scrolls by itself. The region scrolls both
-   together, and the browser scrolls the region to keep the caret in view. */
+   coloured copy. Neither wraps unless the block wraps, and the box never scrolls by itself. The
+   region scrolls both together, and the browser scrolls the region to keep the caret in view. */
 .x-govuk-ui-code-block-text {
   position: relative;
   min-width: max-content;
@@ -150,6 +150,45 @@
   text-align: right;
   color: var(--x-govuk-ui-muted);
   user-select: none;
+}
+
+/* Rows and the most rows count lines of code, at 13px with a line height of 1.75, with the code's
+   30px of padding. The least height is the code's own, so an editable block's text box fills it
+   and takes a press anywhere in it. A cap below the rows wins, because a least height would
+   otherwise override a most height. */
+.x-govuk-ui-code-block[data-rows] .x-govuk-ui-code-block-text {
+  min-height: calc(var(--x-govuk-ui-code-rows) * 13px * 1.75 + 30px);
+}
+.x-govuk-ui-code-block[data-rows][data-max-rows] .x-govuk-ui-code-block-text {
+  min-height: calc(
+    min(var(--x-govuk-ui-code-rows), var(--x-govuk-ui-code-max-rows)) *
+    13px *
+    1.75 +
+    30px
+  );
+}
+.x-govuk-ui-code-block[data-max-rows] > .x-govuk-ui-scroll-area {
+  max-height: calc(var(--x-govuk-ui-code-max-rows) * 13px * 1.75 + 30px);
+}
+
+/* Wrapped, the code is as wide as the block. The code and the text box over it break their lines
+   in the same places, at a space or, within a word too long for the line, anywhere. A wrapped
+   line's number stays at its start, and the rest of the line starts under its code, where the
+   text box's padding starts its text. */
+.x-govuk-ui-code-block[data-wrap] .x-govuk-ui-code-block-text {
+  min-width: 0;
+}
+.x-govuk-ui-code-block[data-wrap] .x-govuk-ui-code-block-code,
+.x-govuk-ui-code-block[data-wrap] .x-govuk-ui-code-block-input {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.x-govuk-ui-code-block[data-wrap][data-line-numbers] .x-govuk-ui-code-line {
+  padding-left: calc(var(--x-govuk-ui-code-digits, 2) * 1ch + 30px);
+  text-indent: calc(-1 * (var(--x-govuk-ui-code-digits, 2) * 1ch + 30px));
+}
+.x-govuk-ui-code-block[data-wrap] .x-govuk-ui-code-line-number {
+  text-indent: 0;
 }
 
 /* Syntax colours from the GOV.UK palette, each at least 4.5:1 on the block's background. */

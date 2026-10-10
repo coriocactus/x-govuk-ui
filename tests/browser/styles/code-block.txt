@@ -64,6 +64,7 @@
   line-height: 1.75
   color: rgb(11, 12, 12)
   min-width: max-content
+  min-height: 348.5px
 .x-govuk-ui-code-line
   display: block
   font-size: 13px

@@ -1279,7 +1279,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI · sugar-high",
     changes:
-      "A block of code with its filename and a Copy button. Code is coloured from the GOV.UK palette by sugar-high, which knows about 30 languages, with line numbers left out of copies. It scrolls both ways in a Scroll area. Copy sits in a header beside the filename, or floats over the code, and its icon turns to a tick. Editable, it is a code editor. A clear text box over the coloured code takes what is typed, so the caret, selection, undo and screen readers are the browser's own, and the code is coloured again at each key. The two share one font and size and never wrap, so the text sits on its colours in any typeface. Tab moves on from it, as from any text box. The workbench's usage panel is a Code block, and the Editor's source is an editable one.",
+      "A block of code with its filename and a Copy button. Code is coloured from the GOV.UK palette by sugar-high, which knows about 30 languages, with line numbers left out of copies. It scrolls both ways in a Scroll area. Copy sits in a header beside the filename, or floats over the code, and its icon turns to a tick. Editable, it is a code editor. A clear text box over the coloured code takes what is typed, so the caret, selection, undo and screen readers are the browser's own, and the code is coloured again at each key. The two share one font and size, and break their lines in the same places, so the text sits on its colours in any typeface. Tab moves on from it, as from any text box. Wrapped, long lines break at the block's width, and the rest of a line starts under its code, beside its number. rows and maxRows set the block's height in lines of code. The example sets both to the short sample's length, for each language, so Long's 2,000 or so lines scroll in a box of that size, to try scrolling and typing at length. The workbench's usage panel is a Code block, and the Editor's source is an editable one.",
     props: [
       reference("code / defaultCode", "string", "Required"),
       choice(
@@ -1296,6 +1296,17 @@ const entries = {
       ),
       toggle("lineNumbers", true),
       toggle("editable", false),
+      toggle("wrap", false, { note: "Breaks long lines at the block's width." }),
+      number("rows", 0, {
+        min: 0,
+        default: "None",
+        note: "The least height, in lines of code. 0 is the short sample's length here.",
+      }),
+      number("maxRows", 0, {
+        min: 0,
+        default: "None",
+        note: "Lines before it scrolls inside. 0 is the short sample's length here.",
+      }),
       reference("onCodeChange", "(code) => void"),
       reference("inputProps", "The text box's props, such as name, id or ref"),
       reference("filename", "string"),
@@ -1305,6 +1316,7 @@ const entries = {
     ],
     example: [
       toggle("header", true, { note: "Names the file in a header. Without it, Copy floats." }),
+      toggle("long", false, { note: "Repeats the sample to about 2,000 lines." }),
     ],
   },
   "scroll-area": {
@@ -1865,7 +1877,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI · Motion",
     changes:
-      "Rows sit under bands, such as issues by status, and pressing a band folds its rows away on Base UI's Collapsible. Each column is as wide as its widest cell, and the columns line up across every group, with the first band heading them. No text is ever cut short or wrapped. As the table narrows, the columns give way in steps, each taken only once the one before would cut text short. Some columns are left out, then some join each row's title and the marks go, then some merge into others, as the dates into the people, and the people stand closer together. Each step moves through the rows from the top down, a little later in each row, and goes back the same way as the table widens. Past the last step, the groups scroll sideways in a Scroll area. Screen readers hear each cell's column before it, wherever it sits. With resizable, a Resizable handle on the right edge narrows and widens the table, by dragging or with the arrow keys.",
+      "Rows sit under bands, such as issues by status, and pressing a band folds its rows away on Base UI's Collapsible. Each column is as wide as its widest cell, and the columns line up across every group, with the first band heading them. No text is ever cut short or wrapped. As the table narrows, the columns give way in steps, each taken only once the one before would cut text short. Some columns are left out, then some join each row's title and the marks go, then some merge into others, as the dates into the people, and the people stand closer together. Each step moves through the rows from the top down, a little later in each row, and goes back the same way as the table widens. Past the last step, the groups scroll sideways in a Scroll area. Screen readers hear each cell's column before it, wherever it sits. With resizable, a Resizable handle on the right edge narrows and widens the table, by dragging or with the arrow keys. The example's To do band starts folded, with defaultOpen.",
     props: [
       reference("label", "string", "Required"),
       reference(
@@ -1890,7 +1902,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI · Motion",
     changes:
-      "A dense table for working through many records, as a CRM's is. It is built from Table's parts in a Scroll area that scrolls both ways. The headings stay at the top, the foot at the bottom and the first columns at the side, and once the rest has scrolled under them they cast a shadow along their edge. Each column's edge is a Resizable handle, dragged or moved with the arrow keys, and double-clicking it returns the column to its width. Sortable headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes, the heading one choosing every row or none. The foot counts the rows, and offers each column's figure, such as a sum or an average, on a button.",
+      "A dense table for working through many records, as a CRM's is. It is built from Table's parts in a Scroll area that scrolls both ways. The headings stay at the top, the foot at the bottom and the first columns at the side, and once the rest has scrolled under them they cast a shadow along their edge. Each column's edge is a Resizable handle, dragged or moved with the arrow keys, and double-clicking it returns the column to its width. Sortable headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes, the heading one choosing every row or none. The foot counts the rows, and offers each column's figure, such as a sum or an average, on a button. The rows scroll between the headings and the foot, with the scrollbar beside them alone, and stop at either end without a bounce, which would move the headings and the foot too. minRows and maxRows set the table's height in rows of data. The example sets both to 8, so Long's 1,000 or so rows scroll in a box of that size.",
     props: [
       reference("label", "string", "Required"),
       reference(
@@ -1912,8 +1924,18 @@ const entries = {
       toggle("selectable", true, { default: "false" }),
       reference("selected / onSelectedChange", "string[] / (selected: string[]) => void"),
       reference("count", "(rows: number) => ReactNode"),
-      reference("maxHeight", "number", "440"),
+      number("minRows", 8, {
+        min: 0,
+        default: "None",
+        note: "The least height, in rows of data. 0 sets none here.",
+      }),
+      number("maxRows", 8, {
+        min: 0,
+        default: "8",
+        note: "Rows of data before they scroll under the headings. 0 is the default here.",
+      }),
     ],
+    example: [toggle("long", false, { note: "Repeats the organisations to about 1,000 rows." })],
   },
   chart: {
     name: "Chart",
@@ -2600,14 +2622,26 @@ const entries = {
     upstream: "",
     dependencies: "React",
     changes:
-      "One column of lines, coloured by their syntax as Code block colours them. Removed lines sit on a red tint with a minus and added lines on a green tint with a plus, and screen readers hear which. Long unchanged runs fold away behind a quiet row that opens them in place, and the opened lines fade in. The header names the file and counts the lines added and removed, beside actions such as Accept and Reject. It scrolls sideways in a Scroll area.",
+      "One column of lines, coloured by their syntax as Code block colours them. Removed lines sit on a red tint with a minus and added lines on a green tint with a plus, and screen readers hear which. Long unchanged runs fold away behind a quiet row that opens them in place, and the opened lines fade in. The header names the file and counts the lines added and removed, beside actions such as Accept and Reject. It scrolls sideways in a Scroll area. Wrapped, long lines break at its width instead, and the rest of a line starts under its code. rows and maxRows set its height in rows, each a line or a fold. The example sets both to the 17 rows the short diff shows, so Long, which repeats the file to about 2,000 lines with its change in every part, scrolls in a box of that size.",
     props: [
       number("context", 3, { min: 0, note: "Unchanged lines kept around each change." }),
+      toggle("wrap", false, { note: "Breaks long lines at the diff's width." }),
+      number("rows", 17, {
+        min: 0,
+        default: "None",
+        note: "The least height, in rows. A row is a line or a fold. 0 sets none here.",
+      }),
+      number("maxRows", 17, {
+        min: 0,
+        default: "None",
+        note: "Rows before it scrolls inside. 17 is the short diff's own. 0 sets none here.",
+      }),
       reference("filename", "string", "Required"),
       reference("before / after", "string", "Required"),
       reference("language", "string", "tsx"),
       reference("children", "Actions, such as Accept and Reject"),
     ],
+    example: [toggle("long", false, { note: "Repeats the file to about 2,000 lines." })],
   },
   "organisation-name": {
     name: "Organisation name",

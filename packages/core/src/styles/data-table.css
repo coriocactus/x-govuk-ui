@@ -2,14 +2,42 @@
    top, the foot at the bottom, and the pinned columns at the side, each over the page's paper, so
    the rows pass beneath them. Cells keep to one line and end with an ellipsis. */
 .x-govuk-ui-data-table {
+  --x-govuk-ui-data-table-row: 44px;
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: 10px;
   overflow: clip;
   background: var(--x-govuk-ui-paper);
   font-family: var(--x-govuk-ui-font);
 }
+/* Every row is one line, as tall as the headings and the foot, so the table's height counts rows
+   of data, with a row each for the headings and the foot. A cap below the least wins, because a
+   least height would otherwise override a most height. */
 .x-govuk-ui-data-table-scroll {
   min-height: 0;
+  max-height: calc(
+    (var(--x-govuk-ui-data-table-max-rows, 8) + 2) *
+    var(--x-govuk-ui-data-table-row)
+  );
+}
+.x-govuk-ui-data-table[data-min-rows] > .x-govuk-ui-data-table-scroll {
+  min-height: calc(
+    (min(var(--x-govuk-ui-data-table-min-rows), var(--x-govuk-ui-data-table-max-rows, 8)) + 2) *
+    var(--x-govuk-ui-data-table-row)
+  );
+}
+/* The rows scroll under the headings and above the foot, so the scrollbar runs beside the rows
+   alone. The rows share one scrolling box with the headings and the foot, which keeps them one
+   table and their columns in line. A bounce past either end would move the headings and the foot
+   with the rows, so the table stops there without one. */
+.x-govuk-ui-data-table-scroll > .x-govuk-ui-scroll-area-scrollbar[data-orientation="vertical"] {
+  margin-top: var(--x-govuk-ui-data-table-row);
+  /* Base UI already ends it above the corner the horizontal scrollbar leaves. */
+  margin-bottom: calc(var(--x-govuk-ui-data-table-row) - var(--scroll-area-corner-height, 0px));
+}
+.x-govuk-ui-data-table
+  > .x-govuk-ui-data-table-scroll[data-has-overflow-y]
+  > .x-govuk-ui-scroll-area-viewport {
+  overscroll-behavior-y: none;
 }
 .x-govuk-ui-table.x-govuk-ui-data-table-table {
   table-layout: fixed;
@@ -19,7 +47,7 @@
 }
 .x-govuk-ui-data-table-table :is(th, td) {
   box-sizing: border-box;
-  height: 44px;
+  height: var(--x-govuk-ui-data-table-row);
   padding: 0 12px;
   border-bottom: 1px solid var(--x-govuk-ui-line);
   overflow: hidden;

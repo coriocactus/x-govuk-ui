@@ -87,6 +87,7 @@
   font-weight: 400
   line-height: 1.5
   color: rgb(11, 12, 12)
+  min-height: 440px
 .x-govuk-ui-data-table-table
   display: table
   font-size: 16px

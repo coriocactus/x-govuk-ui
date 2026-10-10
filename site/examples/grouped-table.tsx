@@ -250,7 +250,13 @@ export default function GroupedTableExample({ resizable = true }: Props) {
       }
     >
       {groups.map((group) => (
-        <GroupedTableGroup key={group.label} label={group.label} icon={marks[group.mark]}>
+        <GroupedTableGroup
+          key={group.label}
+          label={group.label}
+          icon={marks[group.mark]}
+          // Work not yet started is looked at least, so its band starts folded.
+          defaultOpen={group.mark !== "todo"}
+        >
           {group.items.map((item) => (
             <GroupedTableRow
               key={item.change}

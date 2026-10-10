@@ -155,14 +155,42 @@
 .x-govuk-ui-diff-code {
   white-space: pre;
 }
-/* A folded run of unchanged lines, as one quiet row that opens them. */
+/* Rows and the most rows count lines and folds, each 13px with a line height of 1.75, with the
+   code's 12px of padding. A cap below the rows wins, because a least height would otherwise
+   override a most height. */
+.x-govuk-ui-file-diff[data-rows] .x-govuk-ui-file-diff-code {
+  min-height: calc(var(--x-govuk-ui-diff-rows) * 13px * 1.75 + 12px);
+}
+.x-govuk-ui-file-diff[data-rows][data-max-rows] .x-govuk-ui-file-diff-code {
+  min-height: calc(
+    min(var(--x-govuk-ui-diff-rows), var(--x-govuk-ui-diff-max-rows)) *
+    13px *
+    1.75 +
+    12px
+  );
+}
+.x-govuk-ui-file-diff[data-max-rows] > .x-govuk-ui-scroll-area {
+  max-height: calc(var(--x-govuk-ui-diff-max-rows) * 13px * 1.75 + 12px);
+}
+/* Wrapped, the code is as wide as the diff, and the rest of a long line starts under its code. */
+.x-govuk-ui-file-diff[data-wrap] .x-govuk-ui-file-diff-code {
+  min-width: 0;
+}
+.x-govuk-ui-file-diff[data-wrap] .x-govuk-ui-diff-code {
+  flex: 1;
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* A folded run of unchanged lines, as one quiet row that opens them. It is exactly as tall as a
+   line, so rows and the most rows count lines and folds alike. */
 .x-govuk-ui-diff-fold {
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  margin: 2px 0;
-  padding: 2px 14px;
+  margin: 0;
+  padding: 0 14px;
   border: 0;
   background: var(--x-govuk-ui-surface);
   color: var(--x-govuk-ui-muted);

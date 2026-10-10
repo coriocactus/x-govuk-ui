@@ -1,6 +1,13 @@
 import { Avatar, DataTable, type DataTableColumn, Tag, type TagColour } from "x-govuk-ui";
 
-type Props = { selectable?: boolean; pinned?: number };
+type Props = {
+  selectable?: boolean;
+  pinned?: number;
+  minRows?: number;
+  maxRows?: number;
+  /** Repeats the organisations to about 1,000 rows, to try scrolling and sorting at length. */
+  long?: boolean;
+};
 
 type Partner = {
   name: string;
@@ -160,17 +167,30 @@ const columns: DataTableColumn<Partner>[] = [
   },
 ];
 
-export default function DataTableExample({ selectable = true, pinned = 1 }: Props) {
+/** The organisations over and over, each named by its round, to about 1,000 rows. */
+const many = Array.from({ length: 63 }, (_, round) =>
+  partners.map((partner) => ({ ...partner, name: `${partner.name} ${round + 1}` })),
+).flat();
+
+export default function DataTableExample({
+  selectable = true,
+  pinned = 1,
+  minRows = 8,
+  maxRows = 8,
+  long = false,
+}: Props) {
   return (
     <DataTable
       label="Partner organisations"
       columns={columns}
-      rows={partners}
+      rows={long ? many : partners}
       rowKey={(partner) => partner.name}
       rowName={(partner) => partner.name}
       pinned={pinned}
       selectable={selectable}
       count={(count) => `${count} organisations`}
+      minRows={minRows || undefined}
+      maxRows={maxRows || undefined}
     />
   );
 }

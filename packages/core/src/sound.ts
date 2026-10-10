@@ -547,8 +547,26 @@ function sound(
   };
 }
 
-/** Plays a cue now, at a level from 0 to 1, a little detuned at random. */
+/**
+ * Plays a cue, at a level from 0 to 1, a little detuned at random. It plays at once, unless the
+ * AudioContext is still to be made.
+ */
 function play(cue: SoundCue, volume: number, detune: number, velocity: number) {
+  // Making the AudioContext opens the audio device, and blocks the main thread while it does. That
+  // takes about 80 milliseconds in Chromium. The first cue usually answers a press, so the cue
+  // waits until the press's frame has painted. The press's feedback is then never late, and the
+  // page's first sound is late by one frame more. A hidden page paints nothing, and runs no
+  // animation frames, so its first cue plays at once.
+  const made = context && context.state !== "closed";
+  if (!made && document.visibilityState === "visible") {
+    requestAnimationFrame(() => setTimeout(() => playNow(cue, volume, detune, velocity)));
+    return;
+  }
+  playNow(cue, volume, detune, velocity);
+}
+
+/** Plays a cue now, making the AudioContext if there is none. */
+function playNow(cue: SoundCue, volume: number, detune: number, velocity: number) {
   const ctx = audio();
   const { voices, spread }: Cue = cues[cue];
   const drift = (Math.random() * 2 - 1) * spread;

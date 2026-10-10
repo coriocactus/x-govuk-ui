@@ -121,4 +121,5 @@ const server = (() => {
   }
   throw new Error("No port is free from 3005 to 3204.");
 })();
-console.log(`x-govuk-ui production preview: ${server.url}`);
+// It is announced at localhost, as the workbench is, whichever address it listens on.
+console.log(`x-govuk-ui production preview: http://localhost:${server.port}/`);

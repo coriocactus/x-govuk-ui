@@ -46,7 +46,8 @@ export type LogoCarouselProps = ComponentPropsWithRef<"section"> & {
  * A wall of logos shown a few at a time, for the governments and public bodies a service works
  * with. Every few seconds, one place turns over. The logo there rolls up and away as the next rises
  * in, and each place takes its turn. It stops while the pointer is over it or something in it has
- * focus. A button pauses it, as moving content must offer. With reduced motion, it starts paused.
+ * focus, and waits while it is off screen or the page is hidden. A button pauses it, as moving
+ * content must offer. With reduced motion, it starts paused.
  * Screen readers hear every organisation, in a list.
  */
 export function LogoCarousel({
@@ -101,9 +102,28 @@ export function LogoCarousel({
   }, [count, items.length]);
   const [paused, setPaused] = useState(timing.reduced);
   const [held, setHeld] = useState(false);
+  // The wall turns over only while users can see it. Off screen or in a hidden tab, each turn
+  // would still render the wall and start its animations, every few seconds, for no one.
+  const [seen, setSeen] = useState(true);
+  useEffect(() => {
+    const element = root.current;
+    if (!element) return;
+    let onScreen = true;
+    const update = () => setSeen(onScreen && document.visibilityState === "visible");
+    const observer = new IntersectionObserver(([entry]) => {
+      onScreen = entry?.isIntersecting ?? true;
+      update();
+    });
+    observer.observe(element);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
 
   useEffect(() => {
-    if (paused || held || items.length <= count) return;
+    if (paused || held || !seen || items.length <= count) return;
     const timer = setInterval(() => {
       setState(({ slots, turn, next }) => {
         // The next logo not already on show takes the next place.
@@ -118,7 +138,7 @@ export function LogoCarousel({
       });
     }, interval);
     return () => clearInterval(timer);
-  }, [paused, held, items.length, count, interval]);
+  }, [paused, held, seen, items.length, count, interval]);
 
   return (
     <section

@@ -2,6 +2,7 @@
 
 import {
   type ComponentPropsWithRef,
+  memo,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -9,6 +10,60 @@ import {
   useState,
 } from "react";
 import { useMotionTiming } from "./motion";
+
+/** How many words make a run. */
+const RUN = 50;
+
+type RunProps = {
+  /** The run's words, each with the spaces after it. */
+  words: readonly string[];
+  /** How many of the run's words show. */
+  shown: number;
+  /** Whether the caret follows the run's last shown word. */
+  caret: boolean;
+  /** Whether the words still to come take their space. */
+  rest: boolean;
+};
+
+/**
+ * A run of words. The words show a few at a time, and each step changes only the run that the
+ * last shown word is in. The other runs are not rendered again, so a step costs the same however
+ * long the text has grown. Rendering every word at every step would keep the main thread busy for
+ * seconds while a long reply streams in.
+ *
+ * Each run is a span of its own, so a word is added among 50 siblings at most. Rules such as
+ * `.x-govuk-ui-card > :last-child` depend on where an element sits among its siblings. Because of
+ * them, Chromium works out the style of every sibling again when one is added. Among 1,500 words,
+ * that takes most of each frame.
+ * @internal
+ */
+const Run = memo(
+  function Run({ words, shown, caret, rest }: RunProps) {
+    return (
+      <span>
+        {words.slice(0, shown).map((word, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: A word has only its place in the text.
+          <span key={index} className="x-govuk-ui-streaming-word">
+            {word}
+          </span>
+        ))}
+        {caret && <span className="x-govuk-ui-streaming-caret" />}
+        {rest && shown < words.length && (
+          <span className="x-govuk-ui-streaming-rest" data-copy="skip">
+            {words.slice(shown).join("")}
+          </span>
+        )}
+      </span>
+    );
+  },
+  // A text that grows is split into words again, so a run's words are compared by value.
+  (was, now) =>
+    was.shown === now.shown &&
+    was.caret === now.caret &&
+    was.rest === now.rest &&
+    was.words.length === now.words.length &&
+    was.words.every((word, index) => word === now.words[index]),
+);
 
 export type StreamingTextProps = Omit<ComponentPropsWithRef<"span">, "onComplete"> & {
   /** The text so far. When it grows, as from a live stream, the new words join the end. */
@@ -83,7 +138,22 @@ export function StreamingText({
     }
   }, [complete]);
 
-  const visible = words.slice(0, shown);
+  // The caret follows the last shown word, or starts the first run. A text with no words yet has
+  // one empty run, for the caret.
+  const caretRun = shown > 0 ? Math.floor((shown - 1) / RUN) : 0;
+  const runs = [];
+  for (let start = 0; start < Math.max(words.length, 1); start += RUN) {
+    const run = words.slice(start, start + RUN);
+    runs.push(
+      <Run
+        key={start}
+        words={run}
+        shown={Math.min(Math.max(shown - start, 0), run.length)}
+        caret={!complete && caretRun === start / RUN}
+        rest={!stopped}
+      />,
+    );
+  }
   return (
     <span
       {...props}
@@ -92,24 +162,11 @@ export function StreamingText({
       data-instant={mountedInstant || undefined}
     >
       {stopped ? (
-        <span className="x-govuk-ui-visually-hidden">{visible.join("")}</span>
+        <span className="x-govuk-ui-visually-hidden">{words.slice(0, shown).join("")}</span>
       ) : (
         !streaming && <span className="x-govuk-ui-visually-hidden">{text}</span>
       )}
-      <span aria-hidden="true">
-        {visible.map((word, index) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: A word has only its place in the text.
-          <span key={index} className="x-govuk-ui-streaming-word">
-            {word}
-          </span>
-        ))}
-        {!complete && <span className="x-govuk-ui-streaming-caret" />}
-        {!stopped && shown < words.length && (
-          <span className="x-govuk-ui-streaming-rest" data-copy="skip">
-            {words.slice(shown).join("")}
-          </span>
-        )}
-      </span>
+      <span aria-hidden="true">{runs}</span>
     </span>
   );
 }

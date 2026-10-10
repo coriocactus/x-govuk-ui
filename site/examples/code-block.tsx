@@ -5,8 +5,13 @@ type Props = {
   language?: "tsx" | "python" | "ruby" | "html" | "shell";
   lineNumbers?: boolean;
   editable?: boolean;
+  wrap?: boolean;
+  rows?: number;
+  maxRows?: number;
   /** Names the file in a header. Without it, Copy floats over the code. */
   header?: boolean;
+  /** Repeats the sample to about 2,000 lines, to try scrolling and typing in a long file. */
+  long?: boolean;
 };
 
 const samples = {
@@ -84,25 +89,40 @@ bun run dev
   },
 };
 
+/** The sample over and over, to about 2,000 lines. */
+const lengthen = (code: string) =>
+  Array.from({ length: Math.ceil(2000 / code.split("\n").length) }, () => code).join("");
+
 export default function CodeBlockExample({
   language = "tsx",
   lineNumbers = true,
   header = true,
   editable = false,
+  wrap = false,
+  rows = 0,
+  maxRows = 0,
+  long = false,
 }: Props) {
-  // Each language's sample keeps what was typed in it.
-  const [edited, setEdited] = useState<Partial<Record<keyof typeof samples, string>>>({});
+  // Each sample, short or long, keeps what was typed in it.
+  const [edited, setEdited] = useState<Record<string, string>>({});
   const { filename } = samples[language];
-  const code = edited[language] ?? samples[language].code;
+  const sample = `${language}${long ? "-long" : ""}`;
+  const code = edited[sample] ?? (long ? lengthen(samples[language].code) : samples[language].code);
+  // Without rows, the block is as tall as the short sample, with the empty line an editable
+  // block keeps for the caret. A long sample scrolls in a box of that size.
+  const fit = samples[language].code.replace(/\n$/, "").split("\n").length + (editable ? 1 : 0);
   return (
     <CodeBlock
       code={code}
       editable={editable}
-      onCodeChange={(next) => setEdited({ ...edited, [language]: next })}
+      onCodeChange={(next) => setEdited({ ...edited, [sample]: next })}
       language={language}
       filename={header ? filename : undefined}
       label={filename}
       lineNumbers={lineNumbers}
+      wrap={wrap}
+      rows={rows || fit}
+      maxRows={maxRows || fit}
     >
       <CodeBlockCopy />
     </CodeBlock>

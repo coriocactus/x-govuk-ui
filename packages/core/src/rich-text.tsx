@@ -212,10 +212,57 @@ export function RichText({
   className = "",
   ...props
 }: RichTextProps) {
-  const document = html ?? (source ? (markdown.parse(source, { async: false }) as string) : "");
   return (
     <div {...props} className={`x-govuk-ui-rich-text x-govuk-ui-prose ${className}`.trim()}>
-      {renderTree(parseHtmlTree(document), { components, headingOffset })}
+      {drawn(html ?? null, source ?? "", components, headingOffset)}
     </div>
   );
+}
+
+/** The most documents `drawn` keeps. */
+const KEPT = 100;
+
+type Drawing = {
+  tree: HtmlNode[];
+  nodes?: ReactNode[];
+  components?: RichTextComponents;
+  headingOffset?: number;
+};
+const drawings = new Map<string, Drawing>();
+
+/**
+ * A document's elements, kept for the documents drawn most recently. A conversation renders every
+ * reply again each time a word of the newest one streams in. Each earlier reply is then found
+ * here, instead of being parsed again. When its `components` and `headingOffset` are the same as
+ * last time, its elements are the same objects too, and React skips them. The map is a hook-free
+ * cache, so Rich text still renders on the server.
+ * @internal
+ */
+function drawn(
+  html: string | null,
+  source: string,
+  components: RichTextComponents | undefined,
+  headingOffset: number | undefined,
+) {
+  const key = html === null ? `markdown:${source}` : `html:${html}`;
+  let drawing = drawings.get(key);
+  if (drawing) drawings.delete(key);
+  else {
+    const document = html ?? (source ? (markdown.parse(source, { async: false }) as string) : "");
+    drawing = { tree: parseHtmlTree(document) };
+    // The map keeps its keys in the order they were set, so the first is the one drawn longest ago.
+    if (drawings.size >= KEPT) drawings.delete(drawings.keys().next().value!);
+  }
+  drawings.set(key, drawing);
+  if (
+    !drawing.nodes ||
+    drawing.components !== components ||
+    drawing.headingOffset !== headingOffset
+  )
+    Object.assign(drawing, {
+      nodes: renderTree(drawing.tree, { components, headingOffset }),
+      components,
+      headingOffset,
+    });
+  return drawing.nodes;
 }

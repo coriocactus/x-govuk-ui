@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-10
+
 ### Breaking Changes
 
 - Changed RichText's types so that `html` and `markdown` cannot both be given. TypeScript now reports passing both, which drew only the HTML and ignored the Markdown. Give the document as one or the other.
@@ -31,6 +33,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Fixed the first press with sounds on taking about 100 milliseconds to paint. Making the AudioContext blocks the main thread for about 80 milliseconds in Chromium. The first cue now waits until the press has painted, and then plays.
 - Fixed Progress's sweep, for an unknown amount, laying out its track in every frame. The fill now moves by a transform, which the browser animates off the main thread, so it keeps moving while the page is busy.
 - Fixed TableBody laying out the table once for each row that moves, as its rows glide to their new places. Sorting a DataTable of 1,000 rows now takes a fifteenth of the time.
+- Fixed GroupedTable laying out the table once for each part that goes as it takes a step, such as a column it leaves out as it narrows. Each part fades out as a copy over its row. The table now measures every row before it adds any copy.
 - Fixed StreamingText keeping the main thread busy while a long text streams in. Each step renders only the words that change, and the browser works out the style of only a few of them. While 1,500 words stream in, the main thread is busy half as long.
 - Fixed RichText parsing its document again each time it renders. It keeps the 100 documents it drew most recently. A conversation whose earlier replies render again each time the newest one grows does a tenth of the work.
 - Fixed FileDiff's comparison taking time and memory that grow with the product of the two texts' lengths. A small change to a file of 6,000 lines now shows in a quarter of the time, with a quarter of the memory.

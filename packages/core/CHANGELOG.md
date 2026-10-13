@@ -61,6 +61,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added `copyrightUrl` to Footer, where its copyright line links to. By default, Crown copyright's terms, as before. Give your own terms, or null for a line with no link, for a service outside GOV.UK.
 - Added CommandMenuBestMatches, the commands that best match the search, shown together where a service places it, such as before every group, so a command named as typed is not lost beneath a group whose keywords match too. By default, the commands whose names are the search come first, then those whose names start with it, at most three. It takes `rank`, `limit` and `label`, and its heading is the `best` label. Each command shown there moves from its place, with its context, ref and handlers, so it is listed once.
 - Added `filter` to CommandMenu, for a search of your own, such as a fuzzy one, and `matchesCommand` and `rankCommandByName`, the search and the ranking it uses by default.
 - Added `controlId` to Field, which binds it to its control. A bound Field gives its `Label`, `Hint` and `ErrorMessage` their ids, and shows its own `errorMessage`, or its Form's error by its `name`. A field composed from its parts then needs no `useField`. `hasHint`, `linkTo` and `describedBy` say the rest. A Field without `controlId` works as before.

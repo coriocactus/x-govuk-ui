@@ -3305,6 +3305,7 @@ const entries = {
       reference("crest", "string", "None"),
       reference("licence", "ReactNode | null", "Open Government Licence"),
       reference("copyright", "ReactNode", "© Crown copyright"),
+      reference("copyrightUrl", "string | null", "Crown copyright's terms"),
       reference("navigation", "ReactNode", "FooterSection parts"),
       reference(
         "FooterSection",

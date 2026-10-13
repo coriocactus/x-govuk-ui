@@ -234,3 +234,19 @@ test("the library's own icons are hidden from screen readers, unless a service n
     'class="x-govuk-ui-chevron next" data-direction="right"',
   );
 });
+
+test("a footer's copyright links to Crown copyright, to a service's own terms, or to nothing", () => {
+  const crown = renderToStaticMarkup(<Footer />);
+  expect(crown).toContain('href="https://www.nationalarchives.gov.uk/');
+  const own = renderToStaticMarkup(
+    <Footer crown={false} copyright="© Example Ltd" copyrightUrl="/copyright" />,
+  );
+  expect(own).toContain(
+    '<a class="x-govuk-ui-footer-link x-govuk-ui-footer-copyright" href="/copyright">© Example Ltd</a>',
+  );
+  const none = renderToStaticMarkup(
+    <Footer crown={false} copyright="© Example Ltd" copyrightUrl={null} />,
+  );
+  expect(none).toContain('<span class="x-govuk-ui-footer-copyright">© Example Ltd</span>');
+  expect(none).not.toContain("crown-copyright");
+});

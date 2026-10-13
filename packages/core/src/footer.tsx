@@ -50,11 +50,21 @@ export type FooterProps = ComponentPropsWithRef<"footer"> & {
   crest?: string;
   /** The content's licence. By default, the Open Government Licence v3.0. Give null for none. */
   licence?: ReactNode;
-  /** The copyright line, which links to Crown copyright's terms. */
+  /** The copyright line, which links to `copyrightUrl`. */
   copyright?: ReactNode;
+  /**
+   * Where the copyright line links to. By default, Crown copyright's terms at the National
+   * Archives, for a GOV.UK service. Give null for a line with no link, such as a service outside
+   * GOV.UK that owns its own content.
+   */
+  copyrightUrl?: string | null;
   /** Wider navigation, as `FooterSection` parts, above a rule at the top of the footer. */
   navigation?: ReactNode;
 };
+
+/** Crown copyright's terms, which a GOV.UK service's copyright line links to. */
+const crownCopyright =
+  "https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/";
 
 /** The words Footer writes, which a LabelsProvider can change. */
 export type FooterLabels = {
@@ -85,6 +95,7 @@ export function Footer({
   crest,
   licence: ownLicence,
   copyright: ownCopyright,
+  copyrightUrl = crownCopyright,
   navigation,
   className = "",
   style,
@@ -122,13 +133,22 @@ export function Footer({
               </p>
             )}
           </div>
-          <a
-            className="x-govuk-ui-footer-link x-govuk-ui-footer-copyright"
-            data-crest={(crown && crest !== undefined) || undefined}
-            href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
-          >
-            {copyright}
-          </a>
+          {copyrightUrl === null ? (
+            <span
+              className="x-govuk-ui-footer-copyright"
+              data-crest={(crown && crest !== undefined) || undefined}
+            >
+              {copyright}
+            </span>
+          ) : (
+            <a
+              className="x-govuk-ui-footer-link x-govuk-ui-footer-copyright"
+              data-crest={(crown && crest !== undefined) || undefined}
+              href={copyrightUrl}
+            >
+              {copyright}
+            </a>
+          )}
         </div>
       </WidthContainer>
     </footer>

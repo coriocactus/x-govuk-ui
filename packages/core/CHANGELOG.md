@@ -39,6 +39,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added `answer` to Field, and `label` and `answer` to `useField`, which say how FormSteps' Check your answers lists the field. A bound Field's `Label` or `FieldsetLegend` gives its question. Without an `answer`, the summary shows what the field sends under its name. `FormField` is the type of what a field tells its Form.
 - Added `errorMessage` to Switch and Slider. Each now takes part in a Form by its `name`, so a Form's error shows on the field, and its error summary links to it.
 - Added the questions and answers of Combobox, MultiSelect, Slider, Switch, Date input and Time input to FormSteps' Check your answers. Combobox shows its option's label, Slider its value as it shows it, and Switch On or Off.
+- Added the ability to put a FormStep inside a wrapper of your own. Each FormStep now draws its own step, in its place, and FormSteps takes its steps in the page's order. A step in a wrapper shows once the page has loaded.
 - Added the ability to put a TourStep inside a wrapper of your own. Each TourStep now leaves an empty, hidden element in its place, which keeps its order among the Tour's steps.
 - Added `render` to Button, which renders another element with the Button's look, such as a link for GOV.UK's Start button, or a router's link.
 - Added CopyButton, an icon button that copies any text, such as a reference number. CodeBlockCopy and ConversationCopy are built on it.

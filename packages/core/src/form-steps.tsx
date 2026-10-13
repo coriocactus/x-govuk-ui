@@ -2,6 +2,7 @@
 
 import {
   Children,
+  createContext,
   isValidElement,
   type KeyboardEvent,
   type ReactNode,
@@ -62,9 +63,56 @@ export type FormStepProps = {
   className?: string;
 };
 
-/** One step of FormSteps. It shows nothing itself, because FormSteps shows each step in turn. */
-export function FormStep(_props: FormStepProps): ReactNode {
-  return null;
+/** A step as its FormSteps knows it, with the fieldset that marks its place among the others. */
+type StepEntry = {
+  id: string;
+  props: RefObject<FormStepProps>;
+  place: RefObject<HTMLFieldSetElement | null>;
+};
+
+/** What a FormSteps gives its steps, so each can draw itself in its place. */
+type StepsHost = {
+  register: (entry: StepEntry) => () => void;
+  /** A registered step's place among the steps, in the page's order. */
+  indexOf: (id: string) => number | null;
+  draw: (
+    index: number | null,
+    props: FormStepProps,
+    place: RefObject<HTMLFieldSetElement | null>,
+  ) => ReactNode;
+};
+
+const StepsContext = createContext<StepsHost | null>(null);
+/** A step's place among its FormSteps' direct children, read as the server renders. */
+const StepIndex = createContext<number | null>(null);
+
+/**
+ * One step of FormSteps, which shows it while it is the step on show. It can sit inside a wrapper
+ * of your own. FormSteps takes its steps in the page's order.
+ */
+export function FormStep(props: FormStepProps): ReactNode {
+  const host = useContext(StepsContext);
+  const direct = useContext(StepIndex);
+  const id = useId();
+  const latest = useRef(props);
+  latest.current = props;
+  const place = useRef<HTMLFieldSetElement>(null);
+  const register = host?.register;
+  useLayoutEffect(() => register?.({ id, props: latest, place }), [register, id]);
+  if (!host) return null;
+  return host.draw(host.indexOf(id) ?? direct, props, place);
+}
+
+/** Gives each direct child that is a FormStep its place, so the first HTML shows the right step. */
+function numberSteps(children: ReactNode) {
+  let index = 0;
+  return Children.map(children, (child) =>
+    isValidElement(child) && child.type === FormStep ? (
+      <StepIndex value={index++}>{child}</StepIndex>
+    ) : (
+      child
+    ),
+  );
 }
 
 export type FormStepsProps = Omit<
@@ -295,9 +343,23 @@ export function FormSteps({
 }: FormStepsProps) {
   const labels = useLabels("formSteps", defaultFormStepsLabels, ownLabels);
   const doneLabel = layout === "card" ? labels.answered : labels.sent;
-  const steps = Children.toArray(children)
-    .filter(isValidElement)
-    .map((child) => child.props as FormStepProps);
+  // Each step registers itself once it renders, in the page's order. Until then, as the server
+  // renders, the steps are the direct children.
+  const [registered, setRegistered] = useState<readonly StepEntry[]>([]);
+  const register = useCallback((entry: StepEntry) => {
+    const order = (all: readonly StepEntry[]) =>
+      [...all].sort((a, b) => {
+        const [first, second] = [a.place.current, b.place.current];
+        if (!first || !second) return 0;
+        return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+      });
+    setRegistered((all) => order([...all, entry]));
+    return () => setRegistered((all) => all.filter((each) => each !== entry));
+  }, []);
+  const direct = Children.toArray(children)
+    .filter((child) => isValidElement(child) && child.type === FormStep)
+    .map((child) => (child as { props: FormStepProps }).props);
+  const steps = registered.length > 0 ? registered.map((entry) => entry.props.current) : direct;
   const count = steps.length;
   const [saved] = useState(() => readSaved(storageKey));
   const [restored] = useState(() => {
@@ -345,10 +407,10 @@ export function FormSteps({
     setPlan((current) => (current.join() === next.join() ? current : next));
     return next;
   };
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the plan is worked out once mounted.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the plan is worked out once mounted, and again as steps come and go.
   useLayoutEffect(() => {
     replan();
-  }, []);
+  }, [count]);
 
   /** Keeps the answers and the step, when there is a key. */
   const remember = (where = at, passing = passed, skipping = skipped) => {
@@ -702,6 +764,47 @@ export function FormSteps({
     </div>
   );
 
+  // Every step stays in the form, so answers are kept as users move back and forth. Steps
+  // skipped or not asked are disabled while out of sight, so their answers are not sent. A step
+  // whose place is not known yet stays out of sight until it registers.
+  const host: StepsHost = {
+    register,
+    indexOf: (id) => {
+      const index = registered.findIndex((entry) => entry.id === id);
+      return index < 0 ? null : index;
+    },
+    draw: (index, each, place) => (
+      <fieldset
+        ref={place}
+        role="presentation"
+        className={`x-govuk-ui-form-step ${each.className ?? ""}`.trim()}
+        data-step={index ?? undefined}
+        hidden={index !== at || sent}
+        disabled={index !== null && index !== at && (skipped.has(index) || !plan.includes(index))}
+      >
+        {layout === "page" && title && (
+          <span className="x-govuk-ui-form-steps-caption">{title}</span>
+        )}
+        {each.title &&
+          (layout === "page" ? (
+            <h1 className="x-govuk-ui-form-step-title">{each.title}</h1>
+          ) : (
+            <h3 className="x-govuk-ui-form-step-title">{each.title}</h3>
+          ))}
+        {each.hint && <div className="x-govuk-ui-hint">{each.hint}</div>}
+        <div className="x-govuk-ui-form-step-fields">
+          {index === null ? (
+            each.children
+          ) : (
+            <StepFields index={index} fields={stepFields}>
+              {each.children}
+            </StepFields>
+          )}
+        </div>
+      </fieldset>
+    ),
+  };
+
   const body = (
     <div className="x-govuk-ui-form-steps-body">
       {!card && progress && !reviewing && !sent && plan.length > 1 && (
@@ -709,35 +812,7 @@ export function FormSteps({
           {labels.progress(position + 1, plan.length)}
         </p>
       )}
-      {steps.map((each, index) => (
-        // Every step stays in the form, so answers are kept as users move back and forth. Steps
-        // skipped or not asked are disabled while out of sight, so their answers are not sent.
-        <fieldset
-          // biome-ignore lint/suspicious/noArrayIndexKey: steps are places in the form's order.
-          key={index}
-          role="presentation"
-          className={`x-govuk-ui-form-step ${each.className ?? ""}`.trim()}
-          data-step={index}
-          hidden={index !== at || sent}
-          disabled={index !== at && (skipped.has(index) || !plan.includes(index))}
-        >
-          {layout === "page" && title && (
-            <span className="x-govuk-ui-form-steps-caption">{title}</span>
-          )}
-          {each.title &&
-            (layout === "page" ? (
-              <h1 className="x-govuk-ui-form-step-title">{each.title}</h1>
-            ) : (
-              <h3 className="x-govuk-ui-form-step-title">{each.title}</h3>
-            ))}
-          {each.hint && <div className="x-govuk-ui-hint">{each.hint}</div>}
-          <div className="x-govuk-ui-form-step-fields">
-            <StepFields index={index} fields={stepFields}>
-              {each.children}
-            </StepFields>
-          </div>
-        </fieldset>
-      ))}
+      <StepsContext value={host}>{numberSteps(children)}</StepsContext>
       {(reviewing || sent) && showSteps && summary}
       {sent && doneContent && (
         <div className="x-govuk-ui-form-steps-done" tabIndex={-1}>

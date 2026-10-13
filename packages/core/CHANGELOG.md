@@ -16,6 +16,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added the parts of Radios and Checkboxes, for a group of your own. RadiosRoot and CheckboxesRoot keep the group's state and bind its Field to the group's id. ChoiceList holds the answers, and Radios' dot travels between them. An answer is a ChoiceRoot, with a ChoiceControl, a ChoiceLabel and a ChoiceHint, and a ChoiceConditional after it for its follow-up question. A part can then go between a group's hint and its answers. ChoiceControl takes an input's props, such as `required` and `ref`. Radios and Checkboxes are now built from these parts, and their markup does not change.
 - Added the props of an element to Radio and Checkbox, as every other part has them. `ref`, `data-*` and the rest go on the answer's row, which holds its input, box, label and hint.
 - Added `controlId` to Radio and Checkbox, to give an answer the id you choose.
+- Added SummaryListRowRoot, SummaryListKey, SummaryListValue and SummaryListActions, for a Summary list row of your own. SummaryListValue glows when its text changes, as the row's value does. SummaryListRow is now built from them, and its markup does not change.
+- Added `ref` to SummaryListAction, which goes on its link or button.
 - Added FieldsetRoot and FieldsetLegend, the parts of a Fieldset, for a fieldset of your own. FieldsetLegend takes `size` and `pageHeading`. In a bound Field, FieldsetRoot is described by the field's hint and error. Fieldset is now built from them, and its markup does not change.
 
 ### Changed

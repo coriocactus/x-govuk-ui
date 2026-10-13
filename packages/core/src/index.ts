@@ -543,9 +543,13 @@ export {
   SummaryList,
   SummaryListAction,
   type SummaryListActionProps,
+  SummaryListActions,
+  SummaryListKey,
   type SummaryListProps,
   SummaryListRow,
   type SummaryListRowProps,
+  SummaryListRowRoot,
+  SummaryListValue,
 } from "./summary-list";
 export { Switch, type SwitchProps } from "./switch";
 export {

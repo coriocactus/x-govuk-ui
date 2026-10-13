@@ -35,7 +35,11 @@ import {
   SummaryCard,
   SummaryList,
   SummaryListAction,
+  SummaryListActions,
+  SummaryListKey,
   SummaryListRow,
+  SummaryListRowRoot,
+  SummaryListValue,
   Table,
   TableBody,
   TableCaption,
@@ -159,6 +163,23 @@ test("summary lists, task lists, diffs and galleries keep GOV.UK's structure and
   expect(summary).toContain('Change<span class="x-govuk-ui-visually-hidden"> name</span>');
   // A row without actions keeps the column, so the values line up.
   expect(summary.match(/x-govuk-ui-summary-list-actions/g)).toHaveLength(2);
+  // A row is its parts, so a row composed from them matches.
+  const action = <SummaryListAction href="#name" hiddenText="name" data-action="" />;
+  expect(
+    renderToStaticMarkup(
+      <SummaryListRow label="Name" actions={action} data-row="">
+        Anthony Eden
+      </SummaryListRow>,
+    ),
+  ).toBe(
+    renderToStaticMarkup(
+      <SummaryListRowRoot data-row="">
+        <SummaryListKey>Name</SummaryListKey>
+        <SummaryListValue>Anthony Eden</SummaryListValue>
+        <SummaryListActions>{action}</SummaryListActions>
+      </SummaryListRowRoot>,
+    ),
+  );
   const tasks = renderToStaticMarkup(
     <TaskList>
       <TaskListItem href="#details" hint="Name and address" status="completed">

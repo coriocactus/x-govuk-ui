@@ -5,11 +5,13 @@ import {
   type HTMLAttributes,
   type MouseEvent,
   type ReactNode,
+  type Ref,
   useLayoutEffect,
   useRef,
 } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
 import { useMotionTiming } from "./motion";
+import { useMergedRef } from "./refs";
 
 export type SummaryListProps = ComponentPropsWithRef<"dl"> & {
   /** Leaves out the lines between rows, as for a short list inside other content. */
@@ -40,15 +42,40 @@ export type SummaryListRowProps = ComponentPropsWithRef<"div"> & {
   actions?: ReactNode;
 };
 
-/** One row. Rows without actions keep the actions column, so the values still line up. */
-export function SummaryListRow({
-  label,
-  children,
-  actions,
+/**
+ * One row. Rows without actions keep the actions column, so the values still line up. It is a
+ * `SummaryListRowRoot` holding a `SummaryListKey`, a `SummaryListValue` and `SummaryListActions`.
+ * Compose those parts yourself for a row of your own.
+ */
+export function SummaryListRow({ label, children, actions, ...props }: SummaryListRowProps) {
+  return (
+    <SummaryListRowRoot {...props}>
+      <SummaryListKey>{label}</SummaryListKey>
+      <SummaryListValue>{children}</SummaryListValue>
+      <SummaryListActions>{actions}</SummaryListActions>
+    </SummaryListRowRoot>
+  );
+}
+
+/** A row of your own. Put a key, a value and its actions in it, in that order. */
+export function SummaryListRowRoot({ className = "", ...props }: ComponentPropsWithRef<"div">) {
+  return <div {...props} className={`x-govuk-ui-summary-list-row ${className}`.trim()} />;
+}
+
+/** A row's key, such as Name. */
+export function SummaryListKey({ className = "", ...props }: ComponentPropsWithRef<"dt">) {
+  return <dt {...props} className={`x-govuk-ui-summary-list-key ${className}`.trim()} />;
+}
+
+/** A row's value. When its text changes, it glows for a moment, so users see what they changed. */
+export function SummaryListValue({
   className = "",
+  children,
+  ref,
   ...props
-}: SummaryListRowProps) {
+}: ComponentPropsWithRef<"dd">) {
   const value = useRef<HTMLElement>(null);
+  const merged = useMergedRef(value, ref);
   const previous = useRef<string | null>(null);
   const { reduced } = useMotionTiming();
   // biome-ignore lint/correctness/useExhaustiveDependencies: The value's text is what changes.
@@ -67,18 +94,23 @@ export function SummaryListRow({
     previous.current = text;
   }, [children]);
   return (
-    <div {...props} className={`x-govuk-ui-summary-list-row ${className}`.trim()}>
-      <dt className="x-govuk-ui-summary-list-key">{label}</dt>
-      <dd ref={value} className="x-govuk-ui-summary-list-value">
-        {children}
-      </dd>
-      <dd className="x-govuk-ui-summary-list-actions">{actions}</dd>
-    </div>
+    <dd {...props} ref={merged} className={`x-govuk-ui-summary-list-value ${className}`.trim()}>
+      {children}
+    </dd>
   );
+}
+
+/**
+ * A row's actions, as `SummaryListAction` parts. A row without actions keeps it, empty, so the
+ * values still line up.
+ */
+export function SummaryListActions({ className = "", ...props }: ComponentPropsWithRef<"dd">) {
+  return <dd {...props} className={`x-govuk-ui-summary-list-actions ${className}`.trim()} />;
 }
 
 // It renders a button or a link, so it takes the attributes they share.
 export type SummaryListActionProps = Omit<HTMLAttributes<HTMLElement>, "onClick"> & {
+  ref?: Ref<HTMLElement>;
   href?: string;
   /** Without an href, the action is a button, such as one that opens a Dialog to edit the value. */
   onClick?: (event: MouseEvent<HTMLElement>) => void;
@@ -98,6 +130,7 @@ export function SummaryListAction({
   hiddenText,
   render,
   className = "",
+  ref,
   ...props
 }: SummaryListActionProps) {
   const content = (
@@ -110,6 +143,7 @@ export function SummaryListAction({
     return (
       <button
         {...props}
+        ref={ref as Ref<HTMLButtonElement>}
         type="button"
         className={`x-govuk-ui-summary-list-action ${className}`.trim()}
         onClick={onClick}
@@ -120,6 +154,7 @@ export function SummaryListAction({
   return (
     <Anchor
       {...props}
+      ref={ref as Ref<HTMLAnchorElement>}
       render={render}
       href={href}
       onClick={onClick}

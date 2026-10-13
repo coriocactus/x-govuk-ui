@@ -9,11 +9,20 @@ import {
   isValidElement,
   type ReactNode,
   useContext,
+  useId,
   useRef,
   useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
-import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "./field";
+import {
+  ErrorMessage,
+  Field,
+  Hint,
+  Label,
+  present,
+  useControlProps,
+  useFormDefault,
+} from "./field";
 import { trackHighlight } from "./highlight";
 import { ChevronIcon, TickIcon } from "./icons";
 import { useMergedRef } from "./refs";
@@ -30,7 +39,7 @@ export type SelectProps = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   /** The chosen value. Leave it out to let the select keep track. */
   value?: string | null;
   defaultValue?: string | null;
@@ -46,7 +55,7 @@ export type SelectProps = Omit<
   id?: string;
   /** The choices, as `SelectItem` parts. */
   children: ReactNode;
-  /** Classes for the field. */
+  /** Classes for the button that opens the list. */
   className?: string;
 };
 
@@ -107,24 +116,52 @@ export function Select({
   hint,
   hideLabel = false,
   errorMessage,
-  value,
-  defaultValue: given,
-  onValueChange,
-  placeholder,
-  name,
-  required,
-  disabled = false,
-  size = "medium",
   id,
-  children,
-  className = "",
-  ref,
+  "aria-describedby": describedBy,
   ...props
 }: SelectProps) {
-  const field = useField({ id, name, hint, errorMessage });
+  const generated = useId();
+  return (
+    <Field
+      controlId={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Hint>{hint}</Hint>
+      <ErrorMessage />
+      <SelectControl {...props} />
+    </Field>
+  );
+}
+
+export type SelectControlProps = Omit<SelectProps, "label" | "hint" | "hideLabel" | "errorMessage">;
+
+/**
+ * Select's control on its own, for a field composed from Field's parts. It is the button that shows
+ * the choice, with its list. In a bound Field, it takes its id, name and descriptions from the
+ * field.
+ */
+export function SelectControl(given: SelectControlProps) {
+  const {
+    value,
+    defaultValue: givenDefault,
+    onValueChange,
+    placeholder,
+    name,
+    required,
+    disabled = false,
+    size = "medium",
+    children,
+    className = "",
+    ref,
+    ...props
+  } = useControlProps(given);
   // A Form can give the field an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(name)?.[0];
-  const defaultValue = given === undefined ? saved : given;
+  const defaultValue = givenDefault === undefined ? saved : givenDefault;
   const labels = labelsOf(children);
   const long = Object.keys(labels).length > SHORT_LIST;
   const list = <Primitive.List className="x-govuk-ui-select-list">{children}</Primitive.List>;
@@ -144,75 +181,67 @@ export function Select({
 
   const mergedRef = useMergedRef(trigger, ref);
   return (
-    <Field invalid={field.invalid}>
-      <Label htmlFor={field.id} visuallyHidden={hideLabel}>
-        {label}
-      </Label>
-      <Hint id={field.hintId}>{hint}</Hint>
-      <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
-      <Primitive.Root
-        items={labels}
-        value={value}
-        defaultValue={defaultValue}
-        onValueChange={(next) => {
-          if (next !== null) choose(next as string);
-        }}
-        onOpenChange={(open) => {
-          if (!open) return;
-          setTicked(current);
-          setWidth(trigger.current?.offsetWidth);
-        }}
-        name={name}
-        required={required}
-        disabled={disabled}
+    <Primitive.Root
+      items={labels}
+      value={value}
+      defaultValue={defaultValue}
+      onValueChange={(next) => {
+        if (next !== null) choose(next as string);
+      }}
+      onOpenChange={(open) => {
+        if (!open) return;
+        setTicked(current);
+        setWidth(trigger.current?.offsetWidth);
+      }}
+      name={name}
+      required={required}
+      disabled={disabled}
+    >
+      <Primitive.Trigger
+        {...props}
+        ref={mergedRef}
+        className={`x-govuk-ui-input x-govuk-ui-select-trigger ${className}`.trim()}
+        data-size={size}
       >
-        <Primitive.Trigger
-          {...props}
-          ref={mergedRef}
-          {...field.controlProps}
-          className={`x-govuk-ui-input x-govuk-ui-select-trigger ${className}`.trim()}
-          data-size={size}
+        <Primitive.Value className="x-govuk-ui-select-value" placeholder={placeholder} />
+        <Primitive.Icon className="x-govuk-ui-select-icon">
+          <ChevronIcon size={16} />
+        </Primitive.Icon>
+      </Primitive.Trigger>
+      <Primitive.Portal>
+        <Primitive.Positioner
+          className="x-govuk-ui-select-positioner"
+          sideOffset={6}
+          alignItemWithTrigger={!long}
         >
-          <Primitive.Value className="x-govuk-ui-select-value" placeholder={placeholder} />
-          <Primitive.Icon className="x-govuk-ui-select-icon">
-            <ChevronIcon size={16} />
-          </Primitive.Icon>
-        </Primitive.Trigger>
-        <Primitive.Portal>
-          <Primitive.Positioner
-            className="x-govuk-ui-select-positioner"
-            sideOffset={6}
-            alignItemWithTrigger={!long}
+          <Primitive.Popup
+            // A short list scrolls in the popup itself, where its highlight slides. A long list's
+            // highlight is in its Scroll area.
+            ref={long ? undefined : followHighlight}
+            className="x-govuk-ui-select-popup"
+            data-size={size}
+            data-long={long || undefined}
+            style={
+              width ? ({ "--x-govuk-ui-select-width": `${width}px` } as CSSProperties) : undefined
+            }
           >
-            <Primitive.Popup
-              // A short list scrolls in the popup itself, where its highlight slides. A long list's
-              // highlight is in its Scroll area.
-              ref={long ? undefined : followHighlight}
-              className="x-govuk-ui-select-popup"
-              data-size={size}
-              data-long={long || undefined}
-              style={
-                width ? ({ "--x-govuk-ui-select-width": `${width}px` } as CSSProperties) : undefined
-              }
-            >
-              <TickContext value={ticked}>
-                {long ? (
-                  <ScrollArea viewportRef={centreChosen} className="x-govuk-ui-select-scroll" fade>
-                    <span className="x-govuk-ui-select-highlight" aria-hidden="true" />
-                    {list}
-                  </ScrollArea>
-                ) : (
-                  <>
-                    <span className="x-govuk-ui-select-highlight" aria-hidden="true" />
-                    {list}
-                  </>
-                )}
-              </TickContext>
-            </Primitive.Popup>
-          </Primitive.Positioner>
-        </Primitive.Portal>
-      </Primitive.Root>
-    </Field>
+            <TickContext value={ticked}>
+              {long ? (
+                <ScrollArea viewportRef={centreChosen} className="x-govuk-ui-select-scroll" fade>
+                  <span className="x-govuk-ui-select-highlight" aria-hidden="true" />
+                  {list}
+                </ScrollArea>
+              ) : (
+                <>
+                  <span className="x-govuk-ui-select-highlight" aria-hidden="true" />
+                  {list}
+                </>
+              )}
+            </TickContext>
+          </Primitive.Popup>
+        </Primitive.Positioner>
+      </Primitive.Portal>
+    </Primitive.Root>
   );
 }
 

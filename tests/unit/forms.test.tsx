@@ -8,6 +8,7 @@ import {
   EditorToolbar,
   editorToolbarGroups,
 } from "@x-govuk-ui/jorjorwel";
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   Calendar,
@@ -25,6 +26,7 @@ import {
   FileUpload,
   Hint,
   Input,
+  InputControl,
   InputOTP,
   Label,
   MultiSelect,
@@ -33,9 +35,11 @@ import {
   Radios,
   SearchBox,
   Select,
+  SelectControl,
   SelectItem,
   Switch,
   Textarea,
+  TextareaControl,
   TimeInput,
   useControlProps,
   useField,
@@ -142,6 +146,66 @@ test("a bound field gives its parts and a control of your own their ids, and its
   expect(renderToStaticMarkup(<Control aria-describedby="own" />)).toBe(
     '<select aria-describedby="own"></select>',
   );
+});
+
+/**
+ * Markup with each tag's attributes in order, and without the ids Base UI generates, which depend
+ * on how deep a part sits in the tree.
+ */
+function normalised(html: string) {
+  return html
+    .replace(/ data-id="base-ui-[^"]*"/g, "")
+    .replace(/<([a-z]+)((?: [^\s=>]+(?:="[^"]*")?)*)(\s*\/?)>/g, (_, tag, attributes, end) => {
+      const sorted = (attributes.match(/ [^\s=>]+(?:="[^"]*")?/g) ?? []).sort().join("");
+      return `<${tag}${sorted}${end}>`;
+    });
+}
+
+test("input, textarea and select are their parts in a bound field, so a composed one matches", () => {
+  const composed = (control: ReactNode) =>
+    normalised(
+      renderToStaticMarkup(
+        <Field controlId="name" name="name" hasHint errorMessage="Enter your name.">
+          <Label>Name</Label>
+          <Hint>As on your passport.</Hint>
+          <ErrorMessage />
+          {control}
+        </Field>,
+      ),
+    );
+  const field = { id: "name", name: "name", hint: "As on your passport." } as const;
+  expect(
+    normalised(
+      renderToStaticMarkup(
+        <Input {...field} label="Name" errorMessage="Enter your name." prefix="£" />,
+      ),
+    ),
+  ).toBe(composed(<InputControl prefix="£" />));
+  expect(
+    normalised(
+      renderToStaticMarkup(
+        <Textarea {...field} label="Name" errorMessage="Enter your name." characterLimit={20} />,
+      ),
+    ),
+  ).toBe(composed(<TextareaControl characterLimit={20} />));
+  const options = <SelectItem value="a">A</SelectItem>;
+  expect(
+    normalised(
+      renderToStaticMarkup(
+        <Select {...field} label="Name" errorMessage="Enter your name.">
+          {options}
+        </Select>,
+      ),
+    ),
+  ).toBe(composed(<SelectControl>{options}</SelectControl>));
+  // A control's own descriptions come before the field's, in the shorthand and the parts.
+  expect(
+    renderToStaticMarkup(
+      <Select id="pick" label="Pick" hint="One" aria-describedby="own">
+        {options}
+      </Select>,
+    ),
+  ).toContain('aria-describedby="own pick-hint"');
 });
 
 test("inputs generate distinct IDs and escape content during server rendering", () => {

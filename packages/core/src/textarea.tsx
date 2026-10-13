@@ -5,12 +5,21 @@ import {
   type ComponentPropsWithRef,
   type CSSProperties,
   type ReactNode,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { CharacterCountNote, countWords } from "./character-count";
-import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "./field";
+import {
+  ErrorMessage,
+  Field,
+  Hint,
+  Label,
+  present,
+  useControlProps,
+  useFormDefault,
+} from "./field";
 import { ScrollAreaBars } from "./scroll-area";
 
 export type TextareaProps = ComponentPropsWithRef<"textarea"> & {
@@ -18,7 +27,7 @@ export type TextareaProps = ComponentPropsWithRef<"textarea"> & {
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   /**
    * Which way users can drag its corner to resize it. It never gets shorter than `rows` lines,
    * narrower than about twelve characters, or wider than its container.
@@ -47,37 +56,67 @@ export type TextareaProps = ComponentPropsWithRef<"textarea"> & {
  * library's own thin scrollbar, as a Scroll area does. With a character or word limit, it is
  * GOV.UK's character count. A line beneath says how many are left, and turns red once there are too
  * many. Screen readers hear the count when typing pauses.
+ *
+ * It is a bound Field with a Label, a Hint, an ErrorMessage and a TextareaControl. Compose those
+ * parts yourself to put something between the hint and the control, or beside the control.
  */
 export function Textarea({
   label,
   hint,
   hideLabel = false,
   errorMessage,
-  resize = "both",
-  autoResize = false,
-  rows = 5,
   id,
-  className = "",
-  style,
-  onInput,
-  onChange,
-  tabIndex,
-  characterLimit,
-  wordLimit,
-  threshold = 0,
   "aria-describedby": describedBy,
   ...props
 }: TextareaProps) {
+  const generated = useId();
+  return (
+    <Field
+      controlId={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Hint>{hint}</Hint>
+      <ErrorMessage />
+      <TextareaControl {...props} />
+    </Field>
+  );
+}
+
+export type TextareaControlProps = Omit<
+  TextareaProps,
+  "label" | "hint" | "hideLabel" | "errorMessage"
+>;
+
+/**
+ * Textarea's control on its own, for a field composed from Field's parts. It is the text box in its
+ * scroll area, with its character or word count. In a bound Field, it takes its id, name and
+ * descriptions from the field.
+ */
+export function TextareaControl(given: TextareaControlProps) {
+  const {
+    resize = "both",
+    autoResize = false,
+    rows = 5,
+    className = "",
+    style,
+    onInput,
+    onChange,
+    tabIndex,
+    characterLimit,
+    wordLimit,
+    threshold = 0,
+    ...props
+  } = useControlProps(given);
+  // The count names the box by its id, so it always has one.
+  const generated = useId();
+  const controlId = props.id ?? `textarea-${generated}`;
   const limit = wordLimit ?? characterLimit;
   const unit = wordLimit ? "word" : "character";
-  const field = useField({
-    id,
-    name: props.name,
-    hint,
-    errorMessage,
-    "aria-describedby": describedBy,
-  });
-  const infoId = `${field.id}-info`;
+  const infoId = `${controlId}-info`;
   // A Form can give the field an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(props.name)?.[0];
   const startWith = props.value === undefined ? (props.defaultValue ?? saved) : undefined;
@@ -98,12 +137,7 @@ export function Textarea({
     return () => observer.disconnect();
   }, []);
   return (
-    <Field invalid={field.invalid}>
-      <Label htmlFor={field.id} visuallyHidden={hideLabel}>
-        {label}
-      </Label>
-      <Hint id={field.hintId}>{hint}</Hint>
-      <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
+    <>
       {/* The textarea is the scrolling element itself, so it keeps native editing and
           resizing. The scrollbar follows its right edge when its corner is dragged. */}
       <Primitive.Root ref={root} className="x-govuk-ui-scroll-area x-govuk-ui-textarea-scroll">
@@ -113,13 +147,12 @@ export function Textarea({
             <textarea
               rows={rows}
               {...props}
-              {...field.controlProps}
+              id={controlId}
               aria-describedby={
                 limit
-                  ? [field.controlProps["aria-describedby"], infoId].filter(Boolean).join(" ")
-                  : field.controlProps["aria-describedby"]
+                  ? [props["aria-describedby"], infoId].filter(Boolean).join(" ")
+                  : props["aria-describedby"]
               }
-              aria-invalid={field.controlProps["aria-invalid"] ?? props["aria-invalid"]}
               defaultValue={startWith}
               data-over-limit={(limit && left < 0) || undefined}
               onChange={(event) => {
@@ -164,6 +197,6 @@ export function Textarea({
           threshold={threshold}
         />
       )}
-    </Field>
+    </>
   );
 }

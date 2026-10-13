@@ -1,7 +1,22 @@
 "use client";
 
-import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef, useState } from "react";
-import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "./field";
+import {
+  type ComponentPropsWithRef,
+  type ReactNode,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import {
+  ErrorMessage,
+  Field,
+  Hint,
+  Label,
+  present,
+  useControlProps,
+  useFormDefault,
+} from "./field";
 import { passwordStrength } from "./helpers";
 
 export type InputProps = Omit<ComponentPropsWithRef<"input">, "prefix"> & {
@@ -9,7 +24,7 @@ export type InputProps = Omit<ComponentPropsWithRef<"input">, "prefix"> & {
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   /**
    * Shown inside the start of the field, such as an icon or "£". Screen readers skip it, so the
    * label or hint must say anything it means.
@@ -30,29 +45,57 @@ const strengthWords = ["Too short", "Weak", "Fair", "Good", "Strong"];
  * A familiar field, with GOV.UK's label, hint and error. With `type="password"`, it is GOV.UK's
  * password input. A Show button reveals the password, and Hide covers it again. The password is
  * also covered again when its form is sent, so the browser never keeps it in plain text.
+ *
+ * It is a bound Field with a Label, a Hint, an ErrorMessage and an InputControl. Compose those
+ * parts yourself to put something between the hint and the control, or beside the control.
  */
 export function Input({
   label,
   hint,
   hideLabel = false,
   errorMessage,
-  prefix,
-  suffix,
-  strength = false,
-  type = "text",
   id,
-  className = "",
   "aria-describedby": describedBy,
-  onChange,
   ...props
 }: InputProps) {
-  const field = useField({
-    id,
-    name: props.name,
-    hint,
-    errorMessage,
-    "aria-describedby": describedBy,
-  });
+  const generated = useId();
+  return (
+    <Field
+      controlId={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Hint>{hint}</Hint>
+      <ErrorMessage />
+      <InputControl {...props} />
+    </Field>
+  );
+}
+
+export type InputControlProps = Omit<ComponentPropsWithRef<"input">, "prefix"> &
+  Pick<InputProps, "prefix" | "suffix" | "strength">;
+
+/**
+ * Input's control on its own, for a field composed from Field's parts. It is the text box, with its
+ * prefix and suffix, and, for a password, the Show button and the strength meter. In a bound Field,
+ * it takes its id, name and descriptions from the field.
+ */
+export function InputControl(given: InputControlProps) {
+  const {
+    prefix,
+    suffix,
+    strength = false,
+    type = "text",
+    className = "",
+    onChange,
+    ...props
+  } = useControlProps(given);
+  // The Show button and the strength meter name the box by its id, so it always has one.
+  const generated = useId();
+  const controlId = props.id ?? `input-${generated}`;
   const password = type === "password";
   const [shown, setShown] = useState(false);
   const [announcement, setAnnouncement] = useState("");
@@ -73,18 +116,17 @@ export function Input({
   }, [password]);
 
   const score = passwordStrength(value);
-  const strengthId = `${field.id}-strength`;
+  const strengthId = `${controlId}-strength`;
   const control = (
     <input
       type={password && shown ? "text" : type}
       {...props}
-      {...field.controlProps}
+      id={controlId}
       aria-describedby={
         password && strength
-          ? [field.controlProps["aria-describedby"], strengthId].filter(Boolean).join(" ")
-          : field.controlProps["aria-describedby"]
+          ? [props["aria-describedby"], strengthId].filter(Boolean).join(" ")
+          : props["aria-describedby"]
       }
-      aria-invalid={field.controlProps["aria-invalid"] ?? props["aria-invalid"]}
       // A password is never corrected or capitalised, as GOV.UK's is not.
       autoCapitalize={password ? "none" : props.autoCapitalize}
       spellCheck={password ? false : props.spellCheck}
@@ -98,12 +140,7 @@ export function Input({
   );
 
   return (
-    <Field invalid={field.invalid}>
-      <Label htmlFor={field.id} visuallyHidden={hideLabel}>
-        {label}
-      </Label>
-      <Hint id={field.hintId}>{hint}</Hint>
-      <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
+    <>
       {prefix || suffix || password ? (
         // The group draws the field's border, so the prefix and suffix sit inside it.
         // Pressing anywhere in the group focuses the field, as pressing a plain field would.
@@ -133,7 +170,7 @@ export function Input({
             <button
               type="button"
               className="x-govuk-ui-input-reveal"
-              aria-controls={field.id}
+              aria-controls={controlId}
               aria-label={shown ? "Hide password" : "Show password"}
               disabled={props.disabled}
               onClick={() => {
@@ -165,6 +202,6 @@ export function Input({
           </span>
         </div>
       )}
-    </Field>
+    </>
   );
 }

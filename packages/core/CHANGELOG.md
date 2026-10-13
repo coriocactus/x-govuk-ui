@@ -8,6 +8,15 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Added `controlId` to Field, which binds it to its control. A bound Field gives its `Label`, `Hint` and `ErrorMessage` their ids, and shows its own `errorMessage`, or its Form's error by its `name`. A field composed from its parts then needs no `useField`. `hasHint`, `linkTo` and `describedBy` say the rest. A Field without `controlId` works as before.
 - Added `useControlProps`, which gives a control of your own the id, name and descriptions of the bound Field around it.
+- Added InputControl, TextareaControl and SelectControl, the controls of Input, Textarea and Select on their own. In a bound Field, each takes its id, name and descriptions from the field. A service can then put something between a field's hint and its control, or beside the control, as GOV.UK's search puts a button. InputControl keeps the prefix, suffix, Show button and strength meter, TextareaControl the character or word count, and SelectControl the list. Input, Textarea and Select are now built from these parts, and their markup does not change.
+
+### Changed
+
+- Changed `errorMessage` on Input, Textarea and Select to take any React content, as Fieldset's does.
+
+### Fixed
+
+- Fixed Select dropping its own `aria-describedby` and `aria-invalid`. It now describes its control by them, before its hint and error, as Input and Textarea do.
 
 ## [0.3.0] - 2026-10-10
 

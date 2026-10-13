@@ -298,7 +298,7 @@ export {
 } from "./icons";
 export { ImageGeneration, type ImageGenerationProps } from "./image-generation";
 export { type CitationSource, InlineCitation, type InlineCitationProps } from "./inline-citation";
-export { Input, type InputProps } from "./input";
+export { Input, InputControl, type InputControlProps, type InputProps } from "./input";
 export { InputOTP, type InputOTPProps } from "./input-otp";
 export { InsetText, type InsetTextProps } from "./inset-text";
 export { Kbd, type KbdProps } from "./kbd";
@@ -422,7 +422,14 @@ export {
 } from "./rich-text";
 export { ScrollArea, type ScrollAreaProps } from "./scroll-area";
 export { SearchBox, type SearchBoxProps } from "./search-box";
-export { Select, SelectItem, type SelectItemProps, type SelectProps } from "./select";
+export {
+  Select,
+  SelectControl,
+  type SelectControlProps,
+  SelectItem,
+  type SelectItemProps,
+  type SelectProps,
+} from "./select";
 export { Separator, type SeparatorProps } from "./separator";
 export {
   ServiceNavigation,
@@ -554,7 +561,12 @@ export {
   type TaskStatus,
 } from "./task-list";
 export { TextShimmer, type TextShimmerProps } from "./text-shimmer";
-export { Textarea, type TextareaProps } from "./textarea";
+export {
+  Textarea,
+  TextareaControl,
+  type TextareaControlProps,
+  type TextareaProps,
+} from "./textarea";
 export {
   type Theme,
   ThemePicker,

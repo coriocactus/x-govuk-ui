@@ -247,7 +247,7 @@ test("check your answers lists every kind of field, links an error to an answer 
   // the survey is chosen again.
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? ""))
-    .toContain('"at":4');
+    .toContain('"at":5');
   await page.reload();
   await choose();
   await expect(review.locator(".x-govuk-ui-summary-list-value")).toHaveText(answers);
@@ -355,6 +355,9 @@ test("a remembered survey keeps the answers of a step that applies again, howeve
   await frame.getByRole("button", { name: "Tablet" }).click();
   await frame.getByRole("button", { name: "Continue" }).click();
   await frame.getByLabel("Which tablet did you use?").fill("A small one");
+  // The step for something else asks under the same name, and never applies with this one, so
+  // the answer is kept.
+  await expect.poll(kept).toContain('["model","A small one"]');
   await frame.getByRole("button", { name: "Back", exact: true }).click();
   await expect(frame.getByRole("heading", { name: "About your visit" })).toBeVisible();
   // Once a phone is chosen, the step no longer applies, and its answer is left out.
@@ -366,5 +369,5 @@ test("a remembered survey keeps the answers of a step that applies again, howeve
   await frame.getByRole("button", { name: "Tablet" }).click();
   await page.reload();
   await choose();
-  await expect(frame.locator('input[name="tablet"]')).toHaveValue("A small one");
+  await expect(frame.getByLabel("Which tablet did you use?")).toHaveValue("A small one");
 });

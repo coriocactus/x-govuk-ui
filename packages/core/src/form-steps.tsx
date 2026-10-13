@@ -491,21 +491,25 @@ export function FormSteps({
     rememberSoon.current = 0;
     const element = form.current;
     if (!keeping.current || !storageKey || !element) return;
-    // The answers of the steps that apply now, even before they are drawn so. A step that a change
-    // has just brought in is still disabled, so it is opened while its answers are read, in the same
-    // task, so nothing is drawn between. A step that a change has just left out is still open, so
-    // its answers are left out of what is read.
+    // The answers of the steps that apply now, even before they are drawn so. Each other step's
+    // fieldset is set as it will be drawn while the answers are read, and set back in the same
+    // task, so nothing is drawn between. A step that a change has just brought in is opened, and
+    // one it has just left out is closed, so steps that never apply together can ask under one
+    // name. The step on show is left as it is, so the field in use keeps its focus.
     const applies = new Set(planFor().filter((index) => !skipping.has(index)));
-    const steps = [...element.querySelectorAll<HTMLFieldSetElement>("fieldset[data-step]")];
-    const appliesTo = (fieldset: HTMLFieldSetElement) => applies.has(Number(fieldset.dataset.step));
-    const opened = steps.filter((fieldset) => fieldset.disabled && appliesTo(fieldset));
-    for (const fieldset of opened) fieldset.disabled = false;
-    const data = new FormData(element);
-    for (const fieldset of opened) fieldset.disabled = true;
-    for (const fieldset of steps)
-      if (!appliesTo(fieldset))
-        for (const field of fieldset.querySelectorAll<HTMLInputElement>("[name]"))
-          data.delete(field.name);
+    const changed = [
+      ...element.querySelectorAll<HTMLFieldSetElement>("fieldset[data-step]"),
+    ].filter((fieldset) => {
+      const index = Number(fieldset.dataset.step);
+      return index !== at && fieldset.disabled === applies.has(index);
+    });
+    let data: FormData;
+    try {
+      for (const fieldset of changed) fieldset.disabled = !fieldset.disabled;
+      data = new FormData(element);
+    } finally {
+      for (const fieldset of changed) fieldset.disabled = !fieldset.disabled;
+    }
     const answers = [...data.entries()].flatMap(([name, value]) =>
       typeof value === "string" ? [[name, value] as [string, string]] : [],
     );

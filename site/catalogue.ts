@@ -999,7 +999,7 @@ const entries = {
         restart: true,
       }),
       toggle("moreKinds", false, {
-        note: "Adds a step asked with a toggle group, a slider, a switch, and radios and a select whose answers come from a component of the survey's own, then a step asked only of those who used a tablet. Check your answers lists each.",
+        note: "Adds a step asked with a toggle group, a slider, a switch, and radios and a select whose answers come from a component of the survey's own, then steps asked only of those who used a tablet or something else. Check your answers lists each.",
         needs: [when("example", "stages")],
         restart: true,
       }),

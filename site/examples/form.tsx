@@ -177,6 +177,7 @@ function VisitStep() {
         <ToggleGroupItem value="phone">Phone</ToggleGroupItem>
         <ToggleGroupItem value="computer">Computer</ToggleGroupItem>
         <ToggleGroupItem value="tablet">Tablet</ToggleGroupItem>
+        <ToggleGroupItem value="other">Something else</ToggleGroupItem>
       </ToggleGroup>
       <Slider name="ease" label="How easy was it, from 1 to 5?" min={1} max={5} defaultValue={3} />
       <Select name="part" label="Which part did you use most?" defaultValue="renew">
@@ -274,9 +275,15 @@ function FeedbackInStages({
         <IssuesStep />
         {moreKinds && <VisitStep />}
         {moreKinds && (
-          // Asked only of those who used a tablet.
+          // Asked only of those who used a tablet, or something else. The two never apply
+          // together, so each asks under one name.
           <FormStep title="Your tablet" when={(data) => data.get("device") === "tablet"}>
-            <Input name="tablet" label="Which tablet did you use?" />
+            <Input name="model" label="Which tablet did you use?" />
+          </FormStep>
+        )}
+        {moreKinds && (
+          <FormStep title="What you used" when={(data) => data.get("device") === "other"}>
+            <Input name="model" label="What did you use?" />
           </FormStep>
         )}
       </FormSteps>

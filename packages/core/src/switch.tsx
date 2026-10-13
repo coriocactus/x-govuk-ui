@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentPropsWithRef, ReactNode } from "react";
-import { ErrorMessage, Field, Hint, useField } from "./field";
+import { ErrorMessage, Hint, useField } from "./field";
 import { useLabels } from "./labels";
 
 /** The words Switch writes in Check your answers, which a LabelsProvider can change. */
@@ -51,10 +51,10 @@ export function Switch({
     answer: (data) => (props.name && data.has(props.name) ? labels.on : labels.off),
   });
   return (
-    <Field
-      invalid={field.invalid}
+    <div
       className={`x-govuk-ui-switch ${className}`.trim()}
       data-size={size === "small" ? "small" : undefined}
+      data-invalid={field.invalid || undefined}
     >
       <span className={`x-govuk-ui-switch-text${hideLabel ? " x-govuk-ui-visually-hidden" : ""}`}>
         <label className="x-govuk-ui-switch-label" htmlFor={field.id}>
@@ -75,6 +75,6 @@ export function Switch({
           onCheckedChange?.(event.target.checked);
         }}
       />
-    </Field>
+    </div>
   );
 }

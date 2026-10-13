@@ -20,6 +20,27 @@
 .x-govuk-ui-switch-text .x-govuk-ui-hint {
   margin: 0;
 }
+/* A switch with an error has GOV.UK's red bar beside it, as a field does, in the space beside the
+   row, so nothing in the row moves. */
+.x-govuk-ui-switch[data-invalid] {
+  position: relative;
+}
+.x-govuk-ui-switch[data-invalid]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -15px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--x-govuk-ui-error);
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-switch[data-invalid]::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
 /* The track is a native checkbox with its appearance removed. The thumb is its ::before, placed
    by its four edges 1px inside the 2px border, so its curve follows the track's ends. */
 .x-govuk-ui-switch-control {

@@ -3283,7 +3283,7 @@ const entries = {
       "GOV.UK's footer under a band of brand blue, on its tinted surface. The crown sits at the top, then any navigation in sections, each a heading over a rule with its links, sharing the row by GOV.UK's widths and setting a long list in columns. A rule closes the navigation. Then come the support links, anything else given, such as who built the service, and the Open Government Licence, with Crown copyright under the Royal Arms at the end of the row. Built from parts. The crown is the library's GovukCrown, and the Royal Arms is GOV.UK Frontend's image, drawn in the text's colour. Both are only for GOV.UK services, so crown false leaves them out. Links are GOV.UK's blue, and the sections stack on a phone. The example sits at the foot of the preview, as it would at the foot of a page.",
     props: [
       toggle("crown", true, { default: "true" }),
-      reference("crest", "string", "/assets/images/govuk-crest.svg"),
+      reference("crest", "string", "None"),
       reference("licence", "ReactNode | null", "Open Government Licence"),
       reference("copyright", "ReactNode", "© Crown copyright"),
       reference("navigation", "ReactNode", "FooterSection parts"),

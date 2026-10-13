@@ -43,6 +43,7 @@ export default function FooterExample({ crown = true, sections = true }: Props) 
   return (
     <Footer
       crown={crown}
+      crest="/assets/images/govuk-crest.svg"
       navigation={
         sections && (
           <>

@@ -43,8 +43,9 @@ export type FooterProps = ComponentPropsWithRef<"footer"> & {
    */
   crown?: boolean;
   /**
-   * Where the Royal Arms image is served, as GOV.UK Frontend's `govuk-crest.svg`. GOV.UK Frontend
-   * serves its images from /assets/images/.
+   * Where the Royal Arms image is served, which is GOV.UK Frontend's `govuk-crest.svg`, such as
+   * "/assets/images/govuk-crest.svg" where a service serves GOV.UK Frontend's assets. The library
+   * does not ship the image. Without it, Crown copyright stands without the Royal Arms.
    */
   crest?: string;
   /** The content's licence. By default, the Open Government Licence v3.0. Give null for none. */
@@ -81,7 +82,7 @@ export const defaultFooterLabels: FooterLabels = {
  */
 export function Footer({
   crown = true,
-  crest = "/assets/images/govuk-crest.svg",
+  crest,
   licence: ownLicence,
   copyright: ownCopyright,
   navigation,
@@ -98,7 +99,7 @@ export function Footer({
       {...props}
       className={`x-govuk-ui-footer ${className}`.trim()}
       style={
-        crown
+        crown && crest
           ? ({ ...style, "--x-govuk-ui-footer-crest": `url("${crest}")` } as CSSProperties)
           : style
       }
@@ -123,7 +124,7 @@ export function Footer({
           </div>
           <a
             className="x-govuk-ui-footer-link x-govuk-ui-footer-copyright"
-            data-crest={crown || undefined}
+            data-crest={(crown && crest !== undefined) || undefined}
             href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
           >
             {copyright}

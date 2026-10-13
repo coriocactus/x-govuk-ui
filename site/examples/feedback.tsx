@@ -35,7 +35,7 @@ export default function FeedbackExample({ question = "Is this page useful?" }) {
           onReport={() => setSaid("This is an example, so the report was not sent.")}
         />
       </WidthContainer>
-      <Footer>
+      <Footer crest="/assets/images/govuk-crest.svg">
         <FooterLinks>
           {support.map((name) => (
             <FooterLink key={name} href={`#${name.toLowerCase().replaceAll(" ", "-")}`}>

@@ -100,6 +100,12 @@ test("page structure and navigation follow GOV.UK's markup", () => {
   expect(footer).toContain('aria-label="Support links"');
   expect(footer).toContain("Open Government Licence v3.0");
   expect(footer).toContain("© Crown copyright");
+  // The library does not ship the Royal Arms, so it is drawn only from an image the service serves.
+  expect(footer).not.toContain("data-crest");
+  expect(footer).not.toContain("--x-govuk-ui-footer-crest");
+  const crested = renderToStaticMarkup(<Footer crest="/assets/images/govuk-crest.svg" />);
+  expect(crested).toContain("data-crest");
+  expect(crested).toContain("/assets/images/govuk-crest.svg");
   const exit = renderToStaticMarkup(<ExitThisPage />);
   expect(exit).toContain('data-sound="off"');
   expect(exit).toContain(

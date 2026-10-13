@@ -15,8 +15,8 @@ import {
   ErrorMessage,
   Field,
   Hint,
+  Label,
   type LabelProps,
-  NamingLabel,
   present,
   useBoundField,
   useFieldSummary,
@@ -239,7 +239,7 @@ export function SliderRoot({
  */
 export function SliderLabel(props: Omit<LabelProps, "htmlFor" | "id">) {
   const { id } = useSlider("SliderLabel");
-  return <NamingLabel {...props} id={`${id}-label`} />;
+  return <Label {...props} htmlFor={null} id={`${id}-label`} />;
 }
 
 /** The slider's value, as it reads, such as 40%, which changes as the thumb moves. */

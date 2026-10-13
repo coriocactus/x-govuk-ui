@@ -157,6 +157,7 @@ export function useField({
 }: UseFieldOptions) {
   const generated = useId();
   const controlId = id ?? `field-${generated}`;
+  const labelId = `${controlId}-label`;
   const hintId = `${controlId}-hint`;
   const errorId = `${controlId}-error`;
   // In a Form, a field shows the form's message for its name, unless it is given one of its own.
@@ -206,6 +207,11 @@ export function useField({
     id: controlId,
     /** What the field tells its Form. Its parts and its control fill in what it was not given. */
     field,
+    /**
+     * The label's id, for a control that its label cannot be for, such as a slider's thumb, which
+     * names itself with `aria-labelledby`. A Label with `htmlFor={null}` takes it.
+     */
+    labelId,
     hintId,
     errorId,
     invalid,
@@ -317,7 +323,7 @@ export function Unbound({ children }: { children: ReactNode }) {
 /**
  * The bound Field around a part, or null outside one. Its parts take their ids from it. A part of
  * your own reads it for what `useControlProps` does not give, such as a row that marks itself
- * invalid, as Switch's does inside a FieldBinding.
+ * invalid, as Switch's does inside a FieldBinding, or a control named by `labelId`.
  */
 export function useBoundField(): BoundField | null {
   return useContext(FieldContext);
@@ -493,41 +499,34 @@ function FieldBox({
   );
 }
 
-export type LabelProps = ComponentPropsWithRef<"label"> & {
+export type LabelProps = Omit<ComponentPropsWithRef<"label">, "htmlFor"> & {
+  /**
+   * The id of the control it names. A bound Field gives it. Give `null` for a control that a label
+   * cannot be for, such as a slider's thumb or a box of prose. The label then has an id, which the
+   * control names itself by, with `aria-labelledby`. In a bound Field, the id is the field's
+   * `labelId`.
+   */
+  htmlFor?: string | null;
   /** Hides the label visually. Screen readers still announce it. */
   visuallyHidden?: boolean;
 };
 
 /** Names a control. Pass the control's id as `htmlFor`, unless a bound Field gives it. */
-export function Label({ visuallyHidden = false, className = "", ...props }: LabelProps) {
+export function Label({
+  visuallyHidden = false,
+  className = "",
+  htmlFor,
+  id,
+  ...props
+}: LabelProps) {
   const field = useContext(FieldContext);
   useFieldSummary({ label: props.children });
   return (
-    // biome-ignore lint/a11y/noLabelWithoutControl: The caller or a bound Field passes htmlFor.
+    // biome-ignore lint/a11y/noLabelWithoutControl: The caller or a bound Field passes htmlFor, or the control names itself by the label's id.
     <label
       {...props}
-      htmlFor={props.htmlFor ?? field?.id}
-      className={`x-govuk-ui-label${visuallyHidden ? " x-govuk-ui-visually-hidden" : ""} ${className}`.trim()}
-    />
-  );
-}
-
-/**
- * A label that names its control through the control's `aria-labelledby`, by the label's own id,
- * instead of by `for`. It suits a control that a label cannot be for, such as a box of prose or a
- * slider's thumb. It looks as Label does, and gives its field its question.
- * @internal
- */
-export function NamingLabel({
-  visuallyHidden = false,
-  className = "",
-  ...props
-}: Omit<LabelProps, "htmlFor"> & { id: string }) {
-  useFieldSummary({ label: props.children });
-  return (
-    // biome-ignore lint/a11y/noLabelWithoutControl: The control names itself by the label's id.
-    <label
-      {...props}
+      htmlFor={htmlFor === null ? undefined : (htmlFor ?? field?.id)}
+      id={id ?? (htmlFor === null ? field?.labelId : undefined)}
       className={`x-govuk-ui-label${visuallyHidden ? " x-govuk-ui-visually-hidden" : ""} ${className}`.trim()}
     />
   );

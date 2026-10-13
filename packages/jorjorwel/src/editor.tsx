@@ -48,6 +48,7 @@ import {
   Field,
   type FieldProps,
   Hint,
+  Label,
   type LabelProps,
   useBoundField,
   useFieldSummary,
@@ -55,14 +56,7 @@ import {
   useLabels,
   useMergedRef,
 } from "x-govuk-ui";
-import {
-  chain,
-  NamingLabel,
-  parseHtmlTree,
-  present,
-  treeText,
-  useLatest,
-} from "x-govuk-ui/internal";
+import { chain, parseHtmlTree, present, treeText, useLatest } from "x-govuk-ui/internal";
 import { registerAttachments } from "./editor-attachment-behaviour";
 import { attachmentState } from "./editor-attachment-state";
 import { AttachmentNode, EmbedNode, GalleryNode } from "./editor-attachments";
@@ -633,8 +627,9 @@ export function EditorLabel({ onClick, ...props }: Omit<LabelProps, "htmlFor" | 
   // Outside a bound Field, the label and the box share the editor's own id.
   const { id } = useEditorContext("EditorLabel");
   return (
-    <NamingLabel
+    <Label
       {...props}
+      htmlFor={null}
       id={`${field?.id ?? id}-label`}
       onClick={chain(onClick, () => focusDocument(editor))}
     />

@@ -487,6 +487,25 @@ test("a switch's row built from public parts renders as Switch does", () => {
   expect(own).toBe(shorthand);
 });
 
+test("a label that its control cannot be for takes the field's label id instead", () => {
+  // A control of a service's own, such as a dial, names itself by the label's id.
+  function Dial() {
+    const field = useBoundField();
+    return <div role="slider" tabIndex={0} aria-valuenow={3} aria-labelledby={field?.labelId} />;
+  }
+  const html = renderToStaticMarkup(
+    <Field controlId="ease">
+      <Label htmlFor={null}>How easy was it?</Label>
+      <Dial />
+    </Field>,
+  );
+  expect(html).toContain(
+    '<label id="ease-label" class="x-govuk-ui-label">How easy was it?</label>',
+  );
+  expect(html).toContain('aria-labelledby="ease-label"');
+  expect(html).not.toContain(" for=");
+});
+
 test("a value of your own is controlled or uncontrolled as the library's are", () => {
   const heard: (string | null)[] = [];
   let state: [string | null, (next: string | null) => void] | undefined;

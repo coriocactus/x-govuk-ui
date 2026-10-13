@@ -33,6 +33,7 @@ import {
   Button,
   ChatInput,
   CommandMenu,
+  CommandMenuContent,
   CommandMenuGroup,
   CommandMenuItem,
   CopyButton,
@@ -761,65 +762,65 @@ function Shell() {
               // Opening by shortcut has no press to answer, so the menu plays its own sound.
               if (open) void play("open").catch(() => {});
             }}
-            trigger={false}
-            placeholder="Search the workspace…"
           >
-            <CommandMenuGroup label="Go to">
-              {sections.flatMap((section) =>
-                section.items.map((item) => (
-                  <CommandMenuItem
-                    key={item.name}
-                    icon={<Icon name={item.icon} />}
-                    onSelect={() => setCurrent(item.name)}
-                  >
-                    {item.name}
-                  </CommandMenuItem>
-                )),
-              )}
-            </CommandMenuGroup>
-            <CommandMenuGroup label="Workspace">
-              <CommandMenuItem
-                icon={<Icon name="arrange" />}
-                keywords={["sidebar", "order", "hide", "pin", "arrange"]}
-                onSelect={() => setCustomising(true)}
-              >
-                Customise the sidebar
-              </CommandMenuItem>
-              <CommandMenuItem
-                icon={<Icon name="fish" />}
-                keywords={["chat", "assistant", "help", "fish"]}
-                onSelect={() => (beside && assistOpen ? closeAssist() : showAssist())}
-              >
-                {beside && assistOpen ? "Hide Piscine Assist" : "Show Piscine Assist"}
-              </CommandMenuItem>
-              <CommandMenuItem
-                icon={<Icon name="sidebar" />}
-                shortcut="⌘ B"
-                onSelect={() => sidebar.toggleSidebar()}
-              >
-                {sidebar.open ? "Collapse the sidebar" : "Expand the sidebar"}
-              </CommandMenuItem>
-              <CommandMenuItem
-                icon={<Icon name={appearance.theme === "light" ? "sun" : "moon"} />}
-                keywords={["appearance", "theme", "dark", "light"]}
-                onSelect={() =>
-                  appearance.setTheme(appearance.theme === "light" ? "dark" : "light")
-                }
-              >
-                {`Switch to ${appearance.theme === "light" ? "dark" : "light"} theme`}
-              </CommandMenuItem>
-              <CommandMenuItem
-                icon={<Icon name={muted ? "sound" : "muted"} />}
-                onSelect={() => setMuted(!muted)}
-              >
-                {muted ? "Unmute sounds" : "Mute sounds"}
-              </CommandMenuItem>
-            </CommandMenuGroup>
-            <CommandMenuGroup label="Account">
-              <CommandMenuItem icon={<Icon name="sign-out" />} onSelect={signOut}>
-                Sign out
-              </CommandMenuItem>
-            </CommandMenuGroup>
+            <CommandMenuContent placeholder="Search the workspace…">
+              <CommandMenuGroup label="Go to">
+                {sections.flatMap((section) =>
+                  section.items.map((item) => (
+                    <CommandMenuItem
+                      key={item.name}
+                      icon={<Icon name={item.icon} />}
+                      onSelect={() => setCurrent(item.name)}
+                    >
+                      {item.name}
+                    </CommandMenuItem>
+                  )),
+                )}
+              </CommandMenuGroup>
+              <CommandMenuGroup label="Workspace">
+                <CommandMenuItem
+                  icon={<Icon name="arrange" />}
+                  keywords={["sidebar", "order", "hide", "pin", "arrange"]}
+                  onSelect={() => setCustomising(true)}
+                >
+                  Customise the sidebar
+                </CommandMenuItem>
+                <CommandMenuItem
+                  icon={<Icon name="fish" />}
+                  keywords={["chat", "assistant", "help", "fish"]}
+                  onSelect={() => (beside && assistOpen ? closeAssist() : showAssist())}
+                >
+                  {beside && assistOpen ? "Hide Piscine Assist" : "Show Piscine Assist"}
+                </CommandMenuItem>
+                <CommandMenuItem
+                  icon={<Icon name="sidebar" />}
+                  shortcut="⌘ B"
+                  onSelect={() => sidebar.toggleSidebar()}
+                >
+                  {sidebar.open ? "Collapse the sidebar" : "Expand the sidebar"}
+                </CommandMenuItem>
+                <CommandMenuItem
+                  icon={<Icon name={appearance.theme === "light" ? "sun" : "moon"} />}
+                  keywords={["appearance", "theme", "dark", "light"]}
+                  onSelect={() =>
+                    appearance.setTheme(appearance.theme === "light" ? "dark" : "light")
+                  }
+                >
+                  {`Switch to ${appearance.theme === "light" ? "dark" : "light"} theme`}
+                </CommandMenuItem>
+                <CommandMenuItem
+                  icon={<Icon name={muted ? "sound" : "muted"} />}
+                  onSelect={() => setMuted(!muted)}
+                >
+                  {muted ? "Unmute sounds" : "Mute sounds"}
+                </CommandMenuItem>
+              </CommandMenuGroup>
+              <CommandMenuGroup label="Account">
+                <CommandMenuItem icon={<Icon name="sign-out" />} onSelect={signOut}>
+                  Sign out
+                </CommandMenuItem>
+              </CommandMenuGroup>
+            </CommandMenuContent>
           </CommandMenu>
         </SidebarLayout>
       </TooltipProvider>

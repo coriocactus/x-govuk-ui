@@ -1793,9 +1793,7 @@ const entries = {
     changes:
       "Built from parts. Base UI's Autocomplete sits inline in a dialog, as Base UI recommends for a command palette, so the first command is always highlighted. Commands sit in labelled groups, show their shortcuts as keyboard keys, and can open pages of further commands, with a trail back and Backspace to return. One highlight slides between commands, and the list, a Scroll area, eases to its new height as the search narrows it. Command-K or Control-K opens it anywhere on the page. This workbench uses it as its site-wide command menu.",
     props: [
-      reference("open / onOpenChange", "boolean / (open) => void", "Uncontrolled"),
-      text("placeholder", "Search commands…", { default: "Search commands…" }),
-      reference("trigger", "boolean | ReactElement", "true"),
+      reference("open / defaultOpen / onOpenChange", "boolean / (open) => void", "Uncontrolled"),
       toggle("keyboardShortcut", true),
       reference("labels", "Partial<CommandMenuLabels>", "Open command menu, No commands found."),
       toggle("disabled"),
@@ -1806,8 +1804,11 @@ const entries = {
         "Part",
       ),
       reference("CommandMenuPage", "{ id, label, placeholder, children }", "Part"),
+      reference("CommandMenuTrigger", "Button props and { render }", "Part"),
+      reference("CommandMenuContent", "{ placeholder, finalFocus, children }", "Part"),
     ],
     example: [
+      text("placeholder", "Search commands…", { note: "CommandMenuContent's search placeholder." }),
       text("triggerLabel", "Open command menu", {
         note: "The built-in button's words, its trigger label.",
       }),

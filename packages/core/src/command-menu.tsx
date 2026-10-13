@@ -5,8 +5,6 @@ import { Dialog } from "@base-ui/react/dialog";
 import {
   type ComponentPropsWithRef,
   createContext,
-  isValidElement,
-  type ReactElement,
   type ReactNode,
   type RefObject,
   useContext,
@@ -16,7 +14,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Button } from "./button";
+import { Button, type ButtonProps, withoutButtonLook } from "./button";
 import { useControllableState } from "./controllable-state";
 import { trackHighlight } from "./highlight";
 import { Kbd } from "./kbd";
@@ -105,6 +103,10 @@ export type CommandMenuLabels = {
   search: string;
   /** Shown when nothing matches the search. */
   empty: string;
+  /** Tells users how to use the menu, beneath the list. */
+  help: string;
+  /** Follows the help on a page of further commands. */
+  helpBack: string;
   /**
    * Names the menu and its list of commands. The list is a Tab stop once it scrolls, so keyboard
    * users can scroll it. A page of further commands takes its own label instead.
@@ -123,53 +125,68 @@ export const defaultCommandMenuLabels: CommandMenuLabels = {
   commands: "Commands",
   close: "Close command menu",
   home: "Home",
+  help: "Use the arrow keys to choose a command, then press Enter.",
+  helpBack: "Press Backspace to go back.",
 };
 
 export type CommandMenuProps = {
+  /** Its parts, which are a `CommandMenuTrigger`, if it has one, and a `CommandMenuContent`. */
   children: ReactNode;
   /** Whether the menu is open. Leave it out to let the menu keep track. */
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /**
-   * The control that opens the menu. By default, it is the built-in outline Button with its
-   * shortcut. Give another element to use in its place, such as a quiet Button that shows only the
-   * keys. Give false when something outside opens the menu through `open`.
-   */
-  trigger?: boolean | ReactElement;
   /** Toggles the menu with Command-K or Control-K anywhere on the page. */
   keyboardShortcut?: boolean;
-  /** The search's placeholder, in place of its `search` label. A page's own comes first. */
-  placeholder?: string;
   disabled?: boolean;
   /** Its words, in place of a LabelsProvider's or the defaults. */
   labels?: Partial<CommandMenuLabels>;
-  /**
-   * Where focus goes as the menu closes, such as the page a command opened. By default, the
-   * control that had focus before it opened.
-   */
-  finalFocus?: Dialog.Popup.Props["finalFocus"];
 };
 
+/** What the menu's trigger and content share, from its root. */
+type Shared = {
+  open: boolean;
+  disabled: boolean;
+  keyboardShortcut: boolean;
+  labels: CommandMenuLabels;
+  input: RefObject<HTMLInputElement | null>;
+  list: RefObject<HTMLDivElement | null>;
+  popup: RefObject<HTMLDivElement | null>;
+  query: string;
+  stack: string[];
+  page: string | null;
+  current: Page | undefined;
+  pages: Map<string, Page>;
+  visible: string[];
+  order: string[];
+  setOrder: (order: string[]) => void;
+  navigated: boolean;
+  back: (depth: number) => void;
+};
+
+const SharedContext = createContext<Shared | null>(null);
+
+function useShared(part: string) {
+  const shared = useContext(SharedContext);
+  if (!shared) throw new Error(`${part} must be inside CommandMenu.`);
+  return shared;
+}
+
 /**
- * A searchable list of commands in a dialog. Compose it from `CommandMenuGroup` and
- * `CommandMenuItem`. An item with `page` opens a `CommandMenuPage` of further commands, and
- * Backspace in an empty search goes back.
+ * A searchable list of commands in a dialog. Compose it from a `CommandMenuTrigger`, if it has
+ * one, and a `CommandMenuContent` of `CommandMenuGroup` and `CommandMenuItem` parts. An item with
+ * `page` opens a `CommandMenuPage` of further commands, and Backspace in an empty search goes back.
  */
 export function CommandMenu({
   children,
   open: controlled,
   defaultOpen = false,
   onOpenChange,
-  trigger = true,
   keyboardShortcut = true,
-  placeholder: ownPlaceholder,
   disabled = false,
   labels: ownLabels,
-  finalFocus,
 }: CommandMenuProps) {
   const labels = useLabels("commandMenu", defaultCommandMenuLabels, ownLabels);
-  const placeholder = ownPlaceholder ?? labels.search;
   const play = useScopeSound();
   const { reduced } = useMotionTiming();
   const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
@@ -230,9 +247,6 @@ export function CommandMenu({
     window.addEventListener("keydown", keydown);
     return () => window.removeEventListener("keydown", keydown);
   }, [keyboardShortcut, disabled, setOpen]);
-  // The shortcut is announced as a shortcut, not as part of the trigger's name.
-  const shortcuts = keyboardShortcut ? "Meta+K Control+K" : undefined;
-
   return (
     <MenuContext
       value={{
@@ -270,104 +284,204 @@ export function CommandMenu({
         keepHighlight
       >
         <Dialog.Root open={open} onOpenChange={(next) => setOpen(next)}>
-          {isValidElement(trigger) ? (
-            <Dialog.Trigger render={trigger} disabled={disabled} aria-keyshortcuts={shortcuts} />
-          ) : (
-            trigger && (
-              <Dialog.Trigger
-                render={<Button variant="outline" className="x-govuk-ui-command-trigger" />}
-                disabled={disabled}
-                aria-keyshortcuts={shortcuts}
-              >
-                {labels.trigger}
-                {keyboardShortcut && <Kbd aria-hidden="true">{shortcutKeys("k")}</Kbd>}
-              </Dialog.Trigger>
-            )
-          )}
-          <Dialog.Portal>
-            <Dialog.Backdrop className="x-govuk-ui-command-backdrop" />
-            <Dialog.Popup
-              ref={popup}
-              className="x-govuk-ui-command-popup"
-              // SoundScope plays the command cue for its options.
-              data-sound-list="command"
-              initialFocus={input}
-              finalFocus={finalFocus}
-            >
-              <Dialog.Title className="x-govuk-ui-visually-hidden">{labels.commands}</Dialog.Title>
-              <div className="x-govuk-ui-command-search">
-                <Autocomplete.Input
-                  ref={input}
-                  className="x-govuk-ui-command-input"
-                  placeholder={current?.placeholder ?? placeholder}
-                  aria-label={(current?.placeholder ?? placeholder).replace(/…$/, "")}
-                  onKeyDown={(event) => {
-                    if (event.key === "Backspace" && !query && stack.length) {
-                      event.preventDefault();
-                      back(stack.length - 1);
-                    }
-                  }}
-                />
-                <Dialog.Close
-                  className="x-govuk-ui-command-close"
-                  aria-label={labels.close}
-                  data-sound="close"
-                >
-                  Esc
-                </Dialog.Close>
-              </div>
-              {stack.length > 0 && (
-                <div className="x-govuk-ui-command-crumbs">
-                  <button type="button" onClick={() => back(0)}>
-                    {labels.home}
-                  </button>
-                  {stack.map((id, index) =>
-                    index === stack.length - 1 ? (
-                      <span key={id} aria-current="page">
-                        {pages.get(id)?.label}
-                      </span>
-                    ) : (
-                      <button key={id} type="button" onClick={() => back(index + 1)}>
-                        {pages.get(id)?.label}
-                      </button>
-                    ),
-                  )}
-                </div>
-              )}
-              <span className="x-govuk-ui-visually-hidden" role="status">
-                {current?.label ?? ""}
-              </span>
-              {open && visible.length === 0 && order.length > 0 && (
-                <p className="x-govuk-ui-command-empty">{labels.empty}</p>
-              )}
-              <ScrollArea
-                viewportRef={followScroller}
-                label={current?.label ?? labels.commands}
-                className="x-govuk-ui-command-scroll"
-                fade
-              >
-                <span className="x-govuk-ui-command-indicator" aria-hidden="true" />
-                <Autocomplete.List ref={list} className="x-govuk-ui-command-list">
-                  {/* Keyed by page, so each page slides in from the side it was opened from. */}
-                  <div
-                    key={page ?? ""}
-                    className="x-govuk-ui-command-page"
-                    data-navigated={navigated || undefined}
-                  >
-                    {children}
-                  </div>
-                </Autocomplete.List>
-                <TrackOrder list={list} onOrder={setOrder} />
-              </ScrollArea>
-              <p className="x-govuk-ui-command-help">
-                Use the arrow keys to choose a command, then press Enter.
-                {stack.length > 0 && " Press Backspace to go back."}
-              </p>
-            </Dialog.Popup>
-          </Dialog.Portal>
+          <SharedContext
+            value={{
+              open,
+              disabled,
+              keyboardShortcut,
+              labels,
+              input,
+              list,
+              popup,
+              query,
+              stack,
+              page,
+              current,
+              pages,
+              visible,
+              order,
+              setOrder,
+              navigated,
+              back,
+            }}
+          >
+            {children}
+          </SharedContext>
         </Dialog.Root>
       </Autocomplete.Root>
     </MenuContext>
+  );
+}
+
+export type CommandMenuTriggerProps = Omit<ButtonProps, "render"> & {
+  /**
+   * Another element to open the menu in the button's place, such as a quiet Button that shows only
+   * the keys. It takes the trigger's props and none of the button's look.
+   */
+  render?: Dialog.Trigger.Props["render"];
+};
+
+/**
+ * The button that opens the menu, an outline Button with its words and shortcut. Leave it out when
+ * something else opens the menu through `open`.
+ */
+export function CommandMenuTrigger({
+  render,
+  className = "",
+  children,
+  ...props
+}: CommandMenuTriggerProps) {
+  const { disabled, keyboardShortcut, labels } = useShared("CommandMenuTrigger");
+  // The shortcut is announced as a shortcut, not as part of the trigger's name.
+  const shortcuts = keyboardShortcut ? "Meta+K Control+K" : undefined;
+  if (render)
+    return (
+      <Dialog.Trigger
+        {...withoutButtonLook(props)}
+        render={render}
+        disabled={disabled}
+        aria-keyshortcuts={shortcuts}
+      />
+    );
+  return (
+    <Dialog.Trigger
+      render={
+        <Button
+          variant="outline"
+          {...props}
+          className={`x-govuk-ui-command-trigger ${className}`.trim()}
+        />
+      }
+      disabled={disabled}
+      aria-keyshortcuts={shortcuts}
+    >
+      {children ?? labels.trigger}
+      {keyboardShortcut && <Kbd aria-hidden="true">{shortcutKeys("k")}</Kbd>}
+    </Dialog.Trigger>
+  );
+}
+
+export type CommandMenuContentProps = ComponentPropsWithRef<"div"> & {
+  /** Its commands, as `CommandMenuGroup`, `CommandMenuItem` and `CommandMenuPage` parts. */
+  children: ReactNode;
+  /** The search's placeholder, in place of its `search` label. A page's own comes first. */
+  placeholder?: string;
+  /**
+   * Where focus goes as the menu closes, such as the page a command opened. By default, the
+   * control that had focus before it opened.
+   */
+  finalFocus?: Dialog.Popup.Props["finalFocus"];
+};
+
+/** The menu's dialog, with its search, its trail of pages and its list of commands. */
+export function CommandMenuContent({
+  children,
+  placeholder: ownPlaceholder,
+  finalFocus,
+  className = "",
+  ...props
+}: CommandMenuContentProps) {
+  const {
+    open,
+    labels,
+    input,
+    list,
+    popup,
+    query,
+    stack,
+    page,
+    current,
+    pages,
+    visible,
+    order,
+    setOrder,
+    navigated,
+    back,
+  } = useShared("CommandMenuContent");
+  const placeholder = ownPlaceholder ?? labels.search;
+  return (
+    <Dialog.Portal>
+      <Dialog.Backdrop className="x-govuk-ui-command-backdrop" />
+      <Dialog.Popup
+        ref={popup}
+        {...props}
+        className={`x-govuk-ui-command-popup ${className}`.trim()}
+        // SoundScope plays the command cue for its options.
+        data-sound-list="command"
+        initialFocus={input}
+        finalFocus={finalFocus}
+      >
+        <Dialog.Title className="x-govuk-ui-visually-hidden">{labels.commands}</Dialog.Title>
+        <div className="x-govuk-ui-command-search">
+          <Autocomplete.Input
+            ref={input}
+            className="x-govuk-ui-command-input"
+            placeholder={current?.placeholder ?? placeholder}
+            aria-label={(current?.placeholder ?? placeholder).replace(/…$/, "")}
+            onKeyDown={(event) => {
+              if (event.key === "Backspace" && !query && stack.length) {
+                event.preventDefault();
+                back(stack.length - 1);
+              }
+            }}
+          />
+          <Dialog.Close
+            className="x-govuk-ui-command-close"
+            aria-label={labels.close}
+            data-sound="close"
+          >
+            Esc
+          </Dialog.Close>
+        </div>
+        {stack.length > 0 && (
+          <div className="x-govuk-ui-command-crumbs">
+            <button type="button" onClick={() => back(0)}>
+              {labels.home}
+            </button>
+            {stack.map((id, index) =>
+              index === stack.length - 1 ? (
+                <span key={id} aria-current="page">
+                  {pages.get(id)?.label}
+                </span>
+              ) : (
+                <button key={id} type="button" onClick={() => back(index + 1)}>
+                  {pages.get(id)?.label}
+                </button>
+              ),
+            )}
+          </div>
+        )}
+        <span className="x-govuk-ui-visually-hidden" role="status">
+          {current?.label ?? ""}
+        </span>
+        {open && visible.length === 0 && order.length > 0 && (
+          <p className="x-govuk-ui-command-empty">{labels.empty}</p>
+        )}
+        <ScrollArea
+          viewportRef={followScroller}
+          label={current?.label ?? labels.commands}
+          className="x-govuk-ui-command-scroll"
+          fade
+        >
+          <span className="x-govuk-ui-command-indicator" aria-hidden="true" />
+          <Autocomplete.List ref={list} className="x-govuk-ui-command-list">
+            {/* Keyed by page, so each page slides in from the side it was opened from. */}
+            <div
+              key={page ?? ""}
+              className="x-govuk-ui-command-page"
+              data-navigated={navigated || undefined}
+            >
+              {children}
+            </div>
+          </Autocomplete.List>
+          <TrackOrder list={list} onOrder={setOrder} />
+        </ScrollArea>
+        <p className="x-govuk-ui-command-help">
+          {labels.help}
+          {stack.length > 0 && ` ${labels.helpBack}`}
+        </p>
+      </Dialog.Popup>
+    </Dialog.Portal>
   );
 }
 

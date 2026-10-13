@@ -6,13 +6,14 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Changed CommandMenu to be built from parts, as Dialog is. CommandMenu keeps its state, `keyboardShortcut`, `disabled` and `labels`. Its dialog is now CommandMenuContent, which holds the groups and takes `placeholder` and `finalFocus`. Its button is CommandMenuTrigger, which takes `render` for another element, in place of the `trigger` prop. Leave the trigger out when something else opens the menu. Write `<CommandMenu><CommandMenuTrigger /><CommandMenuContent>…</CommandMenuContent></CommandMenu>`.
 - Changed Callout to be built from parts, as Popover is. Callout keeps its state, its `anchor` and `closeOnPressOutside`. Its card is now CalloutContent, which takes `title`, `actions`, `variant`, `side`, `align`, `timeout`, `countdown`, `closeButton`, `labels` and the card's other props. CalloutTrigger goes inside Callout, in place of its `trigger` prop, and takes `render` for another element, as the other triggers do. Write `<Callout><CalloutTrigger label="…" /><CalloutContent title="…">…</CalloutContent></Callout>`.
 - Changed ServicePage's `footerLinks` to take FooterLink parts, in place of a list of labels and addresses, so a router's link can be one. It no longer shows GOV.UK's support links at placeholder addresses, such as `#help`, when it is given none. Give your service's own. `ServicePageLink` is removed.
 - Changed the props that turn keys on, so `shortcut` always means the keys a part shows or handles. CommandMenu's `hotkey` is now `keyboardShortcut`, FormSteps' `shortcut` is now `keyboardShortcut`, and Choices' `shortcuts` is now `shortcutScope`.
 - Changed MainWrapper's `size` from `"default" | "large"` to `"medium" | "large"`, as other parts name their sizes.
 - Changed every component's words to labels, which a LabelsProvider or the component's `labels` prop can change, in place of a prop for each word:
   - AccordionShowAll's `showLabel` and `hideLabel` are its labels `showAll` and `hideAll`.
-  - CommandMenu's `triggerLabel`, `emptyLabel` and `listLabel` are its labels `trigger`, `empty` and `commands`. Its `placeholder` stays, in place of its `search` label.
+  - CommandMenu's `triggerLabel`, `emptyLabel` and `listLabel` are its labels `trigger`, `empty` and `commands`. CommandMenuContent's `placeholder` comes before its `search` label. The help beneath the list is its labels `help` and `helpBack`.
   - Combobox's and MultiSelect's `emptyText` is their label `empty`.
   - The `closeLabel` of DialogContent, SheetContent, PopoverContent and Callout is their label `close`.
   - SearchBox's `buttonLabel` is its label `button`, and `showLabel` is now `hideLabel`, which is true by default, as other fields name it.

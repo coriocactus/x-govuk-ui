@@ -12,6 +12,7 @@ import {
   CodeBlock,
   CodeBlockCopy,
   CommandMenu,
+  CommandMenuContent,
   CommandMenuGroup,
   CommandMenuItem,
   EmptyState,
@@ -486,111 +487,113 @@ export function Workbench() {
             // Opening by shortcut has no press to answer, so the menu plays its own sound.
             if (open) void playSound("open").catch(() => {});
           }}
-          trigger={false}
-          // After a component is chosen, or the preview reset, focus rests unseen at the start of
-          // the preview, so the next Tab reaches the example's first control. Base UI only
-          // returns focus to something Tab reaches, and would pass it on to that first control.
-          // The workbench therefore places focus itself and asks Base UI to leave it alone. Other
-          // commands return focus to where it was.
-          finalFocus={() => {
-            if (!focusPreview.current) return true;
-            focusPreview.current = false;
-            stage.current?.focus({ preventScroll: true });
-            return false;
-          }}
           // On its own page, the command menu example takes Command-K.
           keyboardShortcut={name !== "command-menu"}
-          placeholder="Search components and actions…"
         >
-          <CommandMenuGroup label="Preview">
-            <CommandMenuItem icon={<Icon name="next" />} onSelect={() => openFromMenu(next)}>
-              {`Next component: ${catalogue[next].name}`}
-            </CommandMenuItem>
-            <CommandMenuItem
-              icon={<Icon name="previous" />}
-              onSelect={() => openFromMenu(previous)}
-            >
-              {`Previous component: ${catalogue[previous].name}`}
-            </CommandMenuItem>
-            {component && (
-              <CommandMenuItem
-                icon={<Icon name="reset" />}
-                onSelect={() => {
-                  focusPreview.current = true;
-                  resetPreview();
-                }}
-              >
-                Reset preview
+          <CommandMenuContent
+            // After a component is chosen, or the preview reset, focus rests unseen at the start of
+            // the preview, so the next Tab reaches the example's first control. Base UI only
+            // returns focus to something Tab reaches, and would pass it on to that first control.
+            // The workbench therefore places focus itself and asks Base UI to leave it alone. Other
+            // commands return focus to where it was.
+            finalFocus={() => {
+              if (!focusPreview.current) return true;
+              focusPreview.current = false;
+              stage.current?.focus({ preventScroll: true });
+              return false;
+            }}
+            placeholder="Search components and actions…"
+          >
+            <CommandMenuGroup label="Preview">
+              <CommandMenuItem icon={<Icon name="next" />} onSelect={() => openFromMenu(next)}>
+                {`Next component: ${catalogue[next].name}`}
               </CommandMenuItem>
-            )}
-          </CommandMenuGroup>
-          <CommandMenuGroup label="Workbench">
-            {/* The workbench's own page, with every component drawn. */}
-            <CommandMenuItem
-              icon={<Icon name="overview" />}
-              keywords={["home", "start", "landing", "featured"]}
-              onSelect={() => navigate(null)}
-            >
-              Overview
-            </CommandMenuItem>
-            <CommandMenuItem
-              icon={<Icon name={theme === "light" ? "sun" : "moon"} />}
-              keywords={["appearance", "theme"]}
-              onSelect={() => appearance.setTheme(theme === "light" ? "dark" : "light")}
-            >
-              {`Switch to ${theme === "light" ? "dark" : "light"} theme`}
-            </CommandMenuItem>
-            <CommandMenuItem
-              icon={<Icon name={muted ? "sound" : "muted"} />}
-              onSelect={() => setMuted(!muted)}
-            >
-              {muted ? "Unmute sounds" : "Mute sounds"}
-            </CommandMenuItem>
-            {name && component && (
-              <>
+              <CommandMenuItem
+                icon={<Icon name="previous" />}
+                onSelect={() => openFromMenu(previous)}
+              >
+                {`Previous component: ${catalogue[previous].name}`}
+              </CommandMenuItem>
+              {component && (
                 <CommandMenuItem
-                  icon={<Icon name={codeOpen ? "hide" : "code"} />}
-                  keywords={["usage"]}
-                  onSelect={() => toggleCode(!codeOpen)}
+                  icon={<Icon name="reset" />}
+                  onSelect={() => {
+                    focusPreview.current = true;
+                    resetPreview();
+                  }}
                 >
-                  {codeOpen ? "Hide code panel" : "Show code panel"}
+                  Reset preview
                 </CommandMenuItem>
-                <CommandMenuItem
-                  icon={<Icon name="pin" />}
-                  keywords={["sidebar", "favourite"]}
-                  onSelect={() => (pinned ? arranger.unpin(name) : arranger.pin(name))}
-                >
-                  {pinned ? `Unpin ${component.name}` : `Pin ${component.name} to the top`}
-                </CommandMenuItem>
-              </>
-            )}
-            <CommandMenuItem
-              icon={<Icon name="settings" />}
-              keywords={["sidebar", "order", "hide", "pin"]}
-              onSelect={() => setCustomising(true)}
-            >
-              Customise the sidebar
-            </CommandMenuItem>
-          </CommandMenuGroup>
-          {/* The components, in the sidebar's groups and order. */}
-          {groups.map((group) => {
-            const members = componentOrder.filter((key) => catalogue[key].group === group);
-            return (
-              members.length > 0 && (
-                <CommandMenuGroup key={group} label={`Components · ${group}`}>
-                  {members.map((key) => (
-                    <CommandMenuItem
-                      key={key}
-                      keywords={[group]}
-                      onSelect={() => openFromMenu(key)}
-                    >
-                      {catalogue[key].name}
-                    </CommandMenuItem>
-                  ))}
-                </CommandMenuGroup>
-              )
-            );
-          })}
+              )}
+            </CommandMenuGroup>
+            <CommandMenuGroup label="Workbench">
+              {/* The workbench's own page, with every component drawn. */}
+              <CommandMenuItem
+                icon={<Icon name="overview" />}
+                keywords={["home", "start", "landing", "featured"]}
+                onSelect={() => navigate(null)}
+              >
+                Overview
+              </CommandMenuItem>
+              <CommandMenuItem
+                icon={<Icon name={theme === "light" ? "sun" : "moon"} />}
+                keywords={["appearance", "theme"]}
+                onSelect={() => appearance.setTheme(theme === "light" ? "dark" : "light")}
+              >
+                {`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+              </CommandMenuItem>
+              <CommandMenuItem
+                icon={<Icon name={muted ? "sound" : "muted"} />}
+                onSelect={() => setMuted(!muted)}
+              >
+                {muted ? "Unmute sounds" : "Mute sounds"}
+              </CommandMenuItem>
+              {name && component && (
+                <>
+                  <CommandMenuItem
+                    icon={<Icon name={codeOpen ? "hide" : "code"} />}
+                    keywords={["usage"]}
+                    onSelect={() => toggleCode(!codeOpen)}
+                  >
+                    {codeOpen ? "Hide code panel" : "Show code panel"}
+                  </CommandMenuItem>
+                  <CommandMenuItem
+                    icon={<Icon name="pin" />}
+                    keywords={["sidebar", "favourite"]}
+                    onSelect={() => (pinned ? arranger.unpin(name) : arranger.pin(name))}
+                  >
+                    {pinned ? `Unpin ${component.name}` : `Pin ${component.name} to the top`}
+                  </CommandMenuItem>
+                </>
+              )}
+              <CommandMenuItem
+                icon={<Icon name="settings" />}
+                keywords={["sidebar", "order", "hide", "pin"]}
+                onSelect={() => setCustomising(true)}
+              >
+                Customise the sidebar
+              </CommandMenuItem>
+            </CommandMenuGroup>
+            {/* The components, in the sidebar's groups and order. */}
+            {groups.map((group) => {
+              const members = componentOrder.filter((key) => catalogue[key].group === group);
+              return (
+                members.length > 0 && (
+                  <CommandMenuGroup key={group} label={`Components · ${group}`}>
+                    {members.map((key) => (
+                      <CommandMenuItem
+                        key={key}
+                        keywords={[group]}
+                        onSelect={() => openFromMenu(key)}
+                      >
+                        {catalogue[key].name}
+                      </CommandMenuItem>
+                    ))}
+                  </CommandMenuGroup>
+                )
+              );
+            })}
+          </CommandMenuContent>
         </CommandMenu>
         {/* On the sidebar's own page, the sidebar example takes Command-B. */}
         {/* The workbench remembers whether its sidebar is open, and its width. */}

@@ -179,6 +179,8 @@ export {
 } from "./combobox";
 export {
   CommandMenu,
+  CommandMenuContent,
+  type CommandMenuContentProps,
   CommandMenuGroup,
   type CommandMenuGroupProps,
   CommandMenuItem,
@@ -187,6 +189,8 @@ export {
   CommandMenuPage,
   type CommandMenuPageProps,
   type CommandMenuProps,
+  CommandMenuTrigger,
+  type CommandMenuTriggerProps,
   defaultCommandMenuLabels,
 } from "./command-menu";
 export {

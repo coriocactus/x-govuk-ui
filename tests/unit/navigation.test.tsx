@@ -5,7 +5,9 @@ import {
   Breadcrumbs,
   BreadcrumbsItem,
   CommandMenu,
+  CommandMenuContent,
   CommandMenuItem,
+  CommandMenuTrigger,
   ExitThisPage,
   Footer,
   FooterLink,
@@ -132,7 +134,10 @@ test("navigation menu parts mark the current page and keep top-level links in th
 test("the command menu trigger shows its shortcut without adding it to the name", () => {
   const html = renderToStaticMarkup(
     <CommandMenu>
-      <CommandMenuItem onSelect={() => {}}>Save</CommandMenuItem>
+      <CommandMenuTrigger />
+      <CommandMenuContent>
+        <CommandMenuItem onSelect={() => {}}>Save</CommandMenuItem>
+      </CommandMenuContent>
     </CommandMenu>,
   );
   expect(html).toContain("Open command menu");

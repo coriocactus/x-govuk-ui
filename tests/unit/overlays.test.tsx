@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import {
   Button,
   CommandMenu,
+  CommandMenuTrigger,
   ContextMenu,
   ContextMenuTrigger,
   Dialog,
@@ -133,14 +134,14 @@ test("a trigger given another element opens its overlay from it, with none of th
       </DropdownMenu>
     ),
     CommandMenu: (
-      <CommandMenu
-        trigger={
-          <button type="button" className="row">
-            Open
-          </button>
-        }
-      >
-        {null}
+      <CommandMenu>
+        <CommandMenuTrigger
+          render={
+            <button type="button" className="row">
+              Open
+            </button>
+          }
+        />
       </CommandMenu>
     ),
   };

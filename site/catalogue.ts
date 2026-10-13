@@ -1117,6 +1117,7 @@ const entries = {
       reference("open / defaultOpen / onOpenChange", "boolean", "false"),
       reference("title / children / actions", "ReactNode", "None"),
       reference("align", '"start" | "center" | "end"', "center"),
+      reference("labels", "Partial<CalloutLabels>", "Help and Close"),
       number("timeout", 0, {
         min: 0,
         note: "Milliseconds. 0 keeps the notice until it is closed, as Toast's timeout does.",

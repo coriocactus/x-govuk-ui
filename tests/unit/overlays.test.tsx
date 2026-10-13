@@ -16,6 +16,7 @@ import {
   HoverCard,
   HoverCardTrigger,
   Kbd,
+  LabelsProvider,
   Menubar,
   MenubarTrigger,
   Popover,
@@ -217,4 +218,21 @@ test("a link or an area given another element keeps its own class on it", () => 
   expect(html).toMatch(/<a [^>]*class="x-govuk-ui-hover-card-trigger"[^>]*data-router=""/);
   expect(html).toMatch(/<section [^>]*x-govuk-ui-context-menu-trigger/);
   expect(html).toMatch(/<button [^>]*x-govuk-ui-menubar-trigger/);
+});
+
+test("a callout's words are one map, on its root, for its help button and its ×", () => {
+  const own = renderToStaticMarkup(
+    <Callout labels={{ help: "Cymorth gyda threth" }}>
+      <CalloutTrigger />
+    </Callout>,
+  );
+  expect(own).toContain('aria-label="Cymorth gyda threth"');
+  const given = renderToStaticMarkup(
+    <LabelsProvider labels={{ callout: { help: "Cymorth" } }}>
+      <Callout>
+        <CalloutTrigger />
+      </Callout>
+    </LabelsProvider>,
+  );
+  expect(given).toContain('aria-label="Cymorth"');
 });

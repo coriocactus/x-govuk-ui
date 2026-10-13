@@ -18,7 +18,7 @@ import { Button, type ButtonProps, withoutButtonLook } from "./button";
 import { useControllableState } from "./controllable-state";
 import { Countdown } from "./countdown";
 import { useLabels } from "./labels";
-import { ArrowShape, CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
+import { ArrowShape, CloseIconButton, defaultOverlayLabels, useOverlaySound } from "./overlay";
 import { useLatest, useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
@@ -229,6 +229,8 @@ type CalloutState = {
   askedNow: RefObject<boolean>;
   trigger: RefObject<HTMLButtonElement | null>;
   registerTrigger: () => () => void;
+  /** The callout's words, for its trigger and its card. */
+  words: CalloutLabels;
 };
 
 const CalloutContext = createContext<CalloutState | null>(null);
@@ -255,6 +257,8 @@ export type CalloutProps = {
    * a notice stays while they use the page.
    */
   closeOnPressOutside?: boolean;
+  /** Its words, for its trigger and its card, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<CalloutLabels>;
 };
 
 /**
@@ -276,7 +280,11 @@ export function Callout({
   defaultOpen = false,
   onOpenChange,
   closeOnPressOutside,
+  labels,
 }: CalloutProps) {
+  // A callout's × says what every overlay's does, unless its own words say otherwise.
+  const overlay = useLabels("overlay", defaultOverlayLabels);
+  const words = useLabels("callout", { ...defaultCalloutLabels, close: overlay.close }, labels);
   const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
   const sound = useOverlaySound();
   const trigger = useRef<HTMLButtonElement>(null);
@@ -288,7 +296,9 @@ export function Callout({
     return () => setTriggers((count) => count - 1);
   }, []);
   return (
-    <CalloutContext value={{ open, setOpen, anchor, asked, askedNow, trigger, registerTrigger }}>
+    <CalloutContext
+      value={{ open, setOpen, anchor, asked, askedNow, trigger, registerTrigger, words }}
+    >
       <Primitive.Root
         open={open}
         onOpenChange={(next, details) => {
@@ -333,8 +343,6 @@ export type CalloutContentProps = Omit<ComponentPropsWithRef<"div">, "title"> & 
    * another way to close it, such as an action, a timeout or a press outside.
    */
   closeButton?: boolean;
-  /** Its words, in place of a LabelsProvider's or the defaults. */
-  labels?: Partial<OverlayLabels>;
 };
 
 /**
@@ -352,7 +360,6 @@ export function CalloutContent({
   timeout = 0,
   countdown = true,
   closeButton = true,
-  labels,
   className = "",
   ref,
   onPointerEnter,
@@ -361,7 +368,7 @@ export function CalloutContent({
   onBlur,
   ...props
 }: CalloutContentProps) {
-  const { open, setOpen, anchor, asked, askedNow, trigger } = useCallout("CalloutContent");
+  const { open, setOpen, anchor, asked, askedNow, trigger, words } = useCallout("CalloutContent");
   const play = useScopeSound();
   const [target, setTarget] = useState<Element | null>(null);
   const [card, setCard] = useState<HTMLDivElement | null>(null);
@@ -515,7 +522,7 @@ export function CalloutContent({
             {closeButton && (
               <Primitive.Close
                 render={
-                  <CloseIconButton label={labels?.close} className="x-govuk-ui-callout-close" />
+                  <CloseIconButton label={words.close} className="x-govuk-ui-callout-close" />
                 }
               />
             )}
@@ -538,14 +545,17 @@ export type CalloutTriggerProps = Omit<ButtonProps, "render"> & {
   render?: Primitive.Trigger.Props["render"];
 };
 
-/** The words Callout writes, which a LabelsProvider can change. */
+/** The words Callout writes, which a LabelsProvider or its `labels` can change. */
 export type CalloutLabels = {
   /** Names the help button, unless it is given a name of its own. */
   help: string;
+  /** Names the × in the card's corner. By default, a LabelsProvider's `overlay` words name it. */
+  close: string;
 };
 
 export const defaultCalloutLabels: CalloutLabels = {
   help: "Help",
+  close: defaultOverlayLabels.close,
 };
 
 /**
@@ -559,9 +569,8 @@ export function CalloutTrigger({
   ref,
   ...props
 }: CalloutTriggerProps) {
-  const words = useLabels("callout", defaultCalloutLabels);
+  const { trigger, registerTrigger, words } = useCallout("CalloutTrigger");
   const label = ownLabel ?? words.help;
-  const { trigger, registerTrigger } = useCallout("CalloutTrigger");
   const triggerRef = useMergedRef(trigger, ref);
   useLayoutEffect(() => registerTrigger(), [registerTrigger]);
   // Another element keeps its own content, and takes a name only when it is given one.

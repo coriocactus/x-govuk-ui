@@ -49,9 +49,11 @@ import {
   type FieldProps,
   Hint,
   type LabelProps,
+  useBoundField,
   useFieldSummary,
   useFormDefault,
   useLabels,
+  useMergedRef,
 } from "x-govuk-ui";
 import {
   chain,
@@ -59,9 +61,7 @@ import {
   parseHtmlTree,
   present,
   treeText,
-  useBoundField,
   useLatest,
-  useMergedRef,
 } from "x-govuk-ui/internal";
 import { registerAttachments } from "./editor-attachment-behaviour";
 import { attachmentState } from "./editor-attachment-state";

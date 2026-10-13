@@ -47,10 +47,11 @@ import {
   RichText,
   ScrollArea,
   TextShimmer,
+  useMergedRef,
   useMotionTiming,
   useScopeSound,
 } from "x-govuk-ui";
-import { AutoHeight, chain, duration, Orb, useMergedRef } from "x-govuk-ui/internal";
+import { AutoHeight, chain, duration, Orb } from "x-govuk-ui/internal";
 import { type EditorShared, focusDocument, useEditorContext } from "./editor-context";
 import { $getValue, parseHtml, pastedMarkdownToHtml } from "./editor-html";
 

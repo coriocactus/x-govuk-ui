@@ -47,8 +47,9 @@ import {
   MenuSeparator,
   Tooltip,
   TooltipGroup,
+  useMergedRef,
 } from "x-govuk-ui";
-import { codeLanguage, codeLanguages, useMergedRef } from "x-govuk-ui/internal";
+import { codeLanguage, codeLanguages } from "x-govuk-ui/internal";
 import { focusDocument, useEditorContext } from "./editor-context";
 import { controlIcons } from "./editor-controls";
 import { tableCommands } from "./editor-tables";

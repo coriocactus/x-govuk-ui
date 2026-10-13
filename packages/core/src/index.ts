@@ -219,6 +219,7 @@ export {
   type CommandMenuTriggerProps,
   defaultCommandMenuLabels,
 } from "./command-menu";
+export { useControllableState } from "./controllable-state";
 export {
   Conversation,
   ConversationActions,
@@ -310,6 +311,7 @@ export {
   type FeedbackReport,
 } from "./feedback";
 export {
+  type BoundField,
   type ControlBinding,
   ErrorMessage,
   type ErrorMessageProps,
@@ -325,6 +327,7 @@ export {
   ShownProvider,
   type ShownProviderProps,
   type UseFieldOptions,
+  useBoundField,
   useControlProps,
   useField,
   useFieldSummary,
@@ -651,6 +654,7 @@ export {
   type ReasoningStepsLabels,
   type ReasoningStepsProps,
 } from "./reasoning-steps";
+export { useMergedRef } from "./refs";
 export {
   defaultResizableLabels,
   ResizableHandle,

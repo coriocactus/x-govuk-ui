@@ -44,8 +44,8 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { ScrollArea } from "x-govuk-ui";
-import { chain, trackHighlight, useMergedRef } from "x-govuk-ui/internal";
+import { ScrollArea, useMergedRef } from "x-govuk-ui";
+import { chain, trackHighlight } from "x-govuk-ui/internal";
 import { $createNodeSelectionWith, $textBefore } from "./editor-commands";
 import { useEditorContext, useStore } from "./editor-context";
 import { parseHtml } from "./editor-html";

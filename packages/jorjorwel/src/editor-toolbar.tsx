@@ -49,8 +49,9 @@ import {
   modifierKey,
   Tooltip,
   TooltipGroup,
+  useMergedRef,
 } from "x-govuk-ui";
-import { chain, useMergedRef } from "x-govuk-ui/internal";
+import { chain } from "x-govuk-ui/internal";
 import {
   $clearFormatting,
   $insertLink,

@@ -4,11 +4,12 @@ import { useCallback, useState } from "react";
 import { useLatest } from "./refs";
 
 /**
- * A value that the caller controls, or leaves to the component. Given a `value`, the component
- * shows it and only reports a change through `onChange`. Left `undefined`, the component keeps its
- * own value, which starts as `defaultValue`. `null` counts as a value, so a caller controls
- * "nothing chosen" with `null`. The setter is stable, so effects and handlers can depend on it.
- * @internal
+ * A value that the caller controls, or leaves to the component, as every part of the library
+ * takes `value`, `defaultValue` and `onValueChange`. Given a `value`, the component shows it and
+ * only reports a change through `onChange`. Left `undefined`, the component keeps its own value,
+ * which starts as `defaultValue`. `null` counts as a value, so a caller controls "nothing chosen"
+ * with `null`. The setter is stable, so effects and handlers can depend on it. A component of your
+ * own uses it to be controlled or uncontrolled in the same way.
  */
 export function useControllableState<T>(
   value: T | undefined,

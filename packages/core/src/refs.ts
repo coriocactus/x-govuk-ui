@@ -13,8 +13,8 @@ import {
  * one that starts observing the element does. The merged ref gives React one cleanup that runs it,
  * so whatever the callback started stops when the element goes. React then never calls the merged
  * ref with null. Instead, the cleanup empties an object ref, and calls a callback that returned no
- * cleanup with null, as React would have called it.
- * @internal
+ * cleanup with null, as React would have called it. A part of your own that measures its element
+ * and takes a `ref` uses it to keep both.
  */
 export function useMergedRef<T>(own: Ref<T>, theirs: Ref<T> | undefined): RefCallback<T> {
   return useCallback(

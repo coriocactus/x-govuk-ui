@@ -39,8 +39,8 @@ import {
   TabsList,
   TabsPanel,
   TabsTrigger,
+  useMergedRef,
 } from "x-govuk-ui";
-import { useMergedRef } from "x-govuk-ui/internal";
 import {
   dividerPixels,
   dividersOf,

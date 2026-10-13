@@ -34,17 +34,12 @@ import {
   ResizableHandle,
   ScrollArea,
   Tooltip,
+  useControllableState,
   useLabels,
+  useMergedRef,
   useScopeSound,
 } from "x-govuk-ui";
-import {
-  chain,
-  useControllableState,
-  useLatest,
-  useMediaQuery,
-  useMergedRef,
-  useStoredState,
-} from "x-govuk-ui/internal";
+import { chain, useLatest, useMediaQuery, useStoredState } from "x-govuk-ui/internal";
 import {
   balanceTiles,
   dividerPixels,

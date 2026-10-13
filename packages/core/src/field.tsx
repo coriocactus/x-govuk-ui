@@ -244,7 +244,7 @@ type Entry = FormField & {
 };
 
 /** What a bound Field gives the parts inside it, which is `useField`'s result and its name. */
-type Bound = ReturnType<typeof useField> & { name?: string };
+export type BoundField = ReturnType<typeof useField> & { name?: string };
 
 /**
  * Gives the bound Field around it its answer, for Check your answers. It renders nothing.
@@ -303,7 +303,7 @@ export function useFieldSummary(summary: FieldSummary) {
   });
 }
 
-const FieldContext = createContext<Bound | null>(null);
+const FieldContext = createContext<BoundField | null>(null);
 
 /**
  * Keeps the parts inside from binding to the Field around them, such as the fields of a follow-up
@@ -315,10 +315,11 @@ export function Unbound({ children }: { children: ReactNode }) {
 }
 
 /**
- * The bound Field around a part, if there is one. Its parts take their ids from it.
- * @internal
+ * The bound Field around a part, or null outside one. Its parts take their ids from it. A part of
+ * your own reads it for what `useControlProps` does not give, such as a row that marks itself
+ * invalid, as Switch's does inside a FieldBinding.
  */
-export function useBoundField() {
+export function useBoundField(): BoundField | null {
   return useContext(FieldContext);
 }
 
@@ -451,7 +452,7 @@ function BoundBox({ invalid, ...props }: ComponentPropsWithRef<"div"> & { invali
 
 export type FieldBindingProps = Pick<
   FieldProps,
-  "controlId" | "name" | "linkTo" | "hasHint" | "errorMessage" | "describedBy" | "answer" | "label"
+  "name" | "linkTo" | "hasHint" | "errorMessage" | "describedBy" | "answer" | "label"
 > & {
   /** The control's id, which the parts inside take their ids from. */
   controlId: string;

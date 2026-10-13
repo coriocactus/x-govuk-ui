@@ -22,8 +22,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { CodeBlock } from "x-govuk-ui";
-import { CharacterCountNote, countWords, ScrollAreaBars, useMergedRef } from "x-govuk-ui/internal";
+import { CodeBlock, useMergedRef } from "x-govuk-ui";
+import { CharacterCountNote, countWords, ScrollAreaBars } from "x-govuk-ui/internal";
 import { EditorAttachmentTools } from "./editor-attachment-tools";
 import { $holdsText } from "./editor-behaviour";
 import { focusDocument, type Store, useEditorContext, useStore } from "./editor-context";

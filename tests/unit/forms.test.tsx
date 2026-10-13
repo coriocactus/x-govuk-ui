@@ -37,6 +37,7 @@ import {
   ErrorSummaryItem,
   Feedback,
   Field,
+  FieldBinding,
   Fieldset,
   FieldsetLegend,
   FieldsetRoot,
@@ -76,6 +77,8 @@ import {
   TimeInputControl,
   ToggleGroup,
   ToggleGroupItem,
+  useBoundField,
+  useControllableState,
   useControlProps,
   useField,
   validateWith,
@@ -445,6 +448,65 @@ test("a switch's control takes its id, name and descriptions from a Field of you
   expect(html).toContain('aria-describedby="alerts-hint alerts-error"');
   expect(html).toContain('aria-invalid="true"');
   expect(html).toContain('for="alerts"');
+});
+
+test("a switch's row built from public parts renders as Switch does", () => {
+  // A row of a service's own, as Switch's is: its words on the left and its control on the right,
+  // bound by a FieldBinding, and marked invalid from the bound field.
+  function Row({ children }: { children: ReactNode }) {
+    const field = useBoundField();
+    return (
+      <div className="x-govuk-ui-switch" data-invalid={field?.invalid || undefined}>
+        <span className="x-govuk-ui-switch-text">
+          <label className="x-govuk-ui-switch-label" htmlFor={field?.id}>
+            Alerts
+          </label>
+          <Hint>By email</Hint>
+          <ErrorMessage />
+        </span>
+        {children}
+      </div>
+    );
+  }
+  const own = renderToStaticMarkup(
+    <FieldBinding controlId="alerts" name="alerts" hasHint errorMessage="Turn alerts on">
+      <Row>
+        <SwitchControl name="alerts" />
+      </Row>
+    </FieldBinding>,
+  );
+  const shorthand = renderToStaticMarkup(
+    <Switch
+      id="alerts"
+      name="alerts"
+      label="Alerts"
+      hint="By email"
+      errorMessage="Turn alerts on"
+    />,
+  );
+  expect(own).toBe(shorthand);
+});
+
+test("a value of your own is controlled or uncontrolled as the library's are", () => {
+  const heard: (string | null)[] = [];
+  let state: [string | null, (next: string | null) => void] | undefined;
+  function Probe({ value }: { value?: string | null }) {
+    state = useControllableState<string | null>(
+      value,
+      () => "first",
+      (next) => heard.push(next),
+    );
+    return null;
+  }
+  // Uncontrolled, it starts from its default. Controlled, it shows the value, even null.
+  renderToStaticMarkup(<Probe />);
+  expect(state?.[0]).toBe("first");
+  renderToStaticMarkup(<Probe value={null} />);
+  expect(state?.[0]).toBeNull();
+  // A controlled value is only reported, for its owner to take.
+  state?.[1]("second");
+  expect(heard).toEqual(["second"]);
+  expect(state?.[0]).toBeNull();
 });
 
 test("inputs generate distinct IDs and escape content during server rendering", () => {

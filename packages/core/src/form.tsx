@@ -39,11 +39,11 @@ export type FormProps = Omit<ComponentPropsWithRef<"form">, "onSubmit"> & {
     event: FormEvent<HTMLFormElement>,
     // biome-ignore lint/suspicious/noConfusingVoidType: An onSubmit that only sends returns nothing.
   ) => FormErrors | void | Promise<FormErrors | void>;
-  /** The error summary's title. By default, its `errors` label, "There is a problem". */
+  /** The error summary's title. By default, its `error` label, "There is a problem". */
   errorTitle?: ReactNode;
   /**
    * Adds "Error: " to the start of the page's title while there are errors, as GOV.UK asks. The
-   * word is its `errors` label's `prefix`.
+   * word is its `error` label's `prefix`.
    */
   titlePrefix?: boolean;
   /**
@@ -55,7 +55,12 @@ export type FormProps = Omit<ComponentPropsWithRef<"form">, "onSubmit"> & {
   /**
    * The answers the fields start with, by the names they submit under, such as answers kept from
    * an earlier visit, or a record being changed. They come before a field's own `defaultValue`,
-   * which is where the field starts when the Form has no answer for it.
+   * which is where the field starts when the Form has no answer for it. A field that is controlled
+   * takes its `value` instead.
+   *
+   * They are read as the Form mounts, as an input reads its `defaultValue`, so answers that arrive
+   * later change nothing. To fill a Form from a record that loads after the page, render the Form
+   * once the record is there, with the record's id as its `key`.
    */
   defaultValues?: Partial<Record<string, string | string[]>>;
 };

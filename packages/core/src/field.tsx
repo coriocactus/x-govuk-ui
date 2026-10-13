@@ -9,7 +9,7 @@
  * - The order is label, hint, error message, then the control.
  * - The hint's id is `{id}-hint` and the error's id is `{id}-error`. The control is described by
  *   the caller's own ids, then the hint, then the error. GOV.UK's error summary links to `#{id}`.
- * - The error message starts with a visually hidden "Error:", the `errors` label's `prefix`.
+ * - The error message starts with a visually hidden "Error:", the `error` label's `prefix`.
  *
  * A Field given `controlId` is bound. It gives its parts their ids through context, and each field
  * tells its Form what it asks and how to show its answer, for FormSteps' Check your answers.

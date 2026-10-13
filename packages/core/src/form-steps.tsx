@@ -157,6 +157,9 @@ export type FormStepsProps = Omit<
    * left off. They come back once the page has loaded, and `onStepChange` is told the step. They
    * are cleared once the form is sent. Answers stay in the browser, so leave out anything
    * sensitive.
+   *
+   * Each field comes back through `useFormDefault`, so a field that is controlled keeps its own
+   * `value`. A controlled field of your own can read `useFormDefault` to start from its answer.
    */
   storageKey?: string;
   /**

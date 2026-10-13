@@ -26,7 +26,7 @@ export type ErrorSummaryProps = Omit<
 > & {
   /** The errors, as `ErrorSummaryItem` parts, in the order of the fields. */
   children: ReactNode;
-  /** The title. By default, its `errors` label, "There is a problem". */
+  /** The title. By default, its `error` label, "There is a problem". */
   title?: ReactNode;
   /** Text between the title and the list, for a problem that is not about one field. */
   description?: ReactNode;

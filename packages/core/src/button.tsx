@@ -44,7 +44,8 @@ export type ButtonProps = ComponentPropsWithRef<"button"> & {
   /**
    * Renders another element with the Button's look, such as a link for GOV.UK's Start button, or a
    * router's link, as `<a href="/start" />` or `<RouterLink to="/start" />`. It takes the Button's
-   * class, label and the rest of its props.
+   * class, label and the rest of its props. Given `disabled` too, the element is marked
+   * `aria-disabled` and does nothing when pressed, because a link has no `disabled` of its own.
    */
   render?: useRender.RenderProp;
 };
@@ -80,8 +81,12 @@ export function Button({
   render,
   ...props
 }: ButtonProps) {
+  // Another element, such as a link, cannot be disabled, so it is marked unavailable instead.
   const unavailable =
-    loading || props["aria-disabled"] === true || props["aria-disabled"] === "true";
+    loading ||
+    props["aria-disabled"] === true ||
+    props["aria-disabled"] === "true" ||
+    (render !== undefined && props.disabled === true);
   // A warning button sounds destructive, unless it names its own sound, as Exit this page does.
   const sound =
     (props as { "data-sound"?: string })["data-sound"] ??

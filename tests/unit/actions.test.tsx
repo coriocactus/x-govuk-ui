@@ -43,6 +43,30 @@ test("pending buttons preserve their name and prevent repeated activation", () =
   );
   expect(start).toMatch(/^<a href="\/start" class="x-govuk-ui-button x-govuk-ui-button--primary"/);
   expect(start).not.toContain("type=");
+  // A link cannot be disabled, so a disabled Button rendered as one is marked so, and does nothing.
+  let followed = 0;
+  let linkClick: ((event: { preventDefault: () => void }) => void) | undefined;
+  const link = renderToStaticMarkup(
+    <Button
+      disabled
+      onClick={() => followed++}
+      render={(given) => {
+        linkClick = given.onClick as typeof linkClick;
+        return <a href="/send" {...given} />;
+      }}
+    >
+      Send
+    </Button>,
+  );
+  expect(link).toContain('aria-disabled="true"');
+  let stopped = false;
+  linkClick?.({
+    preventDefault() {
+      stopped = true;
+    },
+  });
+  expect(stopped).toBe(true);
+  expect(followed).toBe(0);
   expect(renderToStaticMarkup(<Button>Save</Button>)).toContain('type="button"');
 });
 

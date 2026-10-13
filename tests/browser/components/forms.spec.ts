@@ -247,7 +247,7 @@ test("check your answers lists every kind of field, links an error to an answer 
   // the survey is chosen again.
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? ""))
-    .toContain('"at":3');
+    .toContain('"at":4');
   await page.reload();
   await choose();
   await expect(review.locator(".x-govuk-ui-summary-list-value")).toHaveText(answers);
@@ -256,6 +256,16 @@ test("check your answers lists every kind of field, links an error to an answer 
   await expect(frame.getByRole("heading", { name: "About your visit" })).toBeVisible();
   await page.goForward();
   await expect(review.locator(".x-govuk-ui-summary-list-value")).toHaveText(answers);
+  // While the answers are sent, Change does nothing, so nothing keeps them once they are sent. The
+  // two presses come one after the other, before the answers are sent.
+  await frame.evaluate((element) => {
+    const buttons = [...element.querySelectorAll<HTMLButtonElement>("button")];
+    buttons.find((button) => button.textContent === "Send feedback")?.click();
+    element.querySelector<HTMLButtonElement>(".x-govuk-ui-summary-list-action")?.click();
+  });
+  await expect(frame.getByText("Thank you for your feedback.")).toBeVisible();
+  await page.waitForTimeout(600);
+  expect(await page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback"))).toBeNull();
 });
 
 test("a survey that starts on a step in a wrapper goes back to it from Check your answers", async ({
@@ -324,4 +334,37 @@ test("a remembered survey keeps a slider's value as it shows, and an answer give
   await expect(frame.getByText("Thank you for your feedback.")).toBeVisible();
   await page.waitForTimeout(600);
   expect(await page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback"))).toBeNull();
+});
+
+test("a remembered survey keeps the answers of a step that applies again, however soon the page reloads", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  await open("form");
+  const choose = async () => {
+    await playground.set("example", /In stages/);
+    for (const name of ["back", "moreKinds", "remember", "fromVisit"])
+      await playground.set(name, true);
+  };
+  await choose();
+  const kept = () => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? "");
+  // The tablet step applies only to those who used a tablet.
+  await frame.getByRole("radio", { name: "GOV.UK" }).check();
+  await frame.getByRole("button", { name: "Tablet" }).click();
+  await frame.getByRole("button", { name: "Continue" }).click();
+  await frame.getByLabel("Which tablet did you use?").fill("A small one");
+  await frame.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(frame.getByRole("heading", { name: "About your visit" })).toBeVisible();
+  // Once a phone is chosen, the step no longer applies, and its answer is left out.
+  await frame.getByRole("button", { name: "Phone" }).click();
+  await expect.poll(kept).toContain('["device","phone"]');
+  expect(await kept()).not.toContain("A small one");
+  // A tablet again brings the step back, and its answer with it, though the page reloads before
+  // the step is drawn as applying.
+  await frame.getByRole("button", { name: "Tablet" }).click();
+  await page.reload();
+  await choose();
+  await expect(frame.locator('input[name="tablet"]')).toHaveValue("A small one");
 });

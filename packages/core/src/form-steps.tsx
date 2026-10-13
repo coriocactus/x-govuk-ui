@@ -421,6 +421,8 @@ export function FormSteps({
   const rememberSoon = useRef(0);
   // Whether the answers are kept, which they are not while they are sent or once they are.
   const keeping = useRef(true);
+  // Whether the answers are being sent, read as a press comes, before the form draws itself busy.
+  const sending = useRef(false);
   // The fields each step asks, by the step's id and the field's name, as they register.
   const stepFields = useRef(new Map<string, Map<string, FormField>>());
   const [sent, setSent] = useState(false);
@@ -487,18 +489,30 @@ export function FormSteps({
   const remember = (where = at, passing = passed, skipping = skipped) => {
     window.clearTimeout(rememberSoon.current);
     rememberSoon.current = 0;
-    if (!keeping.current || !storageKey || !form.current) return;
-    const data = new FormData(form.current);
+    const element = form.current;
+    if (!keeping.current || !storageKey || !element) return;
+    // The answers of the steps that apply now, even before they are drawn so. A step that a change
+    // has just brought in is still disabled, so it is opened while its answers are read, in the same
+    // task, so nothing is drawn between. A step that a change has just left out is still open, so
+    // its answers are left out of what is read.
+    const applies = new Set(planFor().filter((index) => !skipping.has(index)));
+    const steps = [...element.querySelectorAll<HTMLFieldSetElement>("fieldset[data-step]")];
+    const appliesTo = (fieldset: HTMLFieldSetElement) => applies.has(Number(fieldset.dataset.step));
+    const opened = steps.filter((fieldset) => fieldset.disabled && appliesTo(fieldset));
+    for (const fieldset of opened) fieldset.disabled = false;
+    const data = new FormData(element);
+    for (const fieldset of opened) fieldset.disabled = true;
+    for (const fieldset of steps)
+      if (!appliesTo(fieldset))
+        for (const field of fieldset.querySelectorAll<HTMLInputElement>("[name]"))
+          data.delete(field.name);
     const answers = [...data.entries()].flatMap(([name, value]) =>
       typeof value === "string" ? [[name, value] as [string, string]] : [],
     );
     // A field that sends nothing is kept as empty, so it comes back empty. A field on a step that
     // was skipped or does not apply sends nothing because its answers are left out, so it is not
-    // kept, and comes back at its own default. The steps that apply are those the page shows, as
-    // drawn, so a step that a change has just brought in is not read before it can send.
-    const live = new Set(
-      plan.filter((index) => !skipping.has(index)).map((index) => registered[index]?.id),
-    );
+    // kept, and comes back at its own default.
+    const live = new Set([...applies].map((index) => registered[index]?.id));
     const names = new Set(
       [...stepFields.current]
         .filter(([id]) => live.has(id))
@@ -515,20 +529,13 @@ export function FormSteps({
   };
 
   // Answers are kept a moment after the last change, once React has drawn it, such as in a hidden
-  // input that a control fills from its state. The steps that apply are worked out again first,
-  // and the answers kept once those are drawn too. They are kept with the form as it is then, not
-  // as it was at the change. A page that closes or reloads within that moment, or a form that
-  // leaves it, keeps them at once, as they are drawn.
-  const [saving, setSaving] = useState(0);
+  // input that a control fills from its state. They are kept with the form as it is then, not as
+  // it was at the change. A page that closes or reloads within that moment, or a form that leaves
+  // it, keeps them at once.
   const later = useLatest(() => {
     replan();
-    setSaving((count) => count + 1);
+    remember();
   });
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are kept after the render that a change and its new steps cause.
-  useEffect(() => {
-    if (saving) remember();
-  }, [saving]);
-  const keepNow = useLatest(() => remember());
   const keepSoon = () => {
     if (!keeping.current) return;
     window.clearTimeout(rememberSoon.current);
@@ -536,7 +543,7 @@ export function FormSteps({
   };
   useLayoutEffect(() => {
     const flush = () => {
-      if (rememberSoon.current) keepNow.current();
+      if (rememberSoon.current) later.current();
     };
     window.addEventListener("pagehide", flush);
     return () => {
@@ -688,11 +695,16 @@ export function FormSteps({
       return;
     }
     setBusy(true);
+    sending.current = true;
     const errors = await onComplete(data);
+    sending.current = false;
     setBusy(false);
     const wrong = Object.entries(errors ?? {}).filter(([, message]) => present(message));
     if (wrong.length > 0) {
+      // The answers are kept again, as the form goes back to them, including any change that was
+      // waiting to be kept as they were sent.
       keeping.current = true;
+      keepSoon();
       // The form goes back to the first step with something to fix.
       const first = plan.find((index) =>
         wrong.some(([name]) =>
@@ -708,6 +720,10 @@ export function FormSteps({
       }
       return errors ?? undefined;
     }
+    // Anything that asked to keep the answers while they were sent, such as a press, keeps nothing.
+    window.clearTimeout(rememberSoon.current);
+    rememberSoon.current = 0;
+    keeping.current = false;
     writeSaved(storageKey, null);
     // The answers stay on show once sent, unless something else takes their place.
     setRows(planFor().flatMap((index) => summaryRows(index, skipping)));
@@ -881,6 +897,8 @@ export function FormSteps({
                 // biome-ignore lint/correctness/noChildrenProp: The words are its label.
                 children={labels.change}
                 onClick={() => {
+                  // While the answers are sent, they cannot change.
+                  if (sending.current) return;
                   returning.current = true;
                   keeping.current = true;
                   setSent(false);

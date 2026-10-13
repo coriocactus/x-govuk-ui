@@ -176,6 +176,7 @@ function VisitStep() {
       <ToggleGroup name="device" aria-label="What did you use?" defaultValue={["phone"]}>
         <ToggleGroupItem value="phone">Phone</ToggleGroupItem>
         <ToggleGroupItem value="computer">Computer</ToggleGroupItem>
+        <ToggleGroupItem value="tablet">Tablet</ToggleGroupItem>
       </ToggleGroup>
       <Slider name="ease" label="How easy was it, from 1 to 5?" min={1} max={5} defaultValue={3} />
       <Select name="part" label="Which part did you use most?" defaultValue="renew">
@@ -272,6 +273,12 @@ function FeedbackInStages({
         </FormStep>
         <IssuesStep />
         {moreKinds && <VisitStep />}
+        {moreKinds && (
+          // Asked only of those who used a tablet.
+          <FormStep title="Your tablet" when={(data) => data.get("device") === "tablet"}>
+            <Input name="tablet" label="Which tablet did you use?" />
+          </FormStep>
+        )}
       </FormSteps>
       <Button
         variant="link"

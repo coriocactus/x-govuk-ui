@@ -865,12 +865,13 @@ export function FormSteps({
 
   const summary = (
     <div className="x-govuk-ui-form-steps-review">
-      {/* Once sent, a page says so in a Panel above the answers. */}
-      {!card && sent && <Panel title={doneLabel} titleLevel={2} />}
+      {/* On a page, Check your answers is the page's heading, as each step's title is, and once
+          the answers are sent, a Panel above them says so, as GOV.UK's confirmation page does. */}
+      {!card && sent && <Panel title={doneLabel} />}
       {!card && !sent && (
-        <h2 className="x-govuk-ui-form-steps-review-title" tabIndex={-1}>
+        <h1 className="x-govuk-ui-form-steps-review-title" tabIndex={-1}>
           {labels.checkAnswers}
-        </h2>
+        </h1>
       )}
       <SummaryList
         className="x-govuk-ui-form-steps-summary"

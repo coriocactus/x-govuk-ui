@@ -89,11 +89,12 @@
 .x-govuk-ui-form-steps-back {
   margin-bottom: 20px;
 }
+/* Check your answers is the page's heading, at the size of a step's title on a page. */
 .x-govuk-ui-form-steps-review-title {
   margin: 0 0 20px;
   outline: none;
-  font-size: 24px;
-  line-height: 1.25;
+  font-size: 32px;
+  line-height: 1.15;
 }
 .x-govuk-ui-form-steps-review .x-govuk-ui-panel {
   margin-bottom: 30px;

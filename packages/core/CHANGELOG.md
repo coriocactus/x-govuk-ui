@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Changed FormSteps' Check your answers heading, `.x-govuk-ui-form-steps-review-title`, from an `h2` to an `h1` on a page, and the title of the Panel that says the answers are sent from an `h2` to an `h1`. Select each by its class, not its element.
 - Renamed the classes of five components to start with the component's name, as every other component's do, so a class says which component it belongs to:
   - Command menu's `x-govuk-ui-command-*` classes are now `x-govuk-ui-command-menu-*`, such as `x-govuk-ui-command-menu-item`.
   - Navigation menu's `x-govuk-ui-navigation` and `x-govuk-ui-navigation-*` are now `x-govuk-ui-navigation-menu` and `x-govuk-ui-navigation-menu-*`.
@@ -55,6 +56,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Visual
 
+- Changed FormSteps' Check your answers heading, on a page, to the page's `h1`, at the size of a step's title, as GOV.UK's Check your answers page has it. Once the answers are sent, the Panel's title is the page's `h1` too. Each was an `h2`, and Check your answers was smaller.
 - Changed the components' typeface, where GDS Transport is not served, to Noto Sans, the typeface for a service outside GOV.UK, in place of Arial. Arial now comes after it, for a device without Noto Sans, such as one with Windows, macOS or iOS, unless the page serves it. `--x-govuk-ui-font` is now `"GDS Transport", "Noto Sans", arial, sans-serif`.
 
 ### Added

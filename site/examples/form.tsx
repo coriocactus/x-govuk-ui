@@ -12,7 +12,11 @@ import {
   Radio,
   Radios,
   ServicePage,
+  Slider,
+  Switch,
   Textarea,
+  ToggleGroup,
+  ToggleGroupItem,
 } from "x-govuk-ui";
 
 type Props = {
@@ -28,6 +32,8 @@ type Props = {
   history?: boolean;
   /** The rating fails to save the first time, as a server error would. */
   fail?: boolean;
+  /** Adds a step asked with other kinds of field, which Check your answers lists too. */
+  moreKinds?: boolean;
 };
 
 const answer = (data: FormData, name: string) => String(data.get(name) ?? "").trim();
@@ -146,6 +152,43 @@ function IssuesStep() {
   );
 }
 
+/**
+ * A step asked with other kinds of field, a toggle group, a slider and a switch, each with a name,
+ * so Check your answers lists each as it shows it. The answers to its first question come from a
+ * component of the survey's own.
+ */
+function VisitStep() {
+  return (
+    <FormStep
+      title="About your visit"
+      validate={(data): FormErrors => ({
+        found: data.get("found") ? undefined : "Select how you found this service",
+      })}
+    >
+      <Radios name="found" legend="How did you find this service?">
+        <FoundAnswers />
+      </Radios>
+      <ToggleGroup name="device" aria-label="What did you use?" defaultValue={["phone"]}>
+        <ToggleGroupItem value="phone">Phone</ToggleGroupItem>
+        <ToggleGroupItem value="computer">Computer</ToggleGroupItem>
+      </ToggleGroup>
+      <Slider name="ease" label="How easy was it, from 1 to 5?" min={1} max={5} defaultValue={3} />
+      <Switch name="research" label="Take part in research about this service" />
+    </FormStep>
+  );
+}
+
+/** Where people find the service, as several of its surveys ask. */
+function FoundAnswers() {
+  return (
+    <>
+      <Radio value="search">A search engine</Radio>
+      <Radio value="govuk">GOV.UK</Radio>
+      <Radio value="told">Someone told me about it</Radio>
+    </>
+  );
+}
+
 /** Stands in for a service's API, which takes a moment to answer. */
 const wait = (milliseconds: number) => new Promise((done) => setTimeout(done, milliseconds));
 
@@ -161,6 +204,7 @@ function FeedbackInStages({
   remember = false,
   history = false,
   fail = false,
+  moreKinds = false,
 }: Props) {
   const [run, setRun] = useState(0);
   const failed = useRef(false);
@@ -207,6 +251,7 @@ function FeedbackInStages({
           </Radios>
         </FormStep>
         <IssuesStep />
+        {moreKinds && <VisitStep />}
       </FormSteps>
       <Button
         variant="link"

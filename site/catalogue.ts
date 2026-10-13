@@ -998,6 +998,11 @@ const entries = {
         needs: [when("example", "stages")],
         restart: true,
       }),
+      toggle("moreKinds", false, {
+        note: "Adds a step asked with a toggle group, a slider, a switch, and radios whose answers come from a component of the survey's own. Check your answers lists each.",
+        needs: [when("example", "stages")],
+        restart: true,
+      }),
     ],
     presets: [
       { name: "In stages", args: { example: "stages" } },

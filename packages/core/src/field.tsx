@@ -546,7 +546,7 @@ export function ErrorMessage({
 }: ErrorMessageProps) {
   const timing = useMotionTiming();
   const field = useContext(FieldContext);
-  const labels = useLabels("errors", defaultErrorLabels);
+  const labels = useLabels("error", defaultErrorLabels);
   const id = ownId ?? field?.errorId;
   const children = given ?? field?.errorMessage;
   return (

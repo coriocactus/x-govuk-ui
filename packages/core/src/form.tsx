@@ -264,7 +264,7 @@ export function Form({
   };
 
   const failing = problems.length > 0;
-  const { prefix } = useLabels("errors", defaultErrorLabels);
+  const { prefix } = useLabels("error", defaultErrorLabels);
   useEffect(() => {
     if (!titlePrefix || !failing) return;
     const start = `${prefix}: `;

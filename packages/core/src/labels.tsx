@@ -87,7 +87,7 @@ export interface ComponentLabels {
   copy: CopyLabels;
   dataTable: DataTableLabels;
   dateInput: DateInputLabels;
-  errors: ErrorLabels;
+  error: ErrorLabels;
   exitThisPage: ExitThisPageLabels;
   feedback: FeedbackLabels;
   figure: FigureLabels;

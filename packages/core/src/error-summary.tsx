@@ -65,7 +65,7 @@ export function ErrorSummary({
   ...props
 }: ErrorSummaryProps) {
   const element = useRef<HTMLDivElement>(null);
-  const labels = useLabels("errors", defaultErrorLabels);
+  const labels = useLabels("error", defaultErrorLabels);
   useEffect(() => {
     if (autoFocus) element.current?.focus();
   }, [autoFocus]);

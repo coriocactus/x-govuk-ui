@@ -965,7 +965,7 @@ test("a labels provider gives every component inside it a service's words, and a
       labels={{
         locale: "cy",
         dateInput: { day: "Diwrnod", month: "Mis", year: "Blwyddyn" },
-        errors: { prefix: "Gwall", summaryTitle: "Mae problem wedi codi" },
+        error: { prefix: "Gwall", summaryTitle: "Mae problem wedi codi" },
         pagination: { previous: "Blaenorol", next: "Nesaf" },
       }}
     >

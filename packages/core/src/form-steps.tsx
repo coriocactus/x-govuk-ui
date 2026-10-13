@@ -25,6 +25,8 @@ import { Form, type FormErrors, type FormProps } from "./form";
 import { Kbd } from "./kbd";
 import { useLabels } from "./labels";
 import { Panel } from "./panel";
+import { useLatest } from "./refs";
+import { type Registry, useRegister, useRegistry } from "./registry";
 import { SummaryList, SummaryListAction, SummaryListRow } from "./summary-list";
 import { Tag } from "./tag";
 
@@ -63,19 +65,16 @@ export type FormStepProps = {
   className?: string;
 };
 
-/** A step as its FormSteps knows it, with the fieldset that marks its place among the others. */
-type StepEntry = {
-  id: string;
-  props: RefObject<FormStepProps>;
-  place: RefObject<HTMLFieldSetElement | null>;
-};
+/** A step as its FormSteps knows it, by an id of its own, which keeps its fields while it moves. */
+type StepEntry = { id: string; props: FormStepProps };
 
 /** What a FormSteps gives its steps, so each can draw itself in its place. */
 type StepsHost = {
-  register: (entry: StepEntry) => () => void;
+  registry: Registry<StepEntry>;
   /** A registered step's place among the steps, in the page's order. */
   indexOf: (id: string) => number | null;
   draw: (
+    id: string,
     index: number | null,
     props: FormStepProps,
     place: RefObject<HTMLFieldSetElement | null>,
@@ -89,18 +88,19 @@ const StepIndex = createContext<number | null>(null);
 /**
  * One step of FormSteps, which shows it while it is the step on show. It can sit inside a wrapper
  * of your own. FormSteps takes its steps in the page's order.
+ *
+ * Keep every step on the page, and give a step that applies only to some answers a `when`. A step
+ * is known by its place among the others, so a step that comes or goes moves the steps after it.
  */
 export function FormStep(props: FormStepProps): ReactNode {
   const host = useContext(StepsContext);
   const direct = useContext(StepIndex);
   const id = useId();
-  const latest = useRef(props);
-  latest.current = props;
   const place = useRef<HTMLFieldSetElement>(null);
-  const register = host?.register;
-  useLayoutEffect(() => register?.({ id, props: latest, place }), [register, id]);
+  const entry = useMemo(() => ({ id, props }), [id, props]);
+  useRegister(host?.registry, entry, place);
   if (!host) return null;
-  return host.draw(host.indexOf(id) ?? direct, props, place);
+  return host.draw(id, host.indexOf(id) ?? direct, props, place);
 }
 
 /** Gives each direct child that is a FormStep its place, so the first HTML shows the right step. */
@@ -228,6 +228,18 @@ export const defaultFormStepsLabels: FormStepsLabels = {
 };
 
 type Saved = { at: number; passed: number[]; skipped: number[]; answers: [string, string][] };
+
+const isNumbers = (value: unknown): value is number[] =>
+  Array.isArray(value) && value.every((each) => Number.isInteger(each) && each >= 0);
+const isAnswers = (value: unknown): value is [string, string][] =>
+  Array.isArray(value) &&
+  value.every(
+    (each) =>
+      Array.isArray(each) &&
+      each.length === 2 &&
+      typeof each[0] === "string" &&
+      typeof each[1] === "string",
+  );
 type Row = {
   step: number;
   label: ReactNode;
@@ -238,10 +250,16 @@ type Row = {
   own?: ReactNode;
 };
 
+/** What was kept under the key, or null when there is nothing, or nothing this form wrote. */
 function readSaved(key: string | undefined): Saved | null {
   if (!key || typeof localStorage === "undefined") return null;
   try {
-    return JSON.parse(localStorage.getItem(key) ?? "null") as Saved | null;
+    const saved: unknown = JSON.parse(localStorage.getItem(key) ?? "null");
+    if (typeof saved !== "object" || saved === null) return null;
+    const { at, passed, skipped, answers } = saved as Record<string, unknown>;
+    if (typeof at !== "number" || !Number.isInteger(at) || at < 0) return null;
+    if (!isNumbers(passed) || !isNumbers(skipped) || !isAnswers(answers)) return null;
+    return { at, passed, skipped, answers };
   } catch {
     return null;
   }
@@ -278,12 +296,13 @@ function answersOf(field: FormField, name: string, data: FormData): ReactNode[] 
  * can list each question the step asks.
  */
 function StepFields({
-  index,
+  step,
   fields,
   children,
 }: {
-  index: number;
-  fields: RefObject<Map<number, Map<string, FormField>>>;
+  /** The step's own id, which stays the same while the step moves among the others. */
+  step: string;
+  fields: RefObject<Map<string, Map<string, FormField>>>;
   children: ReactNode;
 }) {
   const form = useContext(FormContext);
@@ -291,15 +310,15 @@ function StepFields({
   const register = useCallback(
     (name: string, field: FormField) => {
       const unregister = parent?.(name, field);
-      const own = fields.current.get(index) ?? new Map<string, FormField>();
-      fields.current.set(index, own);
+      const own = fields.current.get(step) ?? new Map<string, FormField>();
+      fields.current.set(step, own);
       own.set(name, field);
       return () => {
         unregister?.();
         if (own.get(name) === field) own.delete(name);
       };
     },
-    [parent, fields, index],
+    [parent, fields, step],
   );
   const value = useMemo(() => form && { ...form, register }, [form, register]);
   return <FormContext value={value}>{children}</FormContext>;
@@ -345,41 +364,30 @@ export function FormSteps({
   const doneLabel = layout === "card" ? labels.answered : labels.sent;
   // Each step registers itself once it renders, in the page's order. Until then, as the server
   // renders, the steps are the direct children.
-  const [registered, setRegistered] = useState<readonly StepEntry[]>([]);
-  const register = useCallback((entry: StepEntry) => {
-    const order = (all: readonly StepEntry[]) =>
-      [...all].sort((a, b) => {
-        const [first, second] = [a.place.current, b.place.current];
-        if (!first || !second) return 0;
-        return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
-      });
-    setRegistered((all) => order([...all, entry]));
-    return () => setRegistered((all) => all.filter((each) => each !== entry));
-  }, []);
+  const { items: registered, registry } = useRegistry<StepEntry>();
   const direct = Children.toArray(children)
     .filter((child) => isValidElement(child) && child.type === FormStep)
     .map((child) => (child as { props: FormStepProps }).props);
-  const steps = registered.length > 0 ? registered.map((entry) => entry.props.current) : direct;
+  const steps = registered.length > 0 ? registered.map((entry) => entry.props) : direct;
   const count = steps.length;
-  const [saved] = useState(() => readSaved(storageKey));
-  const [restored] = useState(() => {
-    const answers: Record<string, string[]> = {};
-    for (const [name, value] of saved?.answers ?? [])
-      answers[name] = [...(answers[name] ?? []), value];
-    return answers;
+  // The first HTML is the same on the server and in the browser, so answers kept in the browser
+  // are restored once the page has loaded. The form then starts again with them, before the
+  // browser paints.
+  const [restored, setRestored] = useState<{ answers: Record<string, string[]>; round: number }>({
+    answers: {},
+    round: 0,
   });
-  // Where the form is, as a step's index, or `count` for Check your answers.
-  const [at, setAt] = useControllableState(
-    controlledStep,
-    () => Math.min(saved?.at ?? defaultStep, count),
-    onStepChange,
-  );
-  const [passed, setPassed] = useState(() => new Set(saved?.passed ?? []));
-  const [skipped, setSkipped] = useState(() => new Set(saved?.skipped ?? []));
+  // Where the form is, as a step's index, or `count` for Check your answers. It is kept as asked
+  // for, and kept within the steps as it is read, because steps in a wrapper of your own are not
+  // all known until they register.
+  const [wanted, setAt] = useControllableState(controlledStep, defaultStep, onStepChange);
+  const at = Math.max(0, Math.min(wanted, count));
+  const [passed, setPassed] = useState(() => new Set<number>());
+  const [skipped, setSkipped] = useState(() => new Set<number>());
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
   const [rows, setRows] = useState<Row[]>([]);
-  // The fields each step asks, by name, as they register with the Form.
-  const stepFields = useRef(new Map<number, Map<string, FormField>>());
+  // The fields each step asks, by the step's id and the field's name, as they register.
+  const stepFields = useRef(new Map<string, Map<string, FormField>>());
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const returning = useRef(false);
@@ -387,8 +395,22 @@ export function FormSteps({
   const focusNext = useRef<string | null>(null);
   const titleId = useId();
   const historyKey = `x-govuk-ui-form-steps:${storageKey ?? titleId}`;
-  const reviewing = at >= count;
+  // Before any step is known, as when every step is in a wrapper of your own, nothing shows.
+  const ready = count > 0;
+  const reviewing = ready && at >= count;
   const step = steps[at];
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: answers are restored once, as the form first mounts.
+  useLayoutEffect(() => {
+    const saved = readSaved(storageKey);
+    if (!saved) return;
+    const answers: Record<string, string[]> = {};
+    for (const [name, value] of saved.answers) answers[name] = [...(answers[name] ?? []), value];
+    setPassed(new Set(saved.passed));
+    setSkipped(new Set(saved.skipped));
+    if (controlledStep === undefined) setAt(saved.at);
+    setRestored({ answers, round: 1 });
+  }, []);
 
   /** The steps that apply to the answers so far, in order, leaving out a step being skipped. */
   const planFor = (leaving?: number) => {
@@ -407,10 +429,10 @@ export function FormSteps({
     setPlan((current) => (current.join() === next.join() ? current : next));
     return next;
   };
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the plan is worked out once mounted, and again as steps come and go.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the plan is worked out once mounted, again as steps come and go, and again with restored answers.
   useLayoutEffect(() => {
     replan();
-  }, [count]);
+  }, [count, restored.round]);
 
   /** Keeps the answers and the step, when there is a key. */
   const remember = (where = at, passing = passed, skipping = skipped) => {
@@ -422,8 +444,8 @@ export function FormSteps({
   };
   const rememberSoon = useRef(0);
 
-  const go = (where: number, { push = true, route = replan(), skipping = skipped } = {}) => {
-    if (where >= count) setRows(route.flatMap((index) => summaryRows(index, skipping)));
+  const go = (where: number, { push = true } = {}) => {
+    replan();
     setAt(where);
     focusNext.current = where >= count ? "summary" : "step";
     if (historyOn && push)
@@ -434,7 +456,8 @@ export function FormSteps({
     const data = new FormData(form.current);
     // The step's questions in the page's order, leaving out any users cannot see.
     const place = (id: string) => document.getElementById(id);
-    const asked = [...(stepFields.current.get(index) ?? [])]
+    const id = registered[index]?.id;
+    const asked = [...((id && stepFields.current.get(id)) || [])]
       .filter(([, field]) => field.shown?.() !== false)
       .sort(([, a], [, b]) => {
         const [first, second] = [place(a.id), place(b.id)];
@@ -525,14 +548,22 @@ export function FormSteps({
     return () => cancelAnimationFrame(frame);
   }, [at, sent]);
 
+  // Check your answers lists the answers each time the form comes to it, however it does, such as
+  // by Continue, by a `step` given by the page, or by answers restored from an earlier visit.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are listed as the form arrives.
+  useLayoutEffect(() => {
+    if (reviewing && !sent) setRows(planFor().flatMap((index) => summaryRows(index, skipped)));
+  }, [reviewing, sent, restored.round]);
+
   // With history, the browser's Back and Forward move between the steps.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the listener is set once.
+  const goNow = useLatest(go);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the listener is set once, and calls the latest go.
   useEffect(() => {
     if (!historyOn) return;
     window.history.replaceState({ ...window.history.state, [historyKey]: at }, "");
     const moved = (event: PopStateEvent) => {
       const where = event.state?.[historyKey];
-      if (typeof where === "number") go(where, { push: false });
+      if (typeof where === "number") goNow.current(where, { push: false });
     };
     window.addEventListener("popstate", moved);
     return () => window.removeEventListener("popstate", moved);
@@ -593,7 +624,7 @@ export function FormSteps({
       // The last step sends the answers, without Check your answers.
       return finish(data, skipping);
     }
-    go(next, { route, skipping });
+    go(next);
     remember(next, passing, skipping);
   };
 
@@ -615,7 +646,11 @@ export function FormSteps({
       void finish(data, skipping);
       return;
     }
-    go(next, { route, skipping });
+    // The skipped step is disabled once the form renders again, so its answers stay out of the
+    // plan and Check your answers.
+    setAt(next);
+    focusNext.current = next >= count ? "summary" : "step";
+    if (historyOn) window.history.pushState({ ...window.history.state, [historyKey]: next }, "");
     remember(next, passing, skipping);
   };
 
@@ -686,7 +721,7 @@ export function FormSteps({
     ) : null;
 
   // The last press sends the answers, with the success sound once they are taken.
-  const submit = (
+  const submit = ready && (
     <Button
       type="submit"
       size={card ? "small" : undefined}
@@ -768,12 +803,12 @@ export function FormSteps({
   // skipped or not asked are disabled while out of sight, so their answers are not sent. A step
   // whose place is not known yet stays out of sight until it registers.
   const host: StepsHost = {
-    register,
+    registry,
     indexOf: (id) => {
       const index = registered.findIndex((entry) => entry.id === id);
       return index < 0 ? null : index;
     },
-    draw: (index, each, place) => (
+    draw: (id, index, each, place) => (
       <fieldset
         ref={place}
         role="presentation"
@@ -793,13 +828,9 @@ export function FormSteps({
           ))}
         {each.hint && <div className="x-govuk-ui-hint">{each.hint}</div>}
         <div className="x-govuk-ui-form-step-fields">
-          {index === null ? (
-            each.children
-          ) : (
-            <StepFields index={index} fields={stepFields}>
-              {each.children}
-            </StepFields>
-          )}
+          <StepFields step={id} fields={stepFields}>
+            {each.children}
+          </StepFields>
         </div>
       </fieldset>
     ),
@@ -843,13 +874,15 @@ export function FormSteps({
       {!card && backControl}
       <Form
         {...formProps}
+        // Restored answers start the form again, because each field reads its answer once.
+        key={restored.round}
         ref={form}
         className="x-govuk-ui-form-steps-form"
         // Pressing anywhere in it that is not a control puts focus in the form, so keys that work
         // across it, such as Choices' letters, reach it.
         tabIndex={-1}
         errorSummary={errorSummary}
-        defaultValues={restored}
+        defaultValues={restored.answers}
         validate={(data) => (reviewing || !step?.validate ? {} : step.validate(data))}
         onSubmit={(data) => onSubmit(data)}
         onKeyDown={onKeyDown}

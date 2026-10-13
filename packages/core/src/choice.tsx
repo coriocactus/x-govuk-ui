@@ -29,6 +29,7 @@ import {
 import { FieldsetLegend, type FieldsetProps, FieldsetRoot } from "./fieldset";
 import { duration, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
+import { type Registry, useRegister, useRegistry } from "./registry";
 
 /** The dot's jump eases in and out, so it lifts off gently and lands softly. */
 const jump = [0.33, 0, 0.25, 1] as const;
@@ -48,7 +49,8 @@ const jump = [0.33, 0, 0.25, 1] as const;
  *
  * Each part finds its group through context, so an answer can sit inside a wrapper of your own.
  * The shorthands number their direct children, as GOV.UK does, in the first HTML. An answer they
- * cannot number takes an id of its own, never the first answer's.
+ * cannot number takes an id of its own, never the first answer's. Numbering starts again in each
+ * group, so the answers of a group inside a follow-up question are numbered by their own group.
  */
 
 type Kind = "checkbox" | "radio";
@@ -63,8 +65,8 @@ type Group = {
   isChecked: (value: string) => boolean;
   choose: (value: string, checked: boolean, exclusive: boolean) => void;
   registerExclusive: (value: string) => () => void;
-  /** Tells the group each answer's control, so it can link its errors to the first one. */
-  registerControl: (control: HTMLInputElement | null, id: string) => void;
+  /** Where each answer's control registers its id, so the group can link its errors to the first. */
+  controls: Registry<string>;
   /** Each answer's label, by its value, for Check your answers. */
   labels: Map<string, ReactNode>;
   disabled: boolean;
@@ -120,32 +122,13 @@ function useGroupAnswer(name: string) {
 }
 
 /**
- * Where a group's errors link to. It is the group's id, unless no answer has it, as when every
- * answer sits in a wrapper of your own. It is then the first answer's id, in the page's order.
+ * Where a group's errors link to, which is the first answer's control, in the page's order. In the
+ * first HTML, before the answers register, it is the group's id, which the first direct child has.
  */
 function useLinkTarget(groupId: string) {
-  const controls = useRef(new Map<HTMLInputElement, string>());
-  const [first, setFirst] = useState<string | undefined>(undefined);
-  const [changes, setChanges] = useState(0);
-  const registerControl = useCallback((control: HTMLInputElement | null, id: string) => {
-    if (!control) return;
-    controls.current.set(control, id);
-    setChanges((count) => count + 1);
-    return () => {
-      controls.current.delete(control);
-      setChanges((count) => count + 1);
-    };
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: The order is read again as answers come and go.
-  useLayoutEffect(() => {
-    const all = [...controls.current];
-    if (all.some(([, id]) => id === groupId)) return setFirst(undefined);
-    all.sort(([a], [b]) =>
-      a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
-    );
-    setFirst(all[0]?.[1]);
-  }, [changes, groupId]);
-  return { linkTo: first, registerControl };
+  const { items, registry } = useRegistry<string>();
+  const first = items[0];
+  return { linkTo: first === groupId ? undefined : first, controls: registry };
 }
 
 type GroupProps = Omit<FieldsetProps, "children" | "onChange" | "defaultValue"> & {
@@ -252,7 +235,7 @@ export function RadiosRoot({
     isChecked: (item) => value === item,
     choose: (item) => setValue(item),
     registerExclusive: noExclusive,
-    registerControl: target.registerControl,
+    controls: target.controls,
     labels: summary.labels,
   };
   return (
@@ -263,7 +246,9 @@ export function RadiosRoot({
       name={name}
       linkTo={linkTo ?? target.linkTo}
     >
-      <GroupContext value={group}>{children}</GroupContext>
+      <GroupContext value={group}>
+        <ItemIndex value={null}>{children}</ItemIndex>
+      </GroupContext>
     </Field>
   );
 }
@@ -318,7 +303,7 @@ export function CheckboxesRoot({
       set([...value.filter((each) => !exclusive.current.has(each)), item]);
     },
     registerExclusive,
-    registerControl: target.registerControl,
+    controls: target.controls,
     labels: summary.labels,
   };
   return (
@@ -329,7 +314,9 @@ export function CheckboxesRoot({
       name={name}
       linkTo={linkTo ?? target.linkTo}
     >
-      <GroupContext value={group}>{children}</GroupContext>
+      <GroupContext value={group}>
+        <ItemIndex value={null}>{children}</ItemIndex>
+      </GroupContext>
     </Field>
   );
 }
@@ -704,13 +691,9 @@ export function ChoiceControl({
   const group = useGroup();
   const answer = useAnswer();
   const list = useContext(ListContext);
-  const { registerControl } = group;
-  const { controlId } = answer;
-  const register = useCallback(
-    (control: HTMLInputElement | null) => registerControl(control, controlId),
-    [registerControl, controlId],
-  );
-  const mergedRef = useMergedRef(register, ref);
+  const input = useRef<HTMLInputElement>(null);
+  useRegister(group.controls, answer.controlId, input);
+  const mergedRef = useMergedRef(input, ref);
   return (
     <>
       <input
@@ -750,8 +733,12 @@ export function ChoiceControl({
 export function ChoiceLabel({ className = "", ...props }: ComponentPropsWithRef<"label">) {
   const answer = useAnswer();
   const { labels } = useGroup();
+  const words = props.children;
   useLayoutEffect(() => {
-    labels.set(answer.value, props.children);
+    labels.set(answer.value, words);
+    return () => {
+      if (labels.get(answer.value) === words) labels.delete(answer.value);
+    };
   });
   return (
     // biome-ignore lint/a11y/noLabelWithoutControl: The answer gives htmlFor.

@@ -342,6 +342,25 @@ test("an answer in a wrapper of your own takes an id of its own, never the first
   expect(ids[3]).toBe("where-other");
   // Each label names its own answer.
   for (const id of ids) expect(html).toContain(`for="${id}"`);
+  // A group inside a follow-up question numbers its own answers, never by its outer answer's place.
+  const nested = renderToStaticMarkup(
+    <Radios id="contact" name="contact" legend="Contact?" defaultValue="phone">
+      <Radio
+        value="phone"
+        conditional={
+          <Radios id="when" name="when" legend="When?">
+            <Answer value="morning">Morning</Answer>
+            <Answer value="evening">Evening</Answer>
+          </Radios>
+        }
+      >
+        Phone
+      </Radio>
+    </Radios>,
+  );
+  const inner = [...nested.matchAll(/<input[^>]* id="([^"]+)"/g)].map((match) => match[1]);
+  expect(inner).toHaveLength(3);
+  expect(new Set(inner).size).toBe(3);
 });
 
 test("radios and checkboxes are their parts, so a composed group matches, and answers take element props", () => {

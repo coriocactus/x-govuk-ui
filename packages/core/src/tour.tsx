@@ -8,8 +8,6 @@ import {
   isValidElement,
   type KeyboardEvent,
   type ReactNode,
-  type RefObject,
-  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -30,6 +28,7 @@ import { useLabels } from "./labels";
 import { glideEasing, useMotionTiming } from "./motion";
 import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
 import { useMergedRef } from "./refs";
+import { type Registry, useRegister, useRegistry } from "./registry";
 import { useStoredState } from "./stored-state";
 
 export type TourStepProps = {
@@ -48,13 +47,8 @@ export type TourStepProps = {
   className?: string;
 };
 
-/** A step as its Tour knows it, with the empty element that marks its place among the others. */
-type Step = { props: RefObject<TourStepProps>; place: RefObject<HTMLSpanElement | null> };
-
-/** Where each step tells its Tour what it shows. */
-type StepRegistry = (step: Step) => () => void;
-
-const StepsContext = createContext<StepRegistry | null>(null);
+/** Where a Tour's steps register, each with its props. */
+const StepsContext = createContext<Registry<TourStepProps> | null>(null);
 
 /**
  * One step of a Tour. The Tour shows each step in turn, in the card. In its own place, the step
@@ -62,38 +56,24 @@ const StepsContext = createContext<StepRegistry | null>(null);
  * wrapper of your own.
  */
 export function TourStep(props: TourStepProps): ReactNode {
-  const register = useContext(StepsContext);
-  const latest = useRef(props);
-  latest.current = props;
   const place = useRef<HTMLSpanElement>(null);
-  useLayoutEffect(() => register?.({ props: latest, place }), [register]);
+  useRegister(useContext(StepsContext), props, place);
   return <span ref={place} hidden />;
 }
 
 /**
- * The steps of a Tour. Each TourStep tells the Tour its props once it renders, so a step in a
- * wrapper of your own counts. Until then, as the server renders, the Tour reads its direct
- * children.
+ * The steps of a Tour, in the page's order. Each TourStep registers its props once it renders, so
+ * a step in a wrapper of your own counts. Until then, as the server renders, the Tour reads its
+ * direct children.
  */
 function useSteps(children: ReactNode) {
-  const [registered, setRegistered] = useState<readonly Step[]>([]);
-  const register = useCallback<StepRegistry>((step) => {
-    // Steps take their places in the page's order, so one that appears later still comes first.
-    const order = (all: readonly Step[]) =>
-      [...all].sort((a, b) => {
-        const [first, second] = [a.place.current, b.place.current];
-        if (!first || !second) return 0;
-        return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
-      });
-    setRegistered((all) => order([...all, step]));
-    return () => setRegistered((all) => all.filter((each) => each !== step));
-  }, []);
+  const { items, registry } = useRegistry<TourStepProps>();
+  if (items.length > 0) return { steps: items, registry };
   const direct = Children.toArray(children)
     .filter(isValidElement)
     .filter((child) => child.type === TourStep)
     .map((child) => child.props as TourStepProps);
-  const steps = registered.length > 0 ? registered.map((step) => step.props.current) : direct;
-  return { steps, register };
+  return { steps: direct, registry };
 }
 
 // The card takes the other props, at every step.
@@ -233,22 +213,20 @@ export function Tour({
 }: TourProps) {
   const labels = useLabels("tour", defaultTourLabels, ownLabels);
   const stepLabel = labels.step;
-  const { steps, register } = useSteps(children);
-  const stepsNow = useRef(steps);
-  stepsNow.current = steps;
+  const { steps, registry } = useSteps(children);
   // How far someone got, in local storage with a key, or else in memory.
   const [progress, setProgress] = useStoredState<Progress>(storageKey, { step: 0, ended: null });
-  const firstStep = () => {
-    if (!resume || progress.ended === "finished") return 0;
-    return Math.max(0, Math.min(steps.length - 1, progress.step));
-  };
+  // The step is kept as asked for, and kept within the steps as it is read. Steps in a wrapper of
+  // your own register after the tour first renders, so the steps are not all known before then.
+  const firstStep = () => (!resume || progress.ended === "finished" ? 0 : progress.step);
   // A tour opened by default stays closed once someone has finished it, or ended it by closing.
   const [open, setOpen] = useControllableState(
     controlled,
     () => defaultOpen && progress.ended === null,
     onOpenChange,
   );
-  const [step, setStep] = useState(firstStep);
+  const [wanted, setStep] = useState(firstStep);
+  const step = Math.max(0, Math.min(steps.length - 1, wanted));
   // The step's target, or the middle of the screen for a step about the whole page.
   const [target, setTarget] = useState<Element | "middle" | null>(null);
   const [card, setCard] = useState<HTMLDivElement | null>(null);
@@ -266,7 +244,7 @@ export function Tour({
   const current = steps[step];
   const last = step === steps.length - 1;
   const centred = target === "middle";
-  const element = target instanceof Element ? target : null;
+  const element = target === "middle" ? null : target;
   const side = useCalloutSide(open, element, card, centred ? "top" : (current?.side ?? "auto"));
 
   // Opening starts at the first step, or where someone left it. Focus goes back to where it was
@@ -282,16 +260,17 @@ export function Tour({
     wasOpen.current = open;
   });
 
-  // Each step finds its target as it comes. A step whose target is not on the page is passed over,
-  // in the direction of travel.
+  // Each step finds its target as it comes, and again when the step's target changes. A step whose
+  // target is not on the page is passed over, in the direction of travel.
+  const count = steps.length;
+  const aim = current?.target;
   useLayoutEffect(() => {
-    if (!open) return;
-    const wanted = stepsNow.current[step]?.target;
-    if (wanted === undefined) {
+    if (!open || count === 0) return;
+    if (aim === undefined) {
       setTarget("middle");
       return;
     }
-    const found = resolveAnchor(wanted);
+    const found = resolveAnchor(aim);
     if (found) {
       setTarget(found);
       if (!inSight(found))
@@ -299,9 +278,9 @@ export function Tour({
       return;
     }
     const after = step + direction.current;
-    if (after >= 0 && after < stepsNow.current.length) setStep(after);
+    if (after >= 0 && after < count) setStep(after);
     else setOpen(false);
-  }, [open, step, reduced, setOpen]);
+  }, [open, step, aim, count, reduced, setOpen]);
 
   // The card glides from where it was to its next place. Base UI places it a moment after the
   // step changes, so the glide starts as it does, before the new place is ever drawn.
@@ -404,7 +383,7 @@ export function Tour({
 
   return (
     <>
-      <StepsContext value={register}>{children}</StepsContext>
+      <StepsContext value={registry}>{children}</StepsContext>
       {dim && (
         <Spotlight
           target={open ? (centred ? middle : element) : null}

@@ -21,6 +21,7 @@ export { useMediaQuery } from "./media-query";
 export { duration } from "./motion";
 export { Orb } from "./orb";
 export { useLatest, useMergedRef } from "./refs";
+export { type Registry, useRegister, useRegistry } from "./registry";
 export { renderTree } from "./rich-text";
 export { ScrollAreaBars } from "./scroll-area";
 export { type SoundVoice, soundFamilies, voicesOf } from "./sound";

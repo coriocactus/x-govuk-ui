@@ -47,7 +47,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added `answer` to Field, and `label` and `answer` to `useField`, which say how FormSteps' Check your answers lists the field. A bound Field's `Label` or `FieldsetLegend` gives its question. Without an `answer`, the summary shows what the field sends under its name. `FormField` is the type of what a field tells its Form.
 - Added `errorMessage` to Switch and Slider. Each now takes part in a Form by its `name`, so a Form's error shows on the field, and its error summary links to it.
 - Added the questions and answers of Combobox, MultiSelect, Slider, Switch, Date input and Time input to FormSteps' Check your answers. Combobox shows its option's label, Slider its value as it shows it, and Switch On or Off.
-- Added the ability to put a FormStep inside a wrapper of your own. Each FormStep now draws its own step, in its place, and FormSteps takes its steps in the page's order. A step in a wrapper shows once the page has loaded.
+- Added the ability to put a FormStep inside a wrapper of your own. Each FormStep now draws its own step, in its place, and FormSteps takes its steps in the page's order. A step in a wrapper shows once the page has loaded. Keep every step on the page, and give a step that applies only to some answers a `when`.
 - Added the ability to put a TourStep inside a wrapper of your own. Each TourStep now leaves an empty, hidden element in its place, which keeps its order among the Tour's steps.
 - Added `render` to Button, which renders another element with the Button's look, such as a link for GOV.UK's Start button, or a router's link.
 - Added CopyButton, an icon button that copies any text, such as a reference number. CodeBlockCopy and ConversationCopy are built on it.
@@ -84,7 +84,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
-- Fixed an answer in a wrapper of your own, inside Radios or Checkboxes, taking the first answer's id. Its label then named the wrong answer. Such an answer now takes an id of its own. When no answer has the group's id, a Form's error summary links to the first answer on the page.
+- Fixed an answer in a wrapper of your own, inside Radios or Checkboxes, taking the first answer's id. Its label then named the wrong answer. Such an answer now takes an id of its own, including in a group inside a follow-up question. A Form's error summary links to the first answer on the page.
+- Fixed FormSteps with a `storageKey` rendering different first HTML in the browser than on the server. Kept answers and the step now come back once the page has loaded, before it is drawn.
+- Fixed the browser's Back and Forward in FormSteps with `history` using the form as it was when the page loaded, such as which steps were skipped.
+- Fixed Tour failing to render on the server.
 - Fixed a SelectItem in a wrapper of your own showing its value in the field, in place of its label, once chosen. Its label now shows once the page has loaded. A direct child's label is in the first HTML, as before.
 - Fixed Radios' dot landing on a follow-up question's chosen radio instead of the group's own.
 - Fixed Select dropping its own `aria-describedby` and `aria-invalid`. It now describes its control by them, before its hint and error, as Input and Textarea do.

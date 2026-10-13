@@ -34,8 +34,11 @@ import {
 } from "react";
 import { duration, useMotionTiming } from "./motion";
 
-/** Whether content is worth showing. Text of only spaces counts as none. */
-const present = (node: ReactNode) =>
+/**
+ * Whether content is worth showing. Text of only spaces counts as none.
+ * @internal
+ */
+export const present = (node: ReactNode) =>
   typeof node === "string" ? node.trim() !== "" : Boolean(node) || node === 0;
 
 /**
@@ -116,8 +119,132 @@ export function useField({
   };
 }
 
-/** Contains a control with its label, hint and error message. */
+/** What a bound Field gives the parts inside it, which is `useField`'s result and its name. */
+type Bound = ReturnType<typeof useField> & { name?: string };
+
+const FieldContext = createContext<Bound | null>(null);
+
+/**
+ * The bound Field around a part, if there is one. Its parts take their ids from it.
+ * @internal
+ */
+export function useBoundField() {
+  return useContext(FieldContext);
+}
+
+/** The props a bound Field gives a control. */
+export type ControlBinding = {
+  id?: string;
+  name?: string;
+  "aria-describedby"?: string;
+  "aria-invalid"?: boolean | "true" | "false" | "grammar" | "spelling";
+};
+
+/**
+ * A control's props, completed by the bound Field around it, as a shorthand would complete them.
+ * Use it for a control of your own in a Field with `controlId`. The field gives the id and name
+ * wherever the props leave them out. The control's own descriptions come first, then the field's
+ * hint and error. An error makes the control invalid, whatever its props say. Outside a bound
+ * Field, the props are returned as given.
+ */
+export function useControlProps<T extends ControlBinding>(props: T): T & ControlBinding {
+  const field = useContext(FieldContext);
+  if (!field) return props;
+  const described = [props["aria-describedby"], field.controlProps["aria-describedby"]]
+    .join(" ")
+    .split(" ")
+    .filter(Boolean);
+  return {
+    ...props,
+    id: props.id ?? field.controlProps.id,
+    name: props.name ?? field.name,
+    "aria-describedby": [...new Set(described)].join(" ") || undefined,
+    "aria-invalid": field.controlProps["aria-invalid"] ?? props["aria-invalid"],
+  };
+}
+
+export type FieldProps = ComponentPropsWithRef<"div"> & {
+  /** Shows the field as invalid. A bound field works this out from its error, unless it is set. */
+  invalid?: boolean;
+  /**
+   * Binds the field to its control's id. Its `Label`, `Hint`, `ErrorMessage` and control then take
+   * their ids and descriptions from it, wherever their own props leave them out. A field composed
+   * from its parts then needs no `useField`. Leave it out to give each part its props yourself.
+   */
+  controlId?: string;
+  /** In a bound field, the name the control submits under. In a Form, it finds its error by it. */
+  name?: string;
+  /** In a bound field, where a Form's error summary links to, when not the control itself. */
+  linkTo?: string;
+  /**
+   * In a bound field, whether it has a hint, so its control is described by the hint's id. The
+   * field is told rather than finding out, so the description is in the first HTML.
+   */
+  hasHint?: boolean;
+  /** In a bound field, its own error, which shows in place of its Form's. */
+  errorMessage?: ReactNode;
+  /** In a bound field, the ids of your own descriptions, read before the hint and the error. */
+  describedBy?: string;
+};
+
+/**
+ * Contains a control with its label, hint and error message. Bound by `controlId`, it ties them
+ * together itself. A Field inside it is never bound to it.
+ */
 export function Field({
+  controlId,
+  name,
+  linkTo,
+  hasHint,
+  errorMessage,
+  describedBy,
+  ...props
+}: FieldProps) {
+  if (controlId === undefined)
+    return (
+      <FieldContext value={null}>
+        <FieldBox {...props} />
+      </FieldContext>
+    );
+  return (
+    <BoundField
+      {...props}
+      binding={{ id: controlId, name, linkTo, hasHint, errorMessage, describedBy }}
+    />
+  );
+}
+
+type Binding = {
+  id: string;
+  name?: string;
+  linkTo?: string;
+  hasHint?: boolean;
+  errorMessage?: ReactNode;
+  describedBy?: string;
+};
+
+/** A Field bound to its control's id, which ties its parts together through context. */
+function BoundField({
+  binding,
+  invalid,
+  ...props
+}: ComponentPropsWithRef<"div"> & { invalid?: boolean; binding: Binding }) {
+  const field = useField({
+    id: binding.id,
+    name: binding.name,
+    linkTo: binding.linkTo,
+    hint: binding.hasHint || undefined,
+    errorMessage: binding.errorMessage,
+    "aria-describedby": binding.describedBy,
+  });
+  return (
+    <FieldContext value={{ ...field, name: binding.name }}>
+      <FieldBox {...props} invalid={invalid ?? field.invalid} />
+    </FieldContext>
+  );
+}
+
+function FieldBox({
   invalid = false,
   className = "",
   ...props
@@ -136,22 +263,32 @@ export type LabelProps = ComponentPropsWithRef<"label"> & {
   visuallyHidden?: boolean;
 };
 
-/** Names a control. Pass the control's id as `htmlFor`. */
+/** Names a control. Pass the control's id as `htmlFor`, unless a bound Field gives it. */
 export function Label({ visuallyHidden = false, className = "", ...props }: LabelProps) {
+  const field = useContext(FieldContext);
   return (
-    // biome-ignore lint/a11y/noLabelWithoutControl: The caller passes htmlFor.
+    // biome-ignore lint/a11y/noLabelWithoutControl: The caller or a bound Field passes htmlFor.
     <label
       {...props}
+      htmlFor={props.htmlFor ?? field?.id}
       className={`x-govuk-ui-label${visuallyHidden ? " x-govuk-ui-visually-hidden" : ""} ${className}`.trim()}
     />
   );
 }
 
-/** Guidance between the label and the control. Renders nothing without content. */
+/**
+ * Guidance between the label and the control. Renders nothing without content. In a bound Field,
+ * it takes the field's hint id.
+ */
 export function Hint({ className = "", children, ...props }: ComponentPropsWithRef<"div">) {
+  const field = useContext(FieldContext);
   if (!present(children)) return null;
   return (
-    <div {...props} className={`x-govuk-ui-hint ${className}`.trim()}>
+    <div
+      {...props}
+      id={props.id ?? field?.hintId}
+      className={`x-govuk-ui-hint ${className}`.trim()}
+    >
       {children}
     </div>
   );
@@ -164,10 +301,19 @@ export type ErrorMessageProps = ComponentPropsWithRef<"p">;
  * What went wrong and how to fix it, between the hint and the control, as GOV.UK places it. It
  * opens and closes smoothly, so the control moves rather than jumps. GOV.UK's message is not a
  * live region, because its errors arrive with a new page. Ours can appear without a new page, so
- * screen readers announce it. It renders nothing without content.
+ * screen readers announce it. It renders nothing without content. In a bound Field, it takes the
+ * field's error id, and shows the field's own error, or its Form's, when it is given none.
  */
-export function ErrorMessage({ id, children, className = "", ...props }: ErrorMessageProps) {
+export function ErrorMessage({
+  id: ownId,
+  children: given,
+  className = "",
+  ...props
+}: ErrorMessageProps) {
   const timing = useMotionTiming();
+  const field = useContext(FieldContext);
+  const id = ownId ?? field?.errorId;
+  const children = given ?? field?.errorMessage;
   return (
     <AnimatePresence initial={false}>
       {present(children) && (

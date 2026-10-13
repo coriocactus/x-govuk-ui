@@ -37,6 +37,7 @@ import {
   Switch,
   Textarea,
   TimeInput,
+  useControlProps,
   useField,
   validateWith,
 } from "x-govuk-ui";
@@ -96,6 +97,51 @@ test("field parts connect any control to its label, hint and error", () => {
   );
   expect(otp).toContain('for="code"');
   expect(otp).toContain('aria-describedby="code-hint code-error"');
+});
+
+test("a bound field gives its parts and a control of your own their ids, and its Form's error", () => {
+  function Control(props: { "aria-describedby"?: string }) {
+    return <select {...useControlProps(props)} />;
+  }
+  const bound = (errorMessage?: string, own?: string) =>
+    renderToStaticMarkup(
+      <Field controlId="reference" name="reference" hasHint errorMessage={errorMessage}>
+        <Label>Reference</Label>
+        <Hint>It is on your letter.</Hint>
+        <ErrorMessage />
+        <Control aria-describedby={own} />
+      </Field>,
+    );
+  const valid = bound();
+  expect(valid).toContain('<label for="reference"');
+  expect(valid).toContain('id="reference-hint"');
+  expect(valid).toContain(
+    '<select aria-describedby="reference-hint" id="reference" name="reference">',
+  );
+  expect(valid).not.toContain("data-invalid");
+  const invalid = bound("Enter your reference.", "terms");
+  expect(invalid).toContain('data-invalid="true"');
+  expect(invalid).toContain('id="reference-error" role="alert"');
+  expect(invalid).toContain(
+    'aria-describedby="terms reference-hint reference-error" id="reference" name="reference" aria-invalid="true"',
+  );
+  // A field inside a bound field is never bound to it.
+  const nested = renderToStaticMarkup(
+    <Field controlId="outer">
+      <Field>
+        <Label htmlFor="inner">Inner</Label>
+      </Field>
+      <Field>
+        <Label>Unbound</Label>
+      </Field>
+    </Field>,
+  );
+  expect(nested).toContain('for="inner"');
+  expect(nested).not.toContain('for="outer"');
+  // Outside a bound field, a control's props are as given.
+  expect(renderToStaticMarkup(<Control aria-describedby="own" />)).toBe(
+    '<select aria-describedby="own"></select>',
+  );
 });
 
 test("inputs generate distinct IDs and escape content during server rendering", () => {

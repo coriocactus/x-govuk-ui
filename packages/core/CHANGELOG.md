@@ -4,6 +4,11 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Added
+
+- Added `controlId` to Field, which binds it to its control. A bound Field gives its `Label`, `Hint` and `ErrorMessage` their ids, and shows its own `errorMessage`, or its Form's error by its `name`. A field composed from its parts then needs no `useField`. `hasHint`, `linkTo` and `describedBy` say the rest. A Field without `controlId` works as before.
+- Added `useControlProps`, which gives a control of your own the id, name and descriptions of the bound Field around it.
+
 ## [0.3.0] - 2026-10-10
 
 ### Breaking Changes

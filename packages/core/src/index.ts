@@ -204,13 +204,16 @@ export {
 export { ExitThisPage, type ExitThisPageProps } from "./exit-this-page";
 export { Feedback, type FeedbackProps, type FeedbackReport } from "./feedback";
 export {
+  type ControlBinding,
   ErrorMessage,
   type ErrorMessageProps,
   Field,
+  type FieldProps,
   Hint,
   Label,
   type LabelProps,
   type UseFieldOptions,
+  useControlProps,
   useField,
   useFormDefault,
 } from "./field";

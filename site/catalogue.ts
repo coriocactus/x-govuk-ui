@@ -805,15 +805,24 @@ const entries = {
     upstream: "error-message",
     dependencies: "React",
     changes:
-      "Field, Label, Hint and ErrorMessage are the parts every field in the library is built from, and useField connects a control to them with GOV.UK's ids. The example builds a field the library does not have yet around Base UI's NumberField.",
+      "Field, Label, Hint and ErrorMessage are the parts every field in the library is built from, with GOV.UK's ids. Given controlId, the Field gives its parts their ids, and useControlProps gives a control of your own its descriptions. Without controlId, useField gives the same ids to a field wired by hand. The example builds a field the library does not have yet around Base UI's NumberField.",
     props: [
       text("label", "How many people live in your home?", { type: "ReactNode" }),
       text("hint", "Include yourself and any children.", { type: "ReactNode" }),
       text("errorMessage", "", { note: "Clearing the number shows an error too." }),
-      reference("Field", "{ invalid, children }", "Part"),
+      reference(
+        "Field",
+        "{ controlId, name, hasHint, errorMessage, linkTo, describedBy, invalid, children }",
+        "Part",
+      ),
       reference("Label", "{ htmlFor, visuallyHidden }", "Part"),
       reference("Hint", "{ id, children }", "Part"),
       reference("ErrorMessage", "{ id, children }", "Part"),
+      reference(
+        "useControlProps",
+        "props → props with the bound Field's id and descriptions",
+        "Hook",
+      ),
       reference("useField", "{ id, hint, errorMessage } → { id, controlProps, … }", "Hook"),
     ],
   },

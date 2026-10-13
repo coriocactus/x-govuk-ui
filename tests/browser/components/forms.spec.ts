@@ -163,6 +163,9 @@ test("a form in stages saves as it goes, shows server errors, reveals follow-ups
   await playground.set("remember", true);
   await frame.getByRole("radio", { name: "Neither satisfied nor dissatisfied" }).check();
   await frame.getByRole("button", { name: "Submit and continue" }).click();
+  // The step's first answer takes focus a frame after the step comes, so typing waits for it, as
+  // a person's would. Typing before then would go to the answer that takes focus.
+  await expect(frame.getByRole("radio", { name: "Yes" })).toBeFocused();
   await frame.getByLabel("How could we improve this service?").fill("Keep it short.");
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? ""))

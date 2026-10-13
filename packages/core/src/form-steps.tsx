@@ -488,7 +488,6 @@ export function FormSteps({
       empty,
     });
   };
-  const rememberSoon = useRef(0);
 
   const go = (where: number, { push = true } = {}) => {
     replan();
@@ -941,13 +940,11 @@ export function FormSteps({
         onSubmit={(data) => onSubmit(data)}
         onKeyDown={chain(givenKeyDown, onKeyDown)}
         // Keeping the answers and working out the steps again follow every change, whatever a
-        // service's own handlers do.
+        // service's own handlers do. Each change is kept at once, with the step the form is on, so
+        // nothing kept later can name a step the form has left.
         onInput={both(givenInput, () => {
-          window.clearTimeout(rememberSoon.current);
-          rememberSoon.current = window.setTimeout(() => {
-            replan();
-            remember();
-          }, 300);
+          replan();
+          remember();
         })}
         onChange={both(givenChange, () => replan())}
       >

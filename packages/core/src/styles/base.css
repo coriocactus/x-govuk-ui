@@ -37,7 +37,12 @@
   --x-govuk-ui-code-string: var(--x-govuk-ui-green);
   --x-govuk-ui-code-entity: var(--x-govuk-ui-link);
   --x-govuk-ui-code-property: var(--x-govuk-ui-magenta-shade-25);
-
+  /* The shade over the page behind a dialog, a sheet, the command menu or a tour. */
+  --x-govuk-ui-backdrop: rgb(11 12 12 / 44%);
+}
+/* Tokens that are the same in every theme. They are set once, on the page, so a service's own
+   values reach a part of the page in another theme too. */
+:root {
   /* Motion. Two curves and four durations, which src/motion.ts repeats for Motion, and a curve
      and a duration that only CSS uses. Looping animations and staggers keep their own timing. */
   /* Things arriving, settling and gliding into place. */
@@ -73,13 +78,12 @@
   --x-govuk-ui-shadow-popup: 0 8px 28px rgb(11 12 12 / 16%);
   /* Dialogs, which sit above everything else. */
   --x-govuk-ui-shadow-dialog: 0 24px 64px rgb(11 12 12 / 28%);
-  /* The shade over the page behind a dialog, a sheet or the command menu. */
-  --x-govuk-ui-backdrop: rgb(11 12 12 / 44%);
 
   /* Corners. GOV.UK Frontend's corners are square. Ours are softened, in four steps by what a part
      is. Set all four to 0 for GOV.UK Frontend's square corners. A corner inside a border follows
-     the corner around it. Circles and pills keep their shape, and so do small marks, such as a
-     chart's key. */
+     the corner around it, and a part rounder than its step, such as One-time code's slots, stays
+     rounder in proportion. Circles and pills keep their shape, as do small marks, such as a
+     chart's key, and chat bubbles, which take --x-govuk-ui-bubble-radius. */
   /* Small parts, such as items in lists and menus, tags, keys, tooltips and toasts. */
   --x-govuk-ui-radius-small: 4px;
   /* Buttons, fields and what they are made of, such as a check box. */
@@ -115,6 +119,8 @@
   --x-govuk-ui-code-string: var(--x-govuk-ui-green-tint-50);
   --x-govuk-ui-code-entity: var(--x-govuk-ui-link);
   --x-govuk-ui-code-property: var(--x-govuk-ui-magenta-tint-50);
+  /* Deeper on the dark page, where a lighter shade hardly shows. */
+  --x-govuk-ui-backdrop: rgb(0 0 0 / 58%);
 }
 /* An inverse part of the page, such as a header or a sidebar's head, set on GOV.UK's black like
    GOV.UK's own header. It takes the dark theme's colours and rules, on GOV.UK's black, with white

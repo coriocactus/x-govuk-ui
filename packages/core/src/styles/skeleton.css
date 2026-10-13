@@ -37,7 +37,7 @@
 }
 .x-govuk-ui-skeleton[data-variant="block"] {
   height: 48px;
-  border-radius: 6px;
+  border-radius: var(--x-govuk-ui-radius-surface);
 }
 .x-govuk-ui-skeleton[data-variant="circle"] {
   width: 40px;

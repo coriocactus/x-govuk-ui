@@ -52,7 +52,7 @@
   height: 28px;
   margin: 0;
   border: 2px solid var(--x-govuk-ui-border);
-  border-radius: 14px;
+  border-radius: 999px;
   background: var(--x-govuk-ui-paper);
   cursor: pointer;
   transition:
@@ -106,7 +106,7 @@
 .x-govuk-ui-switch-control[data-size="small"] {
   width: 36px;
   height: 22px;
-  border-radius: 11px;
+  border-radius: 999px;
 }
 .x-govuk-ui-switch-control[data-size="small"]::before {
   right: 15px;

@@ -12,7 +12,7 @@
 .x-govuk-ui-message-scroller[data-framed] {
   height: 100%;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 12px;
+  border-radius: var(--x-govuk-ui-radius-large);
   background: var(--x-govuk-ui-paper);
   overflow: clip;
 }

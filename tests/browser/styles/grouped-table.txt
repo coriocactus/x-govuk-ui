@@ -59,10 +59,10 @@
   padding-right: 5px
   padding-left: 5px
   min-width: 20px
-  border-top-left-radius: 10px
-  border-top-right-radius: 10px
-  border-bottom-right-radius: 10px
-  border-bottom-left-radius: 10px
+  border-top-left-radius: 999px
+  border-top-right-radius: 999px
+  border-bottom-right-radius: 999px
+  border-bottom-left-radius: 999px
 .x-govuk-ui-grouped-table-group
   display: block
   font-size: 16px

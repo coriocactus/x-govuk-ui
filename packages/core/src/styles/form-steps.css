@@ -167,7 +167,8 @@ h4.x-govuk-ui-form-steps-review-title {
   place-items: center;
   width: 28px;
   height: 28px;
-  border-radius: 7px;
+  /* An icon's tile, rounder than a small part, in proportion, so it squares with the rest. */
+  border-radius: calc(var(--x-govuk-ui-radius-small) * 1.75);
   background: color-mix(in srgb, var(--x-govuk-ui-brand) 12%, var(--x-govuk-ui-paper));
   color: var(--x-govuk-ui-brand);
 }

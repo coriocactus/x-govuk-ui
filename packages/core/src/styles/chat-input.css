@@ -5,7 +5,8 @@
   gap: 4px;
   padding: 10px 10px 8px 14px;
   border: 1.5px solid var(--x-govuk-ui-border);
-  border-radius: 14px;
+  /* Rounder than a large box, in proportion, so it squares with the rest. */
+  border-radius: calc(var(--x-govuk-ui-radius-large) * 1.4);
   background: var(--x-govuk-ui-paper);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
@@ -65,7 +66,7 @@
   align-items: end;
   column-gap: 8px;
   padding: 6px 6px 6px 14px;
-  /* Input's corners, a touch rounder, so Send's sit inside them. */
+  /* A field's corners, as Input's. */
   border-radius: var(--x-govuk-ui-radius-control);
 }
 .x-govuk-ui-chat-input[data-layout="inline"] .x-govuk-ui-chat-input-attachments {

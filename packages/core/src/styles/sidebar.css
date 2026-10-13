@@ -193,7 +193,7 @@
   gap: 7px;
   border-width: 1px;
   border-color: var(--x-govuk-ui-line);
-  border-radius: 6px;
+  border-radius: var(--x-govuk-ui-radius-control);
   background: var(--x-govuk-ui-paper);
   font-size: 14px;
 }

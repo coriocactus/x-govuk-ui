@@ -10,7 +10,7 @@
 .x-govuk-ui-filter-chips-track {
   position: absolute;
   z-index: 0;
-  border-radius: 17px;
+  border-radius: 999px;
   background: var(--x-govuk-ui-brand);
   pointer-events: none;
 }
@@ -23,7 +23,7 @@
   height: 34px;
   padding: 0 14px 0 10px;
   border: 1px solid var(--x-govuk-ui-border);
-  border-radius: 17px;
+  border-radius: 999px;
   background: transparent;
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
@@ -41,7 +41,7 @@
 }
 .x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chips-track,
 .x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chip {
-  border-radius: 14px;
+  border-radius: 999px;
 }
 .x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chip {
   gap: 4px;
@@ -96,7 +96,7 @@
 .x-govuk-ui-filter-chip-count {
   min-width: 18px;
   padding: 1px 5px;
-  border-radius: 9px;
+  border-radius: 999px;
   background: var(--x-govuk-ui-secondary);
   color: var(--x-govuk-ui-text);
   font-size: 13px;

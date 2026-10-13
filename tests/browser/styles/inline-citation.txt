@@ -11,10 +11,10 @@
   margin-left: 2px
   row-gap: 4px
   column-gap: 4px
-  border-top-left-radius: 10px
-  border-top-right-radius: 10px
-  border-bottom-right-radius: 10px
-  border-bottom-left-radius: 10px
+  border-top-left-radius: 999px
+  border-top-right-radius: 999px
+  border-bottom-right-radius: 999px
+  border-bottom-left-radius: 999px
 .x-govuk-ui-inline-citation-mark
   display: grid
   font-size: 9px

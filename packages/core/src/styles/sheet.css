@@ -60,7 +60,7 @@
 }
 .x-govuk-ui-sheet[data-side="bottom"] {
   bottom: 0;
-  border-radius: 12px 12px 0 0;
+  border-radius: var(--x-govuk-ui-radius-large) var(--x-govuk-ui-radius-large) 0 0;
 }
 .x-govuk-ui-sheet-backdrop:is([data-starting-style], [data-ending-style]) {
   opacity: 0;

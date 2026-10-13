@@ -61,8 +61,9 @@
   scale: 0.96;
 }
 /* The dimming is one rounded gap whose shadow covers the page. Only the gap moves, so the page
-   beneath it still takes presses. Set its colour with --x-govuk-ui-tour-dim, and the gap's corners
-   with --x-govuk-ui-tour-radius. It lies just beneath the overlays, as a layer of its own among
+   beneath it still takes presses. It is the shade behind a dialog, --x-govuk-ui-backdrop, unless
+   --x-govuk-ui-tour-dim gives a colour of its own. --x-govuk-ui-tour-radius sets the gap's
+   corners. It lies just beneath the overlays, as a layer of its own among
    them, even when it is turned on after the step has opened. */
 .x-govuk-ui-tour-spotlight {
   position: fixed;
@@ -70,7 +71,7 @@
   left: 0;
   z-index: calc(var(--x-govuk-ui-layer-overlay) - 1);
   border-radius: var(--x-govuk-ui-tour-radius, var(--x-govuk-ui-radius-large));
-  box-shadow: 0 0 0 200vmax var(--x-govuk-ui-tour-dim, rgb(11 12 12 / 48%));
+  box-shadow: 0 0 0 200vmax var(--x-govuk-ui-tour-dim, var(--x-govuk-ui-backdrop));
   pointer-events: none;
   transition: opacity var(--x-govuk-ui-duration-medium) ease;
 }
@@ -81,11 +82,6 @@
 }
 .x-govuk-ui-tour-spotlight[data-closing] {
   opacity: 0;
-}
-@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
-  :scope .x-govuk-ui-tour-spotlight {
-    box-shadow: 0 0 0 200vmax var(--x-govuk-ui-tour-dim, rgb(0 0 0 / 58%));
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .x-govuk-ui-tour-step {

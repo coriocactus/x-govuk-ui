@@ -16,7 +16,7 @@
   --x-govuk-ui-callout-ink: var(--x-govuk-ui-white, #fff);
   border-color: var(--x-govuk-ui-brand);
   background: var(--x-govuk-ui-brand);
-  box-shadow: 0 10px 32px rgb(11 12 12 / 22%);
+  box-shadow: var(--x-govuk-ui-shadow-popup);
   color: var(--x-govuk-ui-callout-ink);
 }
 @scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {

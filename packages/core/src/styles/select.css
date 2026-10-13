@@ -49,7 +49,7 @@
   overflow-y: auto;
   padding: 4px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 6px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
   box-shadow: var(--x-govuk-ui-shadow-popup);
   color: var(--x-govuk-ui-text);

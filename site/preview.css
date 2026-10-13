@@ -237,7 +237,7 @@
   gap: 2px;
   padding: 12px 14px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 6px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   font-size: 16px;
   cursor: context-menu;
   transition: background var(--x-govuk-ui-duration-fast) ease;
@@ -444,7 +444,7 @@
 }
 .preview-calendar .x-govuk-ui-calendar {
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
 }
 .preview-calendar .preview-message {
   text-align: center;
@@ -653,7 +653,7 @@
   gap: 32px;
 }
 .preview-ratio {
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
 }
 .preview-aside {
   display: grid;
@@ -779,7 +779,7 @@
 .preview-app {
   height: 480px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
 }
 .preview-app[data-side="right"] {
   flex-direction: row-reverse;

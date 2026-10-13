@@ -93,7 +93,7 @@
   height: 20px;
   padding: 0 5px;
   box-sizing: border-box;
-  border-radius: var(--x-govuk-ui-radius-large);
+  border-radius: 999px;
   background: var(--x-govuk-ui-secondary);
   color: var(--x-govuk-ui-muted);
   font-size: 13px;

@@ -212,6 +212,49 @@ async function overflowing(page: Page) {
   });
 }
 
+/**
+ * The parts in the preview that keep rounded corners with every token for corners at 0, as
+ * "class corner". GOV.UK Frontend's corners are square, and the tokens promise a service can have
+ * them. Circles and pills keep their shape, as a box rounded by half its height or more. Small
+ * marks of 3px or less keep theirs, and so do chat bubbles, which take a token of their own.
+ */
+async function rounded(page: Page) {
+  return page.evaluate(() => {
+    const square = document.createElement("style");
+    square.textContent = `:root {
+      --x-govuk-ui-radius-small: 0px;
+      --x-govuk-ui-radius-control: 0px;
+      --x-govuk-ui-radius-surface: 0px;
+      --x-govuk-ui-radius-large: 0px;
+    }`;
+    document.head.append(square);
+    const corners = [
+      "borderTopLeftRadius",
+      "borderTopRightRadius",
+      "borderBottomRightRadius",
+      "borderBottomLeftRadius",
+    ] as const;
+    const out = new Set<string>();
+    for (const element of document.querySelectorAll<HTMLElement>(
+      ".preview-stage [class*='x-govuk-ui-']",
+    )) {
+      if (element.closest(".x-govuk-ui-bubble-content")) continue;
+      const style = getComputedStyle(element);
+      const box = element.getBoundingClientRect();
+      for (const corner of corners) {
+        const value = style[corner];
+        if (value.includes("%")) continue;
+        const radius = Number.parseFloat(value);
+        if (!radius || radius <= 3 || radius >= Math.min(box.width, box.height) / 2 - 0.5) continue;
+        const name = [...element.classList].find((each) => each.startsWith("x-govuk-ui-"));
+        out.add(`${name} ${value}`);
+      }
+    }
+    square.remove();
+    return [...out];
+  });
+}
+
 // The site's pages, the workbench's own page and every component's page.
 const pages = [
   ["the front page", "/"],
@@ -255,6 +298,7 @@ for (const [name, path] of pages) {
         await still.goto(path);
         await ready(still);
         expect(await styles(still, name)).toMatchSnapshot(`${name}.txt`);
+        expect(await rounded(still), "rounded with the corners' tokens at 0").toEqual([]);
         await still.close();
       });
     await test.step("colours contrast in dark", async () => {

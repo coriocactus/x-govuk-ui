@@ -21,7 +21,7 @@ import { trackHighlight } from "./highlight";
 import { Kbd } from "./kbd";
 import { useLabels } from "./labels";
 import { duration, easeOut, useMotionTiming } from "./motion";
-import { useLatest } from "./refs";
+import { useLatest, useMergedRef } from "./refs";
 import { ScrollArea } from "./scroll-area";
 import { shortcutKeys } from "./shortcut";
 import { useScopeSound } from "./sound-scope";
@@ -339,10 +339,13 @@ export function CommandMenuTrigger({
     return (
       <Dialog.Trigger
         {...withoutButtonLook(props)}
+        className={className || undefined}
         render={render}
         disabled={disabled}
         aria-keyshortcuts={shortcuts}
-      />
+      >
+        {children}
+      </Dialog.Trigger>
     );
   return (
     <Dialog.Trigger
@@ -380,6 +383,7 @@ export function CommandMenuContent({
   placeholder: ownPlaceholder,
   finalFocus,
   className = "",
+  ref,
   ...props
 }: CommandMenuContentProps) {
   const {
@@ -400,12 +404,13 @@ export function CommandMenuContent({
     back,
   } = useShared("CommandMenuContent");
   const placeholder = ownPlaceholder ?? labels.search;
+  const popupRef = useMergedRef(popup, ref);
   return (
     <Dialog.Portal>
       <Dialog.Backdrop className="x-govuk-ui-command-menu-backdrop" />
       <Dialog.Popup
-        ref={popup}
         {...props}
+        ref={popupRef}
         className={`x-govuk-ui-command-menu-popup ${className}`.trim()}
         // SoundScope plays the command cue for its options.
         data-sound-list="command"

@@ -3,6 +3,8 @@ import type { ComponentPropsWithRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   Button,
+  Callout,
+  CalloutTrigger,
   CommandMenu,
   CommandMenuTrigger,
   ContextMenu,
@@ -111,29 +113,66 @@ test("a callout takes the side where it fits and covers least, then the one with
 });
 
 test("a trigger given another element opens its overlay from it, with none of the Button's look", () => {
+  // Each trigger passes its own content, class and name to the element, as Popover's does.
   const row = <button type="button" className="row" />;
   const triggers = {
     DialogTrigger: (
       <Dialog>
-        <DialogTrigger render={row}>Open</DialogTrigger>
+        <DialogTrigger render={row} className="mine">
+          Open
+        </DialogTrigger>
       </Dialog>
     ),
     PopoverTrigger: (
       <Popover>
-        <PopoverTrigger render={row}>Open</PopoverTrigger>
+        <PopoverTrigger render={row} className="mine">
+          Open
+        </PopoverTrigger>
       </Popover>
     ),
     SheetTrigger: (
       <Sheet>
-        <SheetTrigger render={row}>Open</SheetTrigger>
+        <SheetTrigger render={row} className="mine">
+          Open
+        </SheetTrigger>
       </Sheet>
     ),
     DropdownMenuTrigger: (
       <DropdownMenu>
-        <DropdownMenuTrigger render={row}>Open</DropdownMenuTrigger>
+        <DropdownMenuTrigger render={row} className="mine">
+          Open
+        </DropdownMenuTrigger>
       </DropdownMenu>
     ),
-    CommandMenu: (
+    CommandMenuTrigger: (
+      <CommandMenu>
+        <CommandMenuTrigger render={row} className="mine">
+          Open
+        </CommandMenuTrigger>
+      </CommandMenu>
+    ),
+    CalloutTrigger: (
+      <Callout>
+        <CalloutTrigger render={row} className="mine" label="Help with tax">
+          Open
+        </CalloutTrigger>
+      </Callout>
+    ),
+  };
+  for (const [name, element] of Object.entries(triggers)) {
+    const html = renderToStaticMarkup(element);
+    const plain =
+      /<button[^>]*class="row mine"[^>]*>Open<\/button>/.test(html) &&
+      !/x-govuk-ui-(button|chevron|dropdown-trigger|command-menu-trigger|callout-trigger)/.test(
+        html,
+      );
+    expect(`${name}: ${plain}`).toBe(`${name}: true`);
+  }
+  // A help button keeps the name it is given.
+  expect(renderToStaticMarkup(triggers.CalloutTrigger)).toContain('aria-label="Help with tax"');
+  // An element given its own content keeps it.
+  expect(
+    renderToStaticMarkup(
       <CommandMenu>
         <CommandMenuTrigger
           render={
@@ -142,16 +181,9 @@ test("a trigger given another element opens its overlay from it, with none of th
             </button>
           }
         />
-      </CommandMenu>
+      </CommandMenu>,
     ),
-  };
-  for (const [name, element] of Object.entries(triggers)) {
-    const html = renderToStaticMarkup(element);
-    const plain =
-      /<button[^>]*class="row"[^>]*>Open<\/button>/.test(html) &&
-      !/x-govuk-ui-(button|chevron|dropdown-trigger|command-trigger)/.test(html);
-    expect(`${name}: ${plain}`).toBe(`${name}: true`);
-  }
+  ).toMatch(/<button[^>]*>Open<\/button>/);
   // Without one, each is the library's Button.
   const button = renderToStaticMarkup(
     <DropdownMenu>

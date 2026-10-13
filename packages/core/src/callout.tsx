@@ -225,6 +225,8 @@ type CalloutState = {
   anchor?: CalloutAnchor;
   /** Whether a CalloutTrigger opens it, so it is help that users asked for. */
   asked: boolean;
+  /** The same, as it is now, for Base UI to read as the callout opens. */
+  askedNow: RefObject<boolean>;
   trigger: RefObject<HTMLButtonElement | null>;
   registerTrigger: () => () => void;
 };
@@ -280,12 +282,13 @@ export function Callout({
   const trigger = useRef<HTMLButtonElement>(null);
   const [triggers, setTriggers] = useState(0);
   const asked = triggers > 0;
+  const askedNow = useLatest(asked);
   const registerTrigger = useCallback(() => {
     setTriggers((count) => count + 1);
     return () => setTriggers((count) => count - 1);
   }, []);
   return (
-    <CalloutContext value={{ open, setOpen, anchor, asked, trigger, registerTrigger }}>
+    <CalloutContext value={{ open, setOpen, anchor, asked, askedNow, trigger, registerTrigger }}>
       <Primitive.Root
         open={open}
         onOpenChange={(next, details) => {
@@ -358,7 +361,7 @@ export function CalloutContent({
   onBlur,
   ...props
 }: CalloutContentProps) {
-  const { open, setOpen, anchor, asked, trigger } = useCallout("CalloutContent");
+  const { open, setOpen, anchor, asked, askedNow, trigger } = useCallout("CalloutContent");
   const play = useScopeSound();
   const [target, setTarget] = useState<Element | null>(null);
   const [card, setCard] = useState<HTMLDivElement | null>(null);
@@ -476,8 +479,10 @@ export function CalloutContent({
             className={`x-govuk-ui-floating x-govuk-ui-callout ${className}`.trim()}
             data-variant={variant}
             data-held={held || undefined}
-            initialFocus={asked ? undefined : false}
-            finalFocus={asked ? undefined : false}
+            // Help that users asked for takes focus, and gives it back. A notice leaves it where it
+            // is. Base UI reads this as the callout opens, by when its trigger has registered.
+            initialFocus={() => askedNow.current}
+            finalFocus={() => askedNow.current}
             onPointerEnter={(event) => {
               onPointerEnter?.(event);
               setPointed(true);
@@ -551,17 +556,28 @@ export function CalloutTrigger({
   label: ownLabel,
   render,
   className = "",
+  ref,
   ...props
 }: CalloutTriggerProps) {
   const words = useLabels("callout", defaultCalloutLabels);
   const label = ownLabel ?? words.help;
   const { trigger, registerTrigger } = useCallout("CalloutTrigger");
+  const triggerRef = useMergedRef(trigger, ref);
   useLayoutEffect(() => registerTrigger(), [registerTrigger]);
+  // Another element keeps its own content, and takes a name only when it is given one.
   if (render)
-    return <Primitive.Trigger ref={trigger} {...withoutButtonLook(props)} render={render} />;
+    return (
+      <Primitive.Trigger
+        {...withoutButtonLook(props)}
+        ref={triggerRef}
+        aria-label={ownLabel}
+        className={className || undefined}
+        render={render}
+      />
+    );
   return (
     <Primitive.Trigger
-      ref={trigger}
+      ref={triggerRef}
       render={
         <Button
           variant="quiet"

@@ -72,6 +72,7 @@ function OnePage({ errorTitle = "There is a problem", titlePrefix = true }: Prop
       feedbackUrl="#feedback"
       back="#previous"
       column="three-quarters"
+      crest="/assets/images/govuk-crest.svg"
       footerLinks={
         <>
           <FooterLink href="#help">Help</FooterLink>

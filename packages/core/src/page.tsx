@@ -3,7 +3,7 @@
 import type { ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
 import type { AnchorProps } from "./anchor";
 import { BackLink } from "./back-link";
-import { Footer, FooterLinks } from "./footer";
+import { Footer, FooterLinks, type FooterProps } from "./footer";
 import { Header } from "./header";
 import { useLabels } from "./labels";
 import { Link } from "./link";
@@ -113,6 +113,11 @@ export type ServicePageProps = PageProps & {
    */
   footerLinks?: ReactNode;
   /**
+   * Where the footer's Royal Arms image is served, as Footer's `crest` is. Without it, Crown
+   * copyright stands without the Royal Arms.
+   */
+  crest?: FooterProps["crest"];
+  /**
    * Renders a router's link in place of each link the page makes for you, which are the header's,
    * the service's name, the Back link and the phase banner's feedback link.
    */
@@ -156,6 +161,7 @@ export function ServicePage({
   feedbackUrl,
   back,
   footerLinks,
+  crest,
   render,
   column = "two-thirds",
   beforeContent,
@@ -201,7 +207,11 @@ export function ServicePage({
         )
       }
       beforeContent={above || undefined}
-      footer={footer ?? <Footer>{footerLinks && <FooterLinks>{footerLinks}</FooterLinks>}</Footer>}
+      footer={
+        footer ?? (
+          <Footer crest={crest}>{footerLinks && <FooterLinks>{footerLinks}</FooterLinks>}</Footer>
+        )
+      }
     >
       <MainWrapper>
         <GridRow>

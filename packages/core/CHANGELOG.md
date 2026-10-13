@@ -72,7 +72,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added `useLocale`, which gives the nearest LabelsProvider's language. Calendar and Date input write their dates in it.
 - Added `step` and `defaultStep` to FormSteps, which can now be controlled, as its `onStepChange` suggested.
 - Added `defaultOpen` to CommandMenu and `defaultSelected` to DataTable, so each can keep track of its own state from a start you choose.
-- Added `render`, `header` and `footer` to ServicePage. `render` renders a router's link in place of each link the page makes for you. `header` and `footer` replace the usual ones. Its phase banner's words are its `labels`.
+- Added `render`, `header`, `footer` and `crest` to ServicePage. `render` renders a router's link in place of each link the page makes for you. `header` and `footer` replace the usual ones. `crest` gives its footer the Royal Arms, as Footer's `crest` does. Its phase banner's words are its `labels`.
 - Added `serviceRender` to ServiceNavigation, which renders a router's link in place of the service name's anchor.
 - Added `name` to ToggleGroup and FilterChips, which then send each chosen value with a form. In a Form, they start from the answers the Form keeps, the error summary links to the group, and Check your answers lists the chosen items' words. A disabled ToggleGroup sends nothing.
 - Added `useControlProps`, which gives a control of your own the id, name and descriptions of the bound Field around it.

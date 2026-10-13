@@ -89,11 +89,14 @@ test("a service page puts the usual GOV.UK parts around its content", () => {
       feedbackUrl="/feedback"
       back="#start"
       footerLinks={<FooterLink href="/accessibility">Accessibility statement</FooterLink>}
+      crest="/assets/images/govuk-crest.svg"
       render={(props) => <a data-router="" {...props} />}
     >
       <p>Content</p>
     </ServicePage>,
   );
+  // The footer draws the Royal Arms from the image the page is given.
+  expect(page).toContain("url(&quot;/assets/images/govuk-crest.svg&quot;)");
   expect(page).toContain("Apply for a licence");
   expect(page).toContain("Beta");
   expect(page).toContain('href="#start"');
@@ -113,6 +116,7 @@ test("a service page puts the usual GOV.UK parts around its content", () => {
   expect(bare).not.toContain("x-govuk-ui-footer-links");
   expect(bare).toContain("Beta");
   expect(bare).not.toContain("give your feedback");
+  expect(bare).not.toContain("data-crest");
   // A header or footer of your own replaces the usual one.
   const own = renderToStaticMarkup(
     <ServicePage serviceName="Apply" header={<header>Own header</header>}>

@@ -3,6 +3,7 @@
 import { Slider as Primitive } from "@base-ui/react/slider";
 import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef } from "react";
 import { ErrorMessage, Field, Hint, Label, useField } from "./field";
+import { useLocale } from "./labels";
 import { useMotionTiming } from "./motion";
 import { useScopeSound } from "./sound-scope";
 
@@ -61,6 +62,8 @@ export function Slider({
   className = "",
   ...props
 }: SliderProps) {
+  // The value is written in the page's language, the same on the server and in the browser.
+  const locale = useLocale();
   const field = useField({
     id,
     name,
@@ -71,7 +74,7 @@ export function Slider({
     answer: (data) => {
       const sent = name ? data.get(name) : null;
       return typeof sent === "string" && sent !== ""
-        ? new Intl.NumberFormat(undefined, format).format(Number(sent))
+        ? new Intl.NumberFormat(locale, format).format(Number(sent))
         : undefined;
     },
   });
@@ -136,6 +139,7 @@ export function Slider({
         max={max}
         step={step}
         format={format}
+        locale={locale}
         disabled={disabled}
         name={name}
       >

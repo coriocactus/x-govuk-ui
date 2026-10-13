@@ -2,6 +2,7 @@
 
 import { Progress as Primitive } from "@base-ui/react/progress";
 import type { ComponentPropsWithRef, ReactNode } from "react";
+import { useLocale } from "./labels";
 
 export type ProgressProps = ComponentPropsWithRef<"div"> & {
   label: ReactNode;
@@ -31,6 +32,8 @@ export function Progress({
   ...props
 }: ProgressProps) {
   const complete = value !== null && value >= max;
+  // The value is written in the page's language, the same on the server and in the browser.
+  const locale = useLocale();
   return (
     <Primitive.Root
       {...props}
@@ -39,6 +42,7 @@ export function Progress({
       min={min}
       max={max}
       format={format}
+      locale={locale}
       // SoundScope plays the success sound when this appears.
       data-success={complete || undefined}
     >

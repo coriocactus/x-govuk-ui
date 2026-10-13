@@ -1141,6 +1141,28 @@ test("a combobox narrows as people type", async ({ page, frame, open }) => {
   await expect(frame.getByRole("status")).toHaveText("You chose United Kingdom.");
 });
 
+test("a select shows the label of an option from a component of the service's own", async ({
+  page,
+  frame,
+  open,
+}) => {
+  await open("select");
+  const select = frame.getByRole("combobox", { name: "Sort by" });
+  await expect(select).toHaveText("Recently published");
+  await select.click();
+  // Every option is listed once, those from the service's own component in their place.
+  await expect(page.getByRole("option")).toHaveText([
+    "Recently published",
+    "Recently updated",
+    "Most views",
+    "Most comments",
+  ]);
+  await page.getByRole("option", { name: "Most comments" }).click();
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  await expect(select).toHaveText("Most comments");
+  await expect(frame.locator('input[name="sort"]')).toHaveValue("comments");
+});
+
 test("a multi-select adds chips, which can be removed", async ({ page, frame, open }) => {
   await open("multi-select");
   const multi = frame.getByRole("combobox", { name: "Which languages do you speak?" });

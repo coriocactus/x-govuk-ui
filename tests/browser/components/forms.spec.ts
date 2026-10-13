@@ -171,6 +171,9 @@ test("a form in stages saves as it goes, shows server errors, reveals follow-ups
   await page.reload();
   await playground.set("example", /In stages/);
   for (const name of ["back", "remember"]) await playground.set(name, true);
+  // The step it continues from is the service's own component, which shows once the answers are
+  // restored after the page loads.
+  await expect(frame.getByLabel("How could we improve this service?")).toBeVisible();
   await expect(frame.getByLabel("How could we improve this service?")).toHaveValue(
     "Keep it short.",
   );

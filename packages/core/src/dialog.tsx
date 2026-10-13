@@ -11,6 +11,12 @@ export type DialogProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Closes it when someone presses outside it, on the dimmed page. Give false for a decision that
+   * must be made in the dialog, such as confirming a deletion or a warning that time is running
+   * out. Escape and its own close still close it.
+   */
+  closeOnPressOutside?: boolean;
 };
 
 /**
@@ -19,12 +25,19 @@ export type DialogProps = {
  * `DialogTrigger`, `DialogContent`, `DialogTitle`, `DialogDescription` and `DialogClose`. GOV.UK
  * advises against dialogs for most tasks, so prefer a page of its own when the task has steps.
  */
-export function Dialog({ children, open, defaultOpen, onOpenChange }: DialogProps) {
+export function Dialog({
+  children,
+  open,
+  defaultOpen,
+  onOpenChange,
+  closeOnPressOutside = true,
+}: DialogProps) {
   const sound = useOverlaySound();
   return (
     <Primitive.Root
       open={open}
       defaultOpen={defaultOpen}
+      disablePointerDismissal={!closeOnPressOutside}
       onOpenChange={(next, details) => {
         sound(next, details.reason);
         onOpenChange?.(next);

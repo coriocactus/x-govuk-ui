@@ -10,16 +10,16 @@ import {
   DialogTrigger,
 } from "x-govuk-ui";
 
-type Props = { closeButton?: boolean };
+type Props = { closeButton?: boolean; closeOnPressOutside?: boolean };
 
-export default function DialogExample({ closeButton = true }: Props) {
+export default function DialogExample({ closeButton = true, closeOnPressOutside = true }: Props) {
   const [open, setOpen] = useState(false);
   const [deleted, setDeleted] = useState(false);
   // Focus starts on Cancel, so pressing Enter straight away deletes nothing.
   const cancel = useRef<HTMLButtonElement>(null);
   return (
     <>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={setOpen} closeOnPressOutside={closeOnPressOutside}>
         <DialogTrigger variant="warning" onClick={() => setDeleted(false)}>
           Delete draft
         </DialogTrigger>

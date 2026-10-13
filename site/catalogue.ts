@@ -1032,6 +1032,10 @@ const entries = {
       "GOV.UK has no dialog, and advises a page of its own for most tasks. Ours is Base UI's Dialog, built from parts. It grows into place from a little below over a dimmed page, which stays inert until it closes. Focus moves into it and returns to its button. Escape and a press outside close it with the close sound, and long content scrolls in the window.",
     props: [
       toggle("closeButton", true, { default: "true", note: "DialogContent's × button." }),
+      toggle("closeOnPressOutside", true, {
+        default: "true",
+        note: "Off, a press on the dimmed page leaves it open.",
+      }),
       reference("open / onOpenChange", "boolean / (open: boolean) => void"),
       reference("DialogTrigger", "Button props and { render }", "Part"),
       reference("DialogClose", "Button props", "Part"),
@@ -1059,6 +1063,10 @@ const entries = {
         "right",
       ),
       toggle("closeButton", true, { default: "false", note: "SheetContent's × button." }),
+      toggle("closeOnPressOutside", true, {
+        default: "true",
+        note: "Off, a press on the dimmed page leaves it open.",
+      }),
       reference("open / onOpenChange", "boolean / (open: boolean) => void"),
       reference("SheetTrigger", "Button props and { render }", "Part"),
       reference("SheetClose", "Button props", "Part"),

@@ -17,6 +17,12 @@ export type SheetProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Closes it when someone presses outside it, on the dimmed page. Give false for a sheet that
+   * must be finished or closed by its own controls. Escape, a swipe and its own close still close
+   * it.
+   */
+  closeOnPressOutside?: boolean;
 };
 
 /**
@@ -25,12 +31,20 @@ export type SheetProps = {
  * Compose it from `SheetTrigger`, `SheetContent`, `SheetTitle`, `SheetDescription` and
  * `SheetClose`. The Sidebar becomes a Sheet on small screens.
  */
-export function Sheet({ children, side = "right", open, defaultOpen, onOpenChange }: SheetProps) {
+export function Sheet({
+  children,
+  side = "right",
+  open,
+  defaultOpen,
+  onOpenChange,
+  closeOnPressOutside = true,
+}: SheetProps) {
   const sound = useOverlaySound();
   return (
     <Primitive.Root
       open={open}
       defaultOpen={defaultOpen}
+      disablePointerDismissal={!closeOnPressOutside}
       swipeDirection={swipeTowards[side]}
       onOpenChange={(next, details) => {
         sound(next, details.reason);

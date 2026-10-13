@@ -4,6 +4,7 @@ test("a dialog starts on its safe choice, closes with Escape and returns focus",
   page,
   frame,
   open,
+  playground,
 }) => {
   await open("dialog");
   const trigger = frame.getByRole("button", { name: "Delete draft" });
@@ -19,9 +20,22 @@ test("a dialog starts on its safe choice, closes with Escape and returns focus",
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
   await expect(trigger).toBeFocused();
+  // A press on the dimmed page closes it.
+  await trigger.click();
+  await expect(dialog).toBeVisible();
+  await page.mouse.click(5, 5);
+  await expect(dialog).toBeHidden();
   await trigger.click();
   await dialog.getByRole("button", { name: "Delete draft" }).click();
   await expect(frame.getByRole("status")).toHaveText("Your draft has been deleted.");
+  // A decision that must be made in the dialog leaves it open, whatever is pressed outside it.
+  await playground.set("closeOnPressOutside", false);
+  await trigger.click();
+  await expect(dialog).toBeVisible();
+  await page.mouse.click(5, 5);
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
 });
 
 test("a hover card opens on hover and on keyboard focus", async ({ page, frame, open }) => {

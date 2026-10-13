@@ -12,7 +12,11 @@ import {
   SheetTrigger,
 } from "x-govuk-ui";
 
-type Props = { side?: "left" | "right" | "top" | "bottom"; closeButton?: boolean };
+type Props = {
+  side?: "left" | "right" | "top" | "bottom";
+  closeButton?: boolean;
+  closeOnPressOutside?: boolean;
+};
 
 const types = [
   ["premises", "Premises licence"],
@@ -21,13 +25,22 @@ const types = [
   ["street", "Street trading"],
 ] as const;
 
-export default function SheetExample({ side = "right", closeButton = true }: Props) {
+export default function SheetExample({
+  side = "right",
+  closeButton = true,
+  closeOnPressOutside = true,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [chosen, setChosen] = useState<string[]>([]);
   const [applied, setApplied] = useState<string[]>([]);
   return (
     <>
-      <Sheet side={side} open={open} onOpenChange={setOpen}>
+      <Sheet
+        side={side}
+        open={open}
+        onOpenChange={setOpen}
+        closeOnPressOutside={closeOnPressOutside}
+      >
         <SheetTrigger onClick={() => setChosen(applied)}>Filter licences</SheetTrigger>
         <SheetContent closeButton={closeButton} className="preview-sheet">
           <SheetTitle>Filter licences</SheetTitle>

@@ -11,7 +11,7 @@ import {
 } from "x-govuk-ui";
 import { BrushControl, type BrushState } from "./chart-brush";
 import { type FigureRow, Figures, type FigureTable } from "./chart-frame";
-import { chartLabels } from "./chart-words";
+import { defaultChartLabels } from "./chart-words";
 
 /** One entry of a chart's key, with what it names, and its mark. */
 export type ChartKeyEntry = {
@@ -160,7 +160,7 @@ export function ChartTable({ summary, tables, ...props }: ChartTableProps) {
   const shown = tables ?? parts?.tables;
   if (!shown?.length) return null;
   return (
-    <FigureData {...props} summary={summary ?? parts?.summary ?? chartLabels.showTable}>
+    <FigureData {...props} summary={summary ?? parts?.summary ?? defaultChartLabels.showTable}>
       {shown.map((table, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: A table has only its place among them.
         <Figures key={index} {...table} />
@@ -200,7 +200,7 @@ export function ChartFrame({
     key: null,
     brush: null,
     tables: [],
-    summary: chartLabels.showTable,
+    summary: defaultChartLabels.showTable,
     ...parts,
   };
   return (

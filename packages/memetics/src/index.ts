@@ -40,7 +40,7 @@ export {
   type ChartTableProps,
   type ChartTableRow,
 } from "./chart-parts";
-export { type ChartLabels, chartLabels } from "./chart-words";
+export { type ChartLabels, defaultChartLabels } from "./chart-words";
 export {
   ChoroplethMap,
   type ChoroplethMapProps,

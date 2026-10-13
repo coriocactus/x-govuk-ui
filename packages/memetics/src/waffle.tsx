@@ -1,6 +1,6 @@
 import type { ComponentPropsWithRef, CSSProperties } from "react";
 import { colour } from "./chart-palette";
-import { type ChartLabels, chartLabels, percentIn, plainIn } from "./chart-words";
+import { type ChartLabels, defaultChartLabels, percentIn, plainIn } from "./chart-words";
 
 export type WafflePart = { label: string; value: number };
 
@@ -61,7 +61,7 @@ export function Waffle({
   style,
   ...props
 }: WaffleProps) {
-  const locale = labels?.locale ?? chartLabels.locale;
+  const locale = labels?.locale ?? defaultChartLabels.locale;
   const format = ownFormat ?? plainIn(locale);
   const share = percentIn(locale);
   const sum = data.reduce((all, part) => all + Math.max(0, part.value), 0);

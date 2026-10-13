@@ -2,9 +2,9 @@
 
 import { useMemo } from "react";
 import { useLabels, useLocale } from "x-govuk-ui";
-import { type ChartLabels, chartLabels } from "./chart-words";
+import { type ChartLabels, defaultChartLabels } from "./chart-words";
 
-const { locale: _english, ...chartWords } = chartLabels;
+const { locale: _english, ...chartWords } = defaultChartLabels;
 
 /**
  * A chart's words, from its own `labels`, then a LabelsProvider's `chart` words, then the charts'

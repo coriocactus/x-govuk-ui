@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Renamed `chartLabels` to `defaultChartLabels`, as every map of words' English defaults are named after its key in a LabelsProvider, such as `defaultPaginationLabels`. Import `defaultChartLabels` instead.
+
 ### Added
 
 - Added the charts' words to LabelsProvider, from x-govuk-ui, as `chart`. Chart, Chart set, Calendar heat map, Choropleth map, Gauge, Sankey, Sunburst and Treemap take their words from a chart's own `labels`, then the provider's `chart` words, then their own. They write figures and dates in their own `locale`, then the provider's `locale`, the page's language for every component. Bar list, Bullet chart, Waffle and Sparkline render on the server, where no provider reaches, so they take their words from `labels` only.

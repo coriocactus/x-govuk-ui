@@ -83,7 +83,7 @@ const inSentence = (text: string) =>
   /^[A-Z][a-z]/.test(text) ? text.charAt(0).toLowerCase() + text.slice(1) : text;
 
 /** The charts' own words, in British English. */
-export const chartLabels: ChartLabels = {
+export const defaultChartLabels: ChartLabels = {
   showTable: "Show the figures as a table",
   showTables: "Show the figures as tables",
   noFigure: "No figure",
@@ -115,7 +115,7 @@ export const chartLabels: ChartLabels = {
  * @internal
  */
 export const wordsOf = (labels?: Partial<ChartLabels>): ChartLabels => ({
-  ...chartLabels,
+  ...defaultChartLabels,
   ...labels,
 });
 
@@ -151,9 +151,9 @@ export const percentIn = (locale: string) => {
   return known;
 };
 /** @internal */
-export const plain = plainIn(chartLabels.locale);
+export const plain = plainIn(defaultChartLabels.locale);
 /** @internal */
-export const share = percentIn(chartLabels.locale);
+export const share = percentIn(defaultChartLabels.locale);
 
 /** @internal */
 export const capitalise = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);

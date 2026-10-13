@@ -29,7 +29,7 @@ import {
 } from "x-govuk-ui";
 import { type ChartNode, figureOf, flatten, type heatScale, nodeValue } from "./chart-maths";
 import type { ChartKeyEntry } from "./chart-parts";
-import { type ChartLabels, chartLabels, percentIn } from "./chart-words";
+import { type ChartLabels, defaultChartLabels, percentIn } from "./chart-words";
 
 /**
  * How long a chart takes to draw in as it first shows, and to move to new figures, in
@@ -49,7 +49,7 @@ const CARD_EDGE = 90;
 export function CellFigure({
   value,
   format,
-  missing = chartLabels.noFigure,
+  missing = defaultChartLabels.noFigure,
 }: {
   value: unknown;
   format: (value: number) => string;

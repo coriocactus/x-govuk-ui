@@ -86,20 +86,37 @@
   margin-top: 30px;
   margin-bottom: 0;
 }
-.x-govuk-ui-form-steps-back {
+/* A Back link outside the form, such as in a ServicePage's place for one, takes that place's
+   spacing. */
+.x-govuk-ui-form-steps .x-govuk-ui-form-steps-back {
   margin-bottom: 20px;
 }
-/* Check your answers is the page's heading, at the size of a step's title on a page. */
+/* Check your answers is the page's heading, at the size of a step's title on a page. A section's
+   heading beneath it is smaller, at GOV.UK's sizes for its level. */
 .x-govuk-ui-form-steps-review-title {
   margin: 0 0 20px;
   outline: none;
   font-size: 32px;
   line-height: 1.15;
 }
-.x-govuk-ui-form-steps-review .x-govuk-ui-panel {
+h2.x-govuk-ui-form-steps-review-title {
+  font-size: 24px;
+  line-height: 1.25;
+}
+h3.x-govuk-ui-form-steps-review-title,
+h4.x-govuk-ui-form-steps-review-title {
+  font-size: 19px;
+  line-height: 1.32;
+}
+.x-govuk-ui-form-steps-body > .x-govuk-ui-panel {
   margin-bottom: 30px;
 }
-.x-govuk-ui-form-steps-review .x-govuk-ui-panel-title:focus,
+/* Each section of the answers after the first stands apart from the one before, as GOV.UK's lists
+   do. */
+.x-govuk-ui-form-steps-review ~ .x-govuk-ui-form-steps-review {
+  margin-top: 30px;
+}
+.x-govuk-ui-form-steps-body > .x-govuk-ui-panel .x-govuk-ui-panel-title:focus,
 .x-govuk-ui-form-steps-done:focus,
 .x-govuk-ui-form-steps-summary:focus {
   outline: none;

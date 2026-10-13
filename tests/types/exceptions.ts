@@ -33,6 +33,7 @@ export const elementless = [
   "EditorAI",
   "EditorRoot",
   "FieldBinding",
+  "FormStepsProvider",
 ] as const;
 
 /**
@@ -67,10 +68,11 @@ export const boxed = [
 ] as const;
 
 /**
- * Links to a place on the same page, or away from the service, which no router follows. Every
- * other part that renders a link takes `render`, for a router's link.
+ * Links to a place on the same page, or away from the service, which no router follows. FormSteps'
+ * Back goes to the step before, on the same page. Every other part that renders a link takes
+ * `render`, for a router's link.
  */
-export const notRouted = ["SkipLink", "ErrorSummaryItem", "ExitThisPage"] as const;
+export const notRouted = ["SkipLink", "ErrorSummaryItem", "ExitThisPage", "FormStepsBack"] as const;
 
 /**
  * Parts that render on the server, where no LabelsProvider reaches, so their words are their own,

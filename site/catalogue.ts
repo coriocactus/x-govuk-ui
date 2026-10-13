@@ -933,7 +933,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Motion",
     changes:
-      "GOV.UK's way with a question page, as one component. FormSteps asks a form a step at a time, and the In stages example is a short survey asked that way. Each field takes part by its name, so Input, Textarea, Select, Radios, Checkboxes, Date input, Combobox, File upload and One-time code need nothing more. When the form is sent, one function checks every answer. If any need fixing, an Error summary opens above the fields as they ease down to make space, takes focus and lists the problems in the fields' order, each linking to its field, and every field shows its own message. Fixing an answer clears its message and its line at once, and the summary folds away when nothing is left. A failing answer that changes keeps its message until the form is sent again. While there are errors the page's title starts with Error, as GOV.UK asks. Messages that onSubmit returns, such as the server's, show in the same way. Continue with the form empty to see it. A form small enough to do without an Error summary can turn it off, and focus goes to the first field to fix instead. defaultValues gives the fields their answers to start with, such as ones kept from an earlier visit. FormSteps is a Form in steps, each a FormStep containing any fields. Continue checks only the step's answers and runs its own onContinue, such as saving a rating straight away, with a spinner on the button. Steps whose when says no are passed over, and their answers left out. It can end with Check your answers, worked out from the fields' labels and answers, with Change. It comes as GOV.UK question pages, or a card set into a page, such as a survey or an agent's questions, and Back, progress, the Error summary, the Command with Enter shortcut, the browser's history and remembering progress in local storage can each be turned on or off. The One page example is a service's page, a ServicePage with its questions in a three-quarters column.",
+      "GOV.UK's way with a question page, as one component. FormSteps asks a form a step at a time, and the In stages example is a short survey asked that way. Each field takes part by its name, so Input, Textarea, Select, Radios, Checkboxes, Date input, Combobox, File upload and One-time code need nothing more. When the form is sent, one function checks every answer. If any need fixing, an Error summary opens above the fields as they ease down to make space, takes focus and lists the problems in the fields' order, each linking to its field, and every field shows its own message. Fixing an answer clears its message and its line at once, and the summary folds away when nothing is left. A failing answer that changes keeps its message until the form is sent again. While there are errors the page's title starts with Error, as GOV.UK asks. Messages that onSubmit returns, such as the server's, show in the same way. Continue with the form empty to see it. A form small enough to do without an Error summary can turn it off, and focus goes to the first field to fix instead. defaultValues gives the fields their answers to start with, such as ones kept from an earlier visit. FormSteps is a Form in steps, each a FormStep containing any fields. Continue checks only the step's answers and runs its own onContinue, such as saving a rating straight away, with a spinner on the button. Steps whose when says no are passed over, and their answers left out. It can end with Check your answers, worked out from the fields' labels and answers, with Change. It comes as GOV.UK question pages, or a card set into a page, such as a survey or an agent's questions, and Back, progress, the Error summary, the Command with Enter shortcut, the browser's history and remembering progress in local storage can each be turned on or off. The One page example is a service's page, a ServicePage with its questions in a three-quarters column. The In pages example is FormSteps in a ServicePage. Its Back link is a FormStepsBack in the page's own place for one, which a FormStepsProvider around both allows. Save and come back later sits beside Continue, and Check your answers lists the answers in two sections, each a FormStepsSummary, beneath a heading of the example's own.",
     props: [
       reference("validate", "(data: FormData) => FormErrors"),
       reference(
@@ -958,13 +958,22 @@ const entries = {
       reference("children", "Fields with a name, and a submit Button"),
       reference(
         "FormSteps",
-        '{ layout: "page" | "card", title, checkAnswers, back, progress, errorSummary, shortcut, history, storageKey, onComplete, done, labels }',
+        '{ layout: "page" | "card", title, checkAnswers, back, progress, errorSummary, keyboardShortcut, actions, history, storageKey, storage, onComplete, step, defaultStep, onStepChange, done, labels }',
         "Part",
       ),
       reference(
         "FormStep",
-        "Fieldset props and { title?, titleLevel?, hint?, validate, onContinue, when, optional, labels: { continue }, summary }",
+        "Fieldset props and { title?, titleLevel?, hint?, validate, onContinue, when, optional, labels: { continue }, summary, actions }",
         "Part",
+      ),
+      reference("FormStepsBack", "BackLink props, without href", "Part"),
+      reference("FormStepsProgress", "p props", "Part"),
+      reference("FormStepsSummary", "{ title, titleLevel, steps, children } and div props", "Part"),
+      reference("FormStepsProvider", "{ children }", "Part"),
+      reference(
+        "useFormSteps",
+        "() => { step, count, position, total, settled, reviewing, sent, busy, back, skip, answers, change }",
+        "Hook",
       ),
     ],
     example: [
@@ -972,10 +981,13 @@ const entries = {
         "example",
         [
           ["page", "One page"],
+          ["pages", "In pages: an application"],
           ["stages", "In stages: a feedback survey"],
         ],
         "page",
-        { note: "In stages is FormSteps, asking a short satisfaction survey." },
+        {
+          note: "In pages and In stages are FormSteps. In pages asks a question a page at a time, with its Back link in the page's own place and Check your answers in sections. In stages asks a short satisfaction survey.",
+        },
       ),
       choice(
         "layout",
@@ -1011,6 +1023,7 @@ const entries = {
       }),
       toggle("fail", false, {
         note: "The answers fail to save the first time, as a server error would. In stages, the rating does.",
+        needs: [when("example", "page", "stages")],
         restart: true,
       }),
       toggle("moreKinds", false, {

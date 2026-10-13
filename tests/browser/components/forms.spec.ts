@@ -439,3 +439,79 @@ test("the answers of a step that applies no longer are left out, and its field k
     sent: ["model", "pick"],
   });
 });
+
+test("an application in pages takes its Back link, buttons and answers where it places them", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  await open("form");
+  await playground.set("example", "In pages: an application");
+  const main = frame.locator("main");
+  const back = frame.getByRole("link", { name: "Back", exact: true });
+  // The first question has no way back, and shows how far along it is.
+  await expect(back).toHaveCount(0);
+  await expect(frame.getByText("Question 1 of 3")).toBeVisible();
+  await frame.getByRole("textbox", { name: "What is your full name?" }).fill("Jo Bloggs");
+  await frame.getByRole("button", { name: "Continue" }).click();
+  const email = frame.getByRole("textbox", { name: "What is your email address?" });
+  await expect(email).toBeVisible();
+  // The Back link is in the page's place for one, above the main content, and the form draws
+  // none of its own.
+  await expect(back).toHaveCount(1);
+  await expect(main.getByRole("link", { name: "Back", exact: true })).toHaveCount(0);
+  await back.click();
+  await expect(frame.getByRole("textbox", { name: "What is your full name?" })).toHaveValue(
+    "Jo Bloggs",
+  );
+  await frame.getByRole("button", { name: "Continue" }).click();
+  await email.fill("jo@example.com");
+  await frame.getByRole("button", { name: "Continue" }).click();
+  await frame.getByRole("radio", { name: "8 days" }).check();
+  // A button of the example's own sits beside Continue.
+  const buttons = frame.locator(".x-govuk-ui-form-steps-buttons").getByRole("button");
+  await expect(buttons).toHaveText(["Continue", "Save and come back later"]);
+  await frame.getByRole("button", { name: "Save and come back later" }).click();
+  await expect(frame.getByRole("status")).toHaveText("Your answers are saved. Nothing was sent.");
+  await frame.getByRole("button", { name: "Continue" }).click();
+  // Check your answers takes focus at the example's own heading, and lists the answers in two
+  // sections, without the button that is only for the questions.
+  const heading = frame.getByRole("heading", { name: "Check your answers before you apply" });
+  await expect(heading).toBeFocused();
+  await expect(frame.getByRole("heading", { level: 2 })).toHaveText([
+    "Your details",
+    "Your licence",
+  ]);
+  const details = frame.locator(".x-govuk-ui-form-steps-review").first();
+  await expect(details.locator(".x-govuk-ui-summary-list-value")).toHaveText([
+    "Jo Bloggs",
+    "jo@example.com",
+  ]);
+  await expect(frame.getByRole("button", { name: "Save and come back later" })).toHaveCount(0);
+  await expect(frame.getByText("Question 1 of 3")).toHaveCount(0);
+  // Change asks the question again, then comes back.
+  await frame
+    .getByRole("button", { name: /Change your answer to What is your email address/ })
+    .click();
+  await expect(email).toBeFocused();
+  await email.fill("jo@example.org");
+  await frame.getByRole("button", { name: "Continue" }).click();
+  await expect(heading).toBeFocused();
+  await expect(details.locator(".x-govuk-ui-summary-list-value")).toHaveText([
+    "Jo Bloggs",
+    "jo@example.org",
+  ]);
+  await frame.getByRole("button", { name: "Accept and send" }).click();
+  // Once sent, the Panel heads the page and takes focus, and the sections stay.
+  await expect(
+    frame.getByRole("heading", { level: 1, name: "Your answers have been sent" }),
+  ).toBeFocused();
+  await expect(heading).toHaveCount(0);
+  await expect(frame.getByRole("heading", { level: 2 })).toHaveText([
+    "Your details",
+    "Your licence",
+  ]);
+  await expect(back).toHaveCount(0);
+  await page.screenshot({ path: "/tmp/pages-sent.png" });
+});

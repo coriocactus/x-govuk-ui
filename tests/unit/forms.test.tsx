@@ -15,6 +15,7 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   BackLink,
+  Button,
   Calendar,
   Checkbox,
   Checkboxes,
@@ -48,6 +49,10 @@ import {
   Form,
   FormStep,
   FormSteps,
+  FormStepsBack,
+  FormStepsProgress,
+  FormStepsProvider,
+  FormStepsSummary,
   Hint,
   Input,
   InputControl,
@@ -1190,6 +1195,54 @@ test("a step takes a fieldset's props and the level of its title", () => {
     /<fieldset role="presentation" id="contact" style="margin-top:8px" data-step-name="contact" class="x-govuk-ui-form-step contact-step"/,
   );
   expect(html).toContain('<h2 class="x-govuk-ui-form-step-title">How can we contact you?</h2>');
+});
+
+test("a form in steps draws once each part a service places, and its buttons beside Continue", () => {
+  const steps = (
+    <FormSteps actions={<Button>Save and come back later</Button>}>
+      <FormStepsProgress className="own-progress" />
+      <FormStep actions={<Button>I do not know</Button>}>
+        <Input name="name" label="What is your name?" />
+      </FormStep>
+      <FormStep>
+        <Input name="email" label="Email address" />
+      </FormStep>
+    </FormSteps>
+  );
+  const html = renderToStaticMarkup(steps);
+  // The progress placed among the steps is drawn once, in its place, with the service's class.
+  expect(html.match(/Question 1 of 2/g)).toHaveLength(1);
+  expect(html).toContain('<p class="x-govuk-ui-form-steps-progress own-progress">');
+  // The step's own buttons come before the form's, after Continue.
+  expect(html).toMatch(/Continue.*I do not know.*Save and come back later/s);
+  // The first step has no way back, wherever the Back link is placed.
+  const provided = renderToStaticMarkup(
+    <FormStepsProvider>
+      <FormStepsBack />
+      {steps}
+    </FormStepsProvider>,
+  );
+  expect(provided).not.toContain("x-govuk-ui-back-link");
+});
+
+test("the answers' summary shows only on Check your answers, with its heading at its level", () => {
+  const steps = (start: number) => (
+    <FormSteps defaultStep={start}>
+      <FormStep>
+        <Input name="name" label="What is your name?" />
+      </FormStep>
+      <FormStepsSummary title="Your details" titleLevel={2} className="own-summary" />
+    </FormSteps>
+  );
+  expect(renderToStaticMarkup(steps(0))).not.toContain("own-summary");
+  const review = renderToStaticMarkup(steps(1));
+  expect(review).toContain('<div class="x-govuk-ui-form-steps-review own-summary">');
+  expect(review).toContain(
+    '<h2 class="x-govuk-ui-form-steps-review-title" tabindex="-1">Your details</h2>',
+  );
+  // The form lists no answers of its own beside it.
+  expect(review.match(/x-govuk-ui-form-steps-review[ "]/g)).toHaveLength(1);
+  expect(review).not.toContain("Check your answers");
 });
 
 test("a file upload starts from files given to it, and can leave their list to a service", () => {

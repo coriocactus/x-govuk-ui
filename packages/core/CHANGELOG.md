@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Moved the Panel that says FormSteps' answers are sent out of `.x-govuk-ui-form-steps-review`, to the start of `.x-govuk-ui-form-steps-body`, above every list of the answers. Select it as `.x-govuk-ui-form-steps-body > .x-govuk-ui-panel`.
 - Changed CommandMenu's empty state, `.x-govuk-ui-command-menu-empty`, from a paragraph to a `div`, so it can hold an empty state of a service's own. Select it by its class, not its element.
 - Changed FileUpload's `list` to a boolean, which leaves its list of files out when it is false. It was the input's `list` attribute, which a file input does not use. Remove any `list` you gave it.
 - Changed FormSteps' Check your answers heading, `.x-govuk-ui-form-steps-review-title`, from an `h2` to an `h1` on a page, and the title of the Panel that says the answers are sent from an `h2` to an `h1`. Select each by its class, not its element.
@@ -63,6 +64,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added FormSteps' parts, each of which takes the place of the one FormSteps draws while it is on the page. FormStepsBack is the Back link, FormStepsProgress the words that say how far along the form is, and FormStepsSummary the answers that Check your answers lists. FormStepsSummary takes `title`, `titleLevel` and the `steps` it lists, so several can list a long form's answers in sections, and takes rows of your own as `children`. FormStepsProvider lets the parts sit outside the FormSteps, such as FormStepsBack in a ServicePage's `back`, where GOV.UK puts a Back link. Added `useFormSteps`, which gives a part of your own where the form is, Back, Skip, the answers and Change. Added `actions` to FormSteps and FormStep, for buttons of your own beside Continue, such as Save and come back later.
 - Added FormErrorSummary, a Form's Error summary where a service places it inside the Form, such as above the page's heading, as GOV.UK puts it. While one is on the page, the Form shows no summary of its own. It takes no space until it opens. Added `useFormErrors`, which gives a part of your own the Form's errors, each with the id it links to, and how many times the form has been sent with errors. Added `--x-govuk-ui-form-gap`, the space between a Form's fields.
 - Added `empty` and `help` to CommandMenuContent, in place of its `empty` label and the help beneath the list. `help={null}` leaves the help out. Added `useCommandMenu`, which gives a part of the menu the search, a way to change it and a way to close the menu, such as for an empty state that offers to make what was searched for.
 - Added `filter`, `inputValue`, `defaultInputValue` and `onInputValueChange` to Combobox, MultiSelect and their controls. A service hears the text as users type, such as to ask a server for options, and gives `filter={null}` to show the options it found as they are, or a `filter` of its own. Added `description` to a ComboboxOption, a line beneath its label in the list.
@@ -132,6 +134,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed focus once FormSteps sends its answers on a page. The Panel's heading now takes focus, where focus was lost as the buttons went.
 - Fixed a Form's error summary linking a message about no one field, such as one about the whole form from `validateWith` or `onSubmit`, to a place that does not exist. Such a message now shows beneath the summary's title, without a link.
 - Fixed an answer in a wrapper of your own, inside Radios or Checkboxes, taking the first answer's id. Its label then named the wrong answer. Such an answer now takes an id of its own, including in a group inside a follow-up question. A Form's error summary links to the first answer on the page.
 - Fixed FormSteps with a `storageKey` rendering different first HTML in the browser than on the server. Kept answers and the step now come back once the page has loaded, before it is drawn.

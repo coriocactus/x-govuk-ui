@@ -8,7 +8,10 @@ import {
   type FormErrors,
   FormStep,
   FormSteps,
+  FormStepsBack,
   type FormStepsProps,
+  FormStepsProvider,
+  FormStepsSummary,
   Input,
   Radio,
   Radios,
@@ -20,13 +23,17 @@ import {
   Textarea,
   ToggleGroup,
   ToggleGroupItem,
+  useFormSteps,
 } from "x-govuk-ui";
 
 type Props = {
   errorTitle?: string;
   titlePrefix?: boolean;
-  /** One page of questions, or a short survey asked in stages with FormSteps. */
-  example?: "page" | "stages";
+  /**
+   * One page of questions, an application asked a page at a time with FormSteps, or a short survey
+   * asked in stages with FormSteps.
+   */
+  example?: "page" | "pages" | "stages";
   layout?: FormStepsProps["layout"];
   back?: boolean;
   progress?: boolean;
@@ -62,7 +69,9 @@ const validate = (data: FormData): FormErrors => ({
 });
 
 export default function FormExample({ example = "page", ...props }: Props) {
-  return example === "stages" ? <FeedbackInStages {...props} /> : <OnePage {...props} />;
+  if (example === "stages") return <FeedbackInStages {...props} />;
+  if (example === "pages") return <ApplyInPages />;
+  return <OnePage {...props} />;
 }
 
 /** A page of questions in a service, as GOV.UK lays it out, read from the top left. */
@@ -133,6 +142,109 @@ function OnePage({ errorTitle = "There is a problem", titlePrefix = true, fail =
         </p>
       </Form>
     </ServicePage>
+  );
+}
+
+/** Offers to keep the answers for later on each question, but not on Check your answers. */
+function SaveForLater({ saved }: { saved: () => void }) {
+  const steps = useFormSteps();
+  if (!steps || steps.reviewing) return null;
+  return (
+    <Button variant="secondary" onClick={saved}>
+      Save and come back later
+    </Button>
+  );
+}
+
+/** Heads Check your answers, above the answers listed in sections. */
+function CheckHeading() {
+  const steps = useFormSteps();
+  if (!steps?.reviewing) return null;
+  return <h1 className="preview-page-heading">Check your answers before you apply</h1>;
+}
+
+/**
+ * An application in a service, asked a page at a time, as GOV.UK lays it out. The form's Back link
+ * sits in the page's own place for one, above the main content, so a FormStepsProvider holds both.
+ * Check your answers lists the answers in two sections.
+ */
+function ApplyInPages() {
+  const [saved, setSaved] = useState("");
+  return (
+    <FormStepsProvider>
+      <ServicePage
+        serviceName="Get a fishing licence"
+        serviceUrl="#service"
+        homepageUrl="#home"
+        phase="Beta"
+        feedbackUrl="#feedback"
+        back={<FormStepsBack />}
+        column="two-thirds"
+        crest="/assets/images/govuk-crest.svg"
+      >
+        <FormSteps
+          title="Apply for a fishing licence"
+          labels={{ submit: "Accept and send" }}
+          actions={
+            <SaveForLater saved={() => setSaved("Your answers are saved. Nothing was sent.")} />
+          }
+          onInput={() => setSaved("")}
+          onComplete={async () => {
+            await wait(250);
+          }}
+        >
+          <FormStep
+            validate={(data): FormErrors => ({
+              "full-name": answer(data, "full-name") ? undefined : "Enter your full name",
+            })}
+          >
+            <Input
+              id="full-name"
+              name="full-name"
+              label="What is your full name?"
+              autoComplete="name"
+              spellCheck={false}
+            />
+          </FormStep>
+          <FormStep
+            validate={(data): FormErrors => ({
+              email: /^\S+@\S+\.\S+$/.test(answer(data, "email"))
+                ? undefined
+                : "Enter an email address in the correct format, like name@example.com",
+            })}
+          >
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              label="What is your email address?"
+              hint="We’ll send your licence to this address."
+              autoComplete="email"
+              spellCheck={false}
+            />
+          </FormStep>
+          <FormStep
+            validate={(data): FormErrors => ({
+              licence: data.get("licence")
+                ? undefined
+                : "Select how long you need your licence for",
+            })}
+          >
+            <Radios id="licence" name="licence" legend="How long do you need your licence for?">
+              <Radio value="day">1 day</Radio>
+              <Radio value="week">8 days</Radio>
+              <Radio value="year">12 months</Radio>
+            </Radios>
+          </FormStep>
+          <CheckHeading />
+          <FormStepsSummary title="Your details" titleLevel={2} steps={[0, 1]} />
+          <FormStepsSummary title="Your licence" titleLevel={2} steps={[2]} />
+        </FormSteps>
+        <p className="preview-message" role="status" data-success={saved ? "" : undefined}>
+          {saved}
+        </p>
+      </ServicePage>
+    </FormStepsProvider>
   );
 }
 

@@ -19,7 +19,7 @@ import {
   useState,
 } from "react";
 import { AutoHeight } from "./auto-height";
-import { BackLink } from "./back-link";
+import { BackLink, type BackLinkProps } from "./back-link";
 import { Button, ButtonGroup } from "./button";
 import { useControllableState } from "./controllable-state";
 import { both, chain } from "./events";
@@ -79,6 +79,11 @@ export type FormStepProps = Omit<
   labels?: Partial<Pick<FormStepsLabels, "continue">>;
   /** The step's answer in Check your answers, in place of each field's own answer. */
   summary?: (data: FormData) => ReactNode;
+  /**
+   * Buttons of the step's own beside Continue, such as a way to say that an answer is not known.
+   * They come before the form's own `actions`.
+   */
+  actions?: ReactNode;
 };
 
 /** A step as its FormSteps knows it, by an id of its own, which keeps its fields while it moves. */
@@ -98,6 +103,44 @@ type StepsHost = {
 };
 
 const StepsContext = createContext<StepsHost | null>(null);
+
+/** A part that a service can place, in place of the one FormSteps draws. */
+type Part = "back" | "progress" | "summary";
+/** Tells FormSteps that a part of a service's own is on the page, until it calls what it returns. */
+type Claim = (part: Part) => () => void;
+
+/** What FormSteps shares with its parts, inside it or in a FormStepsProvider around it. */
+type StepsShared = {
+  controls: FormStepsControls;
+  labels: FormStepsLabels;
+  layout: "page" | "card";
+  /** Whether `done` has taken the place of the steps and their answers. */
+  replaced: boolean;
+};
+const SharedContext = createContext<StepsShared | null>(null);
+const ClaimContext = createContext<Claim | null>(null);
+/** A FormStepsProvider, which a FormSteps inside it tells where it is, and asks what is placed. */
+const ProviderContext = createContext<{
+  publish: (shared: StepsShared | null) => void;
+  claim: Claim;
+  placed: Partial<Record<Part, number>>;
+} | null>(null);
+
+/** How many of each part are placed, and a way for each to say so. */
+function useClaims() {
+  const [placed, setPlaced] = useState<Partial<Record<Part, number>>>({});
+  const claim = useCallback<Claim>((part) => {
+    setPlaced((now) => ({ ...now, [part]: (now[part] ?? 0) + 1 }));
+    return () => setPlaced((now) => ({ ...now, [part]: (now[part] ?? 1) - 1 }));
+  }, []);
+  return [placed, claim] as const;
+}
+
+/** Says that a part of a service's own is on the page, while it is. */
+function useClaim(part: Part) {
+  const claim = useContext(ClaimContext);
+  useLayoutEffect(() => claim?.(part), [claim, part]);
+}
 /** A step's place among its FormSteps' direct children, read as the server renders. */
 const StepIndex = createContext<number | null>(null);
 
@@ -152,12 +195,18 @@ export type FormStepsProps = Omit<
   icon?: ReactNode;
   /**
    * Ends with GOV.UK's Check your answers, with Change for each answer, before the answers are
-   * sent.
+   * sent. A FormStepsSummary in the form lists the answers in place of its own list.
    */
   checkAnswers?: boolean;
-  /** Offers Back from the second step on. */
+  /**
+   * Offers Back from the second step on. A FormStepsBack in the form, or in a FormStepsProvider
+   * around it, takes the place of its own.
+   */
   back?: boolean;
-  /** Shows how far along the form is, such as "Question 2 of 5", or the card's ring. */
+  /**
+   * Shows how far along the form is, such as "Question 2 of 5", or the card's ring. A
+   * FormStepsProgress in the form takes the place of either.
+   */
   progress?: boolean;
   /**
    * Lists the errors in an Error summary that takes focus, as GOV.UK does. Without it, each field
@@ -166,6 +215,11 @@ export type FormStepsProps = Omit<
   errorSummary?: boolean;
   /** Command or Control with Enter sends the step from anywhere in it. The card shows the keys. */
   keyboardShortcut?: boolean;
+  /**
+   * Buttons of your own beside Continue, such as GOV.UK's Save and come back later, while the
+   * form's buttons show. `useFormSteps` tells them where the form is.
+   */
+  actions?: ReactNode;
   /** Each step is a place in the browser's history, so Back in the browser goes back a step. */
   history?: boolean;
   /**
@@ -273,15 +327,51 @@ const isAnswers = (value: unknown): value is [string, string][] =>
       typeof each[0] === "string" &&
       typeof each[1] === "string",
   );
-type Row = {
+/** An answer as Check your answers lists it. */
+export type FormStepsAnswer = {
+  /** The step that asks it, by its place among the steps, from 0. */
   step: number;
-  label: ReactNode;
+  /** The question, from its field's label, or the step's title for a step's own `summary`. */
+  question: ReactNode;
+  /** The answers, one to a line. None for a question left empty, or on a step that was skipped. */
   values: ReactNode[];
+  /** The id of the question's field, which takes focus as Change asks it again. */
   id: string;
-  skipped?: boolean;
-  /** The step's own summary of its answer, in place of the values. */
-  own?: ReactNode;
+  /** Whether its step was skipped. */
+  skipped: boolean;
+  /** The step's own summary of its answers, from its `summary`, there only for such a step. */
+  summary?: ReactNode;
 };
+
+/** What `useFormSteps` gives a part of your own, such as a button beside Continue. */
+export type FormStepsControls = {
+  /** The step on show, by its place among the steps, from 0. `count` is Check your answers. */
+  step: number;
+  /** How many steps there are, whether they apply or not. */
+  count: number;
+  /** Where the step on show comes among the steps that apply, from 0. */
+  position: number;
+  /** How many steps apply to the answers so far. */
+  total: number;
+  /** How many of the steps that apply are answered or skipped. */
+  settled: number;
+  /** Whether Check your answers is on show, before the answers are sent. */
+  reviewing: boolean;
+  /** Whether the answers have been sent. */
+  sent: boolean;
+  /** Whether a step's `onContinue`, or `onComplete`, is running. */
+  busy: boolean;
+  /** Goes back to the step before that applies. Null on the first step, and once sent. */
+  back: (() => void) | null;
+  /** Skips the step on show. Null unless the step is `optional`. */
+  skip: (() => void) | null;
+  /** The answers Check your answers lists, in order. None until it shows. */
+  answers: FormStepsAnswer[];
+  /** Asks an answer's question again, then comes back to Check your answers. */
+  change: (answer: FormStepsAnswer) => void;
+};
+
+const noAnswers: FormStepsAnswer[] = [];
 
 /** What was kept under the key, or null when there is nothing, or nothing this form wrote. */
 function readSaved(key: string | undefined, storage: StorageLike | null): Saved | null {
@@ -392,6 +482,7 @@ export function FormSteps({
   progress = true,
   errorSummary = layout !== "card",
   keyboardShortcut = true,
+  actions,
   history: historyOn = false,
   storageKey,
   storage: ownStorage,
@@ -436,7 +527,7 @@ export function FormSteps({
   const [passed, setPassed] = useState(() => new Set<number>());
   const [skipped, setSkipped] = useState(() => new Set<number>());
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
-  const [rows, setRows] = useState<Row[]>([]);
+  const [rows, setRows] = useState<FormStepsAnswer[]>([]);
   const rememberSoon = useRef(0);
   // Whether the answers are kept, which they are not while they are sent or once they are.
   const keeping = useRef(true);
@@ -567,7 +658,7 @@ export function FormSteps({
     if (historyOn && push)
       window.history.pushState({ ...window.history.state, [historyKey]: where }, "");
   };
-  const summaryRows = (index: number, skipping: Set<number>): Row[] => {
+  const summaryRows = (index: number, skipping: Set<number>): FormStepsAnswer[] => {
     if (!form.current) return [];
     const data = new FormData(form.current);
     // The step's questions in the page's order, leaving out any users cannot see.
@@ -580,26 +671,26 @@ export function FormSteps({
         if (!first || !second) return 0;
         return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
       });
-    const each = asked.map(([name, field]): Row => {
-      const values = answersOf(field, name, data);
-      return {
+    const each = asked.map(
+      ([name, field]): FormStepsAnswer => ({
         step: index,
-        label: field.label,
-        values: values.length > 0 ? values : [labels.notAnswered],
+        question: field.label,
+        values: answersOf(field, name, data),
         id: field.id,
-      };
-    });
-    if (skipping.has(index))
-      return each.map((row) => ({ ...row, values: [labels.skipped], skipped: true }));
+        skipped: false,
+      }),
+    );
+    if (skipping.has(index)) return each.map((row) => ({ ...row, values: [], skipped: true }));
     const own = steps[index]?.summary;
     if (own)
       return [
         {
           step: index,
-          label: steps[index]?.title ?? each[0]?.label,
+          question: steps[index]?.title ?? each[0]?.question,
           values: [],
           id: each[0]?.id ?? "",
-          own: own(data),
+          skipped: false,
+          summary: own(data),
         },
       ];
     return each;
@@ -634,13 +725,24 @@ export function FormSteps({
     const frame = requestAnimationFrame(() => {
       const root = form.current;
       if (!root) return;
-      if (wanted === "summary")
-        return root
-          .closest(".x-govuk-ui-form-steps")
-          ?.querySelector<HTMLElement>(
-            ".x-govuk-ui-form-steps-review-title, .x-govuk-ui-panel-title, .x-govuk-ui-form-steps-summary, .x-govuk-ui-form-steps-done",
+      if (wanted === "summary") {
+        const section = root.closest(".x-govuk-ui-form-steps");
+        // On a page, the page's heading takes focus, such as Check your answers, a heading of your
+        // own above the answers, or the Panel once they are sent. The steps' own are out of sight.
+        const heading =
+          layout === "page"
+            ? [...(section?.querySelectorAll<HTMLElement>("h1") ?? [])].find(
+                (each) => !each.closest("[hidden]"),
+              )
+            : undefined;
+        if (heading && !heading.hasAttribute("tabindex")) heading.tabIndex = -1;
+        return (
+          heading ??
+          section?.querySelector<HTMLElement>(
+            ".x-govuk-ui-form-steps-review-title, .x-govuk-ui-form-steps-summary, .x-govuk-ui-form-steps-done",
           )
-          ?.focus();
+        )?.focus();
+      }
       if (wanted.startsWith("#")) {
         // A question asked again takes focus at its answer, or at the chosen answer of a group.
         const field = document.getElementById(wanted.slice(1));
@@ -795,6 +897,16 @@ export function FormSteps({
     returning.current = false;
     if (previous !== undefined) go(previous);
   };
+  // Change asks the question again, then comes back to Check your answers.
+  const change = (row: FormStepsAnswer) => {
+    // While the answers are sent, they cannot change.
+    if (sending.current) return;
+    returning.current = true;
+    keeping.current = true;
+    setSent(false);
+    go(row.step);
+    if (row.id) focusNext.current = `#${row.id}`;
+  };
 
   const onKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
     if (!keyboardShortcut || event.key !== "Enter" || !(event.metaKey || event.ctrlKey)) return;
@@ -807,10 +919,72 @@ export function FormSteps({
   const last = !checkAnswers && plan.at(-1) === at;
   const label = reviewing || last ? labels.submit : (step?.labels?.continue ?? labels.continue);
   const card = layout === "card";
-  const showSteps = !(sent && doneContent);
+  const replaced = sent && Boolean(doneContent);
+
+  // The parts read the form through stable functions, so a FormStepsProvider is told of a change
+  // only when the form changes.
+  const latest = useLatest({ goBack, skip, change });
+  const backNow = useCallback(() => latest.current.goBack(), []);
+  const skipNow = useCallback(() => latest.current.skip(), []);
+  const changeNow = useCallback((row: FormStepsAnswer) => latest.current.change(row), []);
+  const canGoBack = !sent && previous !== undefined;
+  const canSkip = Boolean(step?.optional) && !reviewing && !sent;
+  const listed = reviewing || sent ? rows : noAnswers;
+  const controls = useMemo<FormStepsControls>(
+    () => ({
+      step: at,
+      count,
+      position,
+      total: plan.length,
+      settled,
+      reviewing: reviewing && !sent,
+      sent,
+      busy,
+      back: canGoBack ? backNow : null,
+      skip: canSkip ? skipNow : null,
+      answers: listed,
+      change: changeNow,
+    }),
+    [
+      at,
+      count,
+      position,
+      plan.length,
+      settled,
+      reviewing,
+      sent,
+      busy,
+      canGoBack,
+      canSkip,
+      listed,
+      backNow,
+      skipNow,
+      changeNow,
+    ],
+  );
+  const shared = useMemo(
+    () => ({ controls, labels, layout, replaced }),
+    [controls, labels, layout, replaced],
+  );
+  // A FormStepsProvider around the form is told where it is, so parts outside it can show it.
+  const provider = useContext(ProviderContext);
+  const publish = provider?.publish;
+  useLayoutEffect(() => publish?.(shared), [publish, shared]);
+  useLayoutEffect(() => () => publish?.(null), [publish]);
+  // Each part a service places takes the place of the form's own. A part among the form's
+  // children is known as the server renders too, so the first HTML draws it once.
+  const [ownPlaced, ownClaim] = useClaims();
+  const placed = provider?.placed ?? ownPlaced;
+  const claim = provider?.claim ?? ownClaim;
+  const types = Children.toArray(children).flatMap((child) =>
+    isValidElement(child) ? [child.type] : [],
+  );
+  const drawBack = back && !placed.back && !types.includes(FormStepsBack);
+  const drawProgress = progress && !placed.progress && !types.includes(FormStepsProgress);
+  const drawSummary = !placed.summary && !types.includes(FormStepsSummary);
 
   const ring = 2 * Math.PI * 7;
-  const progressRing = card && progress && (
+  const progressRing = card && drawProgress && (
     <span
       className="x-govuk-ui-form-steps-ring"
       role="progressbar"
@@ -837,22 +1011,13 @@ export function FormSteps({
   );
 
   const backControl =
-    back && !sent && previous !== undefined ? (
+    drawBack && canGoBack ? (
       card ? (
         <Button variant="outline" size="small" onClick={goBack}>
           {labels.back}
         </Button>
       ) : (
-        <BackLink
-          className="x-govuk-ui-form-steps-back"
-          href="#"
-          onClick={(event) => {
-            event.preventDefault();
-            goBack();
-          }}
-        >
-          {labels.back}
-        </BackLink>
+        <StepsBack />
       )
     ) : null;
 
@@ -870,74 +1035,15 @@ export function FormSteps({
       )}
     </Button>
   );
-  const skipControl =
-    step?.optional && !reviewing && !sent ? (
-      <Button
-        variant={card ? "outline" : "secondary"}
-        size={card ? "small" : undefined}
-        onClick={skip}
-      >
-        {labels.skip}
-      </Button>
-    ) : null;
-
-  const summary = (
-    <div className="x-govuk-ui-form-steps-review">
-      {/* On a page, Check your answers is the page's heading, as each step's title is, and once
-          the answers are sent, a Panel above them says so, as GOV.UK's confirmation page does. */}
-      {!card && sent && <Panel title={doneLabel} />}
-      {!card && !sent && (
-        <h1 className="x-govuk-ui-form-steps-review-title" tabIndex={-1}>
-          {labels.checkAnswers}
-        </h1>
-      )}
-      <SummaryList
-        className="x-govuk-ui-form-steps-summary"
-        tabIndex={card ? -1 : undefined}
-        noBorder={card}
-      >
-        {rows.map((row, index) => (
-          <SummaryListRow
-            key={`${row.step}-${row.id || index}`}
-            label={row.label}
-            actions={
-              <SummaryListAction
-                hiddenText={labels.changeAnswer(row.label)}
-                // biome-ignore lint/correctness/noChildrenProp: The words are its label.
-                children={labels.change}
-                onClick={() => {
-                  // While the answers are sent, they cannot change.
-                  if (sending.current) return;
-                  returning.current = true;
-                  keeping.current = true;
-                  setSent(false);
-                  go(row.step);
-                  if (row.id) focusNext.current = `#${row.id}`;
-                }}
-              />
-            }
-          >
-            {"own" in row
-              ? row.own
-              : row.values.map((value, place) => (
-                  <span
-                    // biome-ignore lint/suspicious/noArrayIndexKey: answers are listed in a fixed order.
-                    key={place}
-                    className="x-govuk-ui-form-steps-answer"
-                    data-muted={
-                      row.skipped ||
-                      (value === labels.notAnswered && row.values.length === 1) ||
-                      undefined
-                    }
-                  >
-                    {value}
-                  </span>
-                ))}
-          </SummaryListRow>
-        ))}
-      </SummaryList>
-    </div>
-  );
+  const skipControl = canSkip ? (
+    <Button
+      variant={card ? "outline" : "secondary"}
+      size={card ? "small" : undefined}
+      onClick={skip}
+    >
+      {labels.skip}
+    </Button>
+  ) : null;
 
   // Every step stays in the form, so answers are kept as users move back and forth. Steps
   // skipped or not asked are disabled while out of sight, so their answers are not sent. A step
@@ -961,6 +1067,7 @@ export function FormSteps({
         optional: _optional,
         labels: _labels,
         summary: _summary,
+        actions: _actions,
         ref: _ref,
         className = "",
         ...props
@@ -993,13 +1100,12 @@ export function FormSteps({
 
   const body = (
     <div className="x-govuk-ui-form-steps-body">
-      {!card && progress && !reviewing && !sent && plan.length > 1 && (
-        <p className="x-govuk-ui-form-steps-progress">
-          {labels.progress(position + 1, plan.length)}
-        </p>
-      )}
+      {!card && drawProgress && <StepsProgress />}
+      {/* On a page, once the answers are sent, a Panel above them says so, as GOV.UK's
+          confirmation page does. */}
+      {!card && sent && !replaced && <Panel title={doneLabel} />}
       <StepsContext value={host}>{numberSteps(children)}</StepsContext>
-      {(reviewing || sent) && showSteps && summary}
+      {drawSummary && <StepsSummary />}
       {sent && doneContent && (
         <div className="x-govuk-ui-form-steps-done" tabIndex={-1}>
           {doneContent}
@@ -1009,73 +1115,275 @@ export function FormSteps({
   );
 
   return (
-    <section
-      className={`x-govuk-ui-form-steps ${className}`.trim()}
-      style={style}
-      data-layout={layout}
-      data-done={sent || undefined}
-      // SoundScope plays the success sound as the answers are taken.
-      data-success={sent || undefined}
-      aria-labelledby={card && title ? titleId : undefined}
-    >
-      {card && (
-        <header className="x-govuk-ui-form-steps-header">
-          {icon && <span className="x-govuk-ui-form-steps-icon">{icon}</span>}
-          <h3 id={titleId} className="x-govuk-ui-form-steps-title">
-            {title}
-          </h3>
-          {progressRing}
-        </header>
-      )}
-      {!card && backControl}
-      <Form
-        {...formProps}
-        // Restored answers start the form again, because each field reads its answer once.
-        key={restored.round}
-        ref={formRef}
-        className="x-govuk-ui-form-steps-form"
-        // Pressing anywhere in it that is not a control puts focus in the form, so keys that work
-        // across it, such as Choices' letters, reach it.
-        tabIndex={-1}
-        errorSummary={errorSummary}
-        defaultValues={restored.answers}
-        validate={(data) => (reviewing || !step?.validate ? {} : step.validate(data))}
-        onSubmit={(data) => onSubmit(data)}
-        onKeyDown={chain(givenKeyDown, onKeyDown)}
-        // Keeping the answers and working out the steps again follow every change, whatever a
-        // service's own handlers do. A control that sends its value from a hidden input, such as a
-        // slider or a toggle group, changes it with a key or a press, not with typing.
-        onInput={both(givenInput, keepSoon)}
-        onChange={both(givenChange, () => {
-          replan();
-          keepSoon();
-        })}
-        onClick={both(givenClick, keepSoon)}
-        onKeyUp={both(givenKeyUp, keepSoon)}
-      >
-        {card ? <AutoHeight>{body}</AutoHeight> : body}
-        {card ? (
-          <div className="x-govuk-ui-form-steps-footer">
-            {sent ? (
-              <Tag colour="green">{doneLabel}</Tag>
-            ) : (
-              <>
-                {backControl}
-                <span className="x-govuk-ui-form-steps-gap" />
-                {skipControl}
-                {submit}
-              </>
+    // The parts inside the form claim their places from it, or from a FormStepsProvider around it.
+    // A FormSteps inside one of the steps answers to no FormStepsProvider of the form's.
+    <ProviderContext value={null}>
+      <ClaimContext value={claim}>
+        <SharedContext value={shared}>
+          <section
+            className={`x-govuk-ui-form-steps ${className}`.trim()}
+            style={style}
+            data-layout={layout}
+            data-done={sent || undefined}
+            // SoundScope plays the success sound as the answers are taken.
+            data-success={sent || undefined}
+            aria-labelledby={card && title ? titleId : undefined}
+          >
+            {card && (
+              <header className="x-govuk-ui-form-steps-header">
+                {icon && <span className="x-govuk-ui-form-steps-icon">{icon}</span>}
+                <h3 id={titleId} className="x-govuk-ui-form-steps-title">
+                  {title}
+                </h3>
+                {progressRing}
+              </header>
             )}
-          </div>
-        ) : (
-          !sent && (
-            <ButtonGroup className="x-govuk-ui-form-steps-buttons">
-              {submit}
-              {skipControl}
-            </ButtonGroup>
-          )
-        )}
-      </Form>
-    </section>
+            {!card && backControl}
+            <Form
+              {...formProps}
+              // Restored answers start the form again, because each field reads its answer once.
+              key={restored.round}
+              ref={formRef}
+              className="x-govuk-ui-form-steps-form"
+              // Pressing anywhere in it that is not a control puts focus in the form, so keys that work
+              // across it, such as Choices' letters, reach it.
+              tabIndex={-1}
+              errorSummary={errorSummary}
+              defaultValues={restored.answers}
+              validate={(data) => (reviewing || !step?.validate ? {} : step.validate(data))}
+              onSubmit={(data) => onSubmit(data)}
+              onKeyDown={chain(givenKeyDown, onKeyDown)}
+              // Keeping the answers and working out the steps again follow every change, whatever a
+              // service's own handlers do. A control that sends its value from a hidden input, such as a
+              // slider or a toggle group, changes it with a key or a press, not with typing.
+              onInput={both(givenInput, keepSoon)}
+              onChange={both(givenChange, () => {
+                replan();
+                keepSoon();
+              })}
+              onClick={both(givenClick, keepSoon)}
+              onKeyUp={both(givenKeyUp, keepSoon)}
+            >
+              {card ? <AutoHeight>{body}</AutoHeight> : body}
+              {card ? (
+                <div className="x-govuk-ui-form-steps-footer">
+                  {sent ? (
+                    <Tag colour="green">{doneLabel}</Tag>
+                  ) : (
+                    <>
+                      {backControl}
+                      <span className="x-govuk-ui-form-steps-gap" />
+                      {step?.actions}
+                      {actions}
+                      {skipControl}
+                      {submit}
+                    </>
+                  )}
+                </div>
+              ) : (
+                !sent && (
+                  <ButtonGroup className="x-govuk-ui-form-steps-buttons">
+                    {submit}
+                    {skipControl}
+                    {step?.actions}
+                    {actions}
+                  </ButtonGroup>
+                )
+              )}
+            </Form>
+          </section>
+        </SharedContext>
+      </ClaimContext>
+    </ProviderContext>
   );
+}
+
+export type FormStepsProviderProps = {
+  /** The FormSteps, and its parts placed outside it. */
+  children: ReactNode;
+};
+
+/**
+ * Lets the parts of the FormSteps inside it sit outside the FormSteps, such as a FormStepsBack in a
+ * ServicePage's `back`, above the page's main content, where GOV.UK puts a Back link.
+ * `useFormSteps` reads the form there too. Put it around one FormSteps and its parts. It renders no
+ * element.
+ */
+export function FormStepsProvider({ children }: FormStepsProviderProps) {
+  const [shared, publish] = useState<StepsShared | null>(null);
+  const [placed, claim] = useClaims();
+  const provider = useMemo(() => ({ publish, claim, placed }), [claim, placed]);
+  return (
+    <ProviderContext value={provider}>
+      <ClaimContext value={claim}>
+        <SharedContext value={shared}>{children}</SharedContext>
+      </ClaimContext>
+    </ProviderContext>
+  );
+}
+
+/**
+ * Where the FormSteps around it is, and ways to move it on, for a part of your own, such as a
+ * button beside Continue or a heading above the answers. It reads a FormStepsProvider too. Null
+ * outside both.
+ */
+export function useFormSteps(): FormStepsControls | null {
+  return useContext(SharedContext)?.controls ?? null;
+}
+
+export type FormStepsBackProps = Omit<BackLinkProps, "href" | "render" | "children">;
+
+/** The form's Back link, as FormSteps draws it. @internal */
+function StepsBack({ className = "", onClick, ...props }: FormStepsBackProps) {
+  const shared = useContext(SharedContext);
+  const back = shared?.controls.back;
+  if (!shared || !back) return null;
+  return (
+    <BackLink
+      {...props}
+      href="#"
+      className={`x-govuk-ui-form-steps-back ${className}`.trim()}
+      onClick={chain(onClick, (event) => {
+        event.preventDefault();
+        back();
+      })}
+    >
+      {shared.labels.back}
+    </BackLink>
+  );
+}
+
+/**
+ * The form's Back link, which goes back to the step before that applies. It shows from the second
+ * step on, until the answers are sent. While one is in the form, or in a FormStepsProvider around
+ * it, FormSteps draws no Back of its own.
+ */
+export function FormStepsBack(props: FormStepsBackProps) {
+  useClaim("back");
+  return <StepsBack {...props} />;
+}
+
+export type FormStepsProgressProps = Omit<ComponentPropsWithRef<"p">, "children">;
+
+/** How far along the form is, as FormSteps draws it. @internal */
+function StepsProgress({ className = "", ...props }: FormStepsProgressProps) {
+  const shared = useContext(SharedContext);
+  if (!shared) return null;
+  const { position, total, reviewing, sent } = shared.controls;
+  if (reviewing || sent || total < 2) return null;
+  return (
+    <p {...props} className={`x-govuk-ui-form-steps-progress ${className}`.trim()}>
+      {shared.labels.progress(position + 1, total)}
+    </p>
+  );
+}
+
+/**
+ * How far along the form is, such as "Question 2 of 5", among the steps that apply to the answers
+ * so far. It shows while two steps or more apply, until Check your answers. While one is in the
+ * form, FormSteps draws no progress of its own, neither these words nor a card's ring.
+ */
+export function FormStepsProgress(props: FormStepsProgressProps) {
+  useClaim("progress");
+  return <StepsProgress {...props} />;
+}
+
+export type FormStepsSummaryProps = ComponentPropsWithRef<"div"> & {
+  /**
+   * The heading above the answers. By default, on a page, its `checkAnswers` label, "Check your
+   * answers", until the answers are sent. Give null for none, such as below a heading of your own.
+   */
+  title?: ReactNode;
+  /** The level of its heading. By default, 1 on a page, as the page's heading, and 3 in a card. */
+  titleLevel?: 1 | 2 | 3 | 4;
+  /**
+   * The steps whose answers it lists, by their places among the steps, from 0, such as a section
+   * of the form. By default, every step that applies.
+   */
+  steps?: readonly number[];
+  /** Rows of your own after the answers, as SummaryListRow parts. */
+  children?: ReactNode;
+};
+
+/** The answers, as FormSteps lists them. @internal */
+function StepsSummary({
+  title,
+  titleLevel,
+  steps: only,
+  children,
+  className = "",
+  ...props
+}: FormStepsSummaryProps) {
+  const shared = useContext(SharedContext);
+  if (!shared) return null;
+  const { controls, labels, layout, replaced } = shared;
+  const { reviewing, sent, answers, change } = controls;
+  if (!(reviewing || sent) || replaced) return null;
+  const card = layout === "card";
+  const rows = only ? answers.filter((answer) => only.includes(answer.step)) : answers;
+  if (only && rows.length === 0 && !children) return null;
+  const heading = title === undefined ? (card || sent ? null : labels.checkAnswers) : title;
+  const Heading = `h${titleLevel ?? (card ? 3 : 1)}` as const;
+  return (
+    <div {...props} className={`x-govuk-ui-form-steps-review ${className}`.trim()}>
+      {present(heading) && (
+        <Heading className="x-govuk-ui-form-steps-review-title" tabIndex={-1}>
+          {heading}
+        </Heading>
+      )}
+      <SummaryList
+        className="x-govuk-ui-form-steps-summary"
+        tabIndex={card ? -1 : undefined}
+        noBorder={card}
+      >
+        {rows.map((row, index) => {
+          const muted = row.skipped || row.values.length === 0;
+          const values = row.skipped
+            ? [labels.skipped]
+            : row.values.length > 0
+              ? row.values
+              : [labels.notAnswered];
+          return (
+            <SummaryListRow
+              key={`${row.step}-${row.id || index}`}
+              label={row.question}
+              actions={
+                <SummaryListAction
+                  hiddenText={labels.changeAnswer(row.question)}
+                  // biome-ignore lint/correctness/noChildrenProp: The words are its label.
+                  children={labels.change}
+                  onClick={() => change(row)}
+                />
+              }
+            >
+              {"summary" in row
+                ? row.summary
+                : values.map((value, place) => (
+                    <span
+                      // biome-ignore lint/suspicious/noArrayIndexKey: answers are listed in a fixed order.
+                      key={place}
+                      className="x-govuk-ui-form-steps-answer"
+                      data-muted={muted || undefined}
+                    >
+                      {value}
+                    </span>
+                  ))}
+            </SummaryListRow>
+          );
+        })}
+        {children}
+      </SummaryList>
+    </div>
+  );
+}
+
+/**
+ * The answers as Check your answers lists them, each with Change, where you place it among the
+ * form's steps. It shows on Check your answers, and stays once the answers are sent. Give each of
+ * several a `title` and the `steps` of a section, as GOV.UK lists a long form's answers. While one
+ * is in the form, FormSteps lists no answers of its own.
+ */
+export function FormStepsSummary(props: FormStepsSummaryProps) {
+  useClaim("summary");
+  return <StepsSummary {...props} />;
 }

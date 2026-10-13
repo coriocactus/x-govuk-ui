@@ -95,9 +95,15 @@ export type ServicePageProps = PageProps & {
    * out for a live service.
    */
   phase?: ReactNode;
-  /** What the phase banner says. By default, its `phase` label, which asks for feedback. */
+  /**
+   * What the phase banner says. By default, given a `feedbackUrl`, its `phase` label, which asks for
+   * feedback there.
+   */
   phaseMessage?: ReactNode;
-  /** Where the phase banner's feedback link goes. */
+  /**
+   * Where the phase banner's feedback link goes. GOV.UK asks every service in a phase for feedback,
+   * so give it, or a `phaseMessage` of your own. Without either, the banner shows only its tag.
+   */
   feedbackUrl?: string;
   /** A Back link, by where it goes, or a part of your own in its place, such as Breadcrumbs. */
   back?: string | ReactNode;
@@ -147,7 +153,7 @@ export function ServicePage({
   navigation,
   phase,
   phaseMessage,
-  feedbackUrl = "#feedback",
+  feedbackUrl,
   back,
   footerLinks,
   render,
@@ -165,11 +171,12 @@ export function ServicePage({
       {phase && (
         <PhaseBanner tag={phase}>
           {phaseMessage ??
-            labels.phase(
-              <Link href={feedbackUrl} render={render}>
-                {labels.feedback}
-              </Link>,
-            )}
+            (feedbackUrl !== undefined &&
+              labels.phase(
+                <Link href={feedbackUrl} render={render}>
+                  {labels.feedback}
+                </Link>,
+              ))}
         </PhaseBanner>
       )}
       {typeof back === "string" ? <BackLink href={back} render={render} /> : back}

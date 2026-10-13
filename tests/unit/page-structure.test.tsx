@@ -86,6 +86,7 @@ test("a service page puts the usual GOV.UK parts around its content", () => {
       serviceName="Apply for a licence"
       serviceUrl="/apply"
       phase="Beta"
+      feedbackUrl="/feedback"
       back="#start"
       footerLinks={<FooterLink href="/accessibility">Accessibility statement</FooterLink>}
       render={(props) => <a data-router="" {...props} />}
@@ -102,9 +103,16 @@ test("a service page puts the usual GOV.UK parts around its content", () => {
   // Every link the page makes goes through the router: the header's, the service's name, the
   // feedback link and the Back link.
   expect(page.match(/<a data-router=""/g)).toHaveLength(4);
-  // Without links of its own, the footer has no placeholder support links.
-  const bare = renderToStaticMarkup(<ServicePage serviceName="Apply">Content</ServicePage>);
+  // Without links of its own, the footer has no placeholder support links, and the phase banner
+  // no placeholder feedback link.
+  const bare = renderToStaticMarkup(
+    <ServicePage serviceName="Apply" phase="Beta">
+      Content
+    </ServicePage>,
+  );
   expect(bare).not.toContain("x-govuk-ui-footer-links");
+  expect(bare).toContain("Beta");
+  expect(bare).not.toContain("give your feedback");
   // A header or footer of your own replaces the usual one.
   const own = renderToStaticMarkup(
     <ServicePage serviceName="Apply" header={<header>Own header</header>}>

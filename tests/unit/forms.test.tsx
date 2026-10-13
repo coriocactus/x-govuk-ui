@@ -92,7 +92,6 @@ import {
 } from "x-govuk-ui";
 import { z } from "zod";
 import { fieldOf } from "../../packages/core/src/form";
-import { sameAnswers } from "../../packages/core/src/form-steps";
 import { browserStorage } from "../../packages/core/src/stored-state";
 import { controlIcons } from "../../packages/jorjorwel/src/editor-controls";
 import { matchPosition } from "../../packages/jorjorwel/src/editor-prompt";
@@ -1245,23 +1244,6 @@ test("the answers' summary shows only on Check your answers, with its heading at
   // The form lists no answers of its own beside it.
   expect(review.match(/x-govuk-ui-form-steps-review[ "]/g)).toHaveLength(1);
   expect(review).not.toContain("Check your answers");
-});
-
-test("answers listed again that show the same are the same, so the list is kept", () => {
-  // A translation's element, as a bilingual service writes a question, with its values.
-  const Trans = (props: { id: string; values: Record<string, number> }) => <>{props.id}</>;
-  const list = (name: string, count: number) => [
-    {
-      step: 0,
-      question: <span style={{ fontWeight: 400 }}>{name}</span>,
-      values: [<Trans key="n" id="answers" values={{ count }} />],
-      id: "name",
-      skipped: false,
-    },
-  ];
-  expect(sameAnswers(list("Your name", 1), list("Your name", 1))).toBe(true);
-  expect(sameAnswers(list("Your name", 1), list("Eich enw", 1))).toBe(false);
-  expect(sameAnswers(list("Your name", 1), list("Your name", 2))).toBe(false);
 });
 
 test("storage that the browser blocks is no storage, not an error", () => {

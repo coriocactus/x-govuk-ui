@@ -433,7 +433,9 @@ export {
   type FormStepsProviderProps,
   FormStepsSummary,
   type FormStepsSummaryProps,
+  type UseFormStepsAnswersResult,
   useFormSteps,
+  useFormStepsAnswers,
 } from "./form-steps";
 export {
   defaultGroupedTableLabels,

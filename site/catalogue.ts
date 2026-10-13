@@ -947,7 +947,7 @@ const entries = {
       ),
       reference(
         "FormStep",
-        "{ title?, hint?, validate, onContinue, when, optional, labels: { continue }, summary }",
+        "Fieldset props and { title?, titleLevel?, hint?, validate, onContinue, when, optional, labels: { continue }, summary }",
         "Part",
       ),
     ],

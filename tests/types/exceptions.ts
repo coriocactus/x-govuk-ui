@@ -37,11 +37,10 @@ export const elementless = [
 
 /**
  * Parts whose props describe what their group draws, rather than an element of their own. A
- * TourStep's class goes on the Tour's card, a FormStep's on the fieldset FormSteps draws for it,
- * and an entry's menu is a whole DropdownMenu. Every other part that renders an element passes its
- * `ref` to it.
+ * TourStep's class goes on the Tour's card, and an entry's menu is a whole DropdownMenu. Every
+ * other part that renders an element passes its `ref` to it.
  */
-export const described = ["TourStep", "FormStep", "SidebarItemMenu"] as const;
+export const described = ["TourStep", "SidebarItemMenu"] as const;
 
 /**
  * Parts that take no `style`, because what they are built on sets it. input-otp sets the style of

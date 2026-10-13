@@ -61,6 +61,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added a fieldset's props to FormStep, such as `id`, `style`, `ref` and data attributes, which go on the step's fieldset beside its `className`, and `titleLevel`, the level of its title's heading, 1 on a page and 3 in a card by default.
 - Added `closeOnPressOutside` to Dialog and Sheet, as Callout and Tour have. Give false for a decision that must be made in the dialog or the sheet, such as confirming a deletion. Escape and its own close still close it.
 - Added `copyrightUrl` to Footer, where its copyright line links to. By default, Crown copyright's terms, as before. Give your own terms, or null for a line with no link, for a service outside GOV.UK.
 - Added CommandMenuBestMatches, the commands that best match the search, shown together where a service places it, such as before every group, so a command named as typed is not lost beneath a group whose keywords match too. By default, the commands whose names are the search come first, then those whose names start with it, at most three. It takes `rank`, `limit` and `label`, and its heading is the `best` label. Each command shown there moves from its place, with its context, ref and handlers, so it is listed once.

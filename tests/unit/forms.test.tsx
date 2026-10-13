@@ -46,6 +46,8 @@ import {
   FilterChip,
   FilterChips,
   Form,
+  FormStep,
+  FormSteps,
   Hint,
   Input,
   InputControl,
@@ -1167,4 +1169,25 @@ test("a part's own name comes first, and its default comes from a labels provide
     "Derbyn cwcis dadansoddi",
   ])
     expect(html).toContain(words);
+});
+
+test("a step takes a fieldset's props and the level of its title", () => {
+  const html = renderToStaticMarkup(
+    <FormSteps layout="card">
+      <FormStep
+        id="contact"
+        title="How can we contact you?"
+        titleLevel={2}
+        className="contact-step"
+        style={{ marginTop: 8 }}
+        data-step-name="contact"
+      >
+        <Input name="email" label="Email address" />
+      </FormStep>
+    </FormSteps>,
+  );
+  expect(html).toMatch(
+    /<fieldset role="presentation" id="contact" style="margin-top:8px" data-step-name="contact" class="x-govuk-ui-form-step contact-step"/,
+  );
+  expect(html).toContain('<h2 class="x-govuk-ui-form-step-title">How can we contact you?</h2>');
 });

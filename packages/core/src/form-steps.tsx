@@ -2,10 +2,12 @@
 
 import {
   Children,
+  type ComponentPropsWithRef,
   createContext,
   isValidElement,
   type KeyboardEvent,
   type ReactNode,
+  type Ref,
   type RefObject,
   useCallback,
   useContext,
@@ -35,12 +37,25 @@ import { Tag } from "./tag";
 // biome-ignore lint/suspicious/noConfusingVoidType: a step that only saves returns nothing.
 type Outcome = FormErrors | void | Promise<FormErrors | void>;
 
-export type FormStepProps = {
+/**
+ * A step's props. The step is a fieldset, which takes every prop of a fieldset's, such as `id`,
+ * `style` and data attributes, apart from `disabled` and `hidden`, which FormSteps sets as the
+ * step comes and goes.
+ */
+export type FormStepProps = Omit<
+  ComponentPropsWithRef<"fieldset">,
+  "title" | "children" | "disabled" | "hidden"
+> & {
   /**
    * A heading for a step that asks several things. A step that asks one thing can leave it out,
    * and its field's own label or legend is the question.
    */
   title?: ReactNode;
+  /**
+   * The level of its `title`'s heading. By default, 1 on a page, where the title is the page's
+   * heading, and 3 in a card.
+   */
+  titleLevel?: 1 | 2 | 3 | 4;
   hint?: ReactNode;
   /** The step's fields, each with a `name`. */
   children: ReactNode;
@@ -63,8 +78,6 @@ export type FormStepProps = {
   labels?: Partial<Pick<FormStepsLabels, "continue">>;
   /** The step's answer in Check your answers, in place of each field's own answer. */
   summary?: (data: FormData) => ReactNode;
-  /** Added to the step. */
-  className?: string;
 };
 
 /** A step as its FormSteps knows it, by an id of its own, which keeps its fields while it moves. */
@@ -79,7 +92,7 @@ type StepsHost = {
     id: string,
     index: number | null,
     props: FormStepProps,
-    place: RefObject<HTMLFieldSetElement | null>,
+    place: Ref<HTMLFieldSetElement>,
   ) => ReactNode;
 };
 
@@ -99,10 +112,11 @@ export function FormStep(props: FormStepProps): ReactNode {
   const direct = useContext(StepIndex);
   const id = useId();
   const place = useRef<HTMLFieldSetElement>(null);
+  const element = useMergedRef(place, props.ref);
   const entry = useMemo(() => ({ id, props }), [id, props]);
   useRegister(host?.registry, entry, place);
   if (!host) return null;
-  return host.draw(id, host.indexOf(id) ?? direct, props, place);
+  return host.draw(id, host.indexOf(id) ?? direct, props, element);
 }
 
 /** Gives each direct child that is a FormStep its place, so the first HTML shows the right step. */
@@ -930,32 +944,47 @@ export function FormSteps({
       const index = registered.findIndex((entry) => entry.id === id);
       return index < 0 ? null : index;
     },
-    draw: (id, index, each, place) => (
-      <fieldset
-        ref={place}
-        role="presentation"
-        className={`x-govuk-ui-form-step ${each.className ?? ""}`.trim()}
-        data-step={index ?? undefined}
-        hidden={index !== at || sent}
-        disabled={index !== null && index !== at && (skipped.has(index) || !plan.includes(index))}
-      >
-        {layout === "page" && title && (
-          <span className="x-govuk-ui-form-steps-caption">{title}</span>
-        )}
-        {each.title &&
-          (layout === "page" ? (
-            <h1 className="x-govuk-ui-form-step-title">{each.title}</h1>
-          ) : (
-            <h3 className="x-govuk-ui-form-step-title">{each.title}</h3>
-          ))}
-        {each.hint && <div className="x-govuk-ui-hint">{each.hint}</div>}
-        <div className="x-govuk-ui-form-step-fields">
-          <StepFields step={id} fields={stepFields} changed={fieldChanged}>
-            {each.children}
-          </StepFields>
-        </div>
-      </fieldset>
-    ),
+    draw: (id, index, each, place) => {
+      // The step's own options, which FormSteps reads, and the fieldset's props, which it draws.
+      const {
+        title: stepTitle,
+        titleLevel = layout === "page" ? 1 : 3,
+        hint,
+        children: fields,
+        validate: _validate,
+        onContinue: _onContinue,
+        when: _when,
+        optional: _optional,
+        labels: _labels,
+        summary: _summary,
+        ref: _ref,
+        className = "",
+        ...props
+      } = each;
+      const Title = `h${titleLevel}` as const;
+      return (
+        <fieldset
+          role="presentation"
+          {...props}
+          ref={place}
+          className={`x-govuk-ui-form-step ${className}`.trim()}
+          data-step={index ?? undefined}
+          hidden={index !== at || sent}
+          disabled={index !== null && index !== at && (skipped.has(index) || !plan.includes(index))}
+        >
+          {layout === "page" && title && (
+            <span className="x-govuk-ui-form-steps-caption">{title}</span>
+          )}
+          {stepTitle && <Title className="x-govuk-ui-form-step-title">{stepTitle}</Title>}
+          {hint && <div className="x-govuk-ui-hint">{hint}</div>}
+          <div className="x-govuk-ui-form-step-fields">
+            <StepFields step={id} fields={stepFields} changed={fieldChanged}>
+              {fields}
+            </StepFields>
+          </div>
+        </fieldset>
+      );
+    },
   };
 
   const body = (

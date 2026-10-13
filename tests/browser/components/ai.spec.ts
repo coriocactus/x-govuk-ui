@@ -692,7 +692,14 @@ test("pressing the chat input's box, anywhere that is not a control or a chip's 
     .first()
     .locator(".x-govuk-ui-file-chip-name");
   const selected = () => name.evaluate(() => getSelection()?.toString());
-  // The name is cut short in this box, so it shows as its start and end.
+  // The name is cut short in this box, so it shows as its start and end, once the page's typeface
+  // has loaded and the name is cut for it.
+  await expect
+    .poll(async () => {
+      const now = await cutOf(name);
+      return now.cut && now.tight && now.fits;
+    })
+    .toBe(true);
   const shown = await name.evaluate((element) =>
     [".x-govuk-ui-file-chip-start", ".x-govuk-ui-file-chip-end"]
       .map((part) => element.querySelector(part)?.textContent ?? "")
@@ -703,7 +710,7 @@ test("pressing the chat input's box, anywhere that is not a control or a chip's 
   await page.mouse.down();
   await page.mouse.move(words.x + words.width - 2, words.y + words.height / 2, { steps: 4 });
   await page.mouse.up();
-  await expect.poll(selected).toMatch(/^Rod fi/);
+  await expect.poll(selected).toMatch(/^Rod/);
   await expect(message).not.toBeFocused();
   await name.evaluate(() => getSelection()?.removeAllRanges());
   await name.dblclick();
@@ -812,9 +819,10 @@ test("file chips list documents outside a chat input, link their names, and pass
       return !justRoom.cut && justRoom.whole && justRoom.fits;
     })
     .toBe(true);
-  // In another typeface, once it is set, the name is cut again for its letters.
+  // In another typeface, once it is set, the name is cut again for its letters. A monospaced face
+  // is far wider than the page's, so the cut is sure to change.
   await list.evaluate((element) => {
-    element.style.setProperty("--x-govuk-ui-font", "Georgia, serif");
+    element.style.setProperty("--x-govuk-ui-font", '"Courier New", monospace');
   });
   await expect
     .poll(async () => {

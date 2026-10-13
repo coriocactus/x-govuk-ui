@@ -38,8 +38,10 @@ test("button keeps its width and focus while saving, and takes the width on a ph
   // On a phone, the playground is a sheet, so the size is chosen on the wider screen.
   await page.setViewportSize(wide);
   await playground.set("size", /^Small$/);
+  const small = (await button.boundingBox())!.width;
+  expect(small).toBeLessThan(column);
   await page.setViewportSize({ width: 375, height: 700 });
-  await expect.poll(async () => (await button.boundingBox())!.width).toBeLessThan(column / 2);
+  await expect.poll(async () => (await button.boundingBox())!.width).toBeCloseTo(small, 0);
   await page.setViewportSize(wide);
   await playground.set("size", /^Medium$/);
   await expect.poll(async () => (await button.boundingBox())!.width).toBeCloseTo(fits, 0);

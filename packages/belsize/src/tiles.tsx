@@ -35,11 +35,11 @@ import {
   ResizableHandle,
   ScrollArea,
   Tooltip,
+  useLabels,
   useScopeSound,
 } from "x-govuk-ui";
 import {
   useControllableState,
-  useLabels,
   useLatest,
   useMediaQuery,
   useMergedRef,

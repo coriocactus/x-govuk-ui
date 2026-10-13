@@ -16,7 +16,6 @@ export { useControllableState } from "./controllable-state";
 export { present, useBoundField } from "./field";
 export { trackHighlight } from "./highlight";
 export { type HtmlNode, parseHtmlTree, safeAddress, treeText, treeToDom } from "./html-tree";
-export { useLabels } from "./labels";
 export { useMediaQuery } from "./media-query";
 export { duration } from "./motion";
 export { Orb } from "./orb";

@@ -450,6 +450,7 @@ export {
   type Labels,
   LabelsProvider,
   type LabelsProviderProps,
+  useLabels,
   useLocale,
 } from "./labels";
 export {

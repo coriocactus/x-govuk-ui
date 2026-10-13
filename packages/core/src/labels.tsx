@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { createContext, type ReactNode, useContext, useMemo, useState } from "react";
 import type { AccordionLabels } from "./accordion";
 import type { QuestionCardLabels } from "./agent-cards";
 import type { BackLinkLabels } from "./back-link";
@@ -118,7 +118,10 @@ export type Labels = {
 const LabelsContext = createContext<Labels>({});
 
 export type LabelsProviderProps = {
-  /** The words to use, by component. A provider inside another adds to its words. */
+  /**
+   * The words to use, by component. A provider inside another adds to its words. Give the same
+   * object at each render, such as a constant, so the components inside need not render again.
+   */
   labels: Labels;
   children: ReactNode;
 };
@@ -144,9 +147,21 @@ export function LabelsProvider({ labels, children }: LabelsProviderProps) {
   return <LabelsContext value={merged}>{children}</LabelsContext>;
 }
 
+/** Whether two maps of words have the same words. */
+function sameWords(a: object, b: object) {
+  const first = Object.entries(a);
+  return (
+    first.length === Object.keys(b).length &&
+    first.every(([key, value]) => Object.is(value, (b as Record<string, unknown>)[key]))
+  );
+}
+
 /**
  * A component's words, from its own `labels`, then the nearest LabelsProvider, then its defaults.
- * @internal
+ * Use it in a component of your own, with its words added to `ComponentLabels`.
+ *
+ * The result is the same object while every word stays the same, even when `own` is a new object
+ * at each render, so an effect can depend on it.
  */
 export function useLabels<Component extends keyof ComponentLabels>(
   component: Component,
@@ -156,7 +171,12 @@ export function useLabels<Component extends keyof ComponentLabels>(
   const given = useContext(LabelsContext)[component] as
     | Partial<ComponentLabels[Component]>
     | undefined;
-  return { ...defaults, ...given, ...own };
+  const words = { ...defaults, ...given, ...own };
+  // The words of the last render, kept as React suggests for information from earlier renders.
+  const [kept, keep] = useState(words);
+  if (sameWords(kept, words)) return kept;
+  keep(words);
+  return words;
 }
 
 /** The language that dates and numbers are written in, from the nearest LabelsProvider. */

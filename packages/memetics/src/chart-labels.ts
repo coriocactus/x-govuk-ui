@@ -1,7 +1,6 @@
 "use client";
 
-import { useLocale } from "x-govuk-ui";
-import { useLabels } from "x-govuk-ui/internal";
+import { useLabels, useLocale } from "x-govuk-ui";
 import { type ChartLabels, chartLabels } from "./chart-words";
 
 declare module "x-govuk-ui" {

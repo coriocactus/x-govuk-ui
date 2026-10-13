@@ -42,8 +42,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "x-govuk-ui";
-import { parseHtmlTree, treeText, useLabels, useMergedRef } from "x-govuk-ui/internal";
+import { ErrorMessage, Field, Hint, Label, useField, useFormDefault, useLabels } from "x-govuk-ui";
+import { parseHtmlTree, treeText, useMergedRef } from "x-govuk-ui/internal";
 import { registerAttachments } from "./editor-attachment-behaviour";
 import { attachmentState } from "./editor-attachment-state";
 import { AttachmentNode, EmbedNode, GalleryNode } from "./editor-attachments";
@@ -348,11 +348,7 @@ export function Editor({
 }: EditorProps) {
   // A form sent while files are uploading is stopped, and the field says why.
   const [waiting, setWaiting] = useState(false);
-  // Kept while each word is the same, because labels given inline are a new object at each render.
-  const merged = useLabels("editor", defaultEditorLabels, ownLabels);
-  const kept = useRef(merged);
-  if (!sameEntries(kept.current, merged)) kept.current = merged;
-  const labels = kept.current;
+  const labels = useLabels("editor", defaultEditorLabels, ownLabels);
   const field = useField({
     id,
     name,
@@ -604,12 +600,6 @@ function caretRect(editor: LexicalEditor) {
   const container = range.startContainer;
   const element = container instanceof Element ? container : container.parentElement;
   return (root.contains(element) ? element : root)?.getBoundingClientRect() ?? null;
-}
-
-/** Whether two objects have the same values under the same keys, with functions by identity. */
-function sameEntries<T extends object>(a: T, b: T) {
-  const keys = Object.keys(a) as (keyof T)[];
-  return keys.length === Object.keys(b).length && keys.every((key) => Object.is(a[key], b[key]));
 }
 
 /** The most written-out values that the editor waits to hear back from its owner. */

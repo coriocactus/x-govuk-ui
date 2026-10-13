@@ -36,7 +36,7 @@ export default function SheetExample({ side = "right", closeButton = true }: Pro
             name="type"
             legend="Licence type"
             legendSize="small"
-            small
+            size="small"
             value={chosen}
             onValueChange={setChosen}
           >

@@ -7,7 +7,7 @@ type Props = {
   hint?: string;
   errorMessage?: string;
   inline?: boolean;
-  small?: boolean;
+  size?: "medium" | "small";
   disabled?: boolean;
   /** Asks for the email address or phone number once that way is chosen. */
   conditional?: boolean;
@@ -19,7 +19,7 @@ export default function RadiosExample({
   hint = "Select one option.",
   errorMessage = "",
   inline = false,
-  small = false,
+  size = "medium",
   disabled = false,
   conditional = true,
 }: Props) {
@@ -35,7 +35,7 @@ export default function RadiosExample({
       hint={hint || undefined}
       errorMessage={errorMessage || undefined}
       inline={inline}
-      small={small}
+      size={size}
       disabled={disabled}
       value={contact}
       onValueChange={setContact}

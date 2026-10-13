@@ -4,11 +4,18 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Changed `small` on Radios and Checkboxes to `size`, `"medium"` or `"small"`, as other parts name their size. Give `size="small"` instead of `small`. The list's `data-small` attribute is now `data-size="small"`.
+
 ### Added
 
 - Added `controlId` to Field, which binds it to its control. A bound Field gives its `Label`, `Hint` and `ErrorMessage` their ids, and shows its own `errorMessage`, or its Form's error by its `name`. A field composed from its parts then needs no `useField`. `hasHint`, `linkTo` and `describedBy` say the rest. A Field without `controlId` works as before.
 - Added `useControlProps`, which gives a control of your own the id, name and descriptions of the bound Field around it.
 - Added InputControl, TextareaControl and SelectControl, the controls of Input, Textarea and Select on their own. In a bound Field, each takes its id, name and descriptions from the field. A service can then put something between a field's hint and its control, or beside the control, as GOV.UK's search puts a button. InputControl keeps the prefix, suffix, Show button and strength meter, TextareaControl the character or word count, and SelectControl the list. Input, Textarea and Select are now built from these parts, and their markup does not change.
+- Added the parts of Radios and Checkboxes, for a group of your own. RadiosRoot and CheckboxesRoot keep the group's state and bind its Field to the group's id. ChoiceList holds the answers, and Radios' dot travels between them. An answer is a ChoiceRoot, with a ChoiceControl, a ChoiceLabel and a ChoiceHint, and a ChoiceConditional after it for its follow-up question. A part can then go between a group's hint and its answers. ChoiceControl takes an input's props, such as `required` and `ref`. Radios and Checkboxes are now built from these parts, and their markup does not change.
+- Added the props of an element to Radio and Checkbox, as every other part has them. `ref`, `data-*` and the rest go on the answer's row, which holds its input, box, label and hint.
+- Added `controlId` to Radio and Checkbox, to give an answer the id you choose.
 - Added FieldsetRoot and FieldsetLegend, the parts of a Fieldset, for a fieldset of your own. FieldsetLegend takes `size` and `pageHeading`. In a bound Field, FieldsetRoot is described by the field's hint and error. Fieldset is now built from them, and its markup does not change.
 
 ### Changed
@@ -17,6 +24,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed an answer in a wrapper of your own, inside Radios or Checkboxes, taking the first answer's id. Its label then named the wrong answer. Such an answer now takes an id of its own. When no answer has the group's id, a Form's error summary links to the first answer on the page.
+- Fixed Radios' dot landing on a follow-up question's chosen radio instead of the group's own.
 - Fixed Select dropping its own `aria-describedby` and `aria-invalid`. It now describes its control by them, before its hint and error, as Input and Textarea do.
 
 ## [0.3.0] - 2026-10-10

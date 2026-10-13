@@ -618,12 +618,24 @@ const entries = {
       ),
       text("hint", "Select all that apply.", { type: "ReactNode" }),
       text("errorMessage", ""),
-      toggle("small"),
+      choice(
+        "size",
+        [
+          ["medium", "Medium"],
+          ["small", "Small"],
+        ],
+        "medium",
+      ),
       toggle("disabled"),
       reference("name", "string", "Required"),
       reference("value / onValueChange", "string[] / (value: string[]) => void"),
-      reference("Checkbox", "{ value, hint, exclusive, conditional, children }", "Part"),
+      reference("Checkbox", "{ value, hint, exclusive, conditional, controlId, children }", "Part"),
       reference("ChoiceDivider", '{ children = "or" }', "Part"),
+      reference("CheckboxesRoot", "{ controlId, name, value, onValueChange, disabled }", "Part"),
+      reference("ChoiceList", "{ inline, size }", "Part"),
+      reference("ChoiceRoot", "{ controlId, value, exclusive, hasHint, conditionalId }", "Part"),
+      reference("ChoiceControl / ChoiceLabel / ChoiceHint", "input / label / hint", "Part"),
+      reference("ChoiceConditional", "{ value, id, children }", "Part"),
     ],
     example: [
       toggle("exclusive", true, { note: "Adds None of these, which clears the other answers." }),
@@ -633,7 +645,13 @@ const entries = {
       { name: "Without follow-ups", args: { exclusive: false, conditional: false } },
       {
         name: "Small, as filters",
-        args: { small: true, legendSize: "small", hint: "", exclusive: false, conditional: false },
+        args: {
+          size: "small",
+          legendSize: "small",
+          hint: "",
+          exclusive: false,
+          conditional: false,
+        },
       },
       {
         name: "With an error",
@@ -668,12 +686,24 @@ const entries = {
       text("hint", "Select one option.", { type: "ReactNode" }),
       text("errorMessage", ""),
       toggle("inline", false, { note: "Follow-up questions do not show on inline radios." }),
-      toggle("small"),
+      choice(
+        "size",
+        [
+          ["medium", "Medium"],
+          ["small", "Small"],
+        ],
+        "medium",
+      ),
       toggle("disabled"),
       reference("name", "string", "Required"),
       reference("value / onValueChange", "string / (value: string) => void"),
-      reference("Radio", "{ value, hint, conditional, children }", "Part"),
+      reference("Radio", "{ value, hint, conditional, controlId, children }", "Part"),
       reference("ChoiceDivider", '{ children = "or" }', "Part"),
+      reference("RadiosRoot", "{ controlId, name, value, onValueChange, disabled }", "Part"),
+      reference("ChoiceList", "{ inline, size }", "Part"),
+      reference("ChoiceRoot", "{ controlId, value, hasHint, conditionalId }", "Part"),
+      reference("ChoiceControl / ChoiceLabel / ChoiceHint", "input / label / hint", "Part"),
+      reference("ChoiceConditional", "{ value, id, children }", "Part"),
     ],
     example: [
       toggle("conditional", true, {
@@ -683,7 +713,7 @@ const entries = {
     ],
     presets: [
       { name: "Inline", args: { inline: true } },
-      { name: "Small", args: { small: true, legendSize: "small" } },
+      { name: "Small", args: { size: "small", legendSize: "small" } },
       { name: "As the page's heading", args: { legendSize: "large" } },
       {
         name: "With an error",

@@ -139,7 +139,7 @@ function PropRow({
       return (
         <li className="prop-row prop-row--stacked" data-prop={prop.name}>
           <Checkboxes
-            small
+            size="small"
             name={prop.name}
             legend={name}
             hint={hint}

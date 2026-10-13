@@ -6,7 +6,7 @@ type Props = {
   legendSize?: "small" | "medium" | "large";
   hint?: string;
   errorMessage?: string;
-  small?: boolean;
+  size?: "medium" | "small";
   disabled?: boolean;
   /** Adds "None of these", which clears the other answers. */
   exclusive?: boolean;
@@ -19,7 +19,7 @@ export default function CheckboxesExample({
   legendSize = "medium",
   hint = "Select all that apply.",
   errorMessage = "",
-  small = false,
+  size = "medium",
   disabled = false,
   exclusive = true,
   conditional = true,
@@ -33,7 +33,7 @@ export default function CheckboxesExample({
       legendSize={legendSize}
       hint={hint || undefined}
       errorMessage={errorMessage || undefined}
-      small={small}
+      size={size}
       disabled={disabled}
       value={waste}
       onValueChange={setWaste}

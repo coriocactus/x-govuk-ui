@@ -7,7 +7,7 @@
   font-family: var(--x-govuk-ui-font);
 }
 /* Small answers keep 12px between them, so the hover ring around one never reaches the next. */
-.x-govuk-ui-choices[data-small] {
+.x-govuk-ui-choices[data-size="small"] {
   --x-govuk-ui-choice-size: 22px;
   gap: 12px;
 }
@@ -52,10 +52,10 @@
 .x-govuk-ui-choices[data-kind="radio"] .x-govuk-ui-choice-box {
   border-radius: 50%;
 }
-.x-govuk-ui-choices[data-small] .x-govuk-ui-choice-box {
+.x-govuk-ui-choices[data-size="small"] .x-govuk-ui-choice-box {
   border-radius: 4px;
 }
-.x-govuk-ui-choices[data-small][data-kind="radio"] .x-govuk-ui-choice-box {
+.x-govuk-ui-choices[data-size="small"][data-kind="radio"] .x-govuk-ui-choice-box {
   border-radius: 50%;
 }
 /* The tick draws itself along its stroke when checked, and draws back when unchecked. */
@@ -107,7 +107,7 @@
 .x-govuk-ui-choice:hover:not(:has(:disabled)) .x-govuk-ui-choice-box {
   box-shadow: 0 0 0 6px var(--x-govuk-ui-secondary);
 }
-.x-govuk-ui-choices[data-small]
+.x-govuk-ui-choices[data-size="small"]
   .x-govuk-ui-choice:hover:not(:has(:disabled))
   .x-govuk-ui-choice-box {
   box-shadow: 0 0 0 5px var(--x-govuk-ui-secondary);
@@ -128,7 +128,7 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.x-govuk-ui-choices[data-small] .x-govuk-ui-choice-label {
+.x-govuk-ui-choices[data-size="small"] .x-govuk-ui-choice-label {
   padding-block: 0;
   font-size: 16px;
 }

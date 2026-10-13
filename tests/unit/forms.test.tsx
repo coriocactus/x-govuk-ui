@@ -14,7 +14,14 @@ import {
   Calendar,
   Checkbox,
   Checkboxes,
+  CheckboxesRoot,
+  ChoiceConditional,
+  ChoiceControl,
   ChoiceDivider,
+  ChoiceHint,
+  ChoiceLabel,
+  ChoiceList,
+  ChoiceRoot,
   Combobox,
   DateInput,
   dateFromParts,
@@ -35,6 +42,7 @@ import {
   passwordStrength,
   Radio,
   Radios,
+  RadiosRoot,
   SearchBox,
   Select,
   SelectControl,
@@ -300,6 +308,98 @@ test("checkboxes and radios follow GOV.UK's ids and describe the group", () => {
   );
   expect(radios).toContain('data-kind="radio" data-inline="true"');
   expect(radios).toMatch(/type="radio" id="contact-2"[^>]*checked=""[^>]*value="phone"/);
+});
+
+test("an answer in a wrapper of your own takes an id of its own, never the first answer's", () => {
+  const Answer = (props: { value: string; children: string }) => <Radio {...props} />;
+  const html = renderToStaticMarkup(
+    <Radios id="where" name="where" legend="Where?">
+      <Radio value="home">Home</Radio>
+      <Answer value="work">Work</Answer>
+      {/* biome-ignore lint/complexity/noUselessFragments: A fragment hides an answer from Radios, as a wrapper does. */}
+      <>
+        <Radio value="away">Away</Radio>
+      </>
+      <Radio value="other" controlId="where-other">
+        Other
+      </Radio>
+    </Radios>,
+  );
+  const ids = [...html.matchAll(/<input[^>]* id="([^"]+)"/g)].map((match) => match[1]);
+  expect(ids).toHaveLength(4);
+  expect(new Set(ids).size).toBe(4);
+  // Direct children keep GOV.UK's ids, and an answer can still be given its own.
+  expect(ids[0]).toBe("where");
+  expect(ids[3]).toBe("where-other");
+  // Each label names its own answer.
+  for (const id of ids) expect(html).toContain(`for="${id}"`);
+});
+
+test("radios and checkboxes are their parts, so a composed group matches, and answers take element props", () => {
+  const shorthand = renderToStaticMarkup(
+    <Radios
+      id="contact"
+      name="contact"
+      legend="Contact"
+      hint="Choose one."
+      size="small"
+      defaultValue="phone"
+    >
+      <Radio value="email" data-answer="email">
+        Email
+      </Radio>
+      <Radio value="phone" hint="We text first." conditional={<p>Number</p>}>
+        Phone
+      </Radio>
+    </Radios>,
+  );
+  const composed = renderToStaticMarkup(
+    <RadiosRoot controlId="contact" name="contact" hasHint defaultValue="phone">
+      <FieldsetRoot>
+        <FieldsetLegend>Contact</FieldsetLegend>
+        <Hint>Choose one.</Hint>
+        <ErrorMessage />
+        <ChoiceList size="small">
+          <ChoiceRoot controlId="contact" value="email" data-answer="email">
+            <ChoiceControl />
+            <ChoiceLabel>Email</ChoiceLabel>
+          </ChoiceRoot>
+          <ChoiceRoot
+            controlId="contact-2"
+            value="phone"
+            hasHint
+            conditionalId="contact-2-conditional"
+          >
+            <ChoiceControl />
+            <ChoiceLabel>Phone</ChoiceLabel>
+            <ChoiceHint>We text first.</ChoiceHint>
+          </ChoiceRoot>
+          <ChoiceConditional value="phone" id="contact-2-conditional">
+            <p>Number</p>
+          </ChoiceConditional>
+        </ChoiceList>
+      </FieldsetRoot>
+    </RadiosRoot>,
+  );
+  expect(normalised(shorthand)).toBe(normalised(composed));
+  expect(shorthand).toContain('data-size="small"');
+  expect(shorthand).toMatch(
+    /class="x-govuk-ui-choice" data-answer="email"|data-answer="email" class="x-govuk-ui-choice"/,
+  );
+  // A control takes an input's props, and its own descriptions come before its hint.
+  const control = renderToStaticMarkup(
+    <CheckboxesRoot controlId="terms" name="terms">
+      <ChoiceList>
+        <ChoiceRoot controlId="terms" value="yes" hasHint>
+          <ChoiceControl required aria-describedby="policy" />
+          <ChoiceLabel>I agree</ChoiceLabel>
+          <ChoiceHint>Read the policy.</ChoiceHint>
+        </ChoiceRoot>
+      </ChoiceList>
+    </CheckboxesRoot>,
+  );
+  expect(control).toContain('required=""');
+  expect(control).toContain('aria-describedby="policy terms-hint"');
 });
 
 test("textarea, select, switch and fieldset connect their labels and hints", () => {

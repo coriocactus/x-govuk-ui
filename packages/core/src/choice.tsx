@@ -14,11 +14,13 @@ import {
   useId,
   useLayoutEffect,
   useRef,
+  useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
-import { useFormDefault } from "./field";
-import { Fieldset, type FieldsetProps } from "./fieldset";
+import { ErrorMessage, Field, type FieldProps, Hint, present, useFormDefault } from "./field";
+import { FieldsetLegend, type FieldsetProps, FieldsetRoot } from "./fieldset";
 import { duration, useMotionTiming } from "./motion";
+import { useMergedRef } from "./refs";
 
 /** The dot's jump eases in and out, so it lifts off gently and lands softly. */
 const jump = [0.33, 0, 0.25, 1] as const;
@@ -27,6 +29,18 @@ const jump = [0.33, 0, 0.25, 1] as const;
  * Radios and Checkboxes share one implementation. Each is a Fieldset of native inputs, so they
  * submit with a form. As in GOV.UK Frontend, the first item's id is the group's id and later items
  * add `-2`, `-3` and so on, so an error summary can link to the group.
+ *
+ * Both are built from parts, which compose a group of your own:
+ *
+ * - A root, RadiosRoot or CheckboxesRoot, keeps the group's state and binds its Field to the group's
+ *   id.
+ * - A ChoiceList holds the answers, and Radios' dot travels between them.
+ * - An answer is a ChoiceRoot with its ChoiceControl, ChoiceLabel and ChoiceHint, and a
+ *   ChoiceConditional after it for its follow-up question.
+ *
+ * Each part finds its group through context, so an answer can sit inside a wrapper of your own.
+ * The shorthands number their direct children, as GOV.UK does, in the first HTML. An answer they
+ * cannot number takes an id of its own, never the first answer's.
  */
 
 type Kind = "checkbox" | "radio";
@@ -34,28 +48,89 @@ type Kind = "checkbox" | "radio";
 type Group = {
   kind: Kind;
   name: string;
+  /** The group's id, which the first answer takes. */
   idPrefix: string;
+  /** The chosen radio's value, which the travelling dot follows. */
+  chosen: string | null;
   isChecked: (value: string) => boolean;
   choose: (value: string, checked: boolean, exclusive: boolean) => void;
   registerExclusive: (value: string) => () => void;
+  /** Tells the group each answer's control, so it can link its errors to the first one. */
+  registerControl: (control: HTMLInputElement | null, id: string) => void;
   disabled: boolean;
 };
 
 const GroupContext = createContext<Group | null>(null);
-const ItemIndex = createContext(0);
+/** An answer's place among its shorthand's direct children, or null when it was not numbered. */
+const ItemIndex = createContext<number | null>(null);
 
 function useGroup() {
   const group = useContext(GroupContext);
-  if (!group) throw new Error("Checkbox must be inside Checkboxes, and Radio inside Radios.");
+  if (!group)
+    throw new Error(
+      "An answer must be inside Radios or Checkboxes, or a RadiosRoot or a CheckboxesRoot.",
+    );
   return group;
+}
+
+/** What an answer's parts share, from its `ChoiceRoot`. */
+type Answer = {
+  controlId: string;
+  value: string;
+  disabled?: boolean;
+  exclusive: boolean;
+  hintId?: string;
+  conditionalId?: string;
+};
+
+const AnswerContext = createContext<Answer | null>(null);
+
+function useAnswer() {
+  const answer = useContext(AnswerContext);
+  if (!answer) throw new Error("An answer's control, label and hint must be inside a ChoiceRoot.");
+  return answer;
+}
+
+/** A list's answers' boxes, by value, which the radios' dot lands on. */
+type List = { register: (value: string, box: HTMLElement | null) => void };
+
+const ListContext = createContext<List | null>(null);
+
+/**
+ * Where a group's errors link to. It is the group's id, unless no answer has it, as when every
+ * answer sits in a wrapper of your own. It is then the first answer's id, in the page's order.
+ */
+function useLinkTarget(groupId: string) {
+  const controls = useRef(new Map<HTMLInputElement, string>());
+  const [first, setFirst] = useState<string | undefined>(undefined);
+  const [changes, setChanges] = useState(0);
+  const registerControl = useCallback((control: HTMLInputElement | null, id: string) => {
+    if (!control) return;
+    controls.current.set(control, id);
+    setChanges((count) => count + 1);
+    return () => {
+      controls.current.delete(control);
+      setChanges((count) => count + 1);
+    };
+  }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: The order is read again as answers come and go.
+  useLayoutEffect(() => {
+    const all = [...controls.current];
+    if (all.some(([, id]) => id === groupId)) return setFirst(undefined);
+    all.sort(([a], [b]) =>
+      a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+    );
+    setFirst(all[0]?.[1]);
+  }, [changes, groupId]);
+  return { linkTo: first, registerControl };
 }
 
 type GroupProps = Omit<FieldsetProps, "children" | "onChange" | "defaultValue"> & {
   children: ReactNode;
   /** The name each input submits under. */
   name: string;
-  /** Smaller inputs, for dense layouts such as filters. */
-  small?: boolean;
+  /** `small` suits dense layouts, such as filters. */
+  size?: "medium" | "small";
   disabled?: boolean;
 };
 
@@ -71,37 +146,198 @@ function numberItems(children: ReactNode, Item: unknown) {
   );
 }
 
-function ChoiceGroup({
-  kind,
-  group,
-  inline = false,
-  small = false,
+/** The group's legend, hint, error and list, as Radios and Checkboxes draw them. */
+function GroupFieldset({
+  legend,
+  legendSize,
+  pageHeading,
+  hint,
+  inline,
+  size,
   children,
-  chosen,
   Item,
   ...fieldset
-}: Omit<GroupProps, "name" | "disabled"> & {
-  kind: Kind;
-  group: Group;
+}: Omit<GroupProps, "name" | "disabled" | "id" | "errorMessage"> & {
   inline?: boolean;
-  /** The chosen radio's value, which the travelling dot follows. */
-  chosen?: string | null;
   Item: unknown;
 }) {
-  const container = useRef<HTMLDivElement>(null);
   return (
-    <Fieldset {...fieldset} id={group.idPrefix} name={group.name}>
-      <div
-        ref={container}
-        className="x-govuk-ui-choices"
-        data-kind={kind}
-        data-inline={inline || undefined}
-        data-small={small || undefined}
-      >
-        <GroupContext value={group}>{numberItems(children, Item)}</GroupContext>
-        {kind === "radio" && <TravellingDot container={container} chosen={chosen ?? null} />}
-      </div>
-    </Fieldset>
+    <FieldsetRoot {...fieldset}>
+      <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
+        {legend}
+      </FieldsetLegend>
+      <Hint>{hint}</Hint>
+      <ErrorMessage />
+      <ChoiceList inline={inline} size={size}>
+        {numberItems(children, Item)}
+      </ChoiceList>
+    </FieldsetRoot>
+  );
+}
+
+type RootProps = Omit<FieldProps, "controlId" | "name" | "onChange" | "defaultValue"> & {
+  /**
+   * The group's id, which the first answer takes. Its hint is `{controlId}-hint` and its error
+   * `{controlId}-error`, and a Form's error summary links to it.
+   */
+  controlId: string;
+  /** The name each answer submits under. In a Form, the group finds its error by it. */
+  name: string;
+  disabled?: boolean;
+};
+
+export type RadiosRootProps = RootProps & {
+  /** The chosen value. Leave it out to let the group keep track. */
+  value?: string | null;
+  defaultValue?: string | null;
+  onValueChange?: (value: string) => void;
+};
+
+const noExclusive = () => () => {};
+
+/**
+ * Radios of your own. It keeps the chosen answer and binds its Field to the group's id. Put a
+ * `FieldsetRoot` in it, with a `FieldsetLegend`, a `Hint`, an `ErrorMessage` and a `ChoiceList` of
+ * answers, and anything else between them.
+ */
+export function RadiosRoot({
+  controlId,
+  name,
+  value: controlled,
+  defaultValue,
+  onValueChange,
+  disabled = false,
+  linkTo,
+  children,
+  ...field
+}: RadiosRootProps) {
+  // A Form can give the group an answer to start with, such as one kept from an earlier visit.
+  const saved = useFormDefault(name)?.[0];
+  const [value, setValue] = useControllableState<string | null>(
+    controlled,
+    () => (defaultValue === undefined ? (saved ?? null) : defaultValue),
+    (next) => next !== null && onValueChange?.(next),
+  );
+  const target = useLinkTarget(controlId);
+  const group: Group = {
+    kind: "radio",
+    name,
+    idPrefix: controlId,
+    chosen: value,
+    disabled,
+    isChecked: (item) => value === item,
+    choose: (item) => setValue(item),
+    registerExclusive: noExclusive,
+    registerControl: target.registerControl,
+  };
+  return (
+    <Field {...field} controlId={controlId} name={name} linkTo={linkTo ?? target.linkTo}>
+      <GroupContext value={group}>{children}</GroupContext>
+    </Field>
+  );
+}
+
+export type CheckboxesRootProps = RootProps & {
+  /** The checked values. Leave it out to let the group keep track. */
+  value?: string[];
+  defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
+};
+
+/**
+ * Checkboxes of your own. It keeps the checked answers and binds its Field to the group's id.
+ * Compose it as `RadiosRoot`.
+ */
+export function CheckboxesRoot({
+  controlId,
+  name,
+  value: controlled,
+  defaultValue,
+  onValueChange,
+  disabled = false,
+  linkTo,
+  children,
+  ...field
+}: CheckboxesRootProps) {
+  // A Form can give the group its answers to start with, such as ones kept from an earlier visit.
+  const saved = useFormDefault(name);
+  const [value, set] = useControllableState(
+    controlled,
+    () => defaultValue ?? saved ?? [],
+    onValueChange,
+  );
+  const exclusive = useRef(new Set<string>());
+  const registerExclusive = useCallback((item: string) => {
+    exclusive.current.add(item);
+    return () => void exclusive.current.delete(item);
+  }, []);
+  const target = useLinkTarget(controlId);
+  const group: Group = {
+    kind: "checkbox",
+    name,
+    idPrefix: controlId,
+    chosen: null,
+    disabled,
+    isChecked: (item) => value.includes(item),
+    // An exclusive answer, such as "None of these", clears the others, and they clear it.
+    choose: (item, checked, isExclusive) => {
+      if (!checked) return set(value.filter((each) => each !== item));
+      if (isExclusive) return set([item]);
+      set([...value.filter((each) => !exclusive.current.has(each)), item]);
+    },
+    registerExclusive,
+    registerControl: target.registerControl,
+  };
+  return (
+    <Field {...field} controlId={controlId} name={name} linkTo={linkTo ?? target.linkTo}>
+      <GroupContext value={group}>{children}</GroupContext>
+    </Field>
+  );
+}
+
+export type ChoiceListProps = ComponentPropsWithRef<"div"> & {
+  /** Sets short answers side by side, such as Yes and No. */
+  inline?: boolean;
+  /** `small` suits dense layouts, such as filters. */
+  size?: "medium" | "small";
+};
+
+/**
+ * A group's list of answers. Put each `ChoiceRoot` in it, with its `ChoiceConditional` after it,
+ * and a `ChoiceDivider` where one goes. In Radios, the dot travels between its answers.
+ */
+export function ChoiceList({
+  inline = false,
+  size = "medium",
+  className = "",
+  children,
+  ref,
+  ...props
+}: ChoiceListProps) {
+  const group = useGroup();
+  const container = useRef<HTMLDivElement>(null);
+  const boxes = useRef(new Map<string, HTMLElement>());
+  const [list] = useState<List>(() => ({
+    register: (value, box) => {
+      if (box) boxes.current.set(value, box);
+      else boxes.current.delete(value);
+    },
+  }));
+  const mergedRef = useMergedRef(container, ref);
+  return (
+    <div
+      {...props}
+      ref={mergedRef}
+      className={`x-govuk-ui-choices ${className}`.trim()}
+      data-kind={group.kind}
+      data-inline={inline || undefined}
+      data-size={size === "small" ? "small" : undefined}
+    >
+      <ListContext value={list}>{children}</ListContext>
+      {group.kind === "radio" && (
+        <TravellingDot container={container} boxes={boxes} chosen={group.chosen} />
+      )}
+    </div>
   );
 }
 
@@ -113,9 +349,11 @@ function ChoiceGroup({
  */
 function TravellingDot({
   container,
+  boxes,
   chosen,
 }: {
   container: RefObject<HTMLDivElement | null>;
+  boxes: RefObject<Map<string, HTMLElement>>;
   chosen: string | null;
 }) {
   const dot = useRef<HTMLSpanElement>(null);
@@ -126,16 +364,15 @@ function TravellingDot({
 
   const measure = useCallback(() => {
     // The dot's own parent is the group. A group that mounts with an answer already chosen measures
-    // before the group's ref is attached, but the dot's own ref is already in place.
+    // before the group's ref is attached, but the dot's own ref is already in place. The box is the
+    // chosen answer's, among those in this list, never one in a follow-up question's own radios.
     const group = dot.current?.parentElement ?? container.current;
-    const box = group?.querySelector<HTMLElement>(
-      ".x-govuk-ui-choice-input:checked + .x-govuk-ui-choice-box",
-    );
+    const box = chosen === null ? null : boxes.current.get(chosen);
     if (!group || !box) return null;
     const outer = group.getBoundingClientRect();
     const inner = box.getBoundingClientRect();
     return { x: inner.left - outer.left, y: inner.top - outer.top };
-  }, [container]);
+  }, [container, boxes, chosen]);
 
   const place = useCallback((x: number, y: number, scale = 1) => {
     if (dot.current) dot.current.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
@@ -216,44 +453,38 @@ export type CheckboxesProps = GroupProps & {
   onValueChange?: (value: string[]) => void;
 };
 
-/** Lets users choose any number of answers. Compose it from `Checkbox` items. */
+/**
+ * Lets users choose any number of answers. Compose it from `Checkbox` items. It is a
+ * `CheckboxesRoot` with a fieldset and a `ChoiceList`.
+ */
 export function Checkboxes({
   name,
-  value: controlled,
+  value,
   defaultValue,
   onValueChange,
   disabled = false,
   id,
+  hint,
+  errorMessage,
+  "aria-describedby": describedBy,
   ...props
 }: CheckboxesProps) {
   const generated = useId();
-  // A Form can give the group its answers to start with, such as ones kept from an earlier visit.
-  const saved = useFormDefault(name);
-  const [value, set] = useControllableState(
-    controlled,
-    () => defaultValue ?? saved ?? [],
-    onValueChange,
+  return (
+    <CheckboxesRoot
+      controlId={id ?? `${name}-${generated}`}
+      name={name}
+      value={value}
+      defaultValue={defaultValue}
+      onValueChange={onValueChange}
+      disabled={disabled}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <GroupFieldset {...props} hint={hint} Item={Checkbox} />
+    </CheckboxesRoot>
   );
-  const exclusive = useRef(new Set<string>());
-  const registerExclusive = useCallback((item: string) => {
-    exclusive.current.add(item);
-    return () => void exclusive.current.delete(item);
-  }, []);
-  const group: Group = {
-    kind: "checkbox",
-    name,
-    idPrefix: id ?? `${name}-${generated}`,
-    disabled,
-    isChecked: (item) => value.includes(item),
-    // An exclusive answer, such as "None of these", clears the others, and they clear it.
-    choose: (item, checked, isExclusive) => {
-      if (!checked) return set(value.filter((each) => each !== item));
-      if (isExclusive) return set([item]);
-      set([...value.filter((each) => !exclusive.current.has(each)), item]);
-    },
-    registerExclusive,
-  };
-  return <ChoiceGroup kind="checkbox" group={group} Item={Checkbox} {...props} />;
 }
 
 export type RadiosProps = GroupProps & {
@@ -265,39 +496,45 @@ export type RadiosProps = GroupProps & {
   inline?: boolean;
 };
 
-const noExclusive = () => () => {};
-
-/** Lets users choose one answer. Compose it from `Radio` items. */
+/**
+ * Lets users choose one answer. Compose it from `Radio` items. It is a `RadiosRoot` with a
+ * fieldset and a `ChoiceList`.
+ */
 export function Radios({
   name,
-  value: controlled,
+  value,
   defaultValue,
   onValueChange,
   disabled = false,
   id,
+  hint,
+  errorMessage,
+  "aria-describedby": describedBy,
   ...props
 }: RadiosProps) {
   const generated = useId();
-  // A Form can give the group an answer to start with, such as one kept from an earlier visit.
-  const saved = useFormDefault(name)?.[0];
-  const [value, setValue] = useControllableState<string | null>(
-    controlled,
-    () => (defaultValue === undefined ? (saved ?? null) : defaultValue),
-    (next) => next !== null && onValueChange?.(next),
+  return (
+    <RadiosRoot
+      controlId={id ?? `${name}-${generated}`}
+      name={name}
+      value={value}
+      defaultValue={defaultValue}
+      onValueChange={onValueChange}
+      disabled={disabled}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <GroupFieldset {...props} hint={hint} Item={Radio} />
+    </RadiosRoot>
   );
-  const group: Group = {
-    kind: "radio",
-    name,
-    idPrefix: id ?? `${name}-${generated}`,
-    disabled,
-    isChecked: (item) => value === item,
-    choose: (item) => setValue(item),
-    registerExclusive: noExclusive,
-  };
-  return <ChoiceGroup kind="radio" group={group} chosen={value} Item={Radio} {...props} />;
 }
 
-export type ChoiceProps = {
+/**
+ * An answer's props. Those for an element, such as `ref` and `data-*`, go on the answer's row,
+ * which holds its input, box, label and hint, and not on its follow-up question.
+ */
+export type ChoiceProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   value: string;
   /** The answer's label. */
   children: ReactNode;
@@ -308,7 +545,11 @@ export type ChoiceProps = {
    * after choosing "Phone". It stays in the page while closed, so its answers are kept.
    */
   conditional?: ReactNode;
-  className?: string;
+  /**
+   * The answer's id. Radios and Checkboxes number their direct children, as GOV.UK does. An answer
+   * in a wrapper of your own takes an id of its own, unless it is given one here.
+   */
+  controlId?: string;
 };
 
 function Choice({
@@ -318,63 +559,215 @@ function Choice({
   disabled,
   conditional,
   exclusive = false,
-  className = "",
+  controlId,
+  ...props
 }: ChoiceProps & { exclusive?: boolean }) {
   const group = useGroup();
   const index = useContext(ItemIndex);
-  const id = index === 0 ? group.idPrefix : `${group.idPrefix}-${index + 1}`;
-  const checked = group.isChecked(value);
-  const { registerExclusive } = group;
+  const own = useId();
+  let id = controlId ?? `${group.idPrefix}-${own}`;
+  if (controlId === undefined && index !== null)
+    id = index === 0 ? group.idPrefix : `${group.idPrefix}-${index + 1}`;
+  return (
+    <>
+      <ChoiceRoot
+        {...props}
+        controlId={id}
+        value={value}
+        disabled={disabled}
+        exclusive={exclusive}
+        hasHint={present(hint)}
+        conditionalId={conditional ? `${id}-conditional` : undefined}
+      >
+        <ChoiceControl />
+        <ChoiceLabel>{children}</ChoiceLabel>
+        <ChoiceHint>{hint}</ChoiceHint>
+      </ChoiceRoot>
+      {conditional && (
+        <ChoiceConditional value={value} id={`${id}-conditional`}>
+          {conditional}
+        </ChoiceConditional>
+      )}
+    </>
+  );
+}
+
+export type ChoiceRootProps = ComponentPropsWithRef<"div"> & {
+  /** The answer's control's id. The first answer's is the group's own. */
+  controlId: string;
+  /** What the answer submits. */
+  value: string;
+  disabled?: boolean;
+  /** In Checkboxes, clears the other answers when chosen, as "None of these" does. */
+  exclusive?: boolean;
+  /**
+   * Whether it has a `ChoiceHint`, so its control is described by the hint's id,
+   * `{controlId}-hint`. The answer is told rather than finding out, so the description is in the
+   * first HTML.
+   */
+  hasHint?: boolean;
+  /** The id of its `ChoiceConditional`, which its control then controls. */
+  conditionalId?: string;
+};
+
+/**
+ * An answer of your own, in a `ChoiceList`. Put a `ChoiceControl`, a `ChoiceLabel` and, if it has
+ * one, a `ChoiceHint` in it, in that order. Its follow-up question is a `ChoiceConditional` after
+ * it, not inside it.
+ */
+export function ChoiceRoot({
+  controlId,
+  value,
+  disabled,
+  exclusive = false,
+  hasHint = false,
+  conditionalId,
+  className = "",
+  ...props
+}: ChoiceRootProps) {
+  const { registerExclusive } = useGroup();
   useLayoutEffect(
     () => (exclusive ? registerExclusive(value) : undefined),
     [exclusive, registerExclusive, value],
   );
+  const answer: Answer = {
+    controlId,
+    value,
+    disabled,
+    exclusive,
+    hintId: hasHint ? `${controlId}-hint` : undefined,
+    conditionalId,
+  };
+  return (
+    <AnswerContext value={answer}>
+      <div {...props} className={`x-govuk-ui-choice ${className}`.trim()} />
+    </AnswerContext>
+  );
+}
+
+export type ChoiceControlProps = Omit<
+  ComponentPropsWithRef<"input">,
+  "type" | "id" | "name" | "value" | "checked" | "defaultChecked" | "disabled" | "aria-controls"
+>;
+
+/**
+ * An answer's control, which is its native input and the box drawn for it. Its group and its
+ * answer give it its type, id, name, value, state and descriptions. Its own `aria-describedby`
+ * comes before the answer's hint.
+ */
+export function ChoiceControl({
+  className = "",
+  ref,
+  onChange,
+  "aria-describedby": describedBy,
+  ...props
+}: ChoiceControlProps) {
+  const group = useGroup();
+  const answer = useAnswer();
+  const list = useContext(ListContext);
+  const { registerControl } = group;
+  const { controlId } = answer;
+  const register = useCallback(
+    (control: HTMLInputElement | null) => registerControl(control, controlId),
+    [registerControl, controlId],
+  );
+  const mergedRef = useMergedRef(register, ref);
   return (
     <>
-      <div className={`x-govuk-ui-choice ${className}`.trim()}>
-        <input
-          className="x-govuk-ui-choice-input"
-          type={group.kind}
-          id={id}
-          name={group.name}
-          value={value}
-          checked={checked}
-          disabled={disabled ?? group.disabled}
-          aria-describedby={hint ? `${id}-hint` : undefined}
-          aria-controls={conditional ? `${id}-conditional` : undefined}
-          onChange={(event) => group.choose(value, event.target.checked, exclusive)}
-        />
-        <span className="x-govuk-ui-choice-box" aria-hidden="true">
-          {/* The tick draws itself along its stroke as the box is checked. */}
-          {group.kind === "checkbox" && (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path pathLength={1} d="M5.5 12.5l4.2 4.2L18.5 7.5" />
-            </svg>
-          )}
-        </span>
-        <label className="x-govuk-ui-choice-label" htmlFor={id}>
-          {children}
-        </label>
-        {hint && (
-          <div className="x-govuk-ui-hint x-govuk-ui-choice-hint" id={`${id}-hint`}>
-            {hint}
-          </div>
+      <input
+        {...props}
+        ref={mergedRef}
+        className={`x-govuk-ui-choice-input ${className}`.trim()}
+        type={group.kind}
+        id={answer.controlId}
+        name={group.name}
+        value={answer.value}
+        checked={group.isChecked(answer.value)}
+        disabled={answer.disabled ?? group.disabled}
+        aria-describedby={[describedBy, answer.hintId].filter(Boolean).join(" ") || undefined}
+        aria-controls={answer.conditionalId}
+        onChange={(event) => {
+          onChange?.(event);
+          group.choose(answer.value, event.target.checked, answer.exclusive);
+        }}
+      />
+      <span
+        ref={(box) => list?.register(answer.value, box)}
+        className="x-govuk-ui-choice-box"
+        aria-hidden="true"
+      >
+        {/* The tick draws itself along its stroke as the box is checked. */}
+        {group.kind === "checkbox" && (
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path pathLength={1} d="M5.5 12.5l4.2 4.2L18.5 7.5" />
+          </svg>
         )}
-      </div>
-      {conditional && (
-        // It opens and closes smoothly. When closed, it is inert, so its fields cannot take focus.
-        <div
-          className="x-govuk-ui-conditional"
-          id={`${id}-conditional`}
-          data-open={checked || undefined}
-          inert={!checked}
-        >
-          <div className="x-govuk-ui-conditional-inner">
-            <div className="x-govuk-ui-conditional-content">{conditional}</div>
-          </div>
-        </div>
-      )}
+      </span>
     </>
+  );
+}
+
+/** An answer's label, for its control. */
+export function ChoiceLabel({ className = "", ...props }: ComponentPropsWithRef<"label">) {
+  const answer = useAnswer();
+  return (
+    // biome-ignore lint/a11y/noLabelWithoutControl: The answer gives htmlFor.
+    <label
+      {...props}
+      className={`x-govuk-ui-choice-label ${className}`.trim()}
+      htmlFor={props.htmlFor ?? answer.controlId}
+    />
+  );
+}
+
+/** An answer's hint, beneath its label. It renders nothing without content. */
+export function ChoiceHint({ className = "", children, ...props }: ComponentPropsWithRef<"div">) {
+  const answer = useAnswer();
+  if (!present(children)) return null;
+  return (
+    <div
+      {...props}
+      className={`x-govuk-ui-hint x-govuk-ui-choice-hint ${className}`.trim()}
+      id={props.id ?? `${answer.controlId}-hint`}
+    >
+      {children}
+    </div>
+  );
+}
+
+export type ChoiceConditionalProps = ComponentPropsWithRef<"div"> & {
+  /** The value of the answer it follows, which opens it while chosen. */
+  value: string;
+  /** Its id, which its answer's `conditionalId` names. */
+  id: string;
+};
+
+/**
+ * An answer's follow-up question, after its `ChoiceRoot`. It opens and closes smoothly while its
+ * answer is chosen. When closed, it is inert, so its fields cannot take focus, and it stays in the
+ * page, so its answers are kept.
+ */
+export function ChoiceConditional({
+  value,
+  id,
+  className = "",
+  children,
+  ...props
+}: ChoiceConditionalProps) {
+  const group = useGroup();
+  const checked = group.isChecked(value);
+  return (
+    <div
+      {...props}
+      className={`x-govuk-ui-conditional ${className}`.trim()}
+      id={id}
+      data-open={checked || undefined}
+      inert={!checked}
+    >
+      <div className="x-govuk-ui-conditional-inner">
+        <div className="x-govuk-ui-conditional-content">{children}</div>
+      </div>
+    </div>
   );
 }
 

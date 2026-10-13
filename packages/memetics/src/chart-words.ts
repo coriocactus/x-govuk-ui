@@ -3,6 +3,17 @@
  * `"use client"`, because the charts set alone render on the server, and call these as they do.
  */
 
+// The package's index exports this module, so its declarations reach every service that imports
+// the charts, and with them the `chart` words a LabelsProvider takes.
+import type {} from "x-govuk-ui";
+
+declare module "x-govuk-ui" {
+  /** The charts' words, which a LabelsProvider or a chart's `labels` can change. */
+  interface ComponentLabels {
+    chart: ChartLabels;
+  }
+}
+
 /**
  * The words the charts write themselves, instead of taking them from the figures, for a service in
  * another language, such as Welsh. Every chart takes any of them in its `labels`, and uses those it

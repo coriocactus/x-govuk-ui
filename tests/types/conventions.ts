@@ -13,7 +13,15 @@ import type * as Memetics from "@x-govuk-ui/memetics";
 import type { ComponentProps, DOMAttributes, JSXElementConstructor } from "react";
 import type * as Core from "x-govuk-ui";
 import type { ComponentLabels } from "x-govuk-ui";
-import type { described, elementless, unstyled } from "./exceptions";
+import type {
+  boxed,
+  described,
+  elementless,
+  notRouted,
+  ownWords,
+  reportedBy,
+  unstyled,
+} from "./exceptions";
 
 type Exports = typeof Core & typeof Jorjorwel & typeof Memetics & typeof Belsize;
 
@@ -53,6 +61,18 @@ type None<T extends never> = T;
 type Elementless = (typeof elementless)[number];
 type Described = (typeof described)[number];
 type Unstyled = (typeof unstyled)[number];
+type Boxed = (typeof boxed)[number];
+type NotRouted = (typeof notRouted)[number];
+type OwnWords = typeof ownWords;
+type ReportedBy = typeof reportedBy;
+
+/** Every name the exceptions list is a part that a package exports. */
+export type UnknownExceptions = None<
+  Exclude<
+    Elementless | Described | Unstyled | Boxed | NotRouted | keyof OwnWords | keyof ReportedBy,
+    keyof Components
+  >
+>;
 
 export type WithoutClassName = None<
   {
@@ -83,16 +103,18 @@ export type RetiredNames = None<
 
 /**
  * A component's words are its `labels`. A prop ending in Label names data of a service's own, such
- * as a chart's column, or is a choice about a label. Header renders on the server, where no
- * LabelsProvider reaches, so it names its logo itself.
+ * as a chart's column, or is a choice about a label.
  */
 type NotWords = "hideLabel" | "categoryLabel" | "nameLabel" | "valueLabel" | "scrollLabel";
+
+/** The prop a part that keeps its own words names them with. */
+type OwnWordsOf<Name> = Name extends keyof OwnWords ? OwnWords[Name] : never;
 
 export type WordsOutsideLabels = None<
   {
     [Name in keyof Components]: Exclude<
       Extract<keyof PropsOf<Name>, `${Lowercase<string>}${string}Label`>,
-      NotWords | (Name extends "Header" ? "logoLabel" : never)
+      NotWords | OwnWordsOf<Name>
     > extends never
       ? never
       : `${Name}: ${Exclude<Extract<keyof PropsOf<Name>, `${string}Label`>, NotWords> & string}`;
@@ -131,12 +153,6 @@ export type DefaultsNamedByKey = None<
   }[keyof ComponentLabels & string]
 >;
 
-/**
- * Stat renders on the server, where no LabelsProvider reaches, so its words are its own. The
- * LabelsProvider takes every map.
- */
-type OwnWords = "Stat" | "LabelsProvider";
-
 /** A component's words, without a chart's own `locale`, which is no word. */
 type WordsOf<Name extends keyof Components> = Omit<
   NonNullable<PropsOf<Name>["labels" & keyof PropsOf<Name>]>,
@@ -155,12 +171,12 @@ type MapOf<Words> = {
 /** Every word a component takes in `labels`, a LabelsProvider can give it too. */
 export type LabelsOutsideProvider = None<
   {
-    [Name in Exclude<keyof Components, OwnWords>]: "labels" extends keyof PropsOf<Name>
+    [Name in Exclude<keyof Components, keyof OwnWords>]: "labels" extends keyof PropsOf<Name>
       ? [MapOf<WordsOf<Name>>] extends [never]
         ? Name
         : never
       : never;
-  }[Exclude<keyof Components, OwnWords>]
+  }[Exclude<keyof Components, keyof OwnWords>]
 >;
 
 /**
@@ -168,12 +184,6 @@ export type LabelsOutsideProvider = None<
  * `on…Change` has the value it reports, which a service can control, and a default to start it.
  */
 type Reported = "Dragging" | "Share" | "Page" | "Files" | "Code" | "Checked";
-
-/**
- * Parts that report a value another part keeps. An Accordion's `value` keeps which items are open.
- * A context menu opens where it is pressed, so a service can only hear that it opened.
- */
-type ReportedBy = { AccordionItem: "Open"; ContextMenu: "Open" };
 
 type Uncontrolled<Props, Also extends string = never> = {
   // The element's own events, such as a video's `onDurationChange`, are the DOM's.
@@ -231,12 +241,6 @@ export type WithoutStyle = None<
 export type StyleTakenAndLost = None<
   { [Name in Unstyled]: "style" extends keyof PropsOf<Name> ? Name : never }[Unstyled]
 >;
-
-/**
- * Links to a place on the same page, or away from the service, which no router follows. Every
- * other part that renders a link takes `render`, for a router's link.
- */
-type NotRouted = "SkipLink" | "ErrorSummaryItem" | "ExitThisPage";
 
 /** A part that renders a link takes an `href`. An SVG's `href` is no link, and an SVG has a `viewBox`. */
 export type LinkWithoutRender = None<

@@ -9,7 +9,7 @@
   display: inline-block;
   max-width: 100%;
   padding: 2px 8px 3px;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-tag-fill);
   color: var(--x-govuk-ui-tag-text);
   font-family: var(--x-govuk-ui-font);

@@ -4,7 +4,7 @@
   box-sizing: border-box;
   margin-bottom: 30px;
   padding: 32px 28px 36px;
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-success);
   color: var(--x-govuk-ui-white);
   font-family: var(--x-govuk-ui-font);

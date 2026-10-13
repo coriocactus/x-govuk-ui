@@ -9,7 +9,7 @@
   box-sizing: border-box;
   max-width: 100%;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   background: var(--x-govuk-ui-paper);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
@@ -44,7 +44,7 @@
   position: relative;
   min-height: 40px;
   margin-top: 4px;
-  border-radius: 7px;
+  border-radius: calc(var(--x-govuk-ui-radius-large) - 3px);
   background: var(--x-govuk-ui-surface);
 }
 .x-govuk-ui-grouped-table-group:first-child .x-govuk-ui-grouped-table-band {
@@ -60,7 +60,7 @@
   margin: 0 -10px;
   padding: 0 10px;
   border: 0;
-  border-radius: 7px;
+  border-radius: calc(var(--x-govuk-ui-radius-large) - 3px);
   background: transparent;
   color: var(--x-govuk-ui-text);
   font: inherit;
@@ -93,7 +93,7 @@
   height: 20px;
   padding: 0 5px;
   box-sizing: border-box;
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   background: var(--x-govuk-ui-secondary);
   color: var(--x-govuk-ui-muted);
   font-size: 13px;
@@ -139,7 +139,7 @@
 .x-govuk-ui-grouped-table-row {
   position: relative;
   min-height: 46px;
-  border-radius: 7px;
+  border-radius: calc(var(--x-govuk-ui-radius-large) - 3px);
   transition: background var(--x-govuk-ui-duration-fast) ease;
 }
 .x-govuk-ui-grouped-table-row:hover {

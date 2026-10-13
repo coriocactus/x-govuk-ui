@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   overflow: hidden;
   background: var(--x-govuk-ui-paper);
   color: var(--x-govuk-ui-text);

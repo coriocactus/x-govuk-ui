@@ -12,6 +12,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Added the charts' words to LabelsProvider, from x-govuk-ui, as `chart`. Chart, Chart set, Calendar heat map, Choropleth map, Gauge, Sankey, Sunburst and Treemap take their words from a chart's own `labels`, then the provider's `chart` words, then their own. ChartTable outside a chart takes the provider's `chart` words too. They write figures and dates in their own `locale`, then the provider's `locale`, the page's language for every component. Bar list, Bullet chart, Waffle and Sparkline render on the server, where no provider reaches, so they take their words from `labels` only.
 
+### Changed
+
+- Changed the charts' corners, such as a chart's tooltip's, to follow x-govuk-ui's tokens for corners, such as `--x-govuk-ui-radius-surface`. They look as they did.
+
 ## [0.3.0] - 2026-10-10
 
 No changes of its own.

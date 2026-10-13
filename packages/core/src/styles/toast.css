@@ -43,7 +43,7 @@
   /* Like a GOV.UK notification banner, a coloured edge shows the toast's type. */
   border: 1px solid var(--x-govuk-ui-line);
   border-inline-start: 5px solid var(--x-govuk-ui-toast-accent, var(--x-govuk-ui-link));
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
   color: var(--x-govuk-ui-text);

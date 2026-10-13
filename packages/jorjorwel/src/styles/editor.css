@@ -6,7 +6,7 @@
   position: relative;
   box-sizing: border-box;
   border: 1.5px solid var(--x-govuk-ui-border);
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
   background-color: inherit;
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
@@ -25,7 +25,7 @@
   position: absolute;
   inset: 0;
   z-index: 4;
-  border-radius: 3.5px;
+  border-radius: calc(var(--x-govuk-ui-radius-control) - 1.5px);
   box-shadow: inset 0 0 0 var(--x-govuk-ui-editor-ring, 0) var(--x-govuk-ui-editor-ring-colour);
   pointer-events: none;
 }
@@ -68,7 +68,8 @@
   gap: 2px;
   padding: 5px 6px;
   border-bottom: 1px solid var(--x-govuk-ui-line);
-  border-radius: 3.5px 3.5px 0 0;
+  border-radius: calc(var(--x-govuk-ui-radius-control) - 1.5px)
+    calc(var(--x-govuk-ui-radius-control) - 1.5px) 0 0;
   background: var(--x-govuk-ui-surface);
 }
 .x-govuk-ui-editor-toolbar[data-sticky] {
@@ -168,7 +169,8 @@
    the cap, and scrolls inside, with the thin scrollbar along the box's edge. */
 .x-govuk-ui-editor-scroll {
   display: block;
-  border-radius: 0 0 3.5px 3.5px;
+  border-radius: 0 0 calc(var(--x-govuk-ui-radius-control) - 1.5px)
+    calc(var(--x-govuk-ui-radius-control) - 1.5px);
 }
 .x-govuk-ui-editor-scroll[hidden] {
   display: none;
@@ -250,7 +252,8 @@
 .x-govuk-ui-editor .x-govuk-ui-code-block.x-govuk-ui-editor-source {
   min-height: calc(var(--x-govuk-ui-editor-rows, 8) * var(--x-govuk-ui-editor-line) + 22px);
   border: 0;
-  border-radius: 0 0 3.5px 3.5px;
+  border-radius: 0 0 calc(var(--x-govuk-ui-radius-control) - 1.5px)
+    calc(var(--x-govuk-ui-radius-control) - 1.5px);
   outline: none;
   box-shadow: none;
   background: transparent;
@@ -347,7 +350,7 @@
   gap: 2px;
   padding: 3px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
 }
@@ -579,7 +582,7 @@ span.x-govuk-ui-editor-attachment-slot {
   justify-items: start;
   gap: 6px;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   cursor: grab;
 }
 .x-govuk-ui-editor-attachment:hover:not([data-selected]) {

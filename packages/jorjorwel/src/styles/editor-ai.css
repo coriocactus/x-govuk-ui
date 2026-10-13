@@ -22,7 +22,7 @@
   max-width: min(440px, 100%);
   overflow: hidden;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
   color: var(--x-govuk-ui-text);

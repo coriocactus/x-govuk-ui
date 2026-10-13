@@ -33,7 +33,7 @@
 .x-govuk-ui-summary-list-value {
   margin-left: -6px;
   padding-left: 6px;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   overflow-wrap: anywhere;
 }
 .x-govuk-ui-summary-list-value > p {
@@ -110,7 +110,7 @@
 .x-govuk-ui-summary-card {
   margin-bottom: 20px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   overflow: clip;
   font-family: var(--x-govuk-ui-font);
 }

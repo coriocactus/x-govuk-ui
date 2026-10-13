@@ -7,7 +7,7 @@
   height: 46px;
   padding: 10px 12px;
   border: 1.5px solid var(--x-govuk-ui-border);
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
   /* The field takes its container's colour instead of painting its own. */
   background-color: inherit;
   color: var(--x-govuk-ui-text);
@@ -51,7 +51,7 @@
   height: 46px;
   padding-inline: 12px;
   border: 1.5px solid var(--x-govuk-ui-border);
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
   background-color: inherit;
   color: var(--x-govuk-ui-text);
   font-size: 17px;
@@ -125,7 +125,7 @@
   height: 34px;
   padding: 0 10px;
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-secondary);
   color: var(--x-govuk-ui-text);
   font: inherit;

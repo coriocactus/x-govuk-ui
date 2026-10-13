@@ -4,7 +4,7 @@
 .x-govuk-ui-data-table {
   --x-govuk-ui-data-table-row: 44px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   overflow: clip;
   background: var(--x-govuk-ui-paper);
   font-family: var(--x-govuk-ui-font);
@@ -145,7 +145,7 @@
   max-width: 100%;
   padding: 2px 4px;
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: none;
   color: var(--x-govuk-ui-text);
   font: inherit;

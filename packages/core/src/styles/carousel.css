@@ -10,7 +10,7 @@
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 7px;
+  border-radius: var(--x-govuk-ui-radius-surface);
 }
 .x-govuk-ui-carousel-viewport::-webkit-scrollbar {
   display: none;

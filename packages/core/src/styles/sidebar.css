@@ -112,7 +112,7 @@
   left: 8px;
   width: auto;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   box-shadow: 0 6px 20px rgb(11 12 12 / 8%);
 }
 .x-govuk-ui-sidebar[data-variant="floating"][data-collapsible="offcanvas"]
@@ -490,11 +490,11 @@
   flex: none;
   width: 16px;
   height: 16px;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
 }
 .x-govuk-ui-skeleton.x-govuk-ui-sidebar-skeleton-label {
   height: 10px;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
 }
 [data-state="collapsed"][data-collapsible="icon"] .x-govuk-ui-sidebar-skeleton-label {
   display: none;
@@ -513,7 +513,7 @@
   margin: 0;
   padding: 7px 10px 7px 11px;
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: transparent;
   font-family: inherit;
   font-size: 14px;
@@ -586,7 +586,7 @@
   position: absolute;
   top: 0;
   inset-inline: 8px;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-sidebar-hover);
   transform-origin: 0 0;
   opacity: 0;
@@ -788,7 +788,7 @@
 .x-govuk-ui-sidebar-inset:has(~ .x-govuk-ui-sidebar[data-variant="inset"]) {
   margin: 8px 8px 8px 0;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 1px 3px rgb(11 12 12 / 6%);
 }

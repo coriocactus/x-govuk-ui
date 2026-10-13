@@ -12,7 +12,7 @@
   flex: 1;
   min-width: 0;
   border-right-color: transparent;
-  border-radius: 5px 0 0 5px;
+  border-radius: var(--x-govuk-ui-radius-control) 0 0 var(--x-govuk-ui-radius-control);
 }
 .x-govuk-ui-input.x-govuk-ui-search-box-input:hover:not(:focus) {
   border-right-color: transparent;
@@ -31,7 +31,7 @@
   height: 46px;
   padding: 0;
   border: 0;
-  border-radius: 0 5px 5px 0;
+  border-radius: 0 var(--x-govuk-ui-radius-control) var(--x-govuk-ui-radius-control) 0;
   background: var(--x-govuk-ui-brand);
   color: var(--x-govuk-ui-white);
   cursor: pointer;

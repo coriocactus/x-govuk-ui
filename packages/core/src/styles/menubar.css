@@ -4,14 +4,14 @@
   gap: 2px;
   padding: 3px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
   font-family: var(--x-govuk-ui-font);
 }
 .x-govuk-ui-menubar-trigger {
   padding: 6px 12px;
   border: 0;
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
   background: none;
   color: var(--x-govuk-ui-text);
   font: inherit;

@@ -152,7 +152,7 @@ h4.x-govuk-ui-form-steps-review-title {
   box-sizing: border-box;
   padding: 18px 20px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   background: var(--x-govuk-ui-paper);
   overflow: clip;
 }
@@ -228,7 +228,7 @@ h4.x-govuk-ui-form-steps-review-title {
   align-items: center;
   height: 36px;
   padding: 0 12px;
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
 }
 .x-govuk-ui-form-steps-gap {
   flex: 1;

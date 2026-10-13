@@ -17,7 +17,7 @@
   gap: 12px;
   min-height: 44px;
   padding: 6px 10px;
-  border-radius: 7px;
+  border-radius: var(--x-govuk-ui-radius-control);
   font-size: 17px;
   line-height: 1.35;
   cursor: pointer;

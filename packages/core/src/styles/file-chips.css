@@ -18,7 +18,7 @@
   max-width: 220px;
   min-height: 28px;
   padding: 0 4px 0 8px;
-  border-radius: 6px;
+  border-radius: var(--x-govuk-ui-radius-control);
   outline: 1px solid transparent;
   outline-offset: -1px;
   background: var(--x-govuk-ui-secondary);
@@ -98,7 +98,7 @@ a.x-govuk-ui-file-chip-name:focus-visible {
   height: 20px;
   padding: 0;
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: none;
   color: var(--x-govuk-ui-muted);
   cursor: pointer;

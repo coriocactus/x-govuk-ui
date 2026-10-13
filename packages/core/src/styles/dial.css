@@ -55,7 +55,7 @@
   height: 168px;
   translate: 0 -50%;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 10px 30px rgb(11 12 12 / 14%);
   color: var(--x-govuk-ui-text);

@@ -26,7 +26,7 @@
   box-sizing: border-box;
   width: min(100%, var(--x-govuk-ui-dialog-width, 560px));
   padding: 28px 30px 30px;
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 24px 64px rgb(11 12 12 / 28%);
   color: var(--x-govuk-ui-text);

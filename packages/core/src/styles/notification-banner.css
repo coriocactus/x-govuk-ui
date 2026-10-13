@@ -5,7 +5,7 @@
   margin-bottom: 30px;
   overflow: hidden;
   border: 4px solid var(--x-govuk-ui-banner-colour);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-banner-colour);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
@@ -43,7 +43,7 @@
 }
 .x-govuk-ui-notification-banner-content {
   padding: 16px 20px 20px;
-  border-radius: 4px 4px 4px 4px;
+  border-radius: calc(var(--x-govuk-ui-radius-surface) - 4px);
   background: var(--x-govuk-ui-paper);
   font-size: 17px;
   line-height: 1.5;

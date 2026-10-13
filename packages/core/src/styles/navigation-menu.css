@@ -21,7 +21,7 @@
   gap: 8px;
   padding: 11px 13px;
   border: 0;
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
   background: transparent;
   color: var(--x-govuk-ui-link);
   font: 700 15px / 1.5 var(--x-govuk-ui-font);
@@ -97,7 +97,7 @@
   max-height: var(--available-height);
   overflow: hidden;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 7px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
   color: var(--x-govuk-ui-text);
   box-shadow: 0 8px 28px #0002;

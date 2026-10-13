@@ -11,10 +11,10 @@
   column-gap: 6px
   min-height: 28px
   max-width: 220px
-  border-top-left-radius: 6px
-  border-top-right-radius: 6px
-  border-bottom-right-radius: 6px
-  border-bottom-left-radius: 6px
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
 .x-govuk-ui-file-chip-end
   display: inline
   font-size: 14px

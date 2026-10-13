@@ -8,7 +8,7 @@
   margin: 0 2px;
   padding: 0 7px 0 3px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   background: var(--x-govuk-ui-secondary);
   color: var(--x-govuk-ui-muted);
   font: 400 12px / 1 var(--x-govuk-ui-font);

@@ -46,7 +46,7 @@
 }
 /* A row the reader jumped to glows in the focus colour for a moment, so the eye finds it. */
 .x-govuk-ui-message-scroller-item[data-found] {
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   animation: x-govuk-ui-message-found 1.4s ease-out backwards;
 }
 @keyframes x-govuk-ui-message-found {

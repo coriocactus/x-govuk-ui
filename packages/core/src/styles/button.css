@@ -14,7 +14,7 @@
   margin: 0;
   padding: 10px 20px;
   border: 1px solid transparent;
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
   background: var(--x-govuk-ui-button-fill);
   box-shadow: 0 2px 0 var(--x-govuk-ui-button-shadow);
   color: var(--x-govuk-ui-button-text);

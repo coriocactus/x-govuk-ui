@@ -4,7 +4,7 @@
   box-sizing: border-box;
   padding: 18px 20px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   background: var(--x-govuk-ui-paper);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
@@ -53,5 +53,5 @@
   align-items: center;
   height: 36px;
   padding: 0 12px;
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
 }

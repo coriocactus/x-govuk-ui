@@ -22,7 +22,7 @@
   min-width: 0;
   margin: 0;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 6px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   overflow: clip;
   background: var(--x-govuk-ui-paper);
   color: var(--x-govuk-ui-text);
@@ -100,7 +100,7 @@
   align-items: center;
   height: 36px;
   padding: 0 12px;
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
 }
 .x-govuk-ui-file-diff-code {
   min-width: max-content;

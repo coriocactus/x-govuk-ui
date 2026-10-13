@@ -50,7 +50,7 @@
 }
 .x-govuk-ui-skeleton-line {
   height: 0.8em;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
 }
 .x-govuk-ui-skeleton-line:last-child:not(:first-child) {
   width: 60%;

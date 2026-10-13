@@ -362,7 +362,7 @@
   max-width: 300px;
   padding: 8px 10px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 8px 24px rgb(11 12 12 / 14%);
   color: var(--x-govuk-ui-text);

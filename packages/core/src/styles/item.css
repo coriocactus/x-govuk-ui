@@ -10,7 +10,7 @@
 .x-govuk-ui-item[data-variant="outline"] {
   padding: 14px 16px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
 }
 .x-govuk-ui-item-group {
   margin: 0;
@@ -30,7 +30,7 @@
 .x-govuk-ui-item-media[data-variant="tile"] {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: color-mix(in srgb, var(--x-govuk-ui-brand) 12%, var(--x-govuk-ui-paper));
   color: var(--x-govuk-ui-brand);
 }

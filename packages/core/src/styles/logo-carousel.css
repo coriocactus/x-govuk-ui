@@ -27,7 +27,7 @@
   display: grid;
   grid-template-columns: repeat(var(--x-govuk-ui-logo-places), minmax(0, 1fr));
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   overflow: hidden;
 }
 /* Every place is as tall as the tallest logo. The first place measures it from a hidden stack of

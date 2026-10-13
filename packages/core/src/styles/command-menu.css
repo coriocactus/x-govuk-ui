@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 16px 48px #0003;
   transition:
@@ -48,8 +48,8 @@
   gap: 12px;
   padding: 16px 17px;
   border-bottom: 1px solid var(--x-govuk-ui-line);
-  border-start-start-radius: 7px;
-  border-start-end-radius: 7px;
+  border-start-start-radius: calc(var(--x-govuk-ui-radius-surface) - 1px);
+  border-start-end-radius: calc(var(--x-govuk-ui-radius-surface) - 1px);
 }
 /* While typing, the whole search area shows GOV.UK's focus pair, yellow outside and dark inside.
    Both are drawn inside the area, so the ring stops at the results. */
@@ -76,7 +76,7 @@
   align-self: center;
   padding: 5px 7px;
   border: 1px solid var(--x-govuk-ui-line);
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-secondary);
   color: var(--x-govuk-ui-muted);
   font-size: 12px;
@@ -177,7 +177,7 @@
   top: 0;
   inset-inline: 7px;
   height: 0;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   border-inline-start: 4px solid var(--x-govuk-ui-link);
   background: var(--x-govuk-ui-secondary);
   opacity: 0;
@@ -195,7 +195,7 @@
   align-items: center;
   gap: 12px;
   padding: 11px 13px;
-  border-radius: 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
   font-size: 15px;
   line-height: 1.4;
   cursor: pointer;

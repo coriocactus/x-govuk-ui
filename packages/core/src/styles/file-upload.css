@@ -8,7 +8,7 @@
   min-height: 132px;
   padding: 20px;
   border: 2px dashed var(--x-govuk-ui-border);
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
   text-align: center;
@@ -76,7 +76,7 @@
   margin-right: 4px;
   padding: 6px 12px;
   border: 1px solid var(--x-govuk-ui-text);
-  border-radius: 5px;
+  border-radius: var(--x-govuk-ui-radius-control);
   background: var(--x-govuk-ui-paper);
   box-shadow: 0 2px 0 var(--x-govuk-ui-text);
   transition: background var(--x-govuk-ui-duration-fast) ease;

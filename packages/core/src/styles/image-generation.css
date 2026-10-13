@@ -4,7 +4,7 @@
   position: relative;
   margin: 0;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: var(--x-govuk-ui-radius-large);
   background: var(--x-govuk-ui-surface);
   font-family: var(--x-govuk-ui-font);
 }
@@ -77,7 +77,7 @@
   align-items: center;
   gap: 6px 10px;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: var(--x-govuk-ui-radius-surface);
   background: color-mix(in srgb, var(--x-govuk-ui-paper) 86%, transparent);
   backdrop-filter: blur(10px);
   color: var(--x-govuk-ui-text);

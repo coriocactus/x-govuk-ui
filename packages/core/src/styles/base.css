@@ -59,6 +59,19 @@
      them, or give its root `isolation: isolate`, so nothing in the page rises above an overlay. */
   --x-govuk-ui-layer-overlay: 60;
   --x-govuk-ui-layer-notification: 70;
+
+  /* Corners. GOV.UK Frontend's corners are square. Ours are softened, in four steps by what a part
+     is. Set all four to 0 for GOV.UK Frontend's square corners. A corner inside a border follows
+     the corner around it. Circles and pills keep their shape, and so do small marks, such as a
+     chart's key. */
+  /* Small parts, such as items in lists and menus, tags, keys, tooltips and toasts. */
+  --x-govuk-ui-radius-small: 4px;
+  /* Buttons, fields and what they are made of, such as a check box. */
+  --x-govuk-ui-radius-control: 5px;
+  /* Surfaces, such as cards, panels, popups and dialogs. */
+  --x-govuk-ui-radius-surface: 8px;
+  /* Large boxes that frame other parts, such as a data table or a card of questions. */
+  --x-govuk-ui-radius-large: 10px;
 }
 [data-theme="light"] {
   color-scheme: light;

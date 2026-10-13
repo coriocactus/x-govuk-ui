@@ -8,10 +8,10 @@
   padding-right: 20px
   padding-bottom: 20px
   padding-left: 20px
-  border-top-left-radius: 6px
-  border-top-right-radius: 6px
-  border-bottom-right-radius: 6px
-  border-bottom-left-radius: 6px
+  border-top-left-radius: 8px
+  border-top-right-radius: 8px
+  border-bottom-right-radius: 8px
+  border-bottom-left-radius: 8px
   border-top: 4px solid rgb(202, 53, 53)
   border-right: 4px solid rgb(202, 53, 53)
   border-bottom: 4px solid rgb(202, 53, 53)

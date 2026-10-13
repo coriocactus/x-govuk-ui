@@ -1,5 +1,14 @@
 import { useRef, useState } from "react";
-import { Button, Callout, CalloutContent, CalloutTrigger, Field, Hint, Label } from "x-govuk-ui";
+import {
+  Button,
+  Callout,
+  CalloutClose,
+  CalloutContent,
+  CalloutTrigger,
+  Field,
+  Hint,
+  Label,
+} from "x-govuk-ui";
 
 type Props = {
   variant?: "brand" | "plain";
@@ -71,11 +80,7 @@ export default function CalloutExample({
           countdown={countdown}
           closeButton={closeButton}
           title="New: download your answers"
-          actions={
-            <Button size="small" onClick={() => setNotice(false)}>
-              Got it
-            </Button>
-          }
+          actions={<CalloutClose>Got it</CalloutClose>}
         >
           Keep a copy of everything you’ve told us, as a PDF.
         </CalloutContent>

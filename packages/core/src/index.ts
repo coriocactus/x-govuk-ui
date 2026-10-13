@@ -81,6 +81,7 @@ export {
 export {
   Callout,
   type CalloutAnchor,
+  CalloutClose,
   CalloutContent,
   type CalloutContentProps,
   type CalloutLabels,
@@ -189,6 +190,7 @@ export {
 } from "./combobox";
 export {
   CommandMenu,
+  CommandMenuClose,
   CommandMenuContent,
   type CommandMenuContentProps,
   CommandMenuGroup,

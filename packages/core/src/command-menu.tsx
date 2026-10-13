@@ -365,6 +365,14 @@ export function CommandMenuTrigger({
   );
 }
 
+/**
+ * A button that closes the menu, such as one in a page of your own. It is a Button, secondary by
+ * default. Choosing a command closes the menu by itself.
+ */
+export function CommandMenuClose({ variant = "secondary", ...props }: ButtonProps) {
+  return <Dialog.Close render={<Button variant={variant} data-sound="close" {...props} />} />;
+}
+
 export type CommandMenuContentProps = ComponentPropsWithRef<"div"> & {
   /** Its commands, as `CommandMenuGroup`, `CommandMenuItem` and `CommandMenuPage` parts. */
   children: ReactNode;

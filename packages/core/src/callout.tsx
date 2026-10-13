@@ -602,3 +602,11 @@ export function CalloutTrigger({
     />
   );
 }
+
+/**
+ * A button that closes the callout, such as "Got it" among its `actions`. It is a small Button by
+ * default, as a callout's actions are.
+ */
+export function CalloutClose({ size = "small", ...props }: ButtonProps) {
+  return <Primitive.Close render={<Button size={size} data-sound="close" {...props} />} />;
+}

@@ -2,12 +2,25 @@
 
 import { type ComponentPropsWithRef, type CSSProperties, useMemo } from "react";
 import { encode } from "uqr";
+import { useLabels } from "./labels";
+
+/** The words QrCode writes, which a LabelsProvider or its `labels` can change. */
+export type QrCodeLabels = {
+  /** Names the code for screen readers, given its label, or else its value. */
+  name: (leadsTo: string) => string;
+};
+
+export const defaultQrCodeLabels: QrCodeLabels = {
+  name: (leadsTo) => `QR code for ${leadsTo}`,
+};
 
 export type QrCodeProps = ComponentPropsWithRef<"svg"> & {
   /** What the code encodes, such as a web address. */
   value: string;
   /** What the code leads to, for screen readers, such as "the fishing licence service". */
   label?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<QrCodeLabels>;
   /** The code's width and height, in pixels. */
   size?: number;
   /** How much of the code can be covered or worn before it stops scanning. */
@@ -36,8 +49,10 @@ export function QrCode({
   ripple = 500,
   className = "",
   style,
+  labels: ownLabels,
   ...props
 }: QrCodeProps) {
+  const labels = useLabels("qrCode", defaultQrCodeLabels, ownLabels);
   const qr = useMemo(
     () => encode(value, { ecc: errorCorrection, border: 0 }),
     [value, errorCorrection],
@@ -63,7 +78,7 @@ export function QrCode({
       width={size}
       height={size}
       role="img"
-      aria-label={`QR code for ${label ?? value}`}
+      aria-label={labels.name(label ?? value)}
       data-still={ripple <= 0 || undefined}
       style={
         {

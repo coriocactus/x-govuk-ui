@@ -2,6 +2,7 @@
 
 import { type ComponentPropsWithRef, type RefObject, useLayoutEffect, useRef } from "react";
 import { Button } from "./button";
+import { useLabels } from "./labels";
 import { useStoredState } from "./stored-state";
 import { Tooltip } from "./tooltip";
 
@@ -68,7 +69,7 @@ export type ThemePickerLabels = {
   toLight: string;
 };
 
-const defaultLabels: ThemePickerLabels = {
+export const defaultThemePickerLabels: ThemePickerLabels = {
   toDark: "Switch to dark theme",
   toLight: "Switch to light theme",
 };
@@ -113,7 +114,7 @@ export function ThemePicker({
   onClick,
   ...props
 }: ThemePickerProps) {
-  const words = { ...defaultLabels, ...labels };
+  const words = useLabels("themePicker", defaultThemePickerLabels, labels);
   const controlled = value !== undefined;
   const own = useTheme({
     storageKey: controlled ? undefined : storageKey,

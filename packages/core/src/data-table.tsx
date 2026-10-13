@@ -75,9 +75,23 @@ const CHECKS = 44;
 export type DataTableLabels = {
   /** Names the checkbox that chooses every row. */
   selectAll: string;
+  /** Names the button that shows a column's figure, such as "Show the sum of Amount". */
+  showFigure: (figure: string, column: string) => string;
+  /** Names a column's figure, which hides it when pressed, such as "Sum of Amount, hide". */
+  hideFigure: (figure: string, column: string) => string;
+  /** Names the handle that resizes a column. */
+  columnWidth: (column: string) => string;
+  /** Names a row's checkbox, given the row's name. */
+  selectRow: (row: string) => string;
 };
 
-export const defaultDataTableLabels: DataTableLabels = { selectAll: "Select every row" };
+export const defaultDataTableLabels: DataTableLabels = {
+  selectAll: "Select every row",
+  showFigure: (figure, column) => `Show the ${figure.toLowerCase()} of ${column}`,
+  hideFigure: (figure, column) => `${figure} of ${column}, hide`,
+  columnWidth: (column) => `Width of ${column}`,
+  selectRow: (row) => `Select ${row}`,
+};
 
 /**
  * A dense table for working through many records, as in a CRM. It is built from Table's parts in a
@@ -186,7 +200,7 @@ export function DataTable<Row>({
         <button
           type="button"
           className="x-govuk-ui-data-table-figure"
-          aria-label={`${summary.label} of ${column.header}, hide`}
+          aria-label={labels.hideFigure(summary.label, column.header)}
           onClick={() => setSummed(summed.filter((id) => id !== column.id))}
         >
           <span aria-hidden="true">{summary.label}</span>
@@ -198,7 +212,7 @@ export function DataTable<Row>({
         variant="quiet"
         size="small"
         className="x-govuk-ui-data-table-add"
-        aria-label={`Show the ${summary.label.toLowerCase()} of ${column.header}`}
+        aria-label={labels.showFigure(summary.label, column.header)}
         onClick={() => setSummed([...summed, column.id])}
       >
         + {summary.label}
@@ -222,7 +236,7 @@ export function DataTable<Row>({
                   <input
                     type="checkbox"
                     className="x-govuk-ui-data-table-checkbox"
-                    aria-label={`Select ${rowName(row)}`}
+                    aria-label={labels.selectRow(rowName(row))}
                     checked={on}
                     onChange={() =>
                       chosenChange.current(
@@ -319,7 +333,7 @@ export function DataTable<Row>({
                   }
                   after={
                     <ResizableHandle
-                      label={`Width of ${column.header}`}
+                      label={labels.columnWidth(column.header)}
                       panel="before"
                       value={widths[column.id] ?? column.width}
                       min={column.minWidth ?? 72}

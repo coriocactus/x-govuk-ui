@@ -268,7 +268,7 @@ export function EditorCount({ id, limit, unit, threshold }: EditorCountProps) {
         count={count}
         unit={unit}
         threshold={threshold}
-        words={labels.count}
+        labels={labels.count}
       />
     </div>
   );

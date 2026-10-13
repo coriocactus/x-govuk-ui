@@ -2,7 +2,9 @@
 
 import { type ReactNode, useLayoutEffect, useMemo, useRef } from "react";
 import { Button } from "./button";
+import { useControllableState } from "./controllable-state";
 import { MoreIcon } from "./icons";
+import { useLabels } from "./labels";
 import { DropdownMenu, DropdownMenuTrigger, MenuContent, MenuItem } from "./menu";
 import { glideEasing, useMotionTiming } from "./motion";
 import {
@@ -239,7 +241,7 @@ export type SidebarItemMenuLabels = {
   hide: string;
 };
 
-const menuWords: SidebarItemMenuLabels = {
+export const defaultSidebarItemMenuLabels: SidebarItemMenuLabels = {
   options: (label) => `Options for ${label}`,
   pin: "Pin to the top",
   unpin: "Unpin",
@@ -252,7 +254,7 @@ export type SidebarItemMenuProps = {
   arranger: SidebarArranger;
   /** The entry's id. */
   id: string;
-  /** The menu's words, such as for Welsh. */
+  /** The menu's words, in place of a LabelsProvider's or the defaults. */
   labels?: Partial<SidebarItemMenuLabels>;
   className?: string;
 };
@@ -264,7 +266,7 @@ export type SidebarItemMenuProps = {
  * offers the same choices from the keyboard.
  */
 export function SidebarItemMenu({ arranger, id, labels, className = "" }: SidebarItemMenuProps) {
-  const words = { ...menuWords, ...labels };
+  const words = useLabels("sidebarItemMenu", defaultSidebarItemMenuLabels, labels);
   const pinned = arranger.isPinned(id);
   return (
     <DropdownMenu>
@@ -362,7 +364,7 @@ export type SidebarCustomiseLabels = {
   close: string;
 };
 
-const customiseWords: SidebarCustomiseLabels = {
+export const defaultSidebarCustomiseLabels: SidebarCustomiseLabels = {
   title: "Customise the sidebar",
   description:
     "Choose what the sidebar shows, and in what order. Pinned entries come first. Your choices are kept in this browser.",
@@ -381,9 +383,19 @@ const customiseWords: SidebarCustomiseLabels = {
 // The sheet's panel takes the other props, as a `SheetContent` does.
 export type SidebarCustomiseProps = Omit<SheetContentProps, "children" | "label" | "labels"> & {
   arranger: SidebarArranger;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  /** The sheet's words, such as for Welsh, or to call the entries by what the sidebar lists. */
+  /**
+   * What opens the sheet, which is a `SheetTrigger`, such as one rendered as a SidebarItem. Leave
+   * it out when something else opens the sheet through `open`.
+   */
+  children?: ReactNode;
+  /** Whether the sheet is open. Leave it out to let the sheet keep track. */
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /**
+   * The sheet's words, in place of a LabelsProvider's or the defaults, such as to call the entries
+   * by what the sidebar lists.
+   */
   labels?: Partial<SidebarCustomiseLabels>;
 };
 
@@ -399,13 +411,16 @@ export type SidebarCustomiseProps = Omit<SheetContentProps, "children" | "label"
  */
 export function SidebarCustomise({
   arranger,
-  open,
+  children,
+  open: controlled,
+  defaultOpen = false,
   onOpenChange,
   labels,
   className = "",
   ...props
 }: SidebarCustomiseProps) {
-  const words = { ...customiseWords, ...labels };
+  const words = useLabels("sidebarCustomise", defaultSidebarCustomiseLabels, labels);
+  const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
   const { arrangement } = arranger;
   const { reduced } = useMotionTiming();
   const root = useRef<HTMLDivElement>(null);
@@ -515,7 +530,8 @@ export function SidebarCustomise({
   };
 
   return (
-    <Sheet side="right" open={open} onOpenChange={onOpenChange}>
+    <Sheet side="right" open={open} onOpenChange={setOpen}>
+      {children}
       <SheetContent
         {...props}
         className={`x-govuk-ui-sidebar-customise ${className}`.trim()}

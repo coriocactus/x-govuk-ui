@@ -12,6 +12,7 @@ import {
   useRef,
 } from "react";
 import { formatDateTime } from "./helpers";
+import { useLabels } from "./labels";
 import { duration, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 
@@ -92,13 +93,28 @@ export function Timeline({
   );
 }
 
+/** The words a TimelineItem writes, which a LabelsProvider or its `labels` can change. */
+export type TimelineLabels = {
+  /** Says who or what did it, beneath the title. */
+  by: (who: ReactNode) => ReactNode;
+  /** Writes when it happened. By default, as GOV.UK writes dates and times. */
+  date: (date: Date) => string;
+};
+
+export const defaultTimelineLabels: TimelineLabels = {
+  by: (who) => <>by {who}</>,
+  date: formatDateTime,
+};
+
 export type TimelineItemProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
   /** What happened, such as Application submitted. */
   title: ReactNode;
   /** Who or what did it, such as the Passport Office. */
   by?: ReactNode;
-  /** When it happened. It is written as GOV.UK writes dates and times. */
+  /** When it happened, written by its `date` label. */
   date: Date;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<TimelineLabels>;
   /** More about what happened. */
   children?: ReactNode;
   /** Things to do about it, such as a link to a letter. */
@@ -113,16 +129,18 @@ export function TimelineItem({
   children,
   actions,
   className = "",
+  labels: ownLabels,
   ...props
 }: TimelineItemProps) {
+  const labels = useLabels("timeline", defaultTimelineLabels, ownLabels);
   const level = useContext(HeadingLevel);
   const Heading = `h${level}` as const;
   return (
     <div {...props} className={`x-govuk-ui-timeline-event ${className}`.trim()}>
       <Heading className="x-govuk-ui-timeline-title">{title}</Heading>
-      {by && <p className="x-govuk-ui-timeline-by">by {by}</p>}
+      {by && <p className="x-govuk-ui-timeline-by">{labels.by(by)}</p>}
       <p className="x-govuk-ui-timeline-date">
-        <time dateTime={date.toISOString()}>{formatDateTime(date)}</time>
+        <time dateTime={date.toISOString()}>{labels.date(date)}</time>
       </p>
       {children && <div className="x-govuk-ui-timeline-description">{children}</div>}
       {actions && <div className="x-govuk-ui-timeline-actions">{actions}</div>}

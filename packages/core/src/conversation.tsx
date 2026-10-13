@@ -81,7 +81,7 @@ const ConversationContext = createContext<{
   headingLevel: HeadingLevel;
   /** Tells the conversation that a message has started or stopped streaming. */
   stream?: (id: string, streaming: boolean) => void;
-}>({ assistantName: "Service assistant", headingLevel: 3 });
+}>({ assistantName: defaultConversationLabels.assistant, headingLevel: 3 });
 const MessageContext = createContext<{
   from: Speaker;
   content: RefObject<HTMLDivElement | null>;

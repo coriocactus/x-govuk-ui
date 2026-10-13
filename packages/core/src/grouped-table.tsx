@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useLabels } from "./labels";
 import { duration, easeOut, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 import { ResizableHandle } from "./resizable";
@@ -69,9 +70,21 @@ const FirstGroup = createContext(false);
 /** Rows tell the table when they appear, as a band opens, so it measures them. */
 const RowsAppear = createContext<() => void>(() => {});
 
+/** The words GroupedTable writes, which a LabelsProvider or its `labels` can change. */
+export type GroupedTableLabels = {
+  /** Names the handle that resizes the table. */
+  width: string;
+};
+
+export const defaultGroupedTableLabels: GroupedTableLabels = {
+  width: "Width of the table",
+};
+
 export type GroupedTableProps = ComponentPropsWithRef<"div"> & {
   /** Names the table for screen readers. */
   label: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<GroupedTableLabels>;
   columns: readonly GroupedTableColumn[];
   /** Sits above the groups, such as a title or tabs. */
   toolbar?: ReactNode;
@@ -113,8 +126,10 @@ export function GroupedTable({
   className = "",
   ref,
   style,
+  labels: ownLabels,
   ...props
 }: GroupedTableProps) {
+  const labels = useLabels("groupedTable", defaultGroupedTableLabels, ownLabels);
   const frame = useRef<HTMLDivElement>(null);
   const body = useRef<HTMLElement>(null);
   const [room, setRoom] = useState(0);
@@ -463,7 +478,7 @@ export function GroupedTable({
       </ScrollArea>
       {resizable && room > 0 && (
         <ResizableHandle
-          label="Width of the table"
+          label={labels.width}
           grip
           panel="before"
           value={chosen ?? room}

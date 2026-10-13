@@ -2,6 +2,7 @@
 
 import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef } from "react";
+import { useLabels } from "./labels";
 
 export type LinkProps = ComponentPropsWithRef<"a"> & {
   /**
@@ -17,6 +18,18 @@ export type LinkProps = ComponentPropsWithRef<"a"> & {
   newTab?: boolean;
   /** Renders a router's link in place of the anchor. */
   render?: useRender.RenderProp;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<LinkLabels>;
+};
+
+/** The words Link writes, which a LabelsProvider or its `labels` can change. */
+export type LinkLabels = {
+  /** Follows a link that opens a new tab, as GOV.UK advises. */
+  newTab: string;
+};
+
+export const defaultLinkLabels: LinkLabels = {
+  newTab: "(opens in new tab)",
 };
 
 /**
@@ -32,8 +45,10 @@ export function Link({
   render,
   className = "",
   children,
+  labels: ownLabels,
   ...props
 }: LinkProps) {
+  const labels = useLabels("link", defaultLinkLabels, ownLabels);
   return useRender({
     defaultTagName: "a",
     render,
@@ -44,7 +59,13 @@ export function Link({
       "data-no-underline": underline ? undefined : "",
       "data-no-visited": visited ? undefined : "",
       ...(newTab ? { target: "_blank", rel: "noreferrer noopener" } : {}),
-      children: newTab ? <>{children} (opens in new tab)</> : children,
+      children: newTab ? (
+        <>
+          {children} {labels.newTab}
+        </>
+      ) : (
+        children
+      ),
     },
   });
 }

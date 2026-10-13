@@ -112,6 +112,8 @@ export type InlineCitationLabels = {
   sources: string;
   previous: string;
   next: string;
+  /** Says which source shows, for screen readers, as in "Source 2 of 3". */
+  position: (place: number, count: number) => string;
 };
 
 export const defaultInlineCitationLabels: InlineCitationLabels = {
@@ -119,6 +121,7 @@ export const defaultInlineCitationLabels: InlineCitationLabels = {
   sources: "Sources",
   previous: "Previous source",
   next: "Next source",
+  position: (place, count) => `Source ${place} of ${count}`,
 };
 
 /**
@@ -199,11 +202,12 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
                   {arrow("m6 3 5 5-5 5")}
                 </Button>
                 <span className="x-govuk-ui-inline-citation-count" aria-live="polite">
-                  <span className="x-govuk-ui-visually-hidden">Source </span>
-                  {index + 1}
-                  <span aria-hidden="true">/</span>
-                  <span className="x-govuk-ui-visually-hidden"> of </span>
-                  {sources.length}
+                  <span className="x-govuk-ui-visually-hidden">
+                    {words.position(index + 1, sources.length)}
+                  </span>
+                  <span aria-hidden="true">
+                    {index + 1}/{sources.length}
+                  </span>
                 </span>
               </div>
             )}

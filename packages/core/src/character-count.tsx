@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLabels } from "./labels";
 
 /** Counts the words in a text, as GOV.UK's character count does when it counts words. */
 export const countWords = (text: string) => text.match(/\S+/g)?.length ?? 0;
 
-/** What a character count says for a number of characters or words, in another language. */
-export type CharacterCountWords = {
+/**
+ * The words a character count writes, for a number of characters or words, which a LabelsProvider
+ * or a field's `labels` can change. Textarea's count and the Editor's share them.
+ */
+export type CharacterCountLabels = {
   /** What it says about the field, such as "You can enter up to 200 characters". */
   limit: (amount: number, unit: "character" | "word") => string;
   remaining: (amount: number, unit: "character" | "word") => string;
@@ -16,8 +20,8 @@ export type CharacterCountWords = {
 const plural = (amount: number, unit: "character" | "word") =>
   `${amount} ${unit}${amount === 1 ? "" : "s"}`;
 
-/** GOV.UK's words for a character count. @internal */
-export const characterCountWords: CharacterCountWords = {
+/** GOV.UK's words for a character count. */
+export const defaultCharacterCountLabels: CharacterCountLabels = {
   limit: (amount, unit) => `You can enter up to ${plural(amount, unit)}`,
   remaining: (amount, unit) => `You have ${plural(amount, unit)} remaining`,
   over: (amount, unit) => `You have ${plural(amount, unit)} too many`,
@@ -35,7 +39,7 @@ export function CharacterCountNote({
   count,
   unit,
   threshold,
-  words = characterCountWords,
+  labels: own,
 }: {
   /** The id the field is described by. */
   id: string;
@@ -44,9 +48,10 @@ export function CharacterCountNote({
   unit: "character" | "word";
   /** The share of the limit used before the count shows, from 0 to 1. */
   threshold: number;
-  /** What it says. By default, it uses GOV.UK's English words. */
-  words?: CharacterCountWords;
+  /** Its words, in place of a LabelsProvider's or GOV.UK's. */
+  labels?: Partial<CharacterCountLabels>;
 }) {
+  const words = useLabels("characterCount", defaultCharacterCountLabels, own);
   const left = limit - count;
   const message = left >= 0 ? words.remaining(left, unit) : words.over(-left, unit);
   const shown = !threshold || count >= limit * threshold;

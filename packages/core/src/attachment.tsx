@@ -2,6 +2,7 @@
 
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Details } from "./details";
+import { useLabels } from "./labels";
 import { Link } from "./link";
 
 export type AttachmentProps = Omit<ComponentPropsWithRef<"section">, "title"> & {
@@ -20,6 +21,32 @@ export type AttachmentProps = Omit<ComponentPropsWithRef<"section">, "title"> & 
    */
   accessibleFormatEmail?: string;
   headingLevel?: 2 | 3 | 4;
+  /** Its words, in place of a LabelsProvider's or GOV.UK's. */
+  labels?: Partial<AttachmentLabels>;
+};
+
+/** The words Attachment writes, which a LabelsProvider or its `labels` can change. */
+export type AttachmentLabels = {
+  pages: (count: number) => string;
+  /** GOV.UK's notice that the file may not suit assistive technology. */
+  notAccessible: ReactNode;
+  /** The summary of the Details that asks for another format. */
+  requestFormat: ReactNode;
+  /** The Details' words, given the link to the address to write to. */
+  requestHelp: (email: ReactNode) => ReactNode;
+};
+
+export const defaultAttachmentLabels: AttachmentLabels = {
+  pages: (count) => `${count} ${count === 1 ? "page" : "pages"}`,
+  notAccessible: "This file may not be suitable for users of assistive technology.",
+  requestFormat: "Request an accessible format.",
+  requestHelp: (email) => (
+    <>
+      If you use assistive technology, such as a screen reader, and need a version of this document
+      in a more accessible format, email {email}. Tell us what format you need. It will help us if
+      you say what assistive technology you use.
+    </>
+  ),
 };
 
 /**
@@ -37,12 +64,12 @@ export function Attachment({
   accessibleFormatEmail,
   headingLevel = 3,
   className = "",
+  labels: ownLabels,
   ...props
 }: AttachmentProps) {
+  const labels = useLabels("attachment", defaultAttachmentLabels, ownLabels);
   const Heading = `h${headingLevel}` as const;
-  const facts = [format, size, pages ? `${pages} ${pages === 1 ? "page" : "pages"}` : null].filter(
-    Boolean,
-  );
+  const facts = [format, size, pages ? labels.pages(pages) : null].filter(Boolean);
   return (
     <section {...props} className={`x-govuk-ui-attachment ${className}`.trim()}>
       {/* The thumbnail is decoration. The title is the link. */}
@@ -75,14 +102,11 @@ export function Attachment({
         {facts.length > 0 && <p className="x-govuk-ui-attachment-facts">{facts.join(", ")}</p>}
         {accessibleFormatEmail && (
           <>
-            <p className="x-govuk-ui-attachment-facts">
-              This file may not be suitable for users of assistive technology.
-            </p>
-            <Details summary="Request an accessible format.">
-              If you use assistive technology, such as a screen reader, and need a version of this
-              document in a more accessible format, email{" "}
-              <Link href={`mailto:${accessibleFormatEmail}`}>{accessibleFormatEmail}</Link>. Tell us
-              what format you need. It will help us if you say what assistive technology you use.
+            <p className="x-govuk-ui-attachment-facts">{labels.notAccessible}</p>
+            <Details summary={labels.requestFormat}>
+              {labels.requestHelp(
+                <Link href={`mailto:${accessibleFormatEmail}`}>{accessibleFormatEmail}</Link>,
+              )}
             </Details>
           </>
         )}

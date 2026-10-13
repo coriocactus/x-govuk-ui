@@ -8,9 +8,29 @@ import {
   useState,
 } from "react";
 import { highlight } from "./code-block";
+import { useLabels } from "./labels";
 import { ScrollArea } from "./scroll-area";
 
+/** The words FileDiff writes, which a LabelsProvider or its `labels` can change. */
+export type FileDiffLabels = {
+  /** The button that opens a folded run of lines that did not change. */
+  unchanged: (count: number) => string;
+  /** Says, for screen readers, how many lines were added and removed. */
+  counts: (added: number, removed: number) => string;
+  /** Names the scrolling code, given the file's path. */
+  changes: (filename: string) => string;
+};
+
+export const defaultFileDiffLabels: FileDiffLabels = {
+  unchanged: (count) => `Show ${count} unchanged ${count === 1 ? "line" : "lines"}`,
+  counts: (added, removed) =>
+    `${added} ${added === 1 ? "line" : "lines"} added, ${removed} removed`,
+  changes: (filename) => `Changes to ${filename}`,
+};
+
 export type FileDiffProps = ComponentPropsWithRef<"figure"> & {
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<FileDiffLabels>;
   /** The file's path, shown in the header. */
   filename: string;
   before: string;
@@ -169,8 +189,10 @@ export function FileDiff({
   children,
   className = "",
   style,
+  labels: ownLabels,
   ...props
 }: FileDiffProps) {
+  const labels = useLabels("fileDiff", defaultFileDiffLabels, ownLabels);
   // The lines are compared and coloured only when the texts change, not when the context does.
   const { lines, added, removed, digits } = useMemo(() => {
     const oldLines = before.replace(/\n$/, "").split("\n");
@@ -208,7 +230,7 @@ export function FileDiff({
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
           <path d="m5 6 3-3 3 3M5 10l3 3 3-3" fill="none" stroke="currentColor" strokeWidth="1.6" />
         </svg>
-        Show {piece.lines.length} unchanged lines
+        {labels.unchanged(piece.lines.length)}
       </button>
     );
   };
@@ -231,9 +253,7 @@ export function FileDiff({
       <figcaption className="x-govuk-ui-file-diff-header">
         <span className="x-govuk-ui-file-diff-filename">{filename}</span>
         <span className="x-govuk-ui-file-diff-counts">
-          <span className="x-govuk-ui-visually-hidden">
-            {added} {added === 1 ? "line" : "lines"} added, {removed} removed
-          </span>
+          <span className="x-govuk-ui-visually-hidden">{labels.counts(added, removed)}</span>
           <span aria-hidden="true" data-kind="add">
             +{added}
           </span>
@@ -245,7 +265,7 @@ export function FileDiff({
       </figcaption>
       <ScrollArea
         orientation={maxRows ? (wrap ? "vertical" : "both") : "horizontal"}
-        label={`Changes to ${filename}`}
+        label={labels.changes(filename)}
       >
         <pre
           className="x-govuk-ui-file-diff-code"

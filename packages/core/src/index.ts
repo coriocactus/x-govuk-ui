@@ -31,12 +31,19 @@ export {
   AspectRatio,
   type AspectRatioProps,
 } from "./aspect-ratio";
-export { Attachment, type AttachmentProps } from "./attachment";
+export {
+  Attachment,
+  type AttachmentLabels,
+  type AttachmentProps,
+  defaultAttachmentLabels,
+} from "./attachment";
 export {
   Avatar,
   AvatarGroup,
+  type AvatarGroupLabels,
   type AvatarGroupProps,
   type AvatarProps,
+  defaultAvatarGroupLabels,
 } from "./avatar";
 export {
   BackLink,
@@ -120,6 +127,7 @@ export {
   type CarouselViewportProps,
   defaultCarouselLabels,
 } from "./carousel";
+export { type CharacterCountLabels, defaultCharacterCountLabels } from "./character-count";
 export {
   browserRecogniser,
   ChatInput,
@@ -341,8 +349,18 @@ export {
   type FileChipsLabels,
   type FileChipsProps,
 } from "./file-chips";
-export { FileDiff, type FileDiffProps } from "./file-diff";
-export { FileUpload, type FileUploadProps } from "./file-upload";
+export {
+  defaultFileDiffLabels,
+  FileDiff,
+  type FileDiffLabels,
+  type FileDiffProps,
+} from "./file-diff";
+export {
+  defaultFileUploadLabels,
+  FileUpload,
+  type FileUploadLabels,
+  type FileUploadProps,
+} from "./file-upload";
 export {
   FilterChip,
   type FilterChipProps,
@@ -378,10 +396,12 @@ export {
   type FormStepsProps,
 } from "./form-steps";
 export {
+  defaultGroupedTableLabels,
   GroupedTable,
   type GroupedTableColumn,
   GroupedTableGroup,
   type GroupedTableGroupProps,
+  type GroupedTableLabels,
   type GroupedTableProps,
   GroupedTableRow,
   type GroupedTableRowProps,
@@ -470,11 +490,19 @@ export {
   type LightboxProps,
 } from "./lightbox";
 export {
+  defaultLinkLabels,
   Link,
+  type LinkLabels,
   type LinkProps,
 } from "./link";
 export { GovukCrown, GovukLockup, type GovukMarkProps, GovukWordmark } from "./logo";
-export { LogoCarousel, type LogoCarouselItem, type LogoCarouselProps } from "./logo-carousel";
+export {
+  defaultLogoCarouselLabels,
+  LogoCarousel,
+  type LogoCarouselItem,
+  type LogoCarouselLabels,
+  type LogoCarouselProps,
+} from "./logo-carousel";
 export {
   Marker,
   type MarkerProps,
@@ -592,7 +620,12 @@ export {
 } from "./popover";
 export { Progress, type ProgressProps } from "./progress";
 export { Prose } from "./prose";
-export { QrCode, type QrCodeProps } from "./qr-code";
+export {
+  defaultQrCodeLabels,
+  QrCode,
+  type QrCodeLabels,
+  type QrCodeProps,
+} from "./qr-code";
 export {
   defaultReasoningStepsLabels,
   ReasoningStep,
@@ -686,6 +719,8 @@ export {
   useSidebar,
 } from "./sidebar";
 export {
+  defaultSidebarCustomiseLabels,
+  defaultSidebarItemMenuLabels,
   type SidebarArrangement,
   type SidebarArranger,
   SidebarCustomise,
@@ -789,6 +824,7 @@ export {
   type TextareaProps,
 } from "./textarea";
 export {
+  defaultThemePickerLabels,
   type Theme,
   ThemePicker,
   type ThemePickerLabels,
@@ -804,9 +840,11 @@ export {
   type TimeParts,
 } from "./time-input";
 export {
+  defaultTimelineLabels,
   Timeline,
   TimelineItem,
   type TimelineItemProps,
+  type TimelineLabels,
   type TimelineProps,
 } from "./timeline";
 export {

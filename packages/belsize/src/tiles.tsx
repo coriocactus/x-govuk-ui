@@ -304,8 +304,12 @@ export type TilesLabels = {
   split: (tile: string, direction: TileSplitDirection) => string;
   madeLarger: (tile: string) => string;
   setOutEvenly: string;
+  /** A tile's menu item that gives it more of the board. */
+  makeLarger: string;
   /** Says which tile is in use on a small screen, as in "Map, 2 of 3". */
   position: (tile: string, place: number, count: number) => string;
+  /** Shows the tile's place in the pager, as in "2 of 3". */
+  place: (place: number, count: number) => string;
   /** Names a divider by the tiles before it. */
   resize: (tiles: string) => string;
   previousTile: string;
@@ -353,7 +357,9 @@ export const defaultTilesLabels: TilesLabels = {
   split: (tile, direction) => `${tile} split ${direction}`,
   madeLarger: (tile) => `${tile} made larger`,
   setOutEvenly: "Tiles set out evenly",
+  makeLarger: "Make larger",
   position: (tile, place, count) => `${tile}, ${place} of ${count}`,
+  place: (place, count) => `${place} of ${count}`,
   resize: (tiles) => `Resize ${tiles}`,
   previousTile: "Previous tile",
   nextTile: "Next tile",
@@ -1567,7 +1573,7 @@ export function TilePager({ className = "", ...props }: ComponentPropsWithRef<"d
         />
       )}
       <span className="x-govuk-ui-tile-pager-place">
-        {at + 1} of {order.length}
+        {tiles.labels.place(at + 1, order.length)}
       </span>
       {after !== undefined && (
         <Control
@@ -1694,10 +1700,10 @@ function TileMenuItems({ children }: { children: ReactNode }) {
       {tiles.canSplit && (
         <MenuGroup>
           <MenuItem icon={icons.across} onSelect={() => tiles.split(tile.id, "across")}>
-            Split across
+            {tiles.labels.splitDirection("across")}
           </MenuItem>
           <MenuItem icon={icons.down} onSelect={() => tiles.split(tile.id, "down")}>
-            Split down
+            {tiles.labels.splitDirection("down")}
           </MenuItem>
         </MenuGroup>
       )}
@@ -1744,7 +1750,7 @@ function TileMenuItems({ children }: { children: ReactNode }) {
       {(children || tiles.canSplit || moves || shows) && <MenuSeparator />}
       {moves && (
         <MenuItem icon={icons.larger} onSelect={() => tiles.expand(tile.id)}>
-          Make larger
+          {tiles.labels.makeLarger}
         </MenuItem>
       )}
       <MenuItem
@@ -1754,7 +1760,7 @@ function TileMenuItems({ children }: { children: ReactNode }) {
         {on ? tiles.labels.restore : tiles.labels.maximise}
       </MenuItem>
       <MenuItem icon={icons.close} onSelect={() => tiles.close(tile.id)}>
-        Close
+        {tiles.labels.close}
       </MenuItem>
     </>
   );

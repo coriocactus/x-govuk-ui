@@ -2,6 +2,7 @@
 
 import { Avatar as Primitive } from "@base-ui/react/avatar";
 import type { ComponentPropsWithRef } from "react";
+import { useLabels } from "./labels";
 
 export type AvatarProps = ComponentPropsWithRef<"span"> & {
   /** The person's name. It names the avatar, and gives the initials when there is no image. */
@@ -48,6 +49,18 @@ export function Avatar({ name, src, size = "medium", className = "", ...props }:
 export type AvatarGroupProps = ComponentPropsWithRef<"div"> & {
   /** People beyond those shown, counted in a last circle, such as +3. */
   more?: number;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<AvatarGroupLabels>;
+};
+
+/** The words AvatarGroup writes, which a LabelsProvider or its `labels` can change. */
+export type AvatarGroupLabels = {
+  /** Says, for screen readers, how many more people there are than the group shows. */
+  more: (count: number) => string;
+};
+
+export const defaultAvatarGroupLabels: AvatarGroupLabels = {
+  more: (count) => `and ${count} more`,
 };
 
 // How the group responds to the pointer. The avatar under it rises most and grows a little. Its
@@ -67,8 +80,10 @@ export function AvatarGroup({
   children,
   onPointerOver,
   onPointerLeave,
+  labels: ownLabels,
   ...props
 }: AvatarGroupProps) {
+  const labels = useLabels("avatarGroup", defaultAvatarGroupLabels, ownLabels);
   const lift = (group: HTMLElement, active: number | null) => {
     group.toggleAttribute("data-settling", active === null);
     [...group.children].forEach((avatar, place) => {
@@ -98,7 +113,7 @@ export function AvatarGroup({
       {more > 0 && (
         <span className="x-govuk-ui-avatar x-govuk-ui-avatar-more" data-size="medium">
           <span aria-hidden="true">+{more}</span>
-          <span className="x-govuk-ui-visually-hidden">and {more} more</span>
+          <span className="x-govuk-ui-visually-hidden">{labels.more(more)}</span>
         </span>
       )}
     </div>

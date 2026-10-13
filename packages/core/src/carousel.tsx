@@ -50,6 +50,7 @@ export type CarouselProps = ComponentPropsWithRef<"section"> & {
  * `CarouselNext`. There is no autoplay or looping.
  */
 export function Carousel({ label, children, className = "", ...props }: CarouselProps) {
+  const words = useLabels("carousel", defaultCarouselLabels);
   const viewport = useRef<HTMLDivElement>(null);
   const timing = useMotionTiming();
   const [index, setIndex] = useState(0);
@@ -80,7 +81,7 @@ export function Carousel({ label, children, className = "", ...props }: Carousel
         {...props}
         className={`x-govuk-ui-carousel ${className}`.trim()}
         aria-label={label}
-        aria-roledescription="carousel"
+        aria-roledescription={words.carousel}
       >
         {children}
       </section>
@@ -99,6 +100,7 @@ export function CarouselViewport({
   ...props
 }: CarouselViewportProps) {
   const carousel = useCarousel("CarouselViewport");
+  const words = useLabels("carousel", defaultCarouselLabels);
   const viewportRef = useMergedRef(carousel.viewport, ref);
   const slides = Children.toArray(children);
   const { setCount } = carousel;
@@ -125,7 +127,7 @@ export function CarouselViewport({
           {slide}
         </SlideContext>
       ))}
-      {!slides.length && <p>No slides available.</p>}
+      {!slides.length && <p>{words.empty}</p>}
     </div>
   );
 }
@@ -138,14 +140,15 @@ export type CarouselSlideProps = ComponentPropsWithRef<"div"> & {
 /** One slide. */
 export function CarouselSlide({ label, className = "", ...props }: CarouselSlideProps) {
   const { index, count } = useContext(SlideContext);
+  const words = useLabels("carousel", defaultCarouselLabels);
   return (
     // biome-ignore lint/a11y/useSemanticElements: ARIA carousel slides are groups, not form fieldsets.
     <div
       {...props}
       className={`x-govuk-ui-carousel-slide ${className}`.trim()}
       role="group"
-      aria-roledescription="slide"
-      aria-label={`${index + 1} of ${count}: ${label}`}
+      aria-roledescription={words.slide}
+      aria-label={words.slideName(index + 1, count, label)}
     />
   );
 }
@@ -178,11 +181,22 @@ export type CarouselButtonProps = Omit<ButtonProps, "children"> & { label?: stri
 export type CarouselLabels = {
   previous: string;
   next: string;
+  /** Said in place of the slides while there are none. */
+  empty: string;
+  /** What screen readers call the carousel and each slide, in place of a region and a group. */
+  carousel: string;
+  slide: string;
+  /** Names a slide by its place and its own name, as in "2 of 3: Your community". */
+  slideName: (place: number, count: number, name: string) => string;
 };
 
 export const defaultCarouselLabels: CarouselLabels = {
   previous: "Previous slide",
   next: "Next slide",
+  empty: "No slides available.",
+  carousel: "carousel",
+  slide: "slide",
+  slideName: (place, count, name) => `${place} of ${count}: ${name}`,
 };
 
 /** Moves to the previous slide. It is unavailable on the first. */

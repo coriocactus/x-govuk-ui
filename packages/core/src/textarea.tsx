@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { CharacterCountNote, countWords } from "./character-count";
+import { type CharacterCountLabels, CharacterCountNote, countWords } from "./character-count";
 import {
   ErrorMessage,
   Field,
@@ -49,6 +49,8 @@ export type TextareaProps = ComponentPropsWithRef<"textarea"> & {
    * The count shows once this share of the limit is used, from 0 to 1. By default, it always shows.
    */
   threshold?: number;
+  /** The count's words, in place of a LabelsProvider's `characterCount` words or GOV.UK's. */
+  labels?: Partial<CharacterCountLabels>;
 };
 
 /**
@@ -109,6 +111,7 @@ export function TextareaControl(given: TextareaControlProps) {
     characterLimit,
     wordLimit,
     threshold = 0,
+    labels,
     ...props
   } = useControlProps(given);
   // The count names the box by its id, so it always has one.
@@ -195,6 +198,7 @@ export function TextareaControl(given: TextareaControlProps) {
           count={count}
           unit={unit}
           threshold={threshold}
+          labels={labels}
         />
       )}
     </>

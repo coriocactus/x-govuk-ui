@@ -12,6 +12,7 @@ import {
 } from "react";
 import { Button } from "./button";
 import { chain } from "./events";
+import { useLabels } from "./labels";
 import { duration, useMotionTiming } from "./motion";
 import { OrganisationName } from "./organisation-name";
 import { useMergedRef } from "./refs";
@@ -30,6 +31,26 @@ export type LogoCarouselItem = {
   colour?: string;
 };
 
+/** The words LogoCarousel writes, which a LabelsProvider or its `labels` can change. */
+export type LogoCarouselLabels = {
+  /** The button that starts the logos turning, with what it turns for screen readers. */
+  play: ReactNode;
+  pause: ReactNode;
+};
+
+export const defaultLogoCarouselLabels: LogoCarouselLabels = {
+  play: (
+    <>
+      Play<span className="x-govuk-ui-visually-hidden"> the logos</span>
+    </>
+  ),
+  pause: (
+    <>
+      Pause<span className="x-govuk-ui-visually-hidden"> the logos</span>
+    </>
+  ),
+};
+
 export type LogoCarouselProps = ComponentPropsWithRef<"section"> & {
   /** Says who the organisations are, such as "Working with". */
   label: string;
@@ -41,6 +62,8 @@ export type LogoCarouselProps = ComponentPropsWithRef<"section"> & {
   visible?: number;
   /** How long a logo stays before the next takes its place, in milliseconds. */
   interval?: number;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<LogoCarouselLabels>;
 };
 
 /**
@@ -62,8 +85,10 @@ export function LogoCarousel({
   onPointerLeave,
   onFocus,
   onBlur,
+  labels: ownLabels,
   ...props
 }: LogoCarouselProps) {
+  const labels = useLabels("logoCarousel", defaultLogoCarouselLabels, ownLabels);
   const timing = useMotionTiming();
   const root = useRef<HTMLElement>(null);
   const merged = useMergedRef(root, ref);
@@ -168,8 +193,7 @@ export function LogoCarousel({
             aria-pressed={paused}
             onClick={() => setPaused(!paused)}
           >
-            {paused ? "Play" : "Pause"}
-            <span className="x-govuk-ui-visually-hidden"> the logos</span>
+            {paused ? labels.play : labels.pause}
           </Button>
         )}
       </div>

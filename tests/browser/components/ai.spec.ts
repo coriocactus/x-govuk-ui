@@ -365,7 +365,10 @@ test("a citation stack opens from the keyboard, takes focus, and steps through i
   await expect(card.getByRole("button", { name: "Previous source" })).toBeFocused();
   await card.getByRole("button", { name: "Next source" }).click();
   await expect(card.getByRole("link", { name: "Passport photo checker" })).toBeVisible();
-  await expect(card.locator(".x-govuk-ui-inline-citation-count")).toHaveText("Source 2/ of 3");
+  // Screen readers hear "Source 2 of 3", and the card shows 2/3.
+  const count = card.locator(".x-govuk-ui-inline-citation-count");
+  await expect(count.locator(".x-govuk-ui-visually-hidden")).toHaveText("Source 2 of 3");
+  await expect(count.locator("[aria-hidden]")).toHaveText("2/3");
   await page.keyboard.press("Escape");
   await expect(card).toBeHidden();
   await expect(stack).toBeFocused();

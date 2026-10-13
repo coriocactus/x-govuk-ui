@@ -207,7 +207,7 @@ export function ImageGeneration({
             aria-valuemin={share === null ? undefined : 0}
             aria-valuemax={share === null ? undefined : 100}
             aria-valuenow={share === null ? undefined : Math.round(share * 100)}
-            aria-label={typeof label === "string" ? label : "Creating image"}
+            aria-label={typeof label === "string" ? label : words.creating}
             className="x-govuk-ui-image-generation-meter"
             data-indeterminate={share === null || undefined}
           >

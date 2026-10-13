@@ -17,6 +17,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 ### Changed
 
 - Changed the Editor's `errorMessage` to take any React content, as every field's does.
+- Changed the Editor's `count` label to take only the words it changes. The rest come from a LabelsProvider's `characterCount` words, which Textarea's count shares, then GOV.UK's.
 
 ### Fixed
 

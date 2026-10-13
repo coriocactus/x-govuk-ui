@@ -61,10 +61,13 @@ export type ResizableHandleProps = Omit<
 export type ResizableLabels = {
   /** Names a handle for screen readers. */
   resize: string;
+  /** Says a handle's place, in pixels, for screen readers. */
+  value: (pixels: number) => string;
 };
 
 export const defaultResizableLabels: ResizableLabels = {
   resize: "Resize",
+  value: (pixels) => `${pixels} pixels`,
 };
 
 /**
@@ -230,7 +233,7 @@ export function ResizableHandle({
       aria-valuemin={Number.isFinite(min) ? Math.round(min) : undefined}
       aria-valuemax={Number.isFinite(max) ? Math.round(max) : undefined}
       aria-valuenow={rounded}
-      aria-valuetext={`${rounded} pixels`}
+      aria-valuetext={words.value(rounded)}
       className={`x-govuk-ui-resizable-handle ${className}`.trim()}
       data-dragging={dragging || undefined}
       data-grip={grip || undefined}

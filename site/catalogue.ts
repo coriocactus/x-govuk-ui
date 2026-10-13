@@ -296,7 +296,7 @@ const entries = {
       toggle("disabled"),
       reference("accept / name", "string"),
       reference("onFilesChange", "(files: File[]) => void"),
-      reference("chooseText / dropText / noFileText", "string", "GOV.UK's"),
+      reference("labels", "Partial<FileUploadLabels>", "GOV.UK's"),
     ],
   },
   combobox: {
@@ -399,6 +399,7 @@ const entries = {
       toggle("disabled"),
       reference("wordLimit", "number", "None"),
       reference("threshold", "number from 0 to 1", "0"),
+      reference("labels", "Partial<CharacterCountLabels>", "GOV.UK's"),
       reference("ref", "HTMLTextAreaElement"),
     ],
     presets: [

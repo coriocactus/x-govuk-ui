@@ -53,12 +53,15 @@ export type ComboboxLabels = {
   clear: string;
   /** Names the button that shows every option. */
   showAll: string;
+  /** Names the button that removes a chosen option, in MultiSelect. */
+  remove: (option: string) => string;
 };
 
 export const defaultComboboxLabels: ComboboxLabels = {
   empty: "No results found",
   clear: "Clear",
   showAll: "Show all options",
+  remove: (option) => `Remove ${option}`,
 };
 
 /** The labels of the options sent, for Check your answers. */
@@ -310,7 +313,7 @@ export function MultiSelect({
                     {option.label}
                     <Primitive.ChipRemove
                       className="x-govuk-ui-chip-remove"
-                      aria-label={`Remove ${option.label}`}
+                      aria-label={labels.remove(option.label)}
                     >
                       <CrossIcon size={12} />
                     </Primitive.ChipRemove>

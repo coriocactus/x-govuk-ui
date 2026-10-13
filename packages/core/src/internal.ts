@@ -5,12 +5,7 @@
  * @internal
  */
 export { AutoHeight, type AutoHeightProps } from "./auto-height";
-export {
-  CharacterCountNote,
-  type CharacterCountWords,
-  characterCountWords,
-  countWords,
-} from "./character-count";
+export { CharacterCountNote, countWords } from "./character-count";
 export { type CodeToken, codeLanguage, codeLanguages, codeTokens } from "./code-tokens";
 export { useControllableState } from "./controllable-state";
 export { chain } from "./events";

@@ -90,6 +90,8 @@ export type LightboxLabels = {
   close: string;
   previous: string;
   next: string;
+  /** Credits a photo's photographer, beneath its caption. */
+  credit: (name: ReactNode) => ReactNode;
 };
 
 export const defaultLightboxLabels: LightboxLabels = {
@@ -97,6 +99,7 @@ export const defaultLightboxLabels: LightboxLabels = {
   close: "Close",
   previous: "Previous photo",
   next: "Next photo",
+  credit: (name) => <>Photo by {name}</>,
 };
 
 /**
@@ -389,7 +392,9 @@ export function Lightbox({
                   <figcaption key={`caption-${index}`} className="x-govuk-ui-lightbox-caption">
                     {current.caption}
                     {current.credit && (
-                      <span className="x-govuk-ui-lightbox-credit">Photo by {current.credit}</span>
+                      <span className="x-govuk-ui-lightbox-credit">
+                        {words.credit(current.credit)}
+                      </span>
                     )}
                   </figcaption>
                 )}

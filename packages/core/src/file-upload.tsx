@@ -10,6 +10,7 @@ import {
 } from "react";
 import { chain } from "./events";
 import { ErrorMessage, Field, Hint, Label, useField } from "./field";
+import { useLabels, useLocale } from "./labels";
 import { useScopeSound } from "./sound-scope";
 
 export type FileUploadProps = Omit<
@@ -23,19 +24,39 @@ export type FileUploadProps = Omit<
   errorMessage?: ReactNode;
   /** Called with the chosen files, after choosing, dropping or removing one. */
   onFilesChange?: (files: File[]) => void;
-  /** What the zone's button says. By default, "Choose file", or "Choose files" for several. */
-  chooseText?: string;
-  /** What the zone says beside the button. */
-  dropText?: string;
-  /** Shown while nothing is chosen. */
-  noFileText?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<FileUploadLabels>;
 };
 
-const size = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
-const formatSize = (bytes: number) =>
-  bytes < 1024 * 1024
-    ? `${size.format(Math.max(1, bytes / 1024))} KB`
-    : `${size.format(bytes / 1024 / 1024)} MB`;
+/** The words FileUpload writes, which a LabelsProvider or its `labels` can change. */
+export type FileUploadLabels = {
+  /** The zone's button, for one file and for several. */
+  choose: string;
+  chooseMany: string;
+  /** What the zone says beside the button, for one file and for several. */
+  drop: string;
+  dropMany: string;
+  /** Shown while nothing is chosen, for one file and for several. */
+  noFile: string;
+  noFiles: string;
+  /** Each file's button. Screen readers hear the file's name after it. */
+  remove: string;
+  /** A file's size, given as a number already written in the language. */
+  kilobytes: (size: string) => string;
+  megabytes: (size: string) => string;
+};
+
+export const defaultFileUploadLabels: FileUploadLabels = {
+  choose: "Choose file",
+  chooseMany: "Choose files",
+  drop: "or drop a file here",
+  dropMany: "or drop files here",
+  noFile: "No file chosen",
+  noFiles: "No files chosen",
+  remove: "Remove",
+  kilobytes: (size) => `${size} KB`,
+  megabytes: (size) => `${size} MB`,
+};
 
 /**
  * GOV.UK's file upload, as a drop zone. The native file input lies over the whole zone, so pressing
@@ -50,9 +71,7 @@ export function FileUpload({
   errorMessage,
   onFilesChange,
   multiple = false,
-  chooseText = multiple ? "Choose files" : "Choose file",
-  dropText = multiple ? "or drop files here" : "or drop a file here",
-  noFileText = multiple ? "No files chosen" : "No file chosen",
+  labels: ownLabels,
   id,
   className = "",
   disabled,
@@ -71,6 +90,12 @@ export function FileUpload({
     "aria-describedby": describedBy,
     label,
   });
+  const labels = useLabels("fileUpload", defaultFileUploadLabels, ownLabels);
+  const number = new Intl.NumberFormat(useLocale(), { maximumFractionDigits: 1 });
+  const sizeOf = (bytes: number) =>
+    bytes < 1024 * 1024
+      ? labels.kilobytes(number.format(Math.max(1, bytes / 1024)))
+      : labels.megabytes(number.format(bytes / 1024 / 1024));
   const input = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [dragging, setDragging] = useState(false);
@@ -166,7 +191,10 @@ export function FileUpload({
             <path d="M12 16V4m0 0-5 5m5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
           </svg>
           <span className="x-govuk-ui-file-upload-text">
-            <span className="x-govuk-ui-file-upload-choose">{chooseText}</span> {dropText}
+            <span className="x-govuk-ui-file-upload-choose">
+              {multiple ? labels.chooseMany : labels.choose}
+            </span>{" "}
+            {multiple ? labels.dropMany : labels.drop}
           </span>
         </span>
       </div>
@@ -176,20 +204,23 @@ export function FileUpload({
             {files.map((file) => (
               <li key={`${file.name}-${file.size}-${file.lastModified}`}>
                 <span className="x-govuk-ui-file-upload-name">{file.name}</span>
-                <span className="x-govuk-ui-file-upload-size">{formatSize(file.size)}</span>
+                <span className="x-govuk-ui-file-upload-size">{sizeOf(file.size)}</span>
                 <button
                   type="button"
                   className="x-govuk-ui-file-upload-remove"
                   onClick={() => remove(file)}
                   disabled={disabled}
                 >
-                  Remove<span className="x-govuk-ui-visually-hidden"> {file.name}</span>
+                  {labels.remove}
+                  <span className="x-govuk-ui-visually-hidden"> {file.name}</span>
                 </button>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="x-govuk-ui-file-upload-empty">{noFileText}</p>
+          <p className="x-govuk-ui-file-upload-empty">
+            {multiple ? labels.noFiles : labels.noFile}
+          </p>
         )}
       </div>
     </Field>

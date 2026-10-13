@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { type CharacterCountWords, characterCountWords } from "x-govuk-ui/internal";
+import type { CharacterCountLabels } from "x-govuk-ui";
 
 /**
  * The editor's own controls. The defaults are Lexxy's toolbar, which has files, the text's marks,
@@ -42,10 +42,6 @@ export type EditorControlKind =
   | "unlink"
   | "source";
 
-/**
- * Every word the editor says, so a service can put them in Welsh, for example. A control's label
- * names it for screen readers and in its tooltip.
- */
 declare module "x-govuk-ui" {
   /** The Editor's words, which a LabelsProvider or the Editor's `labels` can change. */
   interface ComponentLabels {
@@ -53,6 +49,10 @@ declare module "x-govuk-ui" {
   }
 }
 
+/**
+ * Every word the editor says, so a service can put them in Welsh, for example. A control's label
+ * names it for screen readers and in its tooltip.
+ */
 export type EditorLabels = Record<EditorControlKind, string> & {
   /** Names the toolbar. */
   toolbar: string;
@@ -125,8 +125,11 @@ export type EditorLabels = Record<EditorControlKind, string> & {
   nothingFound: string;
   /** Names a prompt's menu, unless the prompt has a `label`. */
   suggestions: string;
-  /** What the count beneath the document says, for a number of characters or words. */
-  count: CharacterCountWords;
+  /**
+   * What the count beneath the document says, in place of a LabelsProvider's `characterCount`
+   * words or GOV.UK's.
+   */
+  count?: Partial<CharacterCountLabels>;
   /** An attachment's type, where its file's name has no extension to show. */
   imageType: string;
   fileType: string;
@@ -243,7 +246,6 @@ export const defaultEditorLabels: EditorLabels = {
   attachment: "Attachment",
   nothingFound: "Nothing found",
   suggestions: "Suggestions",
-  count: characterCountWords,
   imageType: "img",
   fileType: "file",
   aiToolbar: "Suggest an edit",

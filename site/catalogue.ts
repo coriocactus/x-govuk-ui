@@ -295,7 +295,12 @@ const entries = {
       text("errorMessage", "", { note: "The example also asks for a file when you continue." }),
       toggle("disabled"),
       reference("accept / name", "string"),
-      reference("onFilesChange", "(files: File[]) => void"),
+      reference(
+        "files / defaultFiles / onFilesChange",
+        "File[] / (files: File[]) => void",
+        "Uncontrolled",
+      ),
+      reference("list", "boolean", "true"),
       reference("labels", "Partial<FileUploadLabels>", "GOV.UK's"),
     ],
   },

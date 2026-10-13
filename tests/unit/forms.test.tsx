@@ -1191,3 +1191,17 @@ test("a step takes a fieldset's props and the level of its title", () => {
   );
   expect(html).toContain('<h2 class="x-govuk-ui-form-step-title">How can we contact you?</h2>');
 });
+
+test("a file upload starts from files given to it, and can leave their list to a service", () => {
+  const plan = new File(["plan"], "floor-plan.pdf", { type: "application/pdf" });
+  const listed = renderToStaticMarkup(
+    <FileUpload label="Upload a floor plan" defaultFiles={[plan]} />,
+  );
+  expect(listed).toContain('<span class="x-govuk-ui-file-upload-name">floor-plan.pdf</span>');
+  expect(listed).toMatch(/aria-describedby="[^"]*-files"/);
+  const unlisted = renderToStaticMarkup(
+    <FileUpload label="Upload a floor plan" defaultFiles={[plan]} list={false} />,
+  );
+  expect(unlisted).not.toContain("x-govuk-ui-file-upload-files");
+  expect(unlisted).not.toContain("-files");
+});

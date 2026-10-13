@@ -183,7 +183,7 @@ export type LabelsOutsideProvider = None<
  * Handlers that report what users do, which the part does not keep, need no value. Every other
  * `on…Change` has the value it reports, which a service can control, and a default to start it.
  */
-type Reported = "Dragging" | "Share" | "Page" | "Files" | "Code" | "Checked";
+type Reported = "Dragging" | "Share" | "Page" | "Code" | "Checked";
 
 type Uncontrolled<Props, Also extends string = never> = {
   // The element's own events, such as a video's `onDurationChange`, are the DOM's.

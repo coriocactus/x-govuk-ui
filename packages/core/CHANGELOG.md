@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Changed FileUpload's `list` to a boolean, which leaves its list of files out when it is false. It was the input's `list` attribute, which a file input does not use. Remove any `list` you gave it.
 - Changed FormSteps' Check your answers heading, `.x-govuk-ui-form-steps-review-title`, from an `h2` to an `h1` on a page, and the title of the Panel that says the answers are sent from an `h2` to an `h1`. Select each by its class, not its element.
 - Renamed the classes of five components to start with the component's name, as every other component's do, so a class says which component it belongs to:
   - Command menu's `x-govuk-ui-command-*` classes are now `x-govuk-ui-command-menu-*`, such as `x-govuk-ui-command-menu-item`.
@@ -61,6 +62,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added `files` and `defaultFiles` to FileUpload and FileUploadControl, so a service can control the chosen files, show a file it already has, such as for a record being changed, or take one away. The input sends the files the field shows. Added `list`, which, given false, leaves the list of files beneath the zone to the service, such as to draw them with FileChips.
 - Added `step`, `defaultStep` and `onStepChange` to Tour, so a service can open a tour at a step, such as from a help link, and hear each step change. An uncontrolled tour opens at `defaultStep`, unless it resumes where someone left it.
 - Added `actions` to TourStep, more buttons in the step's foot before Back and Next, such as Skip, and `useTour`, with which a button of your own in the card moves to a step, finishes the tour or closes it.
 - Added `storage` to every part that keeps something under a `storageKey`, which are FormSteps, QuestionCard, Tour, SidebarProvider and ThemePicker, and to `useTheme` and `useSidebarArrangement`. Give `sessionStorage`, to keep answers only while the tab is open, or a store of your own with `getItem`, `setItem` and `removeItem`, typed as `StorageLike`. By default, it is local storage, as before.

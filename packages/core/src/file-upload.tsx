@@ -6,26 +6,44 @@ import {
   type DragEvent,
   type ReactNode,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
+import { useControllableState } from "./controllable-state";
 import { both } from "./events";
 import { ErrorMessage, Field, Hint, Label, present, useControlProps } from "./field";
 import { useLabels, useLocale } from "./labels";
 import { useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
+/** No files, the same list each time, so an effect that reads it runs only when files change. */
+const noFiles: File[] = [];
+
 export type FileUploadProps = Omit<
   ComponentPropsWithRef<"input">,
-  "type" | "value" | "defaultValue" | "onChange"
+  "type" | "value" | "defaultValue" | "onChange" | "list"
 > & {
   label: ReactNode;
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
   errorMessage?: ReactNode;
+  /**
+   * The chosen files. Leave it out to let the field keep track. The input sends the files given,
+   * so a service can show a file it already has, such as for a record being changed, or take one
+   * away.
+   */
+  files?: File[];
+  /** The files an uncontrolled field starts with. */
+  defaultFiles?: File[];
   /** Called with the chosen files, after choosing, dropping or removing one. */
   onFilesChange?: (files: File[]) => void;
+  /**
+   * Lists the chosen files beneath the zone, each with Remove. Give false to draw them your own
+   * way, such as with FileChips, from `files` or `onFilesChange`.
+   */
+  list?: boolean;
   /** Its words, in place of a LabelsProvider's or the defaults. */
   labels?: Partial<FileUploadLabels>;
 };
@@ -113,7 +131,10 @@ export type FileUploadControlProps = Omit<
  */
 export function FileUploadControl(given: FileUploadControlProps) {
   const {
+    files: controlled,
+    defaultFiles = noFiles,
     onFilesChange,
+    list = true,
     multiple = false,
     labels: ownLabels,
     className = "",
@@ -137,16 +158,23 @@ export function FileUploadControl(given: FileUploadControlProps) {
       : labels.megabytes(number.format(bytes / 1024 / 1024));
   const input = useRef<HTMLInputElement>(null);
   const inputRef = useMergedRef(input, ref);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, update] = useControllableState(controlled, defaultFiles, onFilesChange);
   const [dragging, setDragging] = useState(false);
   const [pull, setPull] = useState({ x: 0, y: 0 });
   const play = useScopeSound();
   const listId = `${controlId}-files`;
 
-  const update = (next: File[]) => {
-    setFiles(next);
-    onFilesChange?.(next);
-  };
+  // The input sends the files the field shows, so files given by a service, or taken away, are
+  // the files the form sends.
+  useLayoutEffect(() => {
+    const element = input.current;
+    if (!element) return;
+    const sent = Array.from(element.files ?? []);
+    if (sent.length === files.length && sent.every((file, place) => file === files[place])) return;
+    const transfer = new DataTransfer();
+    for (const file of files) transfer.items.add(file);
+    element.files = transfer.files;
+  }, [files]);
   const remove = (file: File) => {
     const element = input.current;
     if (!element) return;
@@ -188,7 +216,9 @@ export function FileUploadControl(given: FileUploadControlProps) {
           disabled={disabled}
           {...props}
           id={controlId}
-          aria-describedby={[props["aria-describedby"], listId].filter(Boolean).join(" ")}
+          aria-describedby={
+            [props["aria-describedby"], list && listId].filter(Boolean).join(" ") || undefined
+          }
           className="x-govuk-ui-file-upload-input"
           onChange={(event) => {
             const next = Array.from(event.target.files ?? []);
@@ -232,31 +262,33 @@ export function FileUploadControl(given: FileUploadControlProps) {
           </span>
         </span>
       </div>
-      <div id={listId} className="x-govuk-ui-file-upload-files" aria-live="polite">
-        {files.length ? (
-          <ul className="x-govuk-ui-file-upload-list">
-            {files.map((file) => (
-              <li key={`${file.name}-${file.size}-${file.lastModified}`}>
-                <span className="x-govuk-ui-file-upload-name">{file.name}</span>
-                <span className="x-govuk-ui-file-upload-size">{sizeOf(file.size)}</span>
-                <button
-                  type="button"
-                  className="x-govuk-ui-file-upload-remove"
-                  onClick={() => remove(file)}
-                  disabled={disabled}
-                >
-                  {labels.remove}
-                  <span className="x-govuk-ui-visually-hidden"> {file.name}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="x-govuk-ui-file-upload-empty">
-            {multiple ? labels.noFiles : labels.noFile}
-          </p>
-        )}
-      </div>
+      {list && (
+        <div id={listId} className="x-govuk-ui-file-upload-files" aria-live="polite">
+          {files.length ? (
+            <ul className="x-govuk-ui-file-upload-list">
+              {files.map((file) => (
+                <li key={`${file.name}-${file.size}-${file.lastModified}`}>
+                  <span className="x-govuk-ui-file-upload-name">{file.name}</span>
+                  <span className="x-govuk-ui-file-upload-size">{sizeOf(file.size)}</span>
+                  <button
+                    type="button"
+                    className="x-govuk-ui-file-upload-remove"
+                    onClick={() => remove(file)}
+                    disabled={disabled}
+                  >
+                    {labels.remove}
+                    <span className="x-govuk-ui-visually-hidden"> {file.name}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="x-govuk-ui-file-upload-empty">
+              {multiple ? labels.noFiles : labels.noFile}
+            </p>
+          )}
+        </div>
+      )}
     </>
   );
 }

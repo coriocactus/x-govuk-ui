@@ -7,7 +7,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--x-govuk-ui-layer-overlay);
-  background: rgb(11 12 12 / 44%);
+  background: var(--x-govuk-ui-backdrop);
   transition: opacity var(--x-govuk-ui-duration-fast) ease;
 }
 .x-govuk-ui-command-menu-popup {
@@ -23,7 +23,7 @@
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 16px 48px #0003;
+  box-shadow: var(--x-govuk-ui-shadow-dialog);
   transition:
     opacity var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
     transform var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);

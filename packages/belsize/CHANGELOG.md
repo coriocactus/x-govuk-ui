@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Visual
+
+- Changed the shadow of a tile being dragged to x-govuk-ui's `--x-govuk-ui-shadow-popup`, which a part lifted as it is dragged has, a little lighter than it was.
+
 ### Added
 
 - Added `storage` to Tiles, TilesProvider and `useTilesLayout`, where `storageKey` keeps the arrangement, such as `sessionStorage`. By default, it is local storage, as before.

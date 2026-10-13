@@ -29,7 +29,7 @@
   border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-tooltip-fill);
   color: var(--x-govuk-ui-tooltip-text);
-  box-shadow: 0 4px 14px rgb(11 12 12 / 18%);
+  box-shadow: var(--x-govuk-ui-shadow-floating);
   font-family: var(--x-govuk-ui-font);
   font-size: 13px;
   line-height: 1.4;

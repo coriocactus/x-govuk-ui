@@ -100,7 +100,7 @@
   border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
   color: var(--x-govuk-ui-text);
-  box-shadow: 0 8px 28px #0002;
+  box-shadow: var(--x-govuk-ui-shadow-popup);
   transform-origin: var(--transform-origin);
   transition:
     width var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),

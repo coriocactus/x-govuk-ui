@@ -4,7 +4,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--x-govuk-ui-layer-overlay);
-  background: rgb(11 12 12 / 44%);
+  background: var(--x-govuk-ui-backdrop);
   transition: opacity var(--x-govuk-ui-duration-medium) ease;
 }
 .x-govuk-ui-dialog-backdrop:is([data-starting-style], [data-ending-style]) {
@@ -28,7 +28,7 @@
   padding: 28px 30px 30px;
   border-radius: var(--x-govuk-ui-radius-surface);
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 24px 64px rgb(11 12 12 / 28%);
+  box-shadow: var(--x-govuk-ui-shadow-dialog);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
   outline: none;

@@ -60,6 +60,18 @@
   --x-govuk-ui-layer-overlay: 60;
   --x-govuk-ui-layer-notification: 70;
 
+  /* Depth. A part above the page casts a shadow by how far above it is. GOV.UK's black, which
+     shows on the light page. On the dark page, a part's edge sets it apart instead. */
+  /* Parts that float over the page beside what they belong to, such as tooltips, toasts and
+     toolbars. */
+  --x-govuk-ui-shadow-floating: 0 4px 14px rgb(11 12 12 / 14%);
+  /* Popups, such as lists, menus and popovers, and a part lifted as it is dragged. */
+  --x-govuk-ui-shadow-popup: 0 8px 28px rgb(11 12 12 / 16%);
+  /* Dialogs, which sit above everything else. */
+  --x-govuk-ui-shadow-dialog: 0 24px 64px rgb(11 12 12 / 28%);
+  /* The shade over the page behind a dialog, a sheet or the command menu. */
+  --x-govuk-ui-backdrop: rgb(11 12 12 / 44%);
+
   /* Corners. GOV.UK Frontend's corners are square. Ours are softened, in four steps by what a part
      is. Set all four to 0 for GOV.UK Frontend's square corners. A corner inside a border follows
      the corner around it. Circles and pills keep their shape, and so do small marks, such as a

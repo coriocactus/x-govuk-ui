@@ -4,7 +4,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--x-govuk-ui-layer-overlay);
-  background: rgb(11 12 12 / 40%);
+  background: var(--x-govuk-ui-backdrop);
   /* The backdrop fades as the sheet is swiped away. */
   opacity: calc(1 - var(--drawer-swipe-progress, 0));
   transition: opacity var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);

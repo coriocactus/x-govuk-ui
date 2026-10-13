@@ -51,7 +51,7 @@
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: 6px;
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 8px 28px rgb(11 12 12 / 16%);
+  box-shadow: var(--x-govuk-ui-shadow-popup);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
   font-size: 17px;

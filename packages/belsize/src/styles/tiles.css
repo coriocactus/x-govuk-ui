@@ -122,7 +122,7 @@
   border: 2px solid var(--x-govuk-ui-tiles-drop, var(--x-govuk-ui-link));
   border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.2);
+  box-shadow: var(--x-govuk-ui-shadow-popup);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
   font-size: 16px;

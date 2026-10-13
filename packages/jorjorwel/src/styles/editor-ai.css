@@ -24,7 +24,7 @@
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
+  box-shadow: var(--x-govuk-ui-shadow-floating);
   color: var(--x-govuk-ui-text);
   font: 16px / 1.4 var(--x-govuk-ui-font);
 }

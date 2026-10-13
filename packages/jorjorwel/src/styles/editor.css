@@ -352,7 +352,7 @@
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: var(--x-govuk-ui-radius-small);
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
+  box-shadow: var(--x-govuk-ui-shadow-floating);
 }
 .x-govuk-ui-editor-tool.x-govuk-ui-button {
   color: var(--x-govuk-ui-text);

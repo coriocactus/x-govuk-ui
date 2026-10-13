@@ -164,7 +164,7 @@
   max-width: min(100%, 960px);
   max-height: min(calc(100vh - 200px), 640px);
   border-radius: var(--x-govuk-ui-radius-surface);
-  box-shadow: 0 24px 60px rgb(11 12 12 / 22%);
+  box-shadow: var(--x-govuk-ui-shadow-dialog);
   cursor: default;
   user-select: none;
   transform-origin: center;
@@ -202,7 +202,7 @@
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: 50%;
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 4px 14px rgb(11 12 12 / 12%);
+  box-shadow: var(--x-govuk-ui-shadow-floating);
   color: var(--x-govuk-ui-text);
   cursor: pointer;
   transition:

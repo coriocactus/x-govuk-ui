@@ -238,7 +238,7 @@
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: 24px;
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 8px 28px rgb(11 12 12 / 16%);
+  box-shadow: var(--x-govuk-ui-shadow-popup);
   outline: none;
   transform-origin: var(--transform-origin);
   transition:

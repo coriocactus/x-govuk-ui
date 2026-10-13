@@ -108,7 +108,7 @@
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: 50%;
   background: var(--x-govuk-ui-paper);
-  box-shadow: 0 4px 14px rgb(11 12 12 / 14%);
+  box-shadow: var(--x-govuk-ui-shadow-floating);
   color: var(--x-govuk-ui-text);
   cursor: pointer;
   opacity: 0;

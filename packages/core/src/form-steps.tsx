@@ -585,7 +585,7 @@ export function FormSteps({
     setBusy(true);
     const errors = await onComplete(data);
     setBusy(false);
-    const wrong = Object.entries(errors ?? {}).filter(([, message]) => message);
+    const wrong = Object.entries(errors ?? {}).filter(([, message]) => present(message));
     if (wrong.length > 0) {
       // The form goes back to the first step with something to fix.
       const first = plan.find((index) =>
@@ -617,7 +617,7 @@ export function FormSteps({
       setBusy(true);
       const errors = await own(data);
       setBusy(false);
-      if (errors && Object.values(errors).some(Boolean)) return errors;
+      if (errors && Object.values(errors).some(present)) return errors;
     }
     const passing = new Set(passed).add(at);
     const skipping = new Set(skipped);

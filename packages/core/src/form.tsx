@@ -12,12 +12,15 @@ import {
 } from "react";
 import { AutoHeight } from "./auto-height";
 import { defaultErrorLabels, ErrorSummary, ErrorSummaryItem } from "./error-summary";
-import { FormContext, type FormField } from "./field";
+import { FormContext, type FormField, present } from "./field";
 import { useLabels } from "./labels";
 import { useMergedRef } from "./refs";
 
-/** A message for each answer that needs fixing, keyed by the name its field submits under. */
-export type FormErrors = Partial<Record<string, string>>;
+/**
+ * A message for each answer that needs fixing, keyed by the name its field submits under. A message
+ * is any content a field's `errorMessage` takes, such as words with a link.
+ */
+export type FormErrors = Partial<Record<string, ReactNode>>;
 
 export type FormProps = Omit<ComponentPropsWithRef<"form">, "onSubmit"> & {
   /**
@@ -139,7 +142,7 @@ export function fieldOf(name: string, fields: Iterable<string>) {
   return owners.sort((a, b) => b.length - a.length)[0] ?? name;
 }
 
-type Problem = { name: string; message: string; id: string };
+type Problem = { name: string; message: ReactNode; id: string };
 
 /** What a field submits, with any parts, such as a date's `{name}-day`, `-month` and `-year`. */
 function answer(data: FormData, name: string) {
@@ -211,10 +214,10 @@ export function Form({
 
   /** Shows the errors, in the order of their fields, and says whether there were any. */
   const show = (errors: FormErrors, data: FormData) => {
-    const owned = new Map<string, string>();
+    const owned = new Map<string, ReactNode>();
     for (const [name, message] of Object.entries(errors)) {
       const field = fieldOf(name, fields.current.keys());
-      if (message && !owned.has(field)) owned.set(field, message);
+      if (present(message) && !owned.has(field)) owned.set(field, message);
     }
     const listed = [...owned].map(([name, message]) => ({
       name,
@@ -247,7 +250,7 @@ export function Form({
       if (!element || !before) return;
       const data = new FormData(element);
       const now = Object.entries(validate?.(data) ?? {}).flatMap(([name, message]) =>
-        message ? [fieldOf(name, fields.current.keys())] : [],
+        present(message) ? [fieldOf(name, fields.current.keys())] : [],
       );
       setProblems((current) => {
         const next = current.filter(

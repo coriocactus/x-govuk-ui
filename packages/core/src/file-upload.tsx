@@ -67,7 +67,8 @@ export const defaultFileUploadLabels: FileUploadLabels = {
  * pointer. Each chosen file is listed with its size and a button to remove it.
  *
  * It is a bound Field with a Label, a Hint, an ErrorMessage and a FileUploadControl. Compose those
- * parts yourself to put something between them.
+ * parts yourself to put something between them. Its props go to the control, which puts its
+ * `className` and `style` on its zone and every other prop on its input.
  */
 export function FileUpload({
   label,

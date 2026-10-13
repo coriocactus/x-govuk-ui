@@ -182,7 +182,8 @@ export type ComboboxProps = Shared & {
  * between the options. The arrow keys and Enter choose one. Base UI provides the behaviour.
  *
  * It is a bound Field with a Label, a Hint, an ErrorMessage and a ComboboxControl. Compose those
- * parts yourself to put something between them.
+ * parts yourself to put something between them. Its props go to the control, which puts its
+ * `className` and `style` on its box and every other prop on its input.
  */
 export function Combobox({
   label,
@@ -285,7 +286,8 @@ export type MultiSelectProps = Shared & {
  * empty field removes the last. The list stays open, with ticks by the choices.
  *
  * It is a bound Field with a Label, a Hint, an ErrorMessage and a MultiSelectControl. Compose
- * those parts yourself to put something between them.
+ * those parts yourself to put something between them. Its props go to the control, which puts its
+ * `className` and `style` on its box of chips and every other prop on its input.
  */
 export function MultiSelect({
   label,

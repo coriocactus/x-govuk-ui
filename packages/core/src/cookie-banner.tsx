@@ -1,16 +1,16 @@
 "use client";
 
-import { AnimatePresence, type HTMLMotionProps, motion } from "motion/react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef, useState } from "react";
 import { AutoHeight } from "./auto-height";
 import { Button, ButtonGroup } from "./button";
 import { Link } from "./link";
-import { duration, useMotionTiming } from "./motion";
+import { duration, motionElementProps, useMotionTiming } from "./motion";
 import { WidthContainer } from "./width-container";
 
 export type CookieChoice = "accepted" | "rejected";
 
-export type CookieBannerProps = Omit<HTMLMotionProps<"div">, "onChoose"> & {
+export type CookieBannerProps = Omit<ComponentPropsWithRef<"div">, "onChoose"> & {
   /** The service's name, as in the banner's heading, "Cookies on …". */
   serviceName?: ReactNode;
   /** Where users can read about the cookies and change their choice. */
@@ -57,7 +57,7 @@ export function CookieBanner({
       {!hidden && (
         <motion.div
           key="banner"
-          {...props}
+          {...motionElementProps(props)}
           className={`x-govuk-ui-cookie-banner ${className}`.trim()}
           role="region"
           aria-label={`Cookies on ${typeof serviceName === "string" ? serviceName : "this service"}`}

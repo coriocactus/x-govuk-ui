@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  AnimatePresence,
-  type AnimationPlaybackControls,
-  animate,
-  type HTMLMotionProps,
-  motion,
-} from "motion/react";
+import { AnimatePresence, type AnimationPlaybackControls, animate, motion } from "motion/react";
 import {
   Children,
   type ComponentPropsWithRef,
@@ -20,7 +14,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { duration, easeOut, useMotionTiming } from "./motion";
+import { duration, easeOut, motionElementProps, useMotionTiming } from "./motion";
 import { ScrollArea } from "./scroll-area";
 
 /** Moves a Message scroller from outside it, such as from search results or a list of turns. */
@@ -438,8 +432,7 @@ function keyed(children: ReactNode) {
   );
 }
 
-// A row is a motion.div, so Motion types its props.
-export type MessageScrollerItemProps = Omit<HTMLMotionProps<"div">, "id"> & {
+export type MessageScrollerItemProps = Omit<ComponentPropsWithRef<"div">, "id"> & {
   /** A stable id, so the log can keep the reader's place and jump to the row. */
   id: string;
   /** Starts a turn, such as the user's question. A new anchor rises to near the top. */
@@ -461,7 +454,7 @@ export function MessageScrollerItem({
   const timing = useMotionTiming();
   return (
     <motion.div
-      {...props}
+      {...motionElementProps(props)}
       className={`x-govuk-ui-message-scroller-item ${className}`.trim()}
       data-message-id={id}
       data-anchor={anchor || undefined}

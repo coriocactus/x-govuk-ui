@@ -11,7 +11,7 @@ import {
 } from "react";
 import { type CodeToken, codeTokens } from "./code-tokens";
 import { useControllableState } from "./controllable-state";
-import { CopyButton, type CopyLabels } from "./copy";
+import { CopyButton, type CopyButtonProps } from "./copy";
 import { ScrollArea } from "./scroll-area";
 
 export type CodeBlockProps = ComponentPropsWithRef<"figure"> & {
@@ -250,11 +250,11 @@ export function CodeBlock({
   );
 }
 
-export type CodeBlockCopyProps = CopyLabels;
+export type CodeBlockCopyProps = Omit<CopyButtonProps, "text">;
 
 /** Copies the block's code. The icon turns to a tick for a moment once it is copied. */
-export function CodeBlockCopy(labels: CodeBlockCopyProps) {
+export function CodeBlockCopy(props: CodeBlockCopyProps) {
   const code = useContext(CodeContext);
   if (code === null) throw new Error("CodeBlockCopy must be used inside a CodeBlock.");
-  return <CopyButton {...labels} text={() => code} />;
+  return <CopyButton {...props} text={() => code} />;
 }

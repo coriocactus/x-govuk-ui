@@ -1,7 +1,7 @@
 "use client";
 
-import type { Transition } from "motion/react";
-import { useSyncExternalStore } from "react";
+import type { HTMLMotionProps, Transition } from "motion/react";
+import { type ComponentPropsWithRef, type SyntheticEvent, useSyncExternalStore } from "react";
 
 type Bezier = readonly [number, number, number, number];
 
@@ -115,4 +115,42 @@ export function useMotionTiming() {
     () => false,
   );
   return reduced ? still : moving;
+}
+
+type Handler<E extends SyntheticEvent> = ((event: E) => void) | undefined;
+
+/** Calls both handlers, so a twin given by the caller still runs. */
+function both<E extends SyntheticEvent>(first: Handler<E>, second: Handler<E>): Handler<E> {
+  if (!first || !second) return first ?? second;
+  return (event) => {
+    first(event);
+    second(event);
+  };
+}
+
+/**
+ * A part's element props, which keep the DOM's meaning, for the Motion element it renders. Motion
+ * reads `onAnimationStart` and the drag handlers as its own callbacks. They are given to the
+ * element as their capturing twins, which Motion passes to the DOM. Each fires for the same events,
+ * one phase earlier.
+ * @internal
+ */
+export function motionElementProps({
+  onAnimationStart,
+  onDrag,
+  onDragStart,
+  onDragEnd,
+  onAnimationStartCapture,
+  onDragCapture,
+  onDragStartCapture,
+  onDragEndCapture,
+  ...props
+}: ComponentPropsWithRef<"div">): HTMLMotionProps<"div"> {
+  return {
+    ...(props as HTMLMotionProps<"div">),
+    onAnimationStartCapture: both(onAnimationStartCapture, onAnimationStart),
+    onDragCapture: both(onDragCapture, onDrag),
+    onDragStartCapture: both(onDragStartCapture, onDragStart),
+    onDragEndCapture: both(onDragEndCapture, onDragEnd),
+  };
 }

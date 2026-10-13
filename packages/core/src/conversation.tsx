@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, type HTMLMotionProps, motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   Children,
   type ComponentPropsWithRef,
@@ -17,10 +17,10 @@ import {
   useState,
 } from "react";
 import { Bubble, BubbleContent } from "./bubble";
-import { type CopyLabels, readableText } from "./copy";
+import { type CopyButtonProps, readableText } from "./copy";
 import { MessageActions, MessageCopy } from "./message-actions";
 import { MessageScroller } from "./message-scroller";
-import { duration, useMotionTiming } from "./motion";
+import { duration, motionElementProps, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 import { TextShimmer } from "./text-shimmer";
 
@@ -199,7 +199,7 @@ function useArrival() {
   };
 }
 
-export type ConversationMessageProps = HTMLMotionProps<"div"> & {
+export type ConversationMessageProps = ComponentPropsWithRef<"div"> & {
   /** Who wrote the message. The user's messages sit in a bubble on the other side. */
   from: Speaker;
   children: ReactNode;
@@ -234,15 +234,15 @@ export function ConversationMessage({
   return (
     <MessageContext value={{ from, content, streaming }}>
       <motion.div
-        {...props}
-        className="x-govuk-ui-message-row"
+        {...motionElementProps(props)}
+        className={`x-govuk-ui-message-row ${className}`.trim()}
         data-role={from}
         data-message=""
         data-sound-enter={from === "assistant" ? "notification" : undefined}
         {...arrival}
       >
         <motion.article
-          className={`x-govuk-ui-message ${className}`.trim()}
+          className="x-govuk-ui-message"
           data-role={from}
           aria-busy={streaming || undefined}
           initial={{ scale: 0.86, x: from === "user" ? 14 : -14, filter: "blur(2px)" }}
@@ -318,15 +318,15 @@ export function ConversationActions({ className = "", ...props }: ComponentProps
   return <MessageActions {...props} className={`x-govuk-ui-message-actions ${className}`.trim()} />;
 }
 
-export type ConversationCopyProps = CopyLabels;
+export type ConversationCopyProps = Omit<CopyButtonProps, "text">;
 
 /** Copies the message's text. The icon turns to a tick for a moment once it is copied. */
-export function ConversationCopy(labels: ConversationCopyProps) {
+export function ConversationCopy(props: ConversationCopyProps) {
   const message = useMessage("ConversationCopy");
-  return <MessageCopy {...labels} text={() => readableText(message.content.current)} />;
+  return <MessageCopy {...props} text={() => readableText(message.content.current)} />;
 }
 
-export type ConversationThinkingProps = HTMLMotionProps<"div"> & {
+export type ConversationThinkingProps = ComponentPropsWithRef<"div"> & {
   /** Status words that take turns. Screen readers hear one plain status instead. */
   labels?: readonly string[];
 };
@@ -357,7 +357,7 @@ export function ConversationThinking({
   const word = labels[index % labels.length] ?? "Thinking";
   return (
     <motion.div
-      {...props}
+      {...motionElementProps(props)}
       className={`x-govuk-ui-message-row ${className}`.trim()}
       data-role="assistant"
       {...arrival}

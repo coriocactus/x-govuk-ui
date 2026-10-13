@@ -125,6 +125,18 @@ test("conversation parts name each speaker, and the thinking status is plain for
   expect(html).toContain('aria-label="Copy"');
   expect(html).toContain('role="status">Benefits assistant is writing a reply</span>');
   expect(html).toContain('<p class="x-govuk-ui-thinking" aria-hidden="true">');
+  // A message's props and class go on its row, one element, as every part's do.
+  const message = renderToStaticMarkup(
+    <Conversation>
+      <ConversationMessage from="user" className="mine" data-turn="1">
+        <ConversationContent>Hello</ConversationContent>
+      </ConversationMessage>
+    </Conversation>,
+  );
+  expect(message).toMatch(
+    /<div class="x-govuk-ui-message-row mine"[^>]*data-turn="1"|<div data-turn="1"[^>]*class="x-govuk-ui-message-row mine"/,
+  );
+  expect(message).toContain('<article class="x-govuk-ui-message"');
 });
 
 test("the assistant thinks in plain words unless a service chooses livelier ones", () => {

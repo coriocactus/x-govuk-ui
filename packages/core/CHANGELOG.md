@@ -6,6 +6,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Changed ConversationMessage, ConversationThinking, MessageScrollerItem and CookieBanner to take an element's props, as every other part does, in place of Motion's. Their types no longer take Motion's props, such as `animate`, `whileHover` or a `style` of motion values. To animate one of them, wrap it in a Motion element of your own. `onAnimationStart`, `onDrag`, `onDragStart` and `onDragEnd` are now the DOM's events, as on any element.
+- Changed ConversationMessage to put its `className` on the message's row, where its other props already go, in place of the `article` inside. A rule that styled the message through the class should now select `.x-govuk-ui-message` inside it.
 - Changed `small` on Radios and Checkboxes to `size`, `"medium"` or `"small"`, as other parts name their size. Give `size="small"` instead of `small`. The list's `data-small` attribute is now `data-size="small"`.
 
 ### Added
@@ -18,6 +20,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added `controlId` to Radio and Checkbox, to give an answer the id you choose.
 - Added SummaryListRowRoot, SummaryListKey, SummaryListValue and SummaryListActions, for a Summary list row of your own. SummaryListValue glows when its text changes, as the row's value does. SummaryListRow is now built from them, and its markup does not change.
 - Added `ref` to SummaryListAction, which goes on its link or button.
+- Added a button's props to CodeBlockCopy and ConversationCopy, such as `ref`, `aria-*` and `data-*`.
 - Added DetailsRoot, DetailsSummary, DetailsPanel and DetailsText, for details of your own. Details is now built from them, and its markup does not change.
 - Added NotificationBannerRoot, NotificationBannerHeader, NotificationBannerTitle and NotificationBannerContent, for a banner of your own. The root's `titleId` names the banner, and its title takes that id. NotificationBanner is now built from them, and its markup does not change.
 - Added FieldsetRoot and FieldsetLegend, the parts of a Fieldset, for a fieldset of your own. FieldsetLegend takes `size` and `pageHeading`. In a bound Field, FieldsetRoot is described by the field's hint and error. Fieldset is now built from them, and its markup does not change.

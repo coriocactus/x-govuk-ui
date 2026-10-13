@@ -22,7 +22,7 @@ function dateAnswer(data: FormData, name: string, locale: string) {
   if (!day && !month && !year) return undefined;
   const date = dateFromParts({ day: day ?? "", month: month ?? "", year: year ?? "" });
   if (!date) return [day, month, year].join("/");
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "long",
     year: "numeric",

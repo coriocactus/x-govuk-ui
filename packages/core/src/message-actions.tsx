@@ -3,7 +3,6 @@
 import { type ComponentPropsWithRef, type ReactNode, useState } from "react";
 import { Button, type ButtonProps } from "./button";
 import { useControllableState } from "./controllable-state";
-import { CopyButton, type CopyButtonProps } from "./copy";
 import { useLabels } from "./labels";
 import { Tooltip } from "./tooltip";
 

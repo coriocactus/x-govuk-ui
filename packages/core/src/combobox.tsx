@@ -195,7 +195,12 @@ function Options({
 }
 
 export type ComboboxProps = Shared & {
+  /**
+   * The chosen option's value. Leave it out to let the field keep track. The option must be among
+   * `items` at least once, such as at first, so the field knows its label.
+   */
   value?: string | null;
+  /** The value an uncontrolled field starts with, of an option among the first `items`. */
   defaultValue?: string | null;
   onValueChange?: (value: string | null) => void;
 };
@@ -238,16 +243,16 @@ export function Combobox({
 /**
  * Every option the field has been given, each by its value. A chosen option stays chosen when
  * `items` change and leave it out, such as when a server's results for a new search come. An
- * option given again as a new object that shows the same is kept as the object first given, because
- * Base UI takes a chosen option of a new identity as a new choice, and puts its label in the input
- * over what users are typing.
+ * option given again as a new object with the same label is kept as the object first given,
+ * because Base UI takes a chosen option of a new identity as a new choice, and puts its label in
+ * the input over what users are typing. The kept object gives only the label, so a description
+ * that differs makes no new choice.
  */
 function useKnownOptions(options: readonly ComboboxOption[]) {
   const [known] = useState(() => new Map<string, ComboboxOption>());
   for (const option of options) {
     const kept = known.get(option.value);
-    if (!kept || kept.label !== option.label || kept.description !== option.description)
-      known.set(option.value, option);
+    if (kept?.label !== option.label) known.set(option.value, option);
   }
   return known;
 }
@@ -352,7 +357,12 @@ export function ComboboxControl(given: ComboboxControlProps) {
 }
 
 export type MultiSelectProps = Shared & {
+  /**
+   * The chosen options' values. Leave it out to let the field keep track. Each option must be
+   * among `items` at least once, such as at first, so the field knows its label.
+   */
   value?: string[];
+  /** The values an uncontrolled field starts with, of options among the first `items`. */
   defaultValue?: string[];
   onValueChange?: (value: string[]) => void;
 };

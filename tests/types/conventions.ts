@@ -12,6 +12,8 @@ import type * as Jorjorwel from "@x-govuk-ui/jorjorwel";
 import type * as Memetics from "@x-govuk-ui/memetics";
 import type { ComponentProps, DOMAttributes, JSXElementConstructor } from "react";
 import type * as Core from "x-govuk-ui";
+import type { ComponentLabels } from "x-govuk-ui";
+import type { described, elementless, unstyled } from "./exceptions";
 
 type Exports = typeof Core & typeof Jorjorwel & typeof Memetics & typeof Belsize;
 
@@ -48,35 +50,9 @@ type PropsOf<Name extends keyof Components> = Required<ComponentProps<Components
 /** Fails to compile unless `T` is `never`. The error shows `T`, which names what is wrong. */
 type None<T extends never> = T;
 
-/**
- * Roots and providers, which render nothing of their own, or only through their parts. Every other
- * part takes `className`, for its element.
- */
-type Elementless =
-  | "SoundScope"
-  | "LabelsProvider"
-  | "ShownProvider"
-  | "Callout"
-  | "Popover"
-  | "HoverCard"
-  | "Sheet"
-  | "Dialog"
-  | "Tooltip"
-  | "TooltipProvider"
-  | "TooltipGroup"
-  | "DropdownMenu"
-  | "ContextMenu"
-  | "MenuSubmenu"
-  | "SidebarProvider"
-  | "TilesProvider"
-  | "ToastProvider"
-  | "CommandMenu"
-  | "CommandMenuPage"
-  | "BubbleReactionPicker"
-  | "ScrollAreaBars"
-  | "EditorAI"
-  | "EditorRoot"
-  | "FieldBinding";
+type Elementless = (typeof elementless)[number];
+type Described = (typeof described)[number];
+type Unstyled = (typeof unstyled)[number];
 
 export type WithoutClassName = None<
   {
@@ -144,6 +120,49 @@ export type LabelsAreMaps = None<
   }[keyof Components]
 >;
 
+/** Each map of words has its English defaults exported under its key, as `defaultPaginationLabels`. */
+export type DefaultsNamedByKey = None<
+  {
+    [Key in keyof ComponentLabels & string]: `default${Capitalize<Key>}Labels` extends keyof Exports
+      ? Exports[`default${Capitalize<Key>}Labels`] extends ComponentLabels[Key]
+        ? never
+        : `default${Capitalize<Key>}Labels`
+      : `default${Capitalize<Key>}Labels`;
+  }[keyof ComponentLabels & string]
+>;
+
+/**
+ * Stat renders on the server, where no LabelsProvider reaches, so its words are its own. The
+ * LabelsProvider takes every map.
+ */
+type OwnWords = "Stat" | "LabelsProvider";
+
+/** A component's words, without a chart's own `locale`, which is no word. */
+type WordsOf<Name extends keyof Components> = Omit<
+  NonNullable<PropsOf<Name>["labels" & keyof PropsOf<Name>]>,
+  "locale"
+>;
+
+/** The provider's map that has every word a component's `labels` take, if one does. */
+type MapOf<Words> = {
+  [Key in keyof ComponentLabels]: [keyof Words] extends [keyof ComponentLabels[Key]]
+    ? [Words] extends [Partial<ComponentLabels[Key]>]
+      ? Key
+      : never
+    : never;
+}[keyof ComponentLabels];
+
+/** Every word a component takes in `labels`, a LabelsProvider can give it too. */
+export type LabelsOutsideProvider = None<
+  {
+    [Name in Exclude<keyof Components, OwnWords>]: "labels" extends keyof PropsOf<Name>
+      ? [MapOf<WordsOf<Name>>] extends [never]
+        ? Name
+        : never
+      : never;
+  }[Exclude<keyof Components, OwnWords>]
+>;
+
 /**
  * Handlers that report what users do, which the part does not keep, need no value. Every other
  * `on…Change` has the value it reports, which a service can control, and a default to start it.
@@ -191,20 +210,26 @@ export type MotionPropsHidden = None<
   }[keyof Components]
 >;
 
-/**
- * Parts whose props describe what their group draws, rather than an element of their own. A
- * TourStep's class goes on the Tour's card, a FormStep's on the fieldset FormSteps draws for it,
- * and an entry's menu is a whole DropdownMenu. Every other part that renders an element passes its
- * `ref` to it.
- */
-type Described = "TourStep" | "FormStep" | "SidebarItemMenu";
-
 export type WithoutRef = None<
   {
     [Name in Exclude<keyof Components, Elementless | Described>]: "ref" extends keyof PropsOf<Name>
       ? never
       : Name;
   }[Exclude<keyof Components, Elementless | Described>]
+>;
+
+export type WithoutStyle = None<
+  {
+    [Name in Exclude<
+      keyof Components,
+      Elementless | Described | Unstyled
+    >]: "style" extends keyof PropsOf<Name> ? never : Name;
+  }[Exclude<keyof Components, Elementless | Described | Unstyled>]
+>;
+
+/** A part that loses a style says so, by taking none. */
+export type StyleTakenAndLost = None<
+  { [Name in Unstyled]: "style" extends keyof PropsOf<Name> ? Name : never }[Unstyled]
 >;
 
 /**

@@ -21,7 +21,7 @@
     "typecheck": "bun run --bun tsc --noEmit",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "test": "bun test tests/unit",
+    "test": "bun test --isolate tests/unit",
     "test:browser": "bunx --bun playwright test",
     "check:static": "bun run lint && bun run typecheck && bun run test && bun run build && bun run build:lib && bun run build:mcp && bun scripts/consumer.ts",
     "check": "bun run check:static && bun run test:browser",

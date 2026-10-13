@@ -53,6 +53,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed `small` on Radios and Checkboxes to `size`, `"medium"` or `"small"`, as other parts name their size. Give `size="small"` instead of `small`. The list's `data-small` attribute is now `data-size="small"`.
 - Changed SoundScope to choose a press's sound from data attributes that parts set, in place of their classes and names. A warning Button sets `data-sound="destructive"`, a quiet one `data-sound-soft`, and every close button, such as an overlay's ×, `data-sound="close"`. A button of your own named Close no longer plays the close sound by its name. Give it `data-sound="close"`.
 
+### Visual
+
+- Changed the components' typeface, where GDS Transport is not served, to Noto Sans, the typeface for a service outside GOV.UK, in place of Arial. Arial now comes after it, for a device without Noto Sans, such as one with Windows, macOS or iOS, unless the page serves it. `--x-govuk-ui-font` is now `"GDS Transport", "Noto Sans", arial, sans-serif`.
+
 ### Added
 
 - Added `controlId` to Field, which binds it to its control. A bound Field gives its `Label`, `Hint` and `ErrorMessage` their ids, and shows its own `errorMessage`, or its Form's error by its `name`. A field composed from its parts then needs no `useField`. `hasHint`, `linkTo` and `describedBy` say the rest. A Field without `controlId` works as before.
@@ -142,7 +146,6 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Visual
 
-- Changed the components' typeface, where GDS Transport is not served, to Noto Sans, the typeface for a service outside GOV.UK, in place of Arial. Arial now comes after it, for a device without Noto Sans, such as one with Windows, macOS or iOS, unless the page serves it. `--x-govuk-ui-font` is now `"GDS Transport", "Noto Sans", arial, sans-serif`.
 - Changed FileDiff's fold, the row that opens a run of unchanged lines, to be exactly as tall as a line. It loses its 2-pixel margins and its 2 pixels of padding above and below.
 
 ### Added

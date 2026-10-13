@@ -142,6 +142,6 @@ Automated tests find some accessibility failures, but not all. Passing them does
 
 GOV.UK's crown, logotype, Royal Arms and GDS Transport are for official GOV.UK services only. As GOV.UK Frontend does, the library draws the crown and logotype, and leaves the Royal Arms and GDS Transport for a service to serve. A GOV.UK service gives Footer or ServicePage the Royal Arms as `crest`, and supplies the font.
 
-Noto Sans is the typeface for a service outside GOV.UK that follows GDS's principles, and this site is set in it. Without GDS Transport, the components fall back to Noto Sans where the device has it or the page serves it, and then to Arial. Android, ChromeOS and most Linux desktops have Noto Sans. Windows, macOS and iOS do not, so serve it, as this site does, from `@fontsource-variable/noto-sans`.
+Noto Sans is the typeface for a service outside GOV.UK that follows GDS's principles, and this site is set in it. Without GDS Transport, the components fall back to Noto Sans where the device has it or the page serves it, and then to Arial. Android, ChromeOS and most Linux desktops have Noto Sans. Windows, macOS and iOS do not, so serve it, such as its weights 400 and 700 from `@fontsource/noto-sans`, whose family is `Noto Sans`, so the components take it with nothing more set.
 
 The site's own mark is GOV/UK, drawn in `site/brand.tsx`.

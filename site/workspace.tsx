@@ -35,6 +35,7 @@ import {
   CommandMenu,
   CommandMenuGroup,
   CommandMenuItem,
+  CopyButton,
   DropdownMenu,
   DropdownMenuTrigger,
   EmptyState,
@@ -54,7 +55,6 @@ import {
   MenuRadioItem,
   MenuSeparator,
   MessageActions,
-  MessageCopy,
   MessageRating,
   MessageScroller,
   MessageScrollerItem,
@@ -1125,7 +1125,7 @@ function PiscineAssist({
             </BubbleGroup>
             {message.from === "assist" && !message.streaming && (
               <MessageActions className="workspace-assist-tools">
-                <MessageCopy text={message.text} />
+                <CopyButton text={message.text} />
                 <MessageRating />
               </MessageActions>
             )}

@@ -1378,7 +1378,7 @@ export function TileContent({
   );
 }
 
-type ControlProps = Omit<ButtonProps, "children" | "variant" | "size">;
+type ControlProps = Omit<ButtonProps, "children" | "variant" | "size" | "render">;
 
 /**
  * @internal An icon button in a tile's bar, named by its tooltip's words and the tile's title. A

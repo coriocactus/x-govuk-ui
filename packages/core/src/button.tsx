@@ -1,5 +1,6 @@
 "use client";
 
+import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef } from "react";
 import { Spinner } from "./spinner";
 
@@ -40,6 +41,12 @@ export type ButtonProps = ComponentPropsWithRef<"button"> & {
    */
   size?: "medium" | "small" | "icon" | "small-icon";
   loading?: boolean;
+  /**
+   * Renders another element with the Button's look, such as a link for GOV.UK's Start button, or a
+   * router's link, as `<a href="/start" />` or `<RouterLink to="/start" />`. It takes the Button's
+   * class, label and the rest of its props.
+   */
+  render?: useRender.RenderProp;
 };
 
 /**
@@ -50,6 +57,7 @@ export function withoutButtonLook({
   variant: _variant,
   size: _size,
   loading: _loading,
+  render: _render,
   ...rest
 }: ButtonProps) {
   return rest;
@@ -65,18 +73,20 @@ export function Button({
   variant = "primary",
   size = "medium",
   loading = false,
-  type = "button",
+  type,
   className = "",
   children,
   onClick,
+  render,
   ...props
 }: ButtonProps) {
   const unavailable =
     loading || props["aria-disabled"] === true || props["aria-disabled"] === "true";
-  return (
+  const button = (
     <button
       {...props}
-      type={type}
+      // A button never sends its form by accident. Another element, such as a link, takes no type.
+      type={render ? type : (type ?? "button")}
       className={`x-govuk-ui-button x-govuk-ui-button--${variant}${size === "medium" ? "" : ` x-govuk-ui-button--${size}`} ${className}`.trim()}
       aria-busy={loading || undefined}
       aria-disabled={unavailable || undefined}
@@ -93,4 +103,10 @@ export function Button({
       <Spinner size="small" className="x-govuk-ui-button-spinner" aria-hidden="true" />
     </button>
   );
+  // Given another element, the Button gives it its own props, look and content.
+  return useRender({
+    defaultTagName: "button",
+    render: render ?? button,
+    props: render ? button.props : {},
+  });
 }

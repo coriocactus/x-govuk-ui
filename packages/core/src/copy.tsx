@@ -61,18 +61,20 @@ async function writeText(text: string, from: HTMLElement) {
   if (!copied) throw new Error("The browser did not copy the text.");
 }
 
-/** @internal */
 export type CopyButtonProps = Omit<ComponentPropsWithRef<"button">, "children"> &
   CopyLabels & {
-    /** The text to copy, read at the press, so it is always current. */
-    text: () => string;
+    /**
+     * The text to copy, or a function that reads it at the press, so it is always current, such
+     * as a message's text as it streams in.
+     */
+    text: string | (() => string);
   };
 
 /**
- * An icon button that copies text, shared by the parts that copy. Its icon turns to a tick for a
+ * An icon button that copies text, such as a reference number. Its icon turns to a tick for a
  * moment once the text is copied. It copies on a page served over plain http too, where browsers
- * offer no Clipboard API.
- * @internal
+ * offer no Clipboard API. CodeBlockCopy and ConversationCopy are this button, given the text they
+ * copy.
  */
 export function CopyButton({
   text,
@@ -98,7 +100,7 @@ export function CopyButton({
         onClick={async (event) => {
           let next: typeof status = "copied";
           try {
-            await writeText(text(), event.currentTarget);
+            await writeText(typeof text === "string" ? text : text(), event.currentTarget);
           } catch {
             next = "failed";
           }

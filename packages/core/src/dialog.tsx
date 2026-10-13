@@ -35,7 +35,7 @@ export function Dialog({ children, open, defaultOpen, onOpenChange }: DialogProp
   );
 }
 
-export type DialogTriggerProps = ButtonProps & {
+export type DialogTriggerProps = Omit<ButtonProps, "render"> & {
   /**
    * Another element to open the dialog in the Button's place, such as a SidebarItem. It takes the
    * trigger's props and none of the Button's look.

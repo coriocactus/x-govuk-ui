@@ -186,6 +186,7 @@ export {
   playfulThinkingLabels,
 } from "./conversation";
 export { CookieBanner, type CookieBannerProps, type CookieChoice } from "./cookie-banner";
+export { CopyButton, type CopyButtonProps, type CopyLabels } from "./copy";
 export { DataTable, type DataTableColumn, type DataTableProps } from "./data-table";
 export { DateInput, type DateInputProps } from "./date-input";
 export {
@@ -373,8 +374,6 @@ export {
   type MessageActionProps,
   MessageActions,
   type MessageActionsProps,
-  MessageCopy,
-  type MessageCopyProps,
   MessageRating,
   type MessageRatingProps,
   type MessageRatingValue,

@@ -42,7 +42,7 @@ export function Sheet({ children, side = "right", open, defaultOpen, onOpenChang
   );
 }
 
-export type SheetTriggerProps = ButtonProps & {
+export type SheetTriggerProps = Omit<ButtonProps, "render"> & {
   /**
    * Another element to open the sheet in the Button's place, such as a SidebarItem. It takes the
    * trigger's props and none of the Button's look.

@@ -7,8 +7,8 @@ import {
   Button,
   Callout,
   ChatInput,
+  CopyButton,
   MessageActions,
-  MessageCopy,
   MessageRating,
   MessageRetry,
   MessageScroller,
@@ -344,7 +344,7 @@ export default function MessageScrollerExample({
                   {/* The office's replies can be copied, rated and requested again. */}
                   {message.from === "office" && !message.streaming && (
                     <MessageActions className="preview-help-tools">
-                      <MessageCopy text={message.text.join("\n\n")} />
+                      <CopyButton text={message.text.join("\n\n")} />
                       <MessageRating />
                       {/* Only a reply to a question asked here can be requested again. An
                             earlier one keeps the tool, which refuses a press. */}

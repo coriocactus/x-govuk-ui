@@ -17,8 +17,8 @@ import {
   useState,
 } from "react";
 import { Bubble, BubbleContent } from "./bubble";
-import { type CopyButtonProps, readableText } from "./copy";
-import { MessageActions, MessageCopy } from "./message-actions";
+import { CopyButton, type CopyButtonProps, readableText } from "./copy";
+import { MessageActions } from "./message-actions";
 import { MessageScroller } from "./message-scroller";
 import { duration, motionElementProps, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
@@ -323,7 +323,7 @@ export type ConversationCopyProps = Omit<CopyButtonProps, "text">;
 /** Copies the message's text. The icon turns to a tick for a moment once it is copied. */
 export function ConversationCopy(props: ConversationCopyProps) {
   const message = useMessage("ConversationCopy");
-  return <MessageCopy {...props} text={() => readableText(message.content.current)} />;
+  return <CopyButton {...props} text={() => readableText(message.content.current)} />;
 }
 
 export type ConversationThinkingProps = ComponentPropsWithRef<"div"> & {

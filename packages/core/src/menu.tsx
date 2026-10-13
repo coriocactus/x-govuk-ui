@@ -51,7 +51,7 @@ export function DropdownMenu({ children, open, defaultOpen, onOpenChange }: Menu
   );
 }
 
-export type DropdownMenuTriggerProps = ButtonProps & {
+export type DropdownMenuTriggerProps = Omit<ButtonProps, "render"> & {
   /** Shows a chevron after the label. Leave it off for an icon button. */
   chevron?: boolean;
   /**

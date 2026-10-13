@@ -11,9 +11,19 @@ test("pending buttons preserve their name and prevent repeated activation", () =
       calls++;
     },
   };
-  const button = Button(props);
+  // The element a Button renders is given the Button's own click handler.
+  let onClick: ((event: { preventDefault: () => void }) => void) | undefined;
+  renderToStaticMarkup(
+    <Button
+      {...props}
+      render={(given) => {
+        onClick = given.onClick as typeof onClick;
+        return <button type="button" {...given} />;
+      }}
+    />,
+  );
   let prevented = false;
-  button.props.onClick({
+  onClick?.({
     preventDefault() {
       prevented = true;
     },
@@ -25,6 +35,15 @@ test("pending buttons preserve their name and prevent repeated activation", () =
   expect(html).toContain('aria-disabled="true"');
   expect(html).toContain("Save");
   expect(html).not.toContain(" disabled=");
+  // Another element, such as GOV.UK's Start button as a link, takes the Button's look and no type.
+  const start = renderToStaticMarkup(
+    <Button render={<a href="/start" />} variant="primary">
+      Start now
+    </Button>,
+  );
+  expect(start).toMatch(/^<a href="\/start" class="x-govuk-ui-button x-govuk-ui-button--primary"/);
+  expect(start).not.toContain("type=");
+  expect(renderToStaticMarkup(<Button>Save</Button>)).toContain('type="button"');
 });
 
 test("link parts render a router's link in place of their anchor", () => {

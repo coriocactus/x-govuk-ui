@@ -9,7 +9,7 @@ import { Tooltip } from "./tooltip";
 export type MessageActionsProps = ComponentPropsWithRef<"div">;
 
 /**
- * A row of tools for one message, such as `MessageCopy`, `MessageRating` and `MessageRetry`, or
+ * A row of tools for one message, such as `CopyButton`, `MessageRating` and `MessageRetry`, or
  * any `MessageAction`. Conversation's `ConversationActions` is one.
  */
 export function MessageActions({ className = "", ...props }: MessageActionsProps) {
@@ -38,16 +38,6 @@ export function MessageAction({ label, icon, className = "", ...props }: Message
       </Button>
     </Tooltip>
   );
-}
-
-export type MessageCopyProps = Omit<CopyButtonProps, "text"> & {
-  /** The message's text, or a function that reads it at the press. */
-  text: string | (() => string);
-};
-
-/** Copies the message's text. The icon turns to a tick for a moment once it is copied. */
-export function MessageCopy({ text, ...props }: MessageCopyProps) {
-  return <CopyButton {...props} text={typeof text === "string" ? () => text : text} />;
 }
 
 const icon = (path: ReactNode) => (

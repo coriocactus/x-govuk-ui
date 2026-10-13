@@ -34,7 +34,7 @@ export function Popover({ children, open, defaultOpen, onOpenChange }: PopoverPr
   );
 }
 
-export type PopoverTriggerProps = ButtonProps & {
+export type PopoverTriggerProps = Omit<ButtonProps, "render"> & {
   /**
    * Another element to open the popover in the Button's place, such as a SidebarItem. It takes the
    * trigger's props and none of the Button's look.

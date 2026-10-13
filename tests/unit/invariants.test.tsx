@@ -149,6 +149,60 @@ test("every part that renders an element takes a className", async () => {
   expect(missing).toEqual([]);
 });
 
+test("every prop follows the library's conventions, so one idea has one name", async () => {
+  // Each prop of an exported props type, read from the packages' source as `name?: type;`.
+  const declared: { file: string; name: string; type: string }[] = [];
+  const propsTypes = /^export type \w+Props(?:<[^>]*>)? =[\s\S]*?^\S/gm;
+  for (const path of new Bun.Glob("packages/*/src/*.tsx").scanSync(".")) {
+    const code = await Bun.file(path).text();
+    for (const [block] of code.matchAll(propsTypes))
+      for (const match of block.matchAll(/^ {2,4}("?[\w-]+"?)\??: ([^;]+);$/gm))
+        declared.push({ file: path, name: match[1]!.replaceAll('"', ""), type: match[2]! });
+  }
+  expect(declared.length).toBeGreaterThan(500);
+  const wrong: string[] = [];
+  // A component's words are its `labels`. A prop ending in Label names data of a service's own,
+  // such as a chart's column, or is a choice about a label.
+  const ownData = new Set(["categoryLabel", "nameLabel", "valueLabel", "scrollLabel"]);
+  for (const { file, name, type } of declared) {
+    if (/^[a-z]\w*Label$/.test(name) && name !== "hideLabel" && !ownData.has(name))
+      if (!(file.endsWith("header.tsx") && name === "logoLabel"))
+        // Header renders on the server, where no LabelsProvider reaches, so it names its logo itself.
+        wrong.push(`${file}: ${name} is a word, so it belongs in labels`);
+    if (name === "hideLabel" && type !== "boolean") wrong.push(`${file}: hideLabel is a boolean`);
+    if (name === "labels" && !/Labels|ChartLabels/.test(type))
+      wrong.push(`${file}: labels is a map of words, typed as one`);
+    // One name for each idea.
+    const instead: Record<string, string> = {
+      isActive: "current",
+      showLabel: "hideLabel",
+      small: 'size: "small"',
+      hotkey: "keyboardShortcut",
+      emptyText: "labels.empty",
+      emptyLabel: "labels.empty",
+      shortcuts: "shortcutScope",
+    };
+    if (name in instead) wrong.push(`${file}: ${name} is ${instead[name]}`);
+    if (/HTMLMotionProps/.test(type)) wrong.push(`${file}: ${name} takes Motion's props`);
+  }
+  // A value a part keeps can be controlled, and started without controlling it.
+  for (const path of new Bun.Glob("packages/*/src/*.tsx").scanSync(".")) {
+    const code = [...(await Bun.file(path).text()).matchAll(propsTypes)].join("\n");
+    for (const [, thing] of code.matchAll(/^ {2,4}on(\w+)Change\?: /gm)) {
+      const value = thing!.charAt(0).toLowerCase() + thing!.slice(1);
+      const has = (prop: string) => new RegExp(`^ {2,4}${prop}\\??: `, "m").test(code);
+      // A handler that reports what users do, which the part does not keep, needs no value.
+      if (["Dragging", "Share", "Page", "Files", "Code", "Checked"].includes(thing!)) continue;
+      if (!has(value) || !has(`default${thing}`))
+        wrong.push(`${path}: on${thing}Change without ${value} and default${thing}`);
+    }
+  }
+  expect(wrong).toEqual([]);
+  // Motion's props never reach an exported part's type.
+  const index = await Bun.file("packages/core/src/index.ts").text();
+  expect(index).not.toContain("HTMLMotionProps");
+});
+
 test("every playground setting that needs another names one of its component's settings", () => {
   const wrong: string[] = [];
   for (const [key, entry] of Object.entries(catalogue)) {

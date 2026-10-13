@@ -9,7 +9,7 @@ export { CharacterCountNote, countWords } from "./character-count";
 export { type CodeToken, codeLanguage, codeLanguages, codeTokens } from "./code-tokens";
 export { useControllableState } from "./controllable-state";
 export { chain } from "./events";
-export { FieldBinding, NamingLabel, present, useBoundField } from "./field";
+export { NamingLabel, present, useBoundField } from "./field";
 export { trackHighlight } from "./highlight";
 export { type HtmlNode, parseHtmlTree, safeAddress, treeText, treeToDom } from "./html-tree";
 export { useMediaQuery } from "./media-query";

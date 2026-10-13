@@ -75,7 +75,8 @@ type Elementless =
   | "BubbleReactionPicker"
   | "ScrollAreaBars"
   | "EditorAI"
-  | "EditorRoot";
+  | "EditorRoot"
+  | "FieldBinding";
 
 export type WithoutClassName = None<
   {

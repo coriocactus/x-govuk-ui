@@ -52,7 +52,7 @@ export function Switch({
   const generated = useId();
   return (
     <FieldBinding
-      id={id ?? `field-${generated}`}
+      controlId={id ?? `field-${generated}`}
       name={props.name}
       hasHint={present(hint)}
       errorMessage={errorMessage}

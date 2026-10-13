@@ -413,8 +413,9 @@ function BoundField({
   invalid,
   ...props
 }: ComponentPropsWithRef<"div"> & { invalid?: boolean; binding: Binding }) {
+  const { id, ...rest } = binding;
   return (
-    <FieldBinding {...binding}>
+    <FieldBinding controlId={id} {...rest}>
       <BoundBox {...props} invalid={invalid} />
     </FieldBinding>
   );
@@ -426,14 +427,24 @@ function BoundBox({ invalid, ...props }: ComponentPropsWithRef<"div"> & { invali
   return <FieldBox {...props} invalid={invalid ?? field?.invalid} />;
 }
 
+export type FieldBindingProps = Pick<
+  FieldProps,
+  "controlId" | "name" | "linkTo" | "hasHint" | "errorMessage" | "describedBy" | "answer" | "label"
+> & {
+  /** The control's id, which the parts inside take their ids from. */
+  controlId: string;
+  children: ReactNode;
+};
+
 /**
- * Binds the parts inside to a control's id, as a bound Field does, without the Field's box. A part
- * with a layout of its own, such as Switch's row, holds its bound parts in it.
- * @internal
+ * Binds the parts inside to a control's id, as a Field with `controlId` does, without the Field's
+ * box. Use it for a field with a layout of its own, as Switch's row is, where the label sits beside
+ * the control. Its parts take their ids from it, and the control takes its descriptions through
+ * `useControlProps`. Its props are a bound Field's.
  */
-export function FieldBinding({ children, ...binding }: Binding & { children: ReactNode }) {
+export function FieldBinding({ children, controlId, ...binding }: FieldBindingProps) {
   const field = useField({
-    id: binding.id,
+    id: controlId,
     name: binding.name,
     linkTo: binding.linkTo,
     hint: binding.hasHint || undefined,

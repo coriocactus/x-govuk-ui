@@ -314,6 +314,8 @@ export {
   ErrorMessage,
   type ErrorMessageProps,
   Field,
+  FieldBinding,
+  type FieldBindingProps,
   type FieldProps,
   type FieldSummary,
   type FormField,

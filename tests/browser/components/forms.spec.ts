@@ -1,3 +1,4 @@
+import { stepAnswers } from "../../../packages/core/src/step-answers";
 import { expect, test } from "../fixtures";
 
 test("the error summary takes focus and its links focus their fields", async ({ frame, open }) => {
@@ -370,4 +371,41 @@ test("a remembered survey keeps the answers of a step that applies again, howeve
   await page.reload();
   await choose();
   await expect(frame.getByLabel("Which tablet did you use?")).toHaveValue("A small one");
+});
+
+test("the answers of a step that applies no longer are left out, and its field keeps its focus, name and form", async ({
+  page,
+}) => {
+  // A service can make the step on show apply no longer, such as by a `when` of its own, while
+  // another step under the same name applies in its place. Each engine reads the page its own way,
+  // so the read runs as it is, in each.
+  await page.setContent(`
+    <form>
+      <fieldset data-step="0">
+        <input name="model" value="From the step on show">
+        <input type="radio" name="pick" value="a" checked>
+      </fieldset>
+      <fieldset data-step="1" disabled><input name="model" value="From the step that applies"></fieldset>
+    </form>`);
+  const form = page.locator("form");
+  const shown = page.locator('input[value="From the step on show"]');
+  await shown.focus();
+  expect(await form.evaluate(stepAnswers, [1])).toEqual([["model", "From the step that applies"]]);
+  // The page is as it was.
+  await expect(shown).toBeFocused();
+  expect(
+    await form.evaluate((element: HTMLFormElement) => ({
+      names: [...element.querySelectorAll("input")].map((input) => input.getAttribute("name")),
+      owned: [...element.querySelectorAll("input")].every((input) => input.form === element),
+      disabled: element.querySelector("fieldset[data-step='1']")?.hasAttribute("disabled"),
+      checked: element.querySelector<HTMLInputElement>("input[type=radio]")?.checked,
+      sent: [...new FormData(element).entries()].map(([name]) => name),
+    })),
+  ).toEqual({
+    names: ["model", "pick", "model"],
+    owned: true,
+    disabled: true,
+    checked: true,
+    sent: ["model", "pick"],
+  });
 });

@@ -1281,22 +1281,35 @@ test("filter chips filter, keep their width, and share one shape behind chosen n
   await expect(frame.getByRole("status")).toHaveText("Showing 31 applications");
   // A chip keeps its width as it turns on.
   expect((await approved.boundingBox())!.width).toBe(width);
-  // Chosen neighbours share one shape behind them, and the chips never move.
+  // Chosen neighbours share one shape behind them on each row they take, and the chips never move.
+  // How many rows they take depends on the typeface's widths, which differ between systems.
+  const inReview = frame.getByRole("button", { name: /^In review/ });
   const waiting = frame.getByRole("button", { name: /^Waiting for evidence/ });
   const left = (await waiting.boundingBox())!.x;
   const tracks = frame.locator(".x-govuk-ui-filter-chips-track");
   await waiting.click();
-  await expect(tracks).toHaveCount(1);
-  const review = (await frame.getByRole("button", { name: /^In review/ }).boundingBox())!;
+  const rows = new Set(
+    await Promise.all(
+      [inReview, waiting, approved].map(async (chip) => Math.round((await chip.boundingBox())!.y)),
+    ),
+  );
+  await expect(tracks).toHaveCount(rows.size);
+  const review = (await inReview.boundingBox())!;
   const end = (await approved.boundingBox())!;
-  // The shape comes to rest over the chips from In review to Approved. Its edges are drawn to whole
-  // pixels, so they may sit a pixel either way.
+  // The shapes come to rest over the chips from In review to Approved. Their edges are drawn to
+  // whole pixels, so they may sit a pixel either way.
   await expect
     .poll(async () => {
-      const track = (await tracks.boundingBox())!;
+      const boxes = (await Promise.all((await tracks.all()).map((track) => track.boundingBox())))
+        .filter((box) => box !== null)
+        .sort((a, b) => a.y - b.y || a.x - b.x);
+      const first = boxes[0];
+      const last = boxes.at(-1);
       return (
-        Math.abs(track.x - review.x) <= 1 &&
-        Math.abs(track.x + track.width - (end.x + end.width)) <= 1
+        first !== undefined &&
+        last !== undefined &&
+        Math.abs(first.x - review.x) <= 1 &&
+        Math.abs(last.x + last.width - (end.x + end.width)) <= 1
       );
     })
     .toBe(true);

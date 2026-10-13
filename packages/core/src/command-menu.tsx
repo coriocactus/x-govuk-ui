@@ -20,6 +20,7 @@ import { trackHighlight } from "./highlight";
 import { Kbd } from "./kbd";
 import { useLabels } from "./labels";
 import { duration, easeOut, useMotionTiming } from "./motion";
+import { useLatest } from "./refs";
 import { ScrollArea } from "./scroll-area";
 import { shortcutKeys } from "./shortcut";
 import { useScopeSound } from "./sound-scope";
@@ -190,8 +191,7 @@ export function CommandMenu({
   const play = useScopeSound();
   const { reduced } = useMotionTiming();
   const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
-  const isOpen = useRef(open);
-  isOpen.current = open;
+  const isOpen = useLatest(open);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");

@@ -19,7 +19,13 @@
     "rules": {
       "preset": "recommended",
       "style": { "noNonNullAssertion": "off", "noDescendingSpecificity": "off" },
-      "complexity": { "noImportantStyles": "off" }
+      "complexity": { "noImportantStyles": "off" },
+      "correctness": {
+        "useExhaustiveDependencies": {
+          "level": "error",
+          "options": { "hooks": [{ "name": "useLatest", "stableResult": true }] }
+        }
+      }
     }
   }
 }

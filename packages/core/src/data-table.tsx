@@ -12,6 +12,7 @@ import {
 import { Button } from "./button";
 import { useControllableState } from "./controllable-state";
 import { useLabels } from "./labels";
+import { useLatest } from "./refs";
 import { ResizableHandle } from "./resizable";
 import { ScrollArea } from "./scroll-area";
 import { TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "./table";
@@ -206,8 +207,7 @@ export function DataTable<Row>({
   };
 
   // The rows are rendered again only when they change, not as a column is resized.
-  const chosenChange = useRef(choose);
-  chosenChange.current = choose;
+  const chosenChange = useLatest(choose);
   // biome-ignore lint/correctness/useExhaustiveDependencies: The pin function reads only the pinned count.
   const body = useMemo(
     () => (

@@ -23,6 +23,7 @@ import {
   MenuRadioGroup,
   MenuRadioItem,
 } from "./menu";
+import { useLatest } from "./refs";
 import { ScrollAreaBars } from "./scroll-area";
 import { Tooltip } from "./tooltip";
 
@@ -199,15 +200,13 @@ export function ChatInput({
   const area = useRef<HTMLTextAreaElement>(null);
   const [files, setOwnFiles] = useControllableState(givenFiles, defaultFiles ?? [], onFilesChange);
   // The latest files, so files attached between renders join the end of them.
-  const latestFiles = useRef(files);
-  latestFiles.current = files;
+  const latestFiles = useLatest(files);
   const setFiles = (next: File[]) => {
     latestFiles.current = next;
     setOwnFiles(next);
   };
   // The latest text, so words dictated between renders join the end of it.
-  const latest = useRef(text);
-  latest.current = text;
+  const latest = useLatest(text);
   const set = (next: string) => {
     latest.current = next;
     setText(next);
@@ -565,8 +564,7 @@ export function ChatInputDictation({
   const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const stop = useRef<(() => void) | null>(null);
-  const insertLatest = useRef(insert);
-  insertLatest.current = insert;
+  const insertLatest = useLatest(insert);
   // Whether it can listen is known only in the browser, so the server renders it unavailable.
   useEffect(() => setSupported(recogniser.available?.() ?? true), [recogniser]);
   useEffect(() => () => stop.current?.(), []);

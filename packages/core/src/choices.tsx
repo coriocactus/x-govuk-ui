@@ -4,6 +4,7 @@ import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { FieldAnswer, useFormDefault } from "./field";
 import { Fieldset, type FieldsetProps } from "./fieldset";
 import { Kbd } from "./kbd";
+import { useLatest } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
 export type ChoicesOption = { value: string; label: ReactNode; hint?: ReactNode };
@@ -157,8 +158,7 @@ export function Choices({
   // Within the choices, the keys always work. Beyond them, across the page or the form, they work
   // while these are the only choices on show there. Focus must also not be somewhere that takes
   // typing or keys of its own, such as a field, a menu or a list.
-  const handler = useRef(onKeyDown);
-  handler.current = onKeyDown;
+  const handler = useLatest(onKeyDown);
   useEffect(() => {
     const own = list.current;
     if (!own || shortcutScope === "none") return;

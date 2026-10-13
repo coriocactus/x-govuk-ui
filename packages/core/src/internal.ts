@@ -20,7 +20,7 @@ export { useLabels } from "./labels";
 export { useMediaQuery } from "./media-query";
 export { duration } from "./motion";
 export { Orb } from "./orb";
-export { useMergedRef } from "./refs";
+export { useLatest, useMergedRef } from "./refs";
 export { renderTree } from "./rich-text";
 export { ScrollAreaBars } from "./scroll-area";
 export { type SoundVoice, soundFamilies, voicesOf } from "./sound";

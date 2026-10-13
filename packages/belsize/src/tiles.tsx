@@ -40,6 +40,7 @@ import {
 import {
   useControllableState,
   useLabels,
+  useLatest,
   useMediaQuery,
   useMergedRef,
   useStoredState,
@@ -525,8 +526,7 @@ export function TilesProvider({
   children,
 }: TilesProviderProps) {
   const labels = useLabels("tiles", defaultTilesLabels, ownLabels);
-  const labelsNow = useRef(labels);
-  labelsNow.current = labels;
+  const labelsNow = useLatest(labels);
   const boardId = useId();
   const play = useScopeSound();
   const board = useRef<HTMLDivElement | null>(null);
@@ -548,8 +548,7 @@ export function TilesProvider({
     () => normaliseLayout(live !== undefined ? live : committed),
     [live, committed],
   );
-  const latest = useRef({ committed, layout });
-  latest.current = { committed, layout };
+  const latest = useLatest({ committed, layout });
   const ids = tileIds(layout);
   const idsText = JSON.stringify(ids);
 
@@ -566,8 +565,7 @@ export function TilesProvider({
   const wantedActive = activeValue !== undefined ? activeValue : ownActive;
   const active = wantedActive !== null && ids.includes(wantedActive) ? wantedActive : null;
   const told = useRef<string | null>(null);
-  const activeNow = useRef(active);
-  activeNow.current = active;
+  const activeNow = useLatest(active);
   // A user's change is told at once, and again each time, even if the service kept the tile it
   // gave.
   const use = useCallback(

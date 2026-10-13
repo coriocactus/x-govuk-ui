@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
+import { useLatest } from "./refs";
 
 /**
  * A value that the caller controls, or leaves to the component. Given a `value`, the component
@@ -16,8 +17,7 @@ export function useControllableState<T>(
 ): [T, (next: T) => void] {
   const [own, setOwn] = useState(defaultValue);
   const controlled = value !== undefined;
-  const latest = useRef({ controlled, onChange });
-  latest.current = { controlled, onChange };
+  const latest = useLatest({ controlled, onChange });
   const set = useCallback((next: T) => {
     if (!latest.current.controlled) setOwn(() => next);
     latest.current.onChange?.(next);

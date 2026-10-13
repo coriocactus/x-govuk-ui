@@ -1,4 +1,11 @@
-import { type Ref, type RefCallback, useCallback } from "react";
+import {
+  type Ref,
+  type RefCallback,
+  type RefObject,
+  useCallback,
+  useInsertionEffect,
+  useRef,
+} from "react";
 
 /**
  * One ref that sets both refs given. One is a component's own, for an element it measures or
@@ -31,4 +38,18 @@ export function useMergedRef<T>(own: Ref<T>, theirs: Ref<T> | undefined): RefCal
     },
     [own, theirs],
   );
+}
+
+/**
+ * A ref to the latest value, such as a callback from props. It is set as React commits each
+ * render, before any layout effect runs, so a render that React throws away never sets it. An
+ * effect or a handler reads it to call the latest callback without depending on it.
+ * @internal
+ */
+export function useLatest<T>(value: T): RefObject<T> {
+  const ref = useRef(value);
+  useInsertionEffect(() => {
+    ref.current = value;
+  });
+  return ref;
 }

@@ -19,7 +19,7 @@ import { useControllableState } from "./controllable-state";
 import { Countdown } from "./countdown";
 import { useLabels } from "./labels";
 import { ArrowShape, CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
-import { useMergedRef } from "./refs";
+import { useLatest, useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
 /** What a callout points at, which is an element, a ref to one, or a CSS selector for one. */
@@ -380,8 +380,7 @@ export function CalloutContent({
   // card that moved to its new anchor then would have the anchor measured too late for that frame,
   // and the browser would report a loop of resize observers. The card therefore moves in a task of
   // its own, straight away.
-  const targetRef = useRef(target);
-  targetRef.current = target;
+  const targetRef = useLatest(target);
   useEffect(() => {
     if (asked || !open) return;
     let timer = 0;
@@ -437,8 +436,7 @@ export function CalloutContent({
     setPointed(false);
     setFocused(false);
   }, [open]);
-  const closeRef = useRef(setOpen);
-  closeRef.current = setOpen;
+  const closeRef = useLatest(setOpen);
   const left = useRef(timeout);
   // biome-ignore lint/correctness/useExhaustiveDependencies: each opening starts the time in full.
   useEffect(() => {

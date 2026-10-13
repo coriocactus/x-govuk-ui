@@ -3304,7 +3304,7 @@ const entries = {
     props: [
       reference(
         "ServicePage",
-        "{ serviceName, serviceUrl, navigation, phase, feedbackUrl, back, footerLinks, column }",
+        "{ serviceName, serviceUrl, navigation, phase, feedbackUrl, back, footerLinks, render, header, footer, column, labels }",
         "Part",
       ),
       reference("header", "ReactNode"),

@@ -1,9 +1,11 @@
 "use client";
 
 import type { ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
+import type { AnchorProps } from "./anchor";
 import { BackLink } from "./back-link";
-import { Footer, FooterLink, FooterLinks } from "./footer";
+import { Footer, FooterLinks } from "./footer";
 import { Header } from "./header";
+import { useLabels } from "./labels";
 import { Link } from "./link";
 import { PhaseBanner } from "./phase-banner";
 import { ServiceNavigation } from "./service-navigation";
@@ -80,9 +82,7 @@ export function Page({
   );
 }
 
-export type ServicePageLink = { label: ReactNode; href: string };
-
-export type ServicePageProps = Omit<PageProps, "header" | "footer"> & {
+export type ServicePageProps = PageProps & {
   /** The service's name, in Service navigation beneath the header. */
   serviceName: ReactNode;
   serviceUrl?: string;
@@ -95,34 +95,50 @@ export type ServicePageProps = Omit<PageProps, "header" | "footer"> & {
    * out for a live service.
    */
   phase?: ReactNode;
-  /** What the phase banner says. By default, GOV.UK's words, asking for feedback. */
+  /** What the phase banner says. By default, its `phase` label, which asks for feedback. */
   phaseMessage?: ReactNode;
   /** Where the phase banner's feedback link goes. */
   feedbackUrl?: string;
   /** A Back link, by where it goes, or a part of your own in its place, such as Breadcrumbs. */
   back?: string | ReactNode;
-  /** The footer's links. By default, GOV.UK's usual support links. Give an empty list for none. */
-  footerLinks?: readonly ServicePageLink[];
+  /**
+   * The footer's support links, as FooterLink parts, such as Help, Cookies and the accessibility
+   * statement. GOV.UK asks every service for these, at addresses of its own.
+   */
+  footerLinks?: ReactNode;
+  /**
+   * Renders a router's link in place of each link the page makes for you, which are the header's,
+   * the service's name, the Back link and the phase banner's feedback link.
+   */
+  render?: AnchorProps["render"];
   /**
    * How wide the content is, as a GridColumn's width, such as two-thirds, as GOV.UK's question
    * pages are, three-quarters, or the full width.
    */
   column?: GridColumnProps["width"];
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<ServicePageLabels>;
 };
 
-const supportLinks: readonly ServicePageLink[] = [
-  { label: "Help", href: "#help" },
-  { label: "Privacy", href: "#privacy" },
-  { label: "Cookies", href: "#cookies" },
-  { label: "Accessibility statement", href: "#accessibility-statement" },
-  { label: "Contact", href: "#contact" },
-];
+/** The words Service page writes, which a LabelsProvider or its `labels` can change. */
+export type ServicePageLabels = {
+  /** The phase banner's message, around its feedback link. */
+  phase: (feedback: ReactNode) => ReactNode;
+  /** The phase banner's feedback link. */
+  feedback: string;
+};
+
+export const defaultServicePageLabels: ServicePageLabels = {
+  phase: (feedback) => <>This is a new service. Help us improve it and {feedback}.</>,
+  feedback: "give your feedback",
+};
 
 /**
  * A GOV.UK service's page, ready made. It has the header with the crown, Service navigation with
  * the service's name, a Phase banner and a Back link if wanted, the content in GOV.UK's two-thirds
- * column, and the footer with its support links. Put the page's own content inside, such as a
- * Form. It is Page with its usual parts filled in. For a page laid out another way, use Page.
+ * column, and the footer with the service's support links. Put the page's own content inside, such
+ * as a Form. It is Page with its usual parts filled in. Give `header` or `footer` to replace one of
+ * them. For a page laid out another way, use Page.
  */
 export function ServicePage({
   serviceName,
@@ -133,25 +149,30 @@ export function ServicePage({
   phaseMessage,
   feedbackUrl = "#feedback",
   back,
-  footerLinks = supportLinks,
+  footerLinks,
+  render,
   column = "two-thirds",
   beforeContent,
+  header,
+  footer,
+  labels: ownLabels,
   children,
   ...page
 }: ServicePageProps) {
+  const labels = useLabels("servicePage", defaultServicePageLabels, ownLabels);
   const above = (phase || back || beforeContent) && (
     <>
       {phase && (
         <PhaseBanner tag={phase}>
-          {phaseMessage ?? (
-            <>
-              This is a new service. Help us improve it and{" "}
-              <Link href={feedbackUrl}>give your feedback</Link>.
-            </>
-          )}
+          {phaseMessage ??
+            labels.phase(
+              <Link href={feedbackUrl} render={render}>
+                {labels.feedback}
+              </Link>,
+            )}
         </PhaseBanner>
       )}
-      {typeof back === "string" ? <BackLink href={back} /> : back}
+      {typeof back === "string" ? <BackLink href={back} render={render} /> : back}
       {beforeContent}
     </>
   );
@@ -159,27 +180,21 @@ export function ServicePage({
     <Page
       {...page}
       header={
-        <>
-          <Header homepageUrl={homepageUrl} />
-          <ServiceNavigation serviceName={serviceName} serviceUrl={serviceUrl}>
-            {navigation}
-          </ServiceNavigation>
-        </>
+        header ?? (
+          <>
+            <Header homepageUrl={homepageUrl} render={render} />
+            <ServiceNavigation
+              serviceName={serviceName}
+              serviceUrl={serviceUrl}
+              serviceRender={render}
+            >
+              {navigation}
+            </ServiceNavigation>
+          </>
+        )
       }
       beforeContent={above || undefined}
-      footer={
-        <Footer>
-          {footerLinks.length > 0 && (
-            <FooterLinks>
-              {footerLinks.map((link) => (
-                <FooterLink key={link.href} href={link.href}>
-                  {link.label}
-                </FooterLink>
-              ))}
-            </FooterLinks>
-          )}
-        </Footer>
-      }
+      footer={footer ?? <Footer>{footerLinks && <FooterLinks>{footerLinks}</FooterLinks>}</Footer>}
     >
       <MainWrapper>
         <GridRow>

@@ -19,6 +19,7 @@ import type { InputLabels } from "./input";
 import type { LightboxLabels } from "./lightbox";
 import type { MessageRatingLabels } from "./message-actions";
 import type { OverlayLabels } from "./overlay";
+import type { ServicePageLabels } from "./page";
 import type { PaginationLabels } from "./pagination";
 import type { SearchBoxLabels } from "./search-box";
 import type { ServiceNavigationLabels } from "./service-navigation";
@@ -55,6 +56,7 @@ export interface ComponentLabels {
   questionCard: QuestionCardLabels;
   searchBox: SearchBoxLabels;
   serviceNavigation: ServiceNavigationLabels;
+  servicePage: ServicePageLabels;
   switch: SwitchLabels;
   taskList: TaskListLabels;
   timeInput: TimeInputLabels;

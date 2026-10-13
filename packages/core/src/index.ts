@@ -486,10 +486,11 @@ export {
 export { OrganisationName, type OrganisationNameProps } from "./organisation-name";
 export { defaultOverlayLabels, type OverlayLabels } from "./overlay";
 export {
+  defaultServicePageLabels,
   Page,
   type PageProps,
   ServicePage,
-  type ServicePageLink,
+  type ServicePageLabels,
   type ServicePageProps,
 } from "./page";
 export {

@@ -14,6 +14,7 @@ import {
   FilterChip,
   FilterChips,
   Footer,
+  FooterLink,
   Form,
   GovukCrown,
   GovukLockup,
@@ -81,7 +82,14 @@ test("pages follow GOV.UK's template, and forms leave validation to themselves",
 
 test("a service page puts the usual GOV.UK parts around its content", () => {
   const page = renderToStaticMarkup(
-    <ServicePage serviceName="Apply for a licence" phase="Beta" back="#start">
+    <ServicePage
+      serviceName="Apply for a licence"
+      serviceUrl="/apply"
+      phase="Beta"
+      back="#start"
+      footerLinks={<FooterLink href="/accessibility">Accessibility statement</FooterLink>}
+      render={(props) => <a data-router="" {...props} />}
+    >
       <p>Content</p>
     </ServicePage>,
   );
@@ -91,6 +99,20 @@ test("a service page puts the usual GOV.UK parts around its content", () => {
   expect(page).toContain("<main");
   expect(page).toContain('data-width="two-thirds"');
   expect(page).toContain("Accessibility statement");
+  // Every link the page makes goes through the router: the header's, the service's name, the
+  // feedback link and the Back link.
+  expect(page.match(/<a data-router=""/g)).toHaveLength(4);
+  // Without links of its own, the footer has no placeholder support links.
+  const bare = renderToStaticMarkup(<ServicePage serviceName="Apply">Content</ServicePage>);
+  expect(bare).not.toContain("x-govuk-ui-footer-links");
+  // A header or footer of your own replaces the usual one.
+  const own = renderToStaticMarkup(
+    <ServicePage serviceName="Apply" header={<header>Own header</header>}>
+      Content
+    </ServicePage>,
+  );
+  expect(own).toContain("Own header");
+  expect(own).not.toContain("x-govuk-ui-service-navigation");
 });
 
 test("links, cards, avatars and page parts follow GOV.UK and name themselves", () => {

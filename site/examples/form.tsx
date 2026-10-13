@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import {
   Button,
   DateInput,
+  FooterLink,
   Form,
   type FormErrors,
   FormStep,
@@ -64,6 +65,13 @@ function OnePage({ errorTitle = "There is a problem", titlePrefix = true }: Prop
       phase="Beta"
       back="#previous"
       column="three-quarters"
+      footerLinks={
+        <>
+          <FooterLink href="#help">Help</FooterLink>
+          <FooterLink href="#cookies">Cookies</FooterLink>
+          <FooterLink href="#accessibility-statement">Accessibility statement</FooterLink>
+        </>
+      }
     >
       <h1 className="preview-page-heading">Your details</h1>
       <Form

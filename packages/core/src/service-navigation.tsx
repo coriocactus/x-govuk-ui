@@ -10,6 +10,7 @@ import {
   useContext,
   useId,
 } from "react";
+import { Anchor, type AnchorProps } from "./anchor";
 import { ChevronIcon } from "./icons";
 import { useLabels } from "./labels";
 import { useMediaQuery } from "./media-query";
@@ -22,6 +23,8 @@ export type ServiceNavigationProps = ComponentPropsWithRef<"section"> & {
   /** The service's name, which leads its navigation. */
   serviceName?: ReactNode;
   serviceUrl?: string;
+  /** Renders a router's link in place of the service name's anchor. */
+  serviceRender?: AnchorProps["render"];
   /** Its words, in place of a LabelsProvider's or the defaults. */
   labels?: Partial<ServiceNavigationLabels>;
   children?: ReactNode;
@@ -51,6 +54,7 @@ export const defaultServiceNavigationLabels: ServiceNavigationLabels = {
 export function ServiceNavigation({
   serviceName,
   serviceUrl,
+  serviceRender,
   labels: ownLabels,
   className = "",
   children,
@@ -74,7 +78,13 @@ export function ServiceNavigation({
         <WidthContainer className="x-govuk-ui-service-navigation-container">
           {serviceName && (
             <span className="x-govuk-ui-service-navigation-name">
-              {serviceUrl ? <a href={serviceUrl}>{serviceName}</a> : serviceName}
+              {serviceUrl ? (
+                <Anchor href={serviceUrl} render={serviceRender}>
+                  {serviceName}
+                </Anchor>
+              ) : (
+                serviceName
+              )}
             </span>
           )}
           {children &&

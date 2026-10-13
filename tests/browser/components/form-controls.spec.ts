@@ -407,12 +407,25 @@ test("the editor's tip follows Source behind More as the window narrows, and bac
   page,
   frame,
   open,
+  playground,
 }) => {
-  // The browser reports a loop of resize observers as an error event, not a thrown error.
+  // The browser reports a loop of resize observers as an error event, not a thrown error. Each
+  // frame in which a callout shows at the page's corner, where Base UI places a card whose anchor
+  // has left the page, is counted.
   await page.addInitScript(() => {
     const seen: string[] = [];
-    Object.assign(window, { seenErrors: seen });
+    const corner = { frames: 0 };
+    Object.assign(window, { seenErrors: seen, cornerFrames: corner });
     window.addEventListener("error", (event) => seen.push(event.message));
+    const watch = () => {
+      for (const card of document.querySelectorAll<HTMLElement>(".x-govuk-ui-callout")) {
+        const box = card.getBoundingClientRect();
+        if (getComputedStyle(card).visibility === "visible" && box.top < 40 && box.left < 40)
+          corner.frames++;
+      }
+      requestAnimationFrame(watch);
+    };
+    requestAnimationFrame(watch);
   });
   await open("editor");
   const tip = page.locator(".x-govuk-ui-callout", { hasText: "See what it submits" });
@@ -440,9 +453,20 @@ test("the editor's tip follows Source behind More as the window narrows, and bac
     await page.setViewportSize({ width: step, height });
   await page.setViewportSize({ width, height });
   await expect.poll(() => near("Source")).toBe(true);
+  // A toolbar of the example's own takes the place of the editor's, and gives it back. Each time,
+  // Source leaves the page, and the tip waits out of sight until it finds the next.
+  for (const own of [true, false, true, false]) {
+    await playground.set("ownToolbar", own);
+    await expect.poll(() => near("Source")).toBe(true);
+  }
   expect(
     await page.evaluate(() => (window as unknown as { seenErrors: string[] }).seenErrors),
   ).toEqual([]);
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { cornerFrames: { frames: number } }).cornerFrames,
+    ),
+  ).toEqual({ frames: 0 });
 });
 
 test("an editor's toolbar of its own keeps a group of its own whole, and never starts or ends its row on a keyline", async ({

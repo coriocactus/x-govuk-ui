@@ -473,7 +473,13 @@ export function CalloutContent({
         <Primitive.Positioner
           className="x-govuk-ui-floating-positioner"
           anchor={asked ? undefined : target}
-          style={asked || target ? undefined : { visibility: "hidden" }}
+          // A notice with nothing to point at waits out of sight. Its anchor can leave the page
+          // before the notice finds the next one, and Base UI then places the card at the page's
+          // corner, which it marks as the anchor being hidden. A notice whose anchor has scrolled
+          // out of sight waits too.
+          style={({ anchorHidden }) =>
+            !asked && (!target || anchorHidden) ? { visibility: "hidden" } : undefined
+          }
           side={chosen}
           align={align}
           sideOffset={GAP}

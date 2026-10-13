@@ -64,6 +64,7 @@ export function FileUpload({
     hint,
     errorMessage,
     "aria-describedby": describedBy,
+    label,
   });
   const input = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);

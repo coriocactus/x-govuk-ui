@@ -31,6 +31,10 @@ function captionFor(field: HTMLElement) {
   );
 }
 
+/** What can take focus, for a field whose link goes to an element around its control. */
+const FOCUSABLE =
+  'input:not([type="hidden"]), select, textarea, button, a[href], [tabindex]:not([tabindex="-1"])';
+
 /** GOV.UK's summary of the errors on a page, above the form. Each error links to its field. */
 export function ErrorSummary({
   children,
@@ -72,7 +76,8 @@ export type ErrorSummaryItemProps = ComponentPropsWithRef<"a"> & {
 
 /**
  * One error. Use the same words as the error message beside the field. Pressing it scrolls the
- * field's label or legend into view and focuses the field.
+ * field's label or legend into view and focuses the field. When the link goes to an element around
+ * the field's control, such as a group, the first control inside takes focus.
  */
 export function ErrorSummaryItem({
   href,
@@ -92,8 +97,11 @@ export function ErrorSummaryItem({
           const field = id && event.currentTarget.ownerDocument.getElementById(id);
           if (event.defaultPrevented || !field) return;
           event.preventDefault();
-          captionFor(field).scrollIntoView({ block: "start" });
-          field.focus({ preventScroll: true });
+          const control = field.matches(FOCUSABLE)
+            ? field
+            : (field.querySelector<HTMLElement>(FOCUSABLE) ?? field);
+          captionFor(control).scrollIntoView({ block: "start" });
+          control.focus({ preventScroll: true });
         }}
       />
     </li>

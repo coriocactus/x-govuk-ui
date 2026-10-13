@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
-import { useFormDefault } from "./field";
+import { FieldAnswer, useFormDefault } from "./field";
 import { Fieldset, type FieldsetProps } from "./fieldset";
 import { Kbd } from "./kbd";
 import { useScopeSound } from "./sound-scope";
@@ -177,6 +177,17 @@ export function Choices({
   const otherKey = other ? keyOf(options.length) : null;
   return (
     <Fieldset {...fieldset} id={groupId} name={name} className={className}>
+      {/* Check your answers shows the chosen answers' labels, and any words for the other. */}
+      <FieldAnswer
+        answer={(data) => [
+          ...data
+            .getAll(name)
+            .map(
+              (value) => options.find((option) => option.value === value)?.label ?? String(value),
+            ),
+          ...data.getAll(`${name}-other`).map(String),
+        ]}
+      />
       {/* The list takes focus itself when someone leaves the other answer's field with Escape,
           so the letters and numbers choose again. */}
       <div ref={list} className="x-govuk-ui-choice-list" data-markers={markers} tabIndex={-1}>

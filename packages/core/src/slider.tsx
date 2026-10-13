@@ -2,7 +2,7 @@
 
 import { Slider as Primitive } from "@base-ui/react/slider";
 import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef } from "react";
-import { Field, Hint, Label, useField } from "./field";
+import { ErrorMessage, Field, Hint, Label, useField } from "./field";
 import { useMotionTiming } from "./motion";
 import { useScopeSound } from "./sound-scope";
 
@@ -14,6 +14,7 @@ export type SliderProps = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
+  errorMessage?: ReactNode;
   /** The value. Leave it out to let the slider keep track. */
   value?: number;
   defaultValue?: number;
@@ -44,6 +45,7 @@ export function Slider({
   label,
   hint,
   hideLabel = false,
+  errorMessage,
   value,
   defaultValue,
   onValueChange,
@@ -59,7 +61,20 @@ export function Slider({
   className = "",
   ...props
 }: SliderProps) {
-  const field = useField({ id, hint });
+  const field = useField({
+    id,
+    name,
+    hint,
+    errorMessage,
+    label,
+    // Check your answers shows the value as the slider shows it.
+    answer: (data) => {
+      const sent = name ? data.get(name) : null;
+      return typeof sent === "string" && sent !== ""
+        ? new Intl.NumberFormat(undefined, format).format(Number(sent))
+        : undefined;
+    },
+  });
   const labelId = `${field.id}-label`;
   const play = useScopeSound();
   const { reduced } = useMotionTiming();
@@ -103,9 +118,11 @@ export function Slider({
     play("sliderTick", { detune: ((next - min) / (max - min || 1)) * 900 });
   };
   return (
-    <Field>
+    <Field invalid={field.invalid}>
       <Primitive.Root
         {...props}
+        // A Form's error summary links here, and focuses the thumb inside.
+        id={field.id}
         className={`x-govuk-ui-slider ${className}`.trim()}
         value={value}
         defaultValue={defaultValue}
@@ -129,6 +146,7 @@ export function Slider({
           {showValue && <Primitive.Value className="x-govuk-ui-slider-value" />}
         </div>
         <Hint id={field.hintId}>{hint}</Hint>
+        <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
         <Primitive.Control className="x-govuk-ui-slider-control">
           <Primitive.Track className="x-govuk-ui-slider-track">
             <Primitive.Indicator className="x-govuk-ui-slider-indicator" />

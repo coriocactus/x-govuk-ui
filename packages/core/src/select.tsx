@@ -25,6 +25,7 @@ import {
   Label,
   present,
   useControlProps,
+  useFieldSummary,
   useFormDefault,
 } from "./field";
 import { trackHighlight } from "./highlight";
@@ -222,6 +223,13 @@ export function SelectControl(given: SelectControlProps) {
   const defaultValue = givenDefault === undefined ? saved : givenDefault;
   const registered = useItemLabels();
   const labels = { ...registered.labels, ...labelsOf(children) };
+  // Check your answers shows the chosen option's label, not its value.
+  useFieldSummary({
+    answer: (data) => {
+      const chosen = name ? data.get(name) : null;
+      return typeof chosen === "string" && chosen ? (labels[chosen] ?? chosen) : undefined;
+    },
+  });
   const long = Object.keys(labels).length > SHORT_LIST;
   const list = <Primitive.List className="x-govuk-ui-select-list">{children}</Primitive.List>;
   // An uncontrolled select keeps its own value, so the tick can be read from it as the list opens.

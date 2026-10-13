@@ -5,17 +5,21 @@ import {
   isValidElement,
   type KeyboardEvent,
   type ReactNode,
+  type RefObject,
+  useCallback,
+  useContext,
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { AutoHeight } from "./auto-height";
 import { BackLink } from "./back-link";
 import { Button, ButtonGroup } from "./button";
+import { FormContext, type FormField, present } from "./field";
 import { Form, type FormErrors, type FormProps } from "./form";
-import { dateFromParts } from "./helpers";
 import { Kbd } from "./kbd";
 import { Panel } from "./panel";
 import { SummaryList, SummaryListAction, SummaryListRow } from "./summary-list";
@@ -132,8 +136,8 @@ export type FormStepsProps = Omit<
 type Saved = { at: number; passed: number[]; skipped: number[]; answers: [string, string][] };
 type Row = {
   step: number;
-  label: string;
-  values: string[];
+  label: ReactNode;
+  values: ReactNode[];
   id: string;
   skipped?: boolean;
   /** The step's own summary of its answer, in place of the values. */
@@ -159,127 +163,52 @@ function writeSaved(key: string | undefined, saved: Saved | null) {
 }
 
 /**
- * The words of a label, legend or answer, without hints, markers or words only screen readers hear.
+ * A field's answer as Check your answers lists it, one answer to a line. A field that says how to
+ * show its answer, such as Select with its option's label, does so. Otherwise the answer is what
+ * the field sends under its name, with a file by its name.
  */
-function wordsOf(element: Element | null | undefined) {
-  if (!element) return "";
-  const copy = element.cloneNode(true) as Element;
-  for (const extra of copy.querySelectorAll(
-    '[aria-hidden="true"], .x-govuk-ui-hint, .x-govuk-ui-choice-list-hint, .x-govuk-ui-choice-hint, .x-govuk-ui-visually-hidden, input, .x-govuk-ui-conditional',
-  ))
-    extra.remove();
-  return (copy.textContent ?? "").replace(/\s+/g, " ").trim();
-}
-
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-/** Whether something is hidden by a part of its step, not by the step being out of sight. */
-function hiddenWithin(element: Element, step: Element) {
-  const hidden = element.closest("[hidden]");
-  return Boolean(hidden && hidden !== step && step.contains(hidden));
+function answersOf(field: FormField, name: string, data: FormData): ReactNode[] {
+  if (field.answer) {
+    const given = field.answer(data);
+    const list = Array.isArray(given) ? given : [given];
+    return list.filter((each) => present(each));
+  }
+  return data
+    .getAll(name)
+    .map((value) => (typeof value === "string" ? value.trim() : value.name))
+    .filter(Boolean);
 }
 
 /**
- * The answers on a step, with a row for each question, in the order the questions come. Each group
- * of radios, checkboxes, choices, date or time goes under its legend. Each other field goes under
- * its label.
+ * Gives a step's fields a Form that also records them for the step, by name, so Check your answers
+ * can list each question the step asks.
  */
-function rowsOf(step: HTMLElement, index: number, notAnswered: string): Row[] {
-  const rows: Row[] = [];
-  const grouped = new Set<Element>();
-  const controls = step.querySelectorAll<HTMLInputElement>(
-    "input:not([type=hidden]):not([type=button]):not([type=submit]), textarea, select",
+function StepFields({
+  index,
+  fields,
+  children,
+}: {
+  index: number;
+  fields: RefObject<Map<number, Map<string, FormField>>>;
+  children: ReactNode;
+}) {
+  const form = useContext(FormContext);
+  const parent = form?.register;
+  const register = useCallback(
+    (name: string, field: FormField) => {
+      const unregister = parent?.(name, field);
+      const own = fields.current.get(index) ?? new Map<string, FormField>();
+      fields.current.set(index, own);
+      own.set(name, field);
+      return () => {
+        unregister?.();
+        if (own.get(name) === field) own.delete(name);
+      };
+    },
+    [parent, fields, index],
   );
-  for (const control of controls) {
-    // Skip what is hidden within the step, such as inside a closed follow-up question, or a Base UI
-    // control's own input that keeps its value out of sight. The step itself may be out of sight.
-    if (
-      hiddenWithin(control, step) ||
-      control.closest(".x-govuk-ui-conditional:not([data-open])") ||
-      control.matches('[aria-hidden="true"], [tabindex="-1"]')
-    )
-      continue;
-    const group = control.closest(
-      ".x-govuk-ui-fieldset:has(> .x-govuk-ui-choices, > .x-govuk-ui-choice-list, .x-govuk-ui-date-input, .x-govuk-ui-time-input)",
-    );
-    const inChoices =
-      control.matches("[type=radio], [type=checkbox], .x-govuk-ui-choice-list-other") ||
-      control.closest(".x-govuk-ui-date-input, .x-govuk-ui-time-input");
-    if (group && inChoices) {
-      if (grouped.has(group)) continue;
-      grouped.add(group);
-      const legend = wordsOf(group.querySelector(":scope > legend"));
-      const values: string[] = [];
-      // A time's box is a date's box too, so the time is looked for first.
-      const time = group.querySelector(".x-govuk-ui-time-input");
-      const date = time ? null : group.querySelector(".x-govuk-ui-date-input");
-      if (time) {
-        const parts = [...time.querySelectorAll<HTMLInputElement>("input")].map((part) =>
-          part.value.trim(),
-        );
-        if (parts[0])
-          values.push(`${parts[0]}:${parts[1] || "00"}${parts[2] ? ` ${parts[2]}` : ""}`);
-      } else if (date) {
-        const [day, month, year] = [...date.querySelectorAll<HTMLInputElement>("input")].map(
-          (part) => part.value.trim(),
-        );
-        if (day || month || year) {
-          const real = dateFromParts({ day: day ?? "", month: month ?? "", year: year ?? "" });
-          values.push(
-            real
-              ? `${real.getDate()} ${MONTHS[real.getMonth()]} ${real.getFullYear()}`
-              : [day, month, year].join("/"),
-          );
-        }
-      } else {
-        for (const choice of group.querySelectorAll<HTMLInputElement>(
-          "input[type=radio]:checked, input[type=checkbox]:checked",
-        ))
-          if (choice.closest(".x-govuk-ui-fieldset") === group)
-            values.push(wordsOf(choice.labels?.[0]));
-        const other = group.querySelector<HTMLInputElement>(".x-govuk-ui-choice-list-other[name]");
-        if (other?.value.trim()) values.push(other.value.trim());
-      }
-      const first = group.querySelector<HTMLElement>("input");
-      rows.push({ step: index, label: legend, values, id: first?.id ?? "" });
-      continue;
-    }
-    // A Select shows its choice in its trigger, and a hidden input keeps its value.
-    const label =
-      wordsOf(control.labels?.[0]) ||
-      control.getAttribute("aria-label") ||
-      wordsOf(document.getElementById(control.getAttribute("aria-labelledby") ?? ""));
-    const shown = control.value;
-    rows.push({ step: index, label, values: shown.trim() ? [shown.trim()] : [], id: control.id });
-  }
-  // Each Select, whose value is in a hidden input beside the button that shows it.
-  for (const select of step.querySelectorAll(".x-govuk-ui-select-trigger")) {
-    if (hiddenWithin(select, step) || select.closest(".x-govuk-ui-conditional:not([data-open])"))
-      continue;
-    const field = select.closest(".x-govuk-ui-field");
-    const hidden = field?.querySelector<HTMLInputElement>("input[type=hidden][name]");
-    rows.push({
-      step: index,
-      label: wordsOf(field?.querySelector("label")),
-      values: hidden?.value ? [wordsOf(select.querySelector(".x-govuk-ui-select-value"))] : [],
-      id: select.id,
-    });
-  }
-  for (const row of rows) if (row.values.length === 0) row.values = [notAnswered];
-  return rows;
+  const value = useMemo(() => form && { ...form, register }, [form, register]);
+  return <FormContext value={value}>{children}</FormContext>;
 }
 
 /**
@@ -341,6 +270,8 @@ export function FormSteps({
   const [skipped, setSkipped] = useState(() => new Set(saved?.skipped ?? []));
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
   const [rows, setRows] = useState<Row[]>([]);
+  // The fields each step asks, by name, as they register with the Form.
+  const stepFields = useRef(new Map<number, Map<string, FormField>>());
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const returning = useRef(false);
@@ -392,25 +323,39 @@ export function FormSteps({
       window.history.pushState({ ...window.history.state, [historyKey]: where }, "");
   };
   const summaryRows = (index: number, skipping: Set<number>): Row[] => {
-    const element = form.current?.querySelector<HTMLElement>(`[data-step="${index}"]`);
-    if (!element) return [];
-    const each = rowsOf(element, index, notAnsweredLabel);
+    if (!form.current) return [];
+    const data = new FormData(form.current);
+    // The step's questions in the page's order, leaving out any users cannot see.
+    const place = (id: string) => document.getElementById(id);
+    const asked = [...(stepFields.current.get(index) ?? [])]
+      .filter(([, field]) => field.shown?.() !== false)
+      .sort(([, a], [, b]) => {
+        const [first, second] = [place(a.id), place(b.id)];
+        if (!first || !second) return 0;
+        return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+      });
+    const each = asked.map(([name, field]): Row => {
+      const values = answersOf(field, name, data);
+      return {
+        step: index,
+        label: field.label,
+        values: values.length > 0 ? values : [notAnsweredLabel],
+        id: field.id,
+      };
+    });
     if (skipping.has(index))
       return each.map((row) => ({ ...row, values: [skippedLabel], skipped: true }));
     const own = steps[index]?.summary;
-    if (own && form.current) {
-      const title = steps[index]?.title;
-      const label = typeof title === "string" ? title : each[0]?.label;
+    if (own)
       return [
         {
           step: index,
-          label: label ?? "",
+          label: steps[index]?.title ?? each[0]?.label,
           values: [],
           id: each[0]?.id ?? "",
-          own: own(new FormData(form.current)),
+          own: own(data),
         },
       ];
-    }
     return each;
   };
 
@@ -453,12 +398,11 @@ export function FormSteps({
       if (wanted.startsWith("#")) {
         // A question asked again takes focus at its answer, or at the chosen answer of a group.
         const field = document.getElementById(wanted.slice(1));
-        const group = field?.closest(".x-govuk-ui-fieldset");
+        const group = field?.closest("fieldset:not([data-step])");
         return (group?.querySelector<HTMLElement>("input:checked") ?? field)?.focus();
       }
       const current = root.querySelector<HTMLElement>(`[data-step="${at}"]`);
-      const heading =
-        layout === "page" ? current?.querySelector<HTMLElement>("h1, .x-govuk-ui-legend h1") : null;
+      const heading = layout === "page" ? current?.querySelector<HTMLElement>("h1") : null;
       if (heading) {
         heading.tabIndex = -1;
         heading.focus();
@@ -677,7 +621,7 @@ export function FormSteps({
             label={row.label}
             actions={
               <SummaryListAction
-                hiddenText={`your answer to ${row.label}`}
+                hiddenText={<>your answer to {row.label}</>}
                 onClick={() => {
                   returning.current = true;
                   setSent(false);
@@ -689,10 +633,10 @@ export function FormSteps({
           >
             {"own" in row
               ? row.own
-              : row.values.map((value) => (
+              : row.values.map((value, place) => (
                   <span
-                    // An answer is listed once, so its words name it.
-                    key={value}
+                    // biome-ignore lint/suspicious/noArrayIndexKey: answers are listed in a fixed order.
+                    key={place}
                     className="x-govuk-ui-form-steps-answer"
                     data-muted={
                       row.skipped ||
@@ -736,7 +680,11 @@ export function FormSteps({
               <h3 className="x-govuk-ui-form-step-title">{each.title}</h3>
             ))}
           {each.hint && <div className="x-govuk-ui-hint">{each.hint}</div>}
-          <div className="x-govuk-ui-form-step-fields">{each.children}</div>
+          <div className="x-govuk-ui-form-step-fields">
+            <StepFields index={index} fields={stepFields}>
+              {each.children}
+            </StepFields>
+          </div>
         </fieldset>
       ))}
       {(reviewing || sent) && showSteps && summary}

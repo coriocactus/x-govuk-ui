@@ -53,6 +53,7 @@ export function InputOTP({
     hint,
     errorMessage,
     "aria-describedby": describedBy,
+    label,
   });
   // Split even-length codes into two groups, as they are often printed.
   const groupAt = maxLength >= 4 && maxLength % 2 === 0 ? maxLength / 2 : -1;

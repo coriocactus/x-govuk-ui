@@ -17,7 +17,15 @@ import {
   useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
-import { ErrorMessage, Field, type FieldProps, Hint, present, useFormDefault } from "./field";
+import {
+  ErrorMessage,
+  Field,
+  type FieldProps,
+  Hint,
+  present,
+  ShownContext,
+  useFormDefault,
+} from "./field";
 import { FieldsetLegend, type FieldsetProps, FieldsetRoot } from "./fieldset";
 import { duration, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
@@ -57,6 +65,8 @@ type Group = {
   registerExclusive: (value: string) => () => void;
   /** Tells the group each answer's control, so it can link its errors to the first one. */
   registerControl: (control: HTMLInputElement | null, id: string) => void;
+  /** Each answer's label, by its value, for Check your answers. */
+  labels: Map<string, ReactNode>;
   disabled: boolean;
 };
 
@@ -95,6 +105,19 @@ function useAnswer() {
 type List = { register: (value: string, box: HTMLElement | null) => void };
 
 const ListContext = createContext<List | null>(null);
+
+/**
+ * The group's answers, as Check your answers shows them, which are the chosen answers' labels.
+ */
+function useGroupAnswer(name: string) {
+  const [labels] = useState(() => new Map<string, ReactNode>());
+  const answer = useCallback(
+    (data: FormData) =>
+      data.getAll(name).map((value) => labels.get(String(value)) ?? String(value)),
+    [labels, name],
+  );
+  return { labels, answer };
+}
 
 /**
  * Where a group's errors link to. It is the group's id, unless no answer has it, as when every
@@ -219,6 +242,7 @@ export function RadiosRoot({
     (next) => next !== null && onValueChange?.(next),
   );
   const target = useLinkTarget(controlId);
+  const summary = useGroupAnswer(name);
   const group: Group = {
     kind: "radio",
     name,
@@ -229,9 +253,16 @@ export function RadiosRoot({
     choose: (item) => setValue(item),
     registerExclusive: noExclusive,
     registerControl: target.registerControl,
+    labels: summary.labels,
   };
   return (
-    <Field {...field} controlId={controlId} name={name} linkTo={linkTo ?? target.linkTo}>
+    <Field
+      answer={summary.answer}
+      {...field}
+      controlId={controlId}
+      name={name}
+      linkTo={linkTo ?? target.linkTo}
+    >
       <GroupContext value={group}>{children}</GroupContext>
     </Field>
   );
@@ -272,6 +303,7 @@ export function CheckboxesRoot({
     return () => void exclusive.current.delete(item);
   }, []);
   const target = useLinkTarget(controlId);
+  const summary = useGroupAnswer(name);
   const group: Group = {
     kind: "checkbox",
     name,
@@ -287,9 +319,16 @@ export function CheckboxesRoot({
     },
     registerExclusive,
     registerControl: target.registerControl,
+    labels: summary.labels,
   };
   return (
-    <Field {...field} controlId={controlId} name={name} linkTo={linkTo ?? target.linkTo}>
+    <Field
+      answer={summary.answer}
+      {...field}
+      controlId={controlId}
+      name={name}
+      linkTo={linkTo ?? target.linkTo}
+    >
       <GroupContext value={group}>{children}</GroupContext>
     </Field>
   );
@@ -707,9 +746,13 @@ export function ChoiceControl({
   );
 }
 
-/** An answer's label, for its control. */
+/** An answer's label, for its control. Check your answers shows it when the answer is chosen. */
 export function ChoiceLabel({ className = "", ...props }: ComponentPropsWithRef<"label">) {
   const answer = useAnswer();
+  const { labels } = useGroup();
+  useLayoutEffect(() => {
+    labels.set(answer.value, props.children);
+  });
   return (
     // biome-ignore lint/a11y/noLabelWithoutControl: The answer gives htmlFor.
     <label
@@ -756,6 +799,11 @@ export function ChoiceConditional({
 }: ChoiceConditionalProps) {
   const group = useGroup();
   const checked = group.isChecked(value);
+  // The fields inside show while the answer is chosen and the question around it shows.
+  const around = useContext(ShownContext);
+  const open = useRef(checked);
+  open.current = checked;
+  const shown = useCallback(() => open.current && around(), [around]);
   return (
     <div
       {...props}
@@ -765,7 +813,9 @@ export function ChoiceConditional({
       inert={!checked}
     >
       <div className="x-govuk-ui-conditional-inner">
-        <div className="x-govuk-ui-conditional-content">{children}</div>
+        <div className="x-govuk-ui-conditional-content">
+          <ShownContext value={shown}>{children}</ShownContext>
+        </div>
       </div>
     </div>
   );

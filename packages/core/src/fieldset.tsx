@@ -1,7 +1,7 @@
 "use client";
 
 import { type ComponentPropsWithRef, type ReactNode, useId } from "react";
-import { ErrorMessage, Field, Hint, present, useBoundField } from "./field";
+import { ErrorMessage, Field, Hint, present, useBoundField, useFieldSummary } from "./field";
 
 export type FieldsetProps = Omit<ComponentPropsWithRef<"fieldset">, "id"> & {
   /** The question or heading for the fields inside. */
@@ -91,7 +91,10 @@ export type FieldsetLegendProps = ComponentPropsWithRef<"legend"> & {
   pageHeading?: boolean;
 };
 
-/** A fieldset's legend, which is its question. It comes first in a `FieldsetRoot`. */
+/**
+ * A fieldset's legend, which is its question. It comes first in a `FieldsetRoot`. In a bound Field,
+ * its words are the question that Check your answers lists.
+ */
 export function FieldsetLegend({
   size = "small",
   pageHeading = false,
@@ -99,6 +102,7 @@ export function FieldsetLegend({
   children,
   ...props
 }: FieldsetLegendProps) {
+  useFieldSummary({ label: children });
   return (
     <legend
       {...props}

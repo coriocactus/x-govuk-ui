@@ -31,6 +31,8 @@ import {
   useContext,
   useEffect,
   useId,
+  useLayoutEffect,
+  useState,
 } from "react";
 import { duration, useMotionTiming } from "./motion";
 
@@ -42,15 +44,41 @@ export const present = (node: ReactNode) =>
   typeof node === "string" ? node.trim() !== "" : Boolean(node) || node === 0;
 
 /**
- * A Form's errors, by name, a way for its fields to say where they are, and the answers its fields
- * start with.
+ * A field as its Form knows it, by the name it submits under. The Form's error summary links to its
+ * `id`. FormSteps' Check your answers shows its `label` and its `answer`. The field keeps the object
+ * up to date as it renders, so the Form reads it only when it needs it.
+ */
+export type FormField = {
+  /** Where the error summary links to. */
+  id: string;
+  /** The question, as the field's label or legend shows it. */
+  label?: ReactNode;
+  /**
+   * The answer, as Check your answers shows it, from the answers the form would send. A list shows
+   * one answer to a line. Without it, the summary shows what the field sends under its name.
+   */
+  answer?: (data: FormData) => ReactNode;
+  /** Whether users can see the field. A follow-up question shows only while its answer is chosen. */
+  shown?: () => boolean;
+};
+
+/**
+ * A Form's errors, by name, a way for its fields to say where they are and what they ask, and the
+ * answers its fields start with.
  * @internal
  */
 export const FormContext = createContext<{
-  errors: Partial<Record<string, string>>;
-  register: (name: string, id: string) => () => void;
+  errors: Partial<Record<string, ReactNode>>;
+  register: (name: string, field: FormField) => () => void;
   defaults?: Partial<Record<string, string[]>>;
 } | null>(null);
+
+/**
+ * Whether the part of the page around a field shows, such as a follow-up question that opens with
+ * its answer. A field outside any such part always shows.
+ * @internal
+ */
+export const ShownContext = createContext<() => boolean>(() => true);
 
 /**
  * The answer a field starts with when its Form has one for the field's `name`, such as an answer
@@ -76,6 +104,13 @@ export type UseFieldOptions = {
   errorMessage?: ReactNode;
   /** The caller's own descriptions, read before the hint and the error. */
   "aria-describedby"?: string;
+  /**
+   * The question, for the field's Form, as Check your answers lists it. A bound Field's `Label`
+   * or `FieldsetLegend` gives it.
+   */
+  label?: ReactNode;
+  /** The answer, as Check your answers shows it. See `FormField`. */
+  answer?: (data: FormData) => ReactNode;
 };
 
 /** The ids that tie a control to its label, hint and error message, in GOV.UK's scheme. */
@@ -86,6 +121,8 @@ export function useField({
   hint,
   errorMessage: own,
   "aria-describedby": describedBy,
+  label,
+  answer,
 }: UseFieldOptions) {
   const generated = useId();
   const controlId = id ?? `field-${generated}`;
@@ -97,12 +134,32 @@ export function useField({
   const invalid = present(errorMessage);
   const register = form?.register;
   const target = linkTo ?? controlId;
-  useEffect(
-    () => (name && register ? register(name, target) : undefined),
-    [name, target, register],
-  );
+  const shown = useContext(ShownContext);
+  // One object for the field's life, which the Form keeps. It is brought up to date at each render.
+  const [field] = useState<Entry>(() => {
+    const entry: Entry = {
+      id: target,
+      shown,
+      own: {},
+      given: {},
+      get label() {
+        return entry.own.label ?? entry.given.label;
+      },
+      get answer() {
+        return entry.own.answer ?? entry.given.answer;
+      },
+    };
+    return entry;
+  });
+  field.id = target;
+  field.shown = shown;
+  field.own.label = label;
+  field.own.answer = answer;
+  useEffect(() => (name && register ? register(name, field) : undefined), [name, register, field]);
   return {
     id: controlId,
+    /** What the field tells its Form. Its parts and its control fill in what it was not given. */
+    field,
     hintId,
     errorId,
     invalid,
@@ -119,8 +176,45 @@ export function useField({
   };
 }
 
+/**
+ * A field as `useField` keeps it. Its own label and answer, given to `useField`, come before those
+ * its parts give.
+ */
+type Entry = FormField & {
+  own: { label?: ReactNode; answer?: (data: FormData) => ReactNode };
+  given: { label?: ReactNode; answer?: (data: FormData) => ReactNode };
+};
+
 /** What a bound Field gives the parts inside it, which is `useField`'s result and its name. */
 type Bound = ReturnType<typeof useField> & { name?: string };
+
+/**
+ * Gives the bound Field around it its answer, for Check your answers. It renders nothing.
+ * @internal
+ */
+export function FieldAnswer({ answer }: { answer: (data: FormData) => ReactNode }) {
+  useFieldSummary({ answer });
+  return null;
+}
+
+/**
+ * Tells the bound Field around a part what it asks, such as its Label's words, or how its control
+ * shows the answer. The field's own `label` and `answer`, given to Field or `useField`, come first.
+ * @internal
+ */
+export function useFieldSummary(summary: {
+  label?: ReactNode;
+  answer?: (data: FormData) => ReactNode;
+}) {
+  const bound = useContext(FieldContext);
+  const entry = bound?.field;
+  // The label and answer change with each render, so they are kept at each one, with no state.
+  useLayoutEffect(() => {
+    if (!entry) return;
+    if ("label" in summary) entry.given.label = summary.label;
+    if ("answer" in summary) entry.given.answer = summary.answer;
+  });
+}
 
 const FieldContext = createContext<Bound | null>(null);
 
@@ -185,6 +279,12 @@ export type FieldProps = ComponentPropsWithRef<"div"> & {
   errorMessage?: ReactNode;
   /** In a bound field, the ids of your own descriptions, read before the hint and the error. */
   describedBy?: string;
+  /**
+   * In a bound field, the answer, as FormSteps' Check your answers shows it, from the answers the
+   * form would send. Without it, the field's control gives it, or else the summary shows what the
+   * field sends under its name.
+   */
+  answer?: (data: FormData) => ReactNode;
 };
 
 /**
@@ -198,6 +298,7 @@ export function Field({
   hasHint,
   errorMessage,
   describedBy,
+  answer,
   ...props
 }: FieldProps) {
   if (controlId === undefined)
@@ -209,7 +310,7 @@ export function Field({
   return (
     <BoundField
       {...props}
-      binding={{ id: controlId, name, linkTo, hasHint, errorMessage, describedBy }}
+      binding={{ id: controlId, name, linkTo, hasHint, errorMessage, describedBy, answer }}
     />
   );
 }
@@ -221,6 +322,7 @@ type Binding = {
   hasHint?: boolean;
   errorMessage?: ReactNode;
   describedBy?: string;
+  answer?: (data: FormData) => ReactNode;
 };
 
 /** A Field bound to its control's id, which ties its parts together through context. */
@@ -236,6 +338,7 @@ function BoundField({
     hint: binding.hasHint || undefined,
     errorMessage: binding.errorMessage,
     "aria-describedby": binding.describedBy,
+    answer: binding.answer,
   });
   return (
     <FieldContext value={{ ...field, name: binding.name }}>
@@ -266,6 +369,7 @@ export type LabelProps = ComponentPropsWithRef<"label"> & {
 /** Names a control. Pass the control's id as `htmlFor`, unless a bound Field gives it. */
 export function Label({ visuallyHidden = false, className = "", ...props }: LabelProps) {
   const field = useContext(FieldContext);
+  useFieldSummary({ label: props.children });
   return (
     // biome-ignore lint/a11y/noLabelWithoutControl: The caller or a bound Field passes htmlFor.
     <label

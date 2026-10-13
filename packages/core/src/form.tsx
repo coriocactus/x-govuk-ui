@@ -12,7 +12,7 @@ import {
 } from "react";
 import { AutoHeight } from "./auto-height";
 import { ErrorSummary, ErrorSummaryItem } from "./error-summary";
-import { FormContext } from "./field";
+import { FormContext, type FormField } from "./field";
 import { useMergedRef } from "./refs";
 
 /** A message for each answer that needs fixing, keyed by the name its field submits under. */
@@ -176,15 +176,15 @@ export function Form({
   const mergedRef = useMergedRef(form, ref);
   const [problems, setProblems] = useState<Problem[]>([]);
   const [attempt, setAttempt] = useState(0);
-  // Where each field is, by its name, so the summary can link to it.
-  const ids = useRef(new Map<string, string>());
+  // Each field, by its name, so the summary can link to it.
+  const fields = useRef(new Map<string, FormField>());
   // The answers when the errors were found, so the form can tell which have changed since.
   const found = useRef<FormData | null>(null);
 
-  const register = useCallback((name: string, id: string) => {
-    ids.current.set(name, id);
+  const register = useCallback((name: string, field: FormField) => {
+    fields.current.set(name, field);
     return () => {
-      if (ids.current.get(name) === id) ids.current.delete(name);
+      if (fields.current.get(name) === field) fields.current.delete(name);
     };
   }, []);
   // Fields read their starting answers once, so the first ones given are the ones kept.
@@ -209,13 +209,13 @@ export function Form({
   const show = (errors: FormErrors, data: FormData) => {
     const owned = new Map<string, string>();
     for (const [name, message] of Object.entries(errors)) {
-      const field = fieldOf(name, ids.current.keys());
+      const field = fieldOf(name, fields.current.keys());
       if (message && !owned.has(field)) owned.set(field, message);
     }
     const listed = [...owned].map(([name, message]) => ({
       name,
       message,
-      id: ids.current.get(name) ?? name,
+      id: fields.current.get(name)?.id ?? name,
     }));
     const place = (problem: Problem) => document.getElementById(problem.id);
     listed.sort((a, b) => {
@@ -243,7 +243,7 @@ export function Form({
       if (!element || !before) return;
       const data = new FormData(element);
       const now = Object.entries(validate?.(data) ?? {}).flatMap(([name, message]) =>
-        message ? [fieldOf(name, ids.current.keys())] : [],
+        message ? [fieldOf(name, fields.current.keys())] : [],
       );
       setProblems((current) => {
         const next = current.filter(

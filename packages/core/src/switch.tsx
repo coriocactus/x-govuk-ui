@@ -1,13 +1,14 @@
 "use client";
 
 import type { ComponentPropsWithRef, ReactNode } from "react";
-import { Hint, useField } from "./field";
+import { ErrorMessage, Field, Hint, useField } from "./field";
 
 export type SwitchProps = Omit<ComponentPropsWithRef<"input">, "type" | "role" | "size"> & {
   label: ReactNode;
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
+  errorMessage?: ReactNode;
   /** Called with the new state when the user turns it on or off. */
   onCheckedChange?: (checked: boolean) => void;
   /** `small` suits a dense list, such as a row of settings beside other controls. */
@@ -23,6 +24,7 @@ export function Switch({
   label,
   hint,
   hideLabel = false,
+  errorMessage,
   onCheckedChange,
   onChange,
   size = "medium",
@@ -31,9 +33,19 @@ export function Switch({
   "aria-describedby": describedBy,
   ...props
 }: SwitchProps) {
-  const field = useField({ id, hint, "aria-describedby": describedBy });
+  const field = useField({
+    id,
+    name: props.name,
+    hint,
+    errorMessage,
+    "aria-describedby": describedBy,
+    label,
+    // Check your answers says whether the setting is on.
+    answer: (data) => (props.name && data.has(props.name) ? "On" : "Off"),
+  });
   return (
-    <div
+    <Field
+      invalid={field.invalid}
       className={`x-govuk-ui-switch ${className}`.trim()}
       data-size={size === "small" ? "small" : undefined}
     >
@@ -42,6 +54,7 @@ export function Switch({
           {label}
         </label>
         <Hint id={field.hintId}>{hint}</Hint>
+        <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
       </span>
       <input
         type="checkbox"
@@ -55,6 +68,6 @@ export function Switch({
           onCheckedChange?.(event.target.checked);
         }}
       />
-    </div>
+    </Field>
   );
 }

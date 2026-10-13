@@ -13,6 +13,21 @@ import { useOverlaySound } from "./overlay";
 
 export type { DateParts };
 
+/** A date as Check your answers shows it, such as 5 January 2026, or as typed if it is no date. */
+function dateAnswer(data: FormData, name: string) {
+  const [day, month, year] = ["day", "month", "year"].map((part) =>
+    String(data.get(`${name}-${part}`) ?? "").trim(),
+  );
+  if (!day && !month && !year) return undefined;
+  const date = dateFromParts({ day: day ?? "", month: month ?? "", year: year ?? "" });
+  if (!date) return [day, month, year].join("/");
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 const numbers = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, index) => String(from + index));
 type Part = keyof DateParts;
@@ -97,7 +112,15 @@ export function DateInput({
 }: DateInputProps) {
   const generated = useId();
   const groupId = id ?? `date-${generated}`;
-  const field = useField({ id: groupId, name, linkTo: `${groupId}-day`, hint, errorMessage });
+  const field = useField({
+    id: groupId,
+    name,
+    linkTo: `${groupId}-day`,
+    hint,
+    errorMessage,
+    label: legend,
+    answer: (data) => (name ? dateAnswer(data, name) : undefined),
+  });
   // A Form can give the fields an answer to start with, such as one kept from an earlier visit.
   const savedDay = useFormDefault(name && `${name}-day`)?.[0];
   const savedMonth = useFormDefault(name && `${name}-month`)?.[0];

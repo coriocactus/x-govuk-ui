@@ -76,7 +76,21 @@ export function TimeInput({
 }: TimeInputProps) {
   const generated = useId();
   const groupId = id ?? `time-${generated}`;
-  const field = useField({ id: groupId, name, linkTo: `${groupId}-hour`, hint, errorMessage });
+  const field = useField({
+    id: groupId,
+    name,
+    linkTo: `${groupId}-hour`,
+    hint,
+    errorMessage,
+    label: legend,
+    answer: (data) => {
+      if (!name) return undefined;
+      const [hour, minute, period] = ["hour", "minute", "period"].map((part) =>
+        String(data.get(`${name}-${part}`) ?? "").trim(),
+      );
+      return hour ? `${hour}:${minute || "00"}${period ? ` ${period}` : ""}` : undefined;
+    },
+  });
   // A Form can give the fields an answer to start with, such as one kept from an earlier visit.
   const savedHour = useFormDefault(name && `${name}-hour`)?.[0];
   const savedMinute = useFormDefault(name && `${name}-minute`)?.[0];

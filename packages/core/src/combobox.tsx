@@ -44,6 +44,13 @@ type Shared = Omit<
   className?: string;
 };
 
+/** The labels of the options sent, for Check your answers. */
+function labelsOf(options: readonly ComboboxOption[], sent: FormDataEntryValue[]) {
+  return sent
+    .filter((value): value is string => typeof value === "string" && value !== "")
+    .map((value) => options.find((option) => option.value === value)?.label ?? value);
+}
+
 /** The part of an option's label that matches what was typed, in bold. */
 function Match({ label, query }: { label: string; query: string }) {
   const at = query ? label.toLowerCase().indexOf(query.trim().toLowerCase()) : -1;
@@ -152,10 +159,17 @@ export function Combobox({
   className = "",
   ...props
 }: ComboboxProps) {
-  const field = useField({ id, name, hint, errorMessage });
+  const options = useMemo(() => items.map(optionOf), [items]);
+  const field = useField({
+    id,
+    name,
+    hint,
+    errorMessage,
+    label,
+    answer: (data) => labelsOf(options, name ? data.getAll(name) : []),
+  });
   // A Form can give the field an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(name)?.[0];
-  const options = useMemo(() => items.map(optionOf), [items]);
   const find = (wanted: string | null | undefined) =>
     wanted == null ? wanted : (options.find((option) => option.value === wanted) ?? null);
   const [query, setQuery] = useState("");
@@ -229,10 +243,17 @@ export function MultiSelect({
   className = "",
   ...props
 }: MultiSelectProps) {
-  const field = useField({ id, name, hint, errorMessage });
+  const options = useMemo(() => items.map(optionOf), [items]);
+  const field = useField({
+    id,
+    name,
+    hint,
+    errorMessage,
+    label,
+    answer: (data) => labelsOf(options, name ? data.getAll(name) : []),
+  });
   // A Form can give the field its answers to start with, such as ones kept from an earlier visit.
   const saved = useFormDefault(name);
-  const options = useMemo(() => items.map(optionOf), [items]);
   const findAll = (wanted: string[] | undefined) =>
     wanted?.flatMap((each) => options.filter((option) => option.value === each));
   const [query, setQuery] = useState("");

@@ -117,7 +117,7 @@ export type SummaryListActionProps = Omit<HTMLAttributes<HTMLElement>, "onClick"
   /** What the action does. */
   children?: ReactNode;
   /** Says what it changes, for screen readers, such as "name" for "Change name". */
-  hiddenText?: string;
+  hiddenText?: ReactNode;
   /** Renders a router's link instead of an anchor. */
   render?: AnchorProps["render"];
 };

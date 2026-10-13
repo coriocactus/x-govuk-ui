@@ -43,7 +43,7 @@ import {
   useState,
 } from "react";
 import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "x-govuk-ui";
-import { useMergedRef } from "x-govuk-ui/internal";
+import { parseHtmlTree, treeText, useMergedRef } from "x-govuk-ui/internal";
 import { registerAttachments } from "./editor-attachment-behaviour";
 import { attachmentState } from "./editor-attachment-state";
 import { AttachmentNode, EmbedNode, GalleryNode } from "./editor-attachments";
@@ -359,6 +359,13 @@ export function Editor({
     hint,
     errorMessage: errorMessage ?? (waiting ? labels.uploadsBusy : undefined),
     "aria-describedby": describedBy,
+    label,
+    // Check your answers shows the document's words, without its markup.
+    answer: (data) => {
+      const sent = name ? data.get(name) : null;
+      if (typeof sent !== "string" || !sent.trim()) return undefined;
+      return format === "html" ? treeText(parseHtmlTree(sent)) : sent;
+    },
   });
   const labelId = `${field.id}-label`;
   const countId = `${field.id}-info`;

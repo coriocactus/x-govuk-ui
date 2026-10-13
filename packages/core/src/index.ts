@@ -231,6 +231,7 @@ export {
   type ErrorMessageProps,
   Field,
   type FieldProps,
+  type FormField,
   Hint,
   Label,
   type LabelProps,

@@ -85,6 +85,8 @@ export const FormContext = createContext<{
   errorTitle?: ReactNode;
   /** Tells the Form that a FormErrorSummary of a service's own shows its errors. */
   addSummary?: () => () => void;
+  /** Whether a part of a service's own shows the errors now, read as focus moves. */
+  claimed?: () => boolean;
   register: (name: string, field: FormField) => () => void;
   defaults?: Partial<Record<string, string[]>>;
   /**

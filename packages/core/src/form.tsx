@@ -250,8 +250,10 @@ export function Form({
       setSummaries((count) => count - 1);
     };
   }, []);
+  const claimed = useCallback(() => shown.current > 0, []);
   const context = useMemo(
     () => ({
+      claimed,
       errors: Object.fromEntries(problems.map(({ name, message }) => [name, message])),
       problems,
       attempt,
@@ -260,7 +262,7 @@ export function Form({
       register,
       defaults,
     }),
-    [problems, attempt, errorTitle, addSummary, register, defaults],
+    [problems, attempt, errorTitle, addSummary, claimed, register, defaults],
   );
 
   /** Shows the errors, in the order of their fields, and says whether there were any. */
@@ -361,7 +363,7 @@ export function Form({
         {/* The summary opens above the fields, and the fields move down smoothly to make room. A
             FormErrorSummary of a service's own shows the errors where it is placed instead. */}
         <AutoHeight className="x-govuk-ui-form-summary">
-          {errorSummary && summaries === 0 && <Summary />}
+          {errorSummary && summaries === 0 && <Summary own />}
         </AutoHeight>
         <div className="x-govuk-ui-form-fields">{children}</div>
       </form>
@@ -392,8 +394,23 @@ export function useFormErrors({
 }
 
 /** The Form's errors, in an Error summary, once there are any. @internal */
-function Summary({ title, description }: Pick<ErrorSummaryProps, "title" | "description">) {
+function Summary({
+  title,
+  description,
+  own = false,
+}: Pick<ErrorSummaryProps, "title" | "description"> & {
+  /** Whether it is the Form's own summary, which a part of a service's own can take the place of. */
+  own?: boolean;
+}) {
   const form = useContext(FormContext);
+  const box = useRef<HTMLDivElement>(null);
+  const attempt = form?.attempt ?? 0;
+  const claimed = form?.claimed;
+  // The Form's own summary is drawn with the errors before a part of a service's own that comes
+  // with them can take its place. It takes focus only if none has, so it takes none from that part.
+  useEffect(() => {
+    if (own && attempt > 0 && !claimed?.()) box.current?.focus();
+  }, [own, attempt, claimed]);
   const problems = form?.problems ?? [];
   if (problems.length === 0) return null;
   const loose = problems.filter((problem) => !problem.id);
@@ -401,6 +418,8 @@ function Summary({ title, description }: Pick<ErrorSummaryProps, "title" | "desc
     // A new attempt opens a new summary, which takes focus again.
     <div key={form?.attempt} data-sound-enter="error">
       <ErrorSummary
+        ref={box}
+        autoFocus={!own}
         title={title ?? form?.errorTitle}
         description={
           description || loose.length > 0 ? (

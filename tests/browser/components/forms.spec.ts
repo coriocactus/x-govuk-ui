@@ -79,6 +79,26 @@ test("a form checks every answer when sent, and its date can come from the calen
   await expect.poll(async () => Math.abs((await offset()) - before)).toBeLessThan(1);
 });
 
+test("a list of errors of a service's own, drawn with the errors, keeps focus", async ({
+  frame,
+  open,
+  playground,
+}) => {
+  await open("form");
+  await playground.set("ownSummary", true);
+  await frame.getByRole("button", { name: "Continue" }).click();
+  // The Form draws its own summary with the errors, before the example's list takes its place, but
+  // takes no focus from the list.
+  const own = frame.locator(".preview-own-errors");
+  await expect(own).toBeFocused();
+  await expect(frame.locator(".x-govuk-ui-error-summary")).toHaveCount(0);
+  await expect(own.getByRole("link")).toHaveText([
+    "Enter an email address in the correct format, like name@example.com",
+    "Enter your date of birth",
+    "Select how long you need your licence for",
+  ]);
+});
+
 test("a message about the whole form shows in the summary without a link", async ({
   frame,
   open,

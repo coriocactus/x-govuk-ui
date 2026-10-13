@@ -1026,6 +1026,11 @@ const entries = {
         needs: [when("example", "stages")],
         restart: true,
       }),
+      toggle("ownSummary", false, {
+        note: "Shows the errors in a list of the example's own, drawn only while there are some, from useFormErrors({ summary: true }).",
+        needs: [when("example", "page")],
+        restart: true,
+      }),
       toggle("fail", false, {
         note: "The answers fail to save the first time, as a server error would. In stages, the rating does.",
         needs: [when("example", "page", "stages")],

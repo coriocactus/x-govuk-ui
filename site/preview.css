@@ -910,6 +910,29 @@
   line-height: 1.11;
   font-weight: 700;
 }
+/* The Form example's own list of errors, in place of the Error summary. */
+.preview-own-errors {
+  margin-bottom: 30px;
+  padding: 4px 0 4px 16px;
+  border-left: 5px solid var(--x-govuk-ui-error);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.preview-own-errors:focus {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 3px;
+}
+.preview-own-errors h2 {
+  margin: 0 0 8px;
+  font-size: 19px;
+}
+.preview-own-errors ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.preview-own-errors a {
+  color: var(--x-govuk-ui-error);
+}
 /* Among a form's fields, the form's gap is part of the heading's space. */
 .x-govuk-ui-form-fields > .preview-page-heading {
   margin-bottom: calc(30px - var(--x-govuk-ui-form-gap));

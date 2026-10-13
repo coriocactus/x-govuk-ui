@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   Button,
   DateInput,
@@ -23,6 +23,7 @@ import {
   Textarea,
   ToggleGroup,
   ToggleGroupItem,
+  useFormErrors,
   useFormSteps,
   useFormStepsAnswers,
 } from "x-govuk-ui";
@@ -43,6 +44,8 @@ type Props = {
   history?: boolean;
   /** The rating fails to save the first time, as a server error would. */
   fail?: boolean;
+  /** Shows the errors in a list of the example's own, in place of the Error summary. */
+  ownSummary?: boolean;
   /** Adds a step asked with other kinds of field, which Check your answers lists too. */
   moreKinds?: boolean;
   /** Starts on the added step, as a link to one question would. */
@@ -76,7 +79,12 @@ export default function FormExample({ example = "page", ...props }: Props) {
 }
 
 /** A page of questions in a service, as GOV.UK lays it out, read from the top left. */
-function OnePage({ errorTitle = "There is a problem", titlePrefix = true, fail = false }: Props) {
+function OnePage({
+  errorTitle = "There is a problem",
+  titlePrefix = true,
+  fail = false,
+  ownSummary = false,
+}: Props) {
   const [ready, setReady] = useState("");
   const failed = useRef(false);
   return (
@@ -112,7 +120,7 @@ function OnePage({ errorTitle = "There is a problem", titlePrefix = true, fail =
         }}
       >
         {/* GOV.UK puts the error summary above the page's heading. */}
-        <FormErrorSummary />
+        {ownSummary ? <OwnErrors /> : <FormErrorSummary />}
         <h1 className="preview-page-heading">Your details</h1>
         <Input
           id="email"
@@ -143,6 +151,36 @@ function OnePage({ errorTitle = "There is a problem", titlePrefix = true, fail =
         </p>
       </Form>
     </ServicePage>
+  );
+}
+
+/** The errors in a list of the example's own, drawn only while there are some, as a service may. */
+function OwnErrors() {
+  const form = useFormErrors();
+  return form?.errors.length ? <OwnErrorList /> : null;
+}
+
+/**
+ * Takes the Error summary's place. The Form then moves focus nowhere, so the list moves it to
+ * itself as it comes, and again as the form is sent with errors again.
+ */
+function OwnErrorList() {
+  const form = useFormErrors({ summary: true });
+  const box = useRef<HTMLElement>(null);
+  const attempt = form?.attempt;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: focus moves again on each attempt.
+  useLayoutEffect(() => box.current?.focus(), [attempt]);
+  return (
+    <section ref={box} tabIndex={-1} className="preview-own-errors" aria-labelledby="own-errors">
+      <h2 id="own-errors">Check these answers</h2>
+      <ul>
+        {form?.errors.map((error) => (
+          <li key={error.name}>
+            {error.id ? <a href={`#${error.id}`}>{error.message}</a> : error.message}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

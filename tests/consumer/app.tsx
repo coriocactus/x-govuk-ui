@@ -32,3 +32,7 @@ export function Page() {
 // A component that does not exist has no words.
 // @ts-expect-error
 export const nowhere: Labels = { nothing: {} };
+
+// The page's language is the provider's own `locale`, not the charts'.
+// @ts-expect-error
+export const twice: Labels = { chart: { locale: "cy" } };

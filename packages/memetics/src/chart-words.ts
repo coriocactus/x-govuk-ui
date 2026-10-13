@@ -8,9 +8,12 @@
 import type {} from "x-govuk-ui";
 
 declare module "x-govuk-ui" {
-  /** The charts' words, which a LabelsProvider or a chart's `labels` can change. */
+  /**
+   * The charts' words, which a LabelsProvider or a chart's `labels` can change. Their language is
+   * the provider's own `locale`, as every component's is.
+   */
   interface ComponentLabels {
-    chart: ChartLabels;
+    chart: Omit<ChartLabels, "locale">;
   }
 }
 
@@ -68,8 +71,9 @@ export type ChartLabels = {
   /** A calendar heat map's table, heading its rows. */
   weekBeginning: string;
   /**
-   * The language the charts write their figures in by default, such as "cy" for Welsh. A calendar
-   * heat map also names its months and days and writes its dates in it.
+   * The language a chart writes its figures in, such as "cy" for Welsh. A calendar heat map also
+   * names its months and days and writes its dates in it. In a chart's own `labels`, it comes
+   * before a LabelsProvider's `locale`.
    */
   locale: string;
 };

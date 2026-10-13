@@ -409,6 +409,25 @@ test("comboboxes, file uploads, one-time codes, sliders and the editor are their
   expect(same(editor)).toBe(same(composedEditor));
   expect(editor).toContain('id="notes-label"');
   expect(editor).toContain('aria-describedby="notes-hint notes-info"');
+  // Outside a bound Field, the label and the box share the editor's own id, so the document is
+  // still named, and two editors are named apart.
+  const bare = () => (
+    <EditorRoot>
+      <EditorLabel>Notes</EditorLabel>
+      <EditorBox />
+    </EditorRoot>
+  );
+  const two = renderToStaticMarkup(
+    <>
+      {bare()}
+      {bare()}
+    </>,
+  );
+  const labels = [...two.matchAll(/<label[^>]* id="([^"]+)"/g)].map((match) => match[1]);
+  const named = [...two.matchAll(/aria-labelledby="([^"]+)"/g)].map((match) => match[1]);
+  expect(labels).toHaveLength(2);
+  expect(new Set(labels).size).toBe(2);
+  for (const id of labels) expect(named).toContain(id);
 });
 
 test("a switch's control takes its id, name and descriptions from a Field of your own", () => {

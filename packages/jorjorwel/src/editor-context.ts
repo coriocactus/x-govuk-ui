@@ -135,6 +135,8 @@ export type EditorShared = {
   /**
    * The content's id, which the label names, and the label's own id. These, what describes the
    * content, whether it is invalid and whether it is capped come from the EditorBox around a part.
+   * Outside a box, the ids are the editor's own, which an EditorLabel and an EditorBox outside a
+   * bound Field share.
    */
   id: string;
   labelId: string;

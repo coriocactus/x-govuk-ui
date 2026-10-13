@@ -630,10 +630,12 @@ function EditorField({ errorMessage, ...props }: FieldProps) {
 export function EditorLabel({ onClick, ...props }: Omit<LabelProps, "htmlFor" | "id">) {
   const [editor] = useLexicalComposerContext();
   const field = useBoundField();
+  // Outside a bound Field, the label and the box share the editor's own id.
+  const { id } = useEditorContext("EditorLabel");
   return (
     <NamingLabel
       {...props}
-      id={`${field?.id ?? "editor"}-label`}
+      id={`${field?.id ?? id}-label`}
       onClick={chain(onClick, () => focusDocument(editor))}
     />
   );
@@ -660,8 +662,7 @@ export function EditorBox({
   const shared = useEditorContext("EditorBox");
   const { box, count, name, text, options } = shared;
   const field = useBoundField();
-  const generated = useId();
-  const id = field?.id ?? `editor-${generated}`;
+  const id = field?.id ?? shared.id;
   const countId = `${id}-info`;
   const describedBy =
     [field?.controlProps["aria-describedby"], count ? countId : undefined]
@@ -834,6 +835,8 @@ function EditorCore({
   children,
 }: RootProps) {
   const [editor] = useLexicalComposerContext();
+  // The editor's own id, for a label and a box outside a bound Field, which then share it.
+  const ownId = `editor-${useId()}`;
   useImperativeHandle<LexicalEditor | null, LexicalEditor | null>(editorRef, () => editor, [
     editor,
   ]);
@@ -1132,8 +1135,8 @@ function EditorCore({
   const shared: EditorShared = useMemo(
     () => ({
       editor,
-      id: "",
-      labelId: "",
+      id: ownId,
+      labelId: `${ownId}-label`,
       describedBy: undefined,
       invalid: false,
       capped: false,
@@ -1168,6 +1171,7 @@ function EditorCore({
     }),
     [
       editor,
+      ownId,
       waiting,
       name,
       count,

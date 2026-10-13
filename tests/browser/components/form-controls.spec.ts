@@ -445,6 +445,77 @@ test("the editor's tip follows Source behind More as the window narrows, and bac
   ).toEqual([]);
 });
 
+test("an editor's toolbar of its own keeps a group of its own whole, and never starts or ends its row on a keyline", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  // A loop of renders, or of resize observers, is an error event, not a thrown error.
+  await page.addInitScript(() => {
+    const seen: string[] = [];
+    Object.assign(window, { seenErrors: seen });
+    window.addEventListener("error", (event) => seen.push(event.message));
+  });
+  await open("editor");
+  await playground.set("tip", false);
+  await playground.set("ownToolbar", true);
+  const toolbar = frame.getByRole("toolbar", { name: "Formatting" });
+  const lists = ["Bulleted list", "Numbered list", "Checklist"];
+  const more = toolbar.getByRole("button", { name: "More formatting" });
+  // The row's items, in order, as the toolbar draws them once it has measured them.
+  const row = () =>
+    toolbar.evaluate((element) =>
+      element.hasAttribute("data-overflow")
+        ? [...element.querySelectorAll<HTMLElement>(":scope > [data-item]")]
+            .map((cell) => cell.dataset.item)
+            .join(" ")
+        : "measuring",
+    );
+  await expect
+    .poll(row)
+    .toBe(
+      "control control control control control separator control separator control control control control separator control control control",
+    );
+  // Narrowed step by step, as a window's edge is dragged, the row gives up items from its end, and
+  // no keyline is left at either end. The list group stays in the row whole, or waits behind More
+  // whole, never split.
+  const { width, height } = page.viewportSize()!;
+  const inRow = () =>
+    toolbar.evaluate(
+      (element, names) =>
+        names.filter((name) =>
+          [...element.querySelectorAll(":scope > [data-item] [aria-label]")].some(
+            (control) => control.getAttribute("aria-label") === name,
+          ),
+        ).length,
+      lists,
+    );
+  let step = width;
+  for (; step >= 400; step -= 40) {
+    await page.setViewportSize({ width: step, height });
+    await expect.poll(row).not.toBe("measuring");
+    const cells = (await row()).split(" ");
+    expect(cells[0]).toBe("control");
+    expect(cells.at(-1)).toBe("control");
+    const shown = await inRow();
+    expect([0, lists.length]).toContain(shown);
+    if (shown === 0) break;
+  }
+  expect(step).toBeGreaterThanOrEqual(400);
+  // Behind More, the lists are together.
+  await more.click();
+  const overflow = page.getByRole("toolbar", { name: "More formatting" });
+  for (const name of lists)
+    await expect(overflow.getByRole("button", { name, exact: true })).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await page.setViewportSize({ width, height });
+  await expect.poll(row).toContain("separator control control control control separator");
+  expect(
+    await page.evaluate(() => (window as unknown as { seenErrors: string[] }).seenErrors),
+  ).toEqual([]);
+});
+
 test("the editor takes part in a Form: its popovers send nothing, it waits for files, and Undo brings back an upload", async ({
   page,
   frame,

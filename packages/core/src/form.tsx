@@ -13,12 +13,7 @@ import {
   useState,
 } from "react";
 import { AutoHeight } from "./auto-height";
-import {
-  defaultErrorLabels,
-  ErrorSummary,
-  ErrorSummaryItem,
-  type ErrorSummaryProps,
-} from "./error-summary";
+import { defaultErrorLabels, ErrorSummary, ErrorSummaryItem } from "./error-summary";
 import { both } from "./events";
 import { FormContext, type FormField, present } from "./field";
 import { useLabels } from "./labels";

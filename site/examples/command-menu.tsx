@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import {
+  Button,
   CommandMenu,
   CommandMenuBestMatches,
   CommandMenuContent,
@@ -9,10 +10,24 @@ import {
   CommandMenuTrigger,
   rankCommandByName,
   shortcutKeys,
+  useCommandMenu,
 } from "x-govuk-ui";
 
 /** The language the service is in, which the service keeps for every part of its page. */
 const Language = createContext("English");
+
+/** What shows when nothing matches, with a way on to the commands for help. */
+function NothingFound() {
+  const menu = useCommandMenu();
+  return (
+    <>
+      No commands match “{menu?.search}”.{" "}
+      <Button variant="link" onClick={() => menu?.setSearch("help")}>
+        Look for help
+      </Button>
+    </>
+  );
+}
 
 /** The language now, inside the command that changes it. */
 function CurrentLanguage() {
@@ -49,7 +64,7 @@ export default function CommandMenuExample({
           disabled={disabled}
         >
           <CommandMenuTrigger />
-          <CommandMenuContent placeholder={placeholder}>
+          <CommandMenuContent placeholder={placeholder} empty={<NothingFound />}>
             <CommandMenuBestMatches
               rank={
                 ownRank

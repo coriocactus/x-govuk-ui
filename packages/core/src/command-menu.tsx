@@ -211,6 +211,10 @@ type Shared = {
   setOrder: (order: string[]) => void;
   navigated: boolean;
   back: (depth: number) => void;
+  /** Changes the search. */
+  setQuery: (query: string) => void;
+  /** Closes the menu. */
+  close: () => void;
   /** Tells the menu how a CommandMenuBestMatches ranks, while it is there. */
   rankWith: (best: BestMatches | null) => void;
   /** Tells the menu where each best match is drawn. */
@@ -380,6 +384,8 @@ export function CommandMenu({
               navigated,
               back,
               rankWith,
+              setQuery,
+              close: () => setOpen(false),
               setSlots,
             }}
           >
@@ -460,13 +466,40 @@ export type CommandMenuContentProps = ComponentPropsWithRef<"div"> & {
    * control that had focus before it opened.
    */
   finalFocus?: Dialog.Popup.Props["finalFocus"];
+  /**
+   * What shows when nothing matches the search, in place of its `empty` label, such as a button to
+   * make what was searched for. `useCommandMenu` gives the search.
+   */
+  empty?: ReactNode;
+  /**
+   * The help beneath the list, in place of its `help` and `helpBack` labels. Give null for none.
+   */
+  help?: ReactNode;
 };
+
+/** What `useCommandMenu` gives a part of the menu, such as an empty state of your own. */
+export type CommandMenuControls = {
+  /** What users have typed. */
+  search: string;
+  /** Changes the search, as typing does. */
+  setSearch: (search: string) => void;
+  /** Closes the menu. */
+  close: () => void;
+};
+
+/** The command menu around a part of it, such as an empty state of your own. Null outside one. */
+export function useCommandMenu(): CommandMenuControls | null {
+  const shared = useContext(SharedContext);
+  return shared && { search: shared.query, setSearch: shared.setQuery, close: shared.close };
+}
 
 /** The menu's dialog, with its search, its trail of pages and its list of commands. */
 export function CommandMenuContent({
   children,
   placeholder: ownPlaceholder,
   finalFocus,
+  empty,
+  help,
   className = "",
   ref,
   ...props
@@ -546,7 +579,7 @@ export function CommandMenuContent({
           {current?.label ?? ""}
         </span>
         {open && visible.length === 0 && order.length > 0 && (
-          <p className="x-govuk-ui-command-menu-empty">{labels.empty}</p>
+          <div className="x-govuk-ui-command-menu-empty">{empty ?? labels.empty}</div>
         )}
         <ScrollArea
           viewportRef={followScroller}
@@ -567,10 +600,16 @@ export function CommandMenuContent({
           </Autocomplete.List>
           <TrackOrder list={list} onOrder={setOrder} />
         </ScrollArea>
-        <p className="x-govuk-ui-command-menu-help">
-          {labels.help}
-          {stack.length > 0 && ` ${labels.helpBack}`}
-        </p>
+        {help !== null && (
+          <p className="x-govuk-ui-command-menu-help">
+            {help ?? (
+              <>
+                {labels.help}
+                {stack.length > 0 && ` ${labels.helpBack}`}
+              </>
+            )}
+          </p>
+        )}
       </Dialog.Popup>
     </Dialog.Portal>
   );

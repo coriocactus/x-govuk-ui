@@ -1850,7 +1850,8 @@ const entries = {
       reference("CommandMenuBestMatches", "{ label, limit, rank }", "Part"),
       reference("filter", "(search, command) => boolean", "matchesCommand"),
       reference("CommandMenuTrigger", "Button props and { render }", "Part"),
-      reference("CommandMenuContent", "{ placeholder, finalFocus, children }", "Part"),
+      reference("CommandMenuContent", "{ placeholder, finalFocus, empty, help, children }", "Part"),
+      reference("useCommandMenu", "() => { search, setSearch, close }", "Hook"),
     ],
     example: [
       text("placeholder", "Search commands…", { note: "CommandMenuContent's search placeholder." }),

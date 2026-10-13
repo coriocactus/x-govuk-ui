@@ -210,6 +210,7 @@ export {
   type CommandMenuCommand,
   CommandMenuContent,
   type CommandMenuContentProps,
+  type CommandMenuControls,
   CommandMenuGroup,
   type CommandMenuGroupProps,
   CommandMenuItem,
@@ -223,6 +224,7 @@ export {
   defaultCommandMenuLabels,
   matchesCommand,
   rankCommandByName,
+  useCommandMenu,
 } from "./command-menu";
 export { useControllableState } from "./controllable-state";
 export {

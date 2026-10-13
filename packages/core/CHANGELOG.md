@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Changed CommandMenu's empty state, `.x-govuk-ui-command-menu-empty`, from a paragraph to a `div`, so it can hold an empty state of a service's own. Select it by its class, not its element.
 - Changed FileUpload's `list` to a boolean, which leaves its list of files out when it is false. It was the input's `list` attribute, which a file input does not use. Remove any `list` you gave it.
 - Changed FormSteps' Check your answers heading, `.x-govuk-ui-form-steps-review-title`, from an `h2` to an `h1` on a page, and the title of the Panel that says the answers are sent from an `h2` to an `h1`. Select each by its class, not its element.
 - Renamed the classes of five components to start with the component's name, as every other component's do, so a class says which component it belongs to:
@@ -62,6 +63,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added `empty` and `help` to CommandMenuContent, in place of its `empty` label and the help beneath the list. `help={null}` leaves the help out. Added `useCommandMenu`, which gives a part of the menu the search, a way to change it and a way to close the menu, such as for an empty state that offers to make what was searched for.
 - Added `filter`, `inputValue`, `defaultInputValue` and `onInputValueChange` to Combobox, MultiSelect and their controls. A service hears the text as users type, such as to ask a server for options, and gives `filter={null}` to show the options it found as they are, or a `filter` of its own. Added `description` to a ComboboxOption, a line beneath its label in the list.
 - Added `files` and `defaultFiles` to FileUpload and FileUploadControl, so a service can control the chosen files, show a file it already has, such as for a record being changed, or take one away. The input sends the files the field shows. Added `list`, which, given false, leaves the list of files beneath the zone to the service, such as to draw them with FileChips.
 - Added `step`, `defaultStep` and `onStepChange` to Tour, so a service can open a tour at a step, such as from a help link, and hear each step change. An uncontrolled tour opens at `defaultStep`, unless it resumes where someone left it.

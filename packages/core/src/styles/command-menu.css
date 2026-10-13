@@ -232,7 +232,9 @@
   padding: 12px 17px;
   border-top: 1px solid var(--x-govuk-ui-line);
 }
+/* It holds the empty label, or an empty state of a service's own, and keeps a paragraph's space. */
 .x-govuk-ui-command-menu-empty {
+  margin: 1em 0;
   padding: 17px;
 }
 .x-govuk-ui-command-menu-empty:empty {

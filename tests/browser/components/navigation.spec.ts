@@ -267,8 +267,12 @@ test("command menu groups commands, opens pages and goes back", async ({ page, f
   await expect(search).toHaveAttribute("placeholder", "Search languages…");
   await search.press("Backspace");
   await expect(popup.getByRole("option", { name: /Change language/ })).toBeVisible();
+  // The example's own empty state says what was searched for, and offers a way on.
   await search.fill("zzz");
-  await expect(popup.getByText("No commands found.")).toBeVisible();
+  await expect(popup.getByText("No commands match “zzz”.")).toBeVisible();
+  await popup.getByRole("button", { name: "Look for help" }).click();
+  await expect(search).toHaveValue("help");
+  await expect(popup.getByRole("option", { name: /Get help/ })).toBeVisible();
   // A command named as typed shows first, among the best matches, and only there.
   await search.fill("get");
   await expect(popup.getByRole("group", { name: "Best matches" })).toBeVisible();

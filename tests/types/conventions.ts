@@ -206,3 +206,22 @@ export type WithoutRef = None<
       : Name;
   }[Exclude<keyof Components, Elementless | Described>]
 >;
+
+/**
+ * Links to a place on the same page, or away from the service, which no router follows. Every
+ * other part that renders a link takes `render`, for a router's link.
+ */
+type NotRouted = "SkipLink" | "ErrorSummaryItem" | "ExitThisPage";
+
+/** A part that renders a link takes an `href`. An SVG's `href` is no link, and an SVG has a `viewBox`. */
+export type LinkWithoutRender = None<
+  {
+    [Name in Exclude<keyof Components, NotRouted>]: "href" extends keyof PropsOf<Name>
+      ? "viewBox" extends keyof PropsOf<Name>
+        ? never
+        : "render" extends keyof PropsOf<Name>
+          ? never
+          : Name
+      : never;
+  }[Exclude<keyof Components, NotRouted>]
+>;

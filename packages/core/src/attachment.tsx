@@ -3,11 +3,13 @@
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Details } from "./details";
 import { useLabels } from "./labels";
-import { Link } from "./link";
+import { Link, type LinkProps } from "./link";
 
 export type AttachmentProps = Omit<ComponentPropsWithRef<"section">, "title"> & {
   title: ReactNode;
   href: string;
+  /** Renders a router's link in place of the title's anchor. */
+  render?: LinkProps["render"];
   /** The file's format, such as PDF or CSV, shown on its thumbnail and in its details. */
   format?: string;
   /** The file's size as it should read, such as "245 KB". */
@@ -57,6 +59,7 @@ export const defaultAttachmentLabels: AttachmentLabels = {
 export function Attachment({
   title,
   href,
+  render,
   format,
   size,
   pages,
@@ -97,7 +100,9 @@ export function Attachment({
       </div>
       <div className="x-govuk-ui-attachment-details">
         <Heading className="x-govuk-ui-attachment-title">
-          <Link href={href}>{title}</Link>
+          <Link href={href} render={render}>
+            {title}
+          </Link>
         </Heading>
         {facts.length > 0 && <p className="x-govuk-ui-attachment-facts">{facts.join(", ")}</p>}
         {accessibleFormatEmail && (

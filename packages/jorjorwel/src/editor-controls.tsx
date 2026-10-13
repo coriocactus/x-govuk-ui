@@ -46,6 +46,13 @@ export type EditorControlKind =
  * Every word the editor says, so a service can put them in Welsh, for example. A control's label
  * names it for screen readers and in its tooltip.
  */
+declare module "x-govuk-ui" {
+  /** The Editor's words, which a LabelsProvider or the Editor's `labels` can change. */
+  interface ComponentLabels {
+    editor: EditorLabels;
+  }
+}
+
 export type EditorLabels = Record<EditorControlKind, string> & {
   /** Names the toolbar. */
   toolbar: string;

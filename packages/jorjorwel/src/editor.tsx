@@ -43,7 +43,7 @@ import {
   useState,
 } from "react";
 import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "x-govuk-ui";
-import { parseHtmlTree, treeText, useMergedRef } from "x-govuk-ui/internal";
+import { parseHtmlTree, treeText, useLabels, useMergedRef } from "x-govuk-ui/internal";
 import { registerAttachments } from "./editor-attachment-behaviour";
 import { attachmentState } from "./editor-attachment-state";
 import { AttachmentNode, EmbedNode, GalleryNode } from "./editor-attachments";
@@ -349,7 +349,7 @@ export function Editor({
   // A form sent while files are uploading is stopped, and the field says why.
   const [waiting, setWaiting] = useState(false);
   // Kept while each word is the same, because labels given inline are a new object at each render.
-  const merged = { ...defaultEditorLabels, ...ownLabels };
+  const merged = useLabels("editor", defaultEditorLabels, ownLabels);
   const kept = useRef(merged);
   if (!sameEntries(kept.current, merged)) kept.current = merged;
   const labels = kept.current;

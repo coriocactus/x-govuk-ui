@@ -788,3 +788,12 @@ test("a labels provider gives every component inside it a service's words, and a
   const english = renderToStaticMarkup(<DateInput legend="Date of birth" />);
   for (const word of ["Day", "Month", "Year"]) expect(english).toContain(word);
 });
+
+test("an extension's component takes its words from a labels provider too", () => {
+  const html = renderToStaticMarkup(
+    <LabelsProvider labels={{ editor: { toolbar: "Fformatio" } }}>
+      <Editor label="Disgrifiad" />
+    </LabelsProvider>,
+  );
+  expect(html).toContain('aria-label="Fformatio"');
+});

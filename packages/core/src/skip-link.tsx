@@ -1,10 +1,20 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
+import { useLabels } from "./labels";
 
 export type SkipLinkProps = Omit<ComponentPropsWithRef<"a">, "href"> & {
   /** The id of the main content, with its hash. */
   href?: string;
+};
+
+/** The words Skip link writes, which a LabelsProvider can change. */
+export type SkipLinkLabels = {
+  skip: string;
+};
+
+export const defaultSkipLinkLabels: SkipLinkLabels = {
+  skip: "Skip to main content",
 };
 
 /**
@@ -14,11 +24,13 @@ export type SkipLinkProps = Omit<ComponentPropsWithRef<"a">, "href"> & {
  */
 export function SkipLink({
   href = "#main-content",
-  children = "Skip to main content",
+  children: ownChildren,
   className = "",
   onClick,
   ...props
 }: SkipLinkProps) {
+  const words = useLabels("skipLink", defaultSkipLinkLabels);
+  const children = ownChildren ?? words.skip;
   return (
     <a
       {...props}

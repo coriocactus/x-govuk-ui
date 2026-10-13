@@ -52,6 +52,10 @@ export const playfulThinkingStatuses = [
 
 /** The words Conversation writes, which a LabelsProvider can change. */
 export type ConversationLabels = {
+  /** The assistant's name, unless it is given one. */
+  assistant: string;
+  /** Names the log for screen readers, unless it is given a name. */
+  conversation: string;
   /** Names the user's messages for screen readers. */
   you: string;
   /** Tells screen readers that the assistant is writing a reply. */
@@ -61,6 +65,8 @@ export type ConversationLabels = {
 };
 
 export const defaultConversationLabels: ConversationLabels = {
+  assistant: "Service assistant",
+  conversation: "Conversation",
   you: "You",
   writing: (assistantName) => `${assistantName} is writing a reply`,
   thinking: defaultThinkingStatuses,
@@ -128,8 +134,8 @@ export type ConversationProps = ComponentPropsWithRef<"div"> & {
  */
 export function Conversation({
   children,
-  label = "Conversation",
-  assistantName = "Service assistant",
+  label: ownLabel,
+  assistantName: ownAssistantName,
   composer,
   empty: start,
   headingLevel = 3,
@@ -137,6 +143,9 @@ export function Conversation({
   ref,
   ...props
 }: ConversationProps) {
+  const words = useLabels("conversation", defaultConversationLabels);
+  const label = ownLabel ?? words.conversation;
+  const assistantName = ownAssistantName ?? words.assistant;
   const root = useRef<HTMLDivElement>(null);
   const empty = Children.toArray(children).length === 0;
   // The composer takes its place before the first frame, and only glides after that.

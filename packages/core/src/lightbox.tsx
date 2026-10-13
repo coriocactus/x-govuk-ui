@@ -85,12 +85,15 @@ function fly(photo: HTMLElement, thumbnail: Rect, toThumbnail: boolean) {
 
 /** The words Lightbox writes, which a LabelsProvider can change. */
 export type LightboxLabels = {
+  /** Names the gallery for screen readers, unless it is given a name. */
+  photos: string;
   close: string;
   previous: string;
   next: string;
 };
 
 export const defaultLightboxLabels: LightboxLabels = {
+  photos: "Photos",
   close: "Close",
   previous: "Previous photo",
   next: "Next photo",
@@ -110,11 +113,12 @@ export function Lightbox({
   images,
   rowHeight = 180,
   gap = 8,
-  label = "Photos",
+  label: ownLabel,
   className = "",
   ...props
 }: LightboxProps) {
   const words = useLabels("lightbox", defaultLightboxLabels);
+  const label = ownLabel ?? words.photos;
   const [index, setIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState(0);
   const [closing, setClosing] = useState(false);

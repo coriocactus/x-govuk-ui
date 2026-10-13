@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { Mosaic } from "./image-mosaic";
+import { useLabels } from "./labels";
 import { useMotionTiming } from "./motion";
 import { TextShimmer } from "./text-shimmer";
 
@@ -61,6 +62,16 @@ function load(src: string, cache: Map<string, Promise<HTMLImageElement>>) {
   return image;
 }
 
+/** The words Image generation writes, which a LabelsProvider can change. */
+export type ImageGenerationLabels = {
+  /** What is being made, while it is made. */
+  creating: string;
+};
+
+export const defaultImageGenerationLabels: ImageGenerationLabels = {
+  creating: "Creating image",
+};
+
 /**
  * An image being made by an agent. Most services report only when the image is done. Until then, a
  * mosaic of small cells fills the frame, with ridges of brand tint flowing through it and cells
@@ -79,10 +90,12 @@ export function ImageGeneration({
   width,
   height,
   progress,
-  label = "Creating image",
+  label: ownLabel,
   className = "",
   ...props
 }: ImageGenerationProps) {
+  const words = useLabels("imageGeneration", defaultImageGenerationLabels);
+  const label = ownLabel ?? words.creating;
   const canvas = useRef<HTMLCanvasElement>(null);
   const tones = useRef<HTMLSpanElement>(null);
   const mosaic = useRef<Mosaic | null>(null);

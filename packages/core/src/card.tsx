@@ -1,6 +1,7 @@
 "use client";
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
+import { useLabels } from "./labels";
 import { Tag } from "./tag";
 
 export type MediaCreditProps = Omit<ComponentPropsWithRef<"span">, "prefix"> & {
@@ -10,6 +11,16 @@ export type MediaCreditProps = Omit<ComponentPropsWithRef<"span">, "prefix"> & {
   prefix?: string;
 };
 
+/** The words Media credit writes, which a LabelsProvider can change. */
+export type MediaCreditLabels = {
+  /** Comes before the name of who made the photo. */
+  photoBy: string;
+};
+
+export const defaultMediaCreditLabels: MediaCreditLabels = {
+  photoBy: "Photo by",
+};
+
 /**
  * A photo's credit, as a small Tag in its bottom right corner. It shows while the pointer is over
  * the photo or over its container, such as a Card, and while something in the container has
@@ -17,10 +28,12 @@ export type MediaCreditProps = Omit<ComponentPropsWithRef<"span">, "prefix"> & {
  */
 export function MediaCredit({
   children,
-  prefix = "Photo by",
+  prefix: ownPrefix,
   className = "",
   ...props
 }: MediaCreditProps) {
+  const words = useLabels("mediaCredit", defaultMediaCreditLabels);
+  const prefix = ownPrefix ?? words.photoBy;
   return (
     <span {...props} className={`x-govuk-ui-media-credit ${className}`.trim()}>
       <Tag colour="grey" className="x-govuk-ui-media-credit-tag">

@@ -14,6 +14,7 @@ import {
   useState,
 } from "react";
 import { Button, type ButtonProps } from "./button";
+import { useLabels } from "./labels";
 import { useMotionTiming } from "./motion";
 
 type CarouselContextValue = {
@@ -164,8 +165,21 @@ const arrow = (path: string) => (
 /** The arrows are Buttons, and take a Button's props. */
 export type CarouselButtonProps = Omit<ButtonProps, "children"> & { label?: string };
 
+/** The words Carousel writes, which a LabelsProvider can change. */
+export type CarouselLabels = {
+  previous: string;
+  next: string;
+};
+
+export const defaultCarouselLabels: CarouselLabels = {
+  previous: "Previous slide",
+  next: "Next slide",
+};
+
 /** Moves to the previous slide. It is unavailable on the first. */
-export function CarouselPrevious({ label = "Previous slide", ...props }: CarouselButtonProps) {
+export function CarouselPrevious({ label: ownLabel, ...props }: CarouselButtonProps) {
+  const words = useLabels("carousel", defaultCarouselLabels);
+  const label = ownLabel ?? words.previous;
   const carousel = useCarousel("CarouselPrevious");
   return (
     <Button
@@ -183,7 +197,9 @@ export function CarouselPrevious({ label = "Previous slide", ...props }: Carouse
 }
 
 /** Moves to the next slide. It is unavailable on the last. */
-export function CarouselNext({ label = "Next slide", ...props }: CarouselButtonProps) {
+export function CarouselNext({ label: ownLabel, ...props }: CarouselButtonProps) {
+  const words = useLabels("carousel", defaultCarouselLabels);
+  const label = ownLabel ?? words.next;
   const carousel = useCarousel("CarouselNext");
   return (
     <Button

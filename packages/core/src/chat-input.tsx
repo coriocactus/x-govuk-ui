@@ -28,6 +28,16 @@ import { Tooltip } from "./tooltip";
 
 /** The words Chat input writes, which a LabelsProvider can change. */
 export type ChatInputLabels = {
+  /** Names the choice of model. */
+  model: string;
+  /** Names the button that attaches a file. */
+  attach: string;
+  /** Names the list of what goes with the message. */
+  attachments: string;
+  /** The message box's placeholder. */
+  placeholder: string;
+  /** Names the message box, unless it is given a name. */
+  message: string;
   /** Names the button that sends the message. */
   send: string;
   /** Names the button that stops the reply. */
@@ -41,6 +51,11 @@ export type ChatInputLabels = {
 };
 
 export const defaultChatInputLabels: ChatInputLabels = {
+  model: "Model",
+  attach: "Attach a file",
+  attachments: "Attached files",
+  placeholder: "Write a message…",
+  message: "Message",
   send: "Send",
   stop: "Stop the reply",
   dictate: "Dictate",
@@ -154,8 +169,8 @@ const stopIcon = (
  * else that goes with the message.
  */
 export function ChatInput({
-  label = "Message",
-  placeholder = "Write a message…",
+  label: ownLabel,
+  placeholder: ownPlaceholder,
   value,
   defaultValue = "",
   onValueChange,
@@ -176,7 +191,9 @@ export function ChatInput({
   className = "",
   ...props
 }: ChatInputProps) {
-  const labels = useLabels("chatInput", defaultChatInputLabels);
+  const words = useLabels("chatInput", defaultChatInputLabels);
+  const label = ownLabel ?? words.message;
+  const placeholder = ownPlaceholder ?? words.placeholder;
   const field = useField({ id });
   const [text, setText] = useControllableState(value, defaultValue, onValueChange);
   const area = useRef<HTMLTextAreaElement>(null);
@@ -308,7 +325,7 @@ export function ChatInput({
               size="small-icon"
               variant="outline"
               className="x-govuk-ui-chat-input-send"
-              aria-label={labels.stop}
+              aria-label={words.stop}
               onClick={onStop}
             >
               {stopIcon}
@@ -319,7 +336,7 @@ export function ChatInput({
               size="small-icon"
               variant="outline"
               className="x-govuk-ui-chat-input-send"
-              aria-label={labels.send}
+              aria-label={words.send}
               aria-disabled={!ready || disabled || undefined}
             >
               {sendIcon}
@@ -338,10 +355,12 @@ export type ChatInputAttachmentsProps = FileChipsProps;
  * list is named "Attached files".
  */
 export function ChatInputAttachments({
-  label = "Attached files",
+  label: ownLabel,
   className = "",
   ...props
 }: ChatInputAttachmentsProps) {
+  const words = useLabels("chatInput", defaultChatInputLabels);
+  const label = ownLabel ?? words.attachments;
   useChatInput("ChatInputAttachments");
   return (
     <FileChips
@@ -395,10 +414,12 @@ export type ChatInputAttachProps = ComponentPropsWithRef<"button"> & {
 export function ChatInputAttach({
   accept,
   multiple = true,
-  label = "Attach a file",
+  label: ownLabel,
   className = "",
   ...props
 }: ChatInputAttachProps) {
+  const words = useLabels("chatInput", defaultChatInputLabels);
+  const label = ownLabel ?? words.attach;
   const { attach, disabled } = useChatInput("ChatInputAttach");
   const input = useRef<HTMLInputElement>(null);
   return (
@@ -637,10 +658,12 @@ export function ChatInputModel({
   value,
   defaultValue,
   onValueChange,
-  label = "Model",
+  label: ownLabel,
   className = "",
   ...props
 }: ChatInputModelProps) {
+  const words = useLabels("chatInput", defaultChatInputLabels);
+  const label = ownLabel ?? words.model;
   const [chosen, choose] = useControllableState(
     value,
     defaultValue ?? models[0]?.value ?? "",

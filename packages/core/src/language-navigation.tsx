@@ -2,17 +2,30 @@
 
 import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef, ReactNode } from "react";
+import { useLabels } from "./labels";
+
+/** The words Language navigation writes, which a LabelsProvider can change. */
+export type LanguageNavigationLabels = {
+  /** Names the navigation for screen readers. */
+  navigation: string;
+};
+
+export const defaultLanguageNavigationLabels: LanguageNavigationLabels = {
+  navigation: "Language",
+};
 
 /**
  * Lets users switch the service's language, as GOV.UK's language navigation does. Compose it from
  * `LanguageNavigationItem` parts, each written in its own language.
  */
 export function LanguageNavigation({
-  "aria-label": label = "Language",
+  "aria-label": ownLabel,
   className = "",
   children,
   ...props
 }: ComponentPropsWithRef<"nav">) {
+  const words = useLabels("languageNavigation", defaultLanguageNavigationLabels);
+  const label = ownLabel ?? words.navigation;
   return (
     <nav
       {...props}

@@ -137,18 +137,33 @@ export type MessageRetryProps = Omit<
   unavailable?: boolean;
 };
 
+/** The words Message actions writes, which a LabelsProvider can change. */
+export type MessageActionsLabels = {
+  /** Names the button that sends a message again. */
+  retry: string;
+  /** Names the list of suggested questions. */
+  suggestions: string;
+};
+
+export const defaultMessageActionsLabels: MessageActionsLabels = {
+  retry: "Try again",
+  suggestions: "Suggested questions",
+};
+
 /**
  * Asks for the reply again. Its arrow turns once round as it is pressed. An unavailable button
  * shakes instead.
  */
 export function MessageRetry({
   onRetry,
-  label = "Try again",
+  label: ownLabel,
   disabled,
   unavailable = false,
   className = "",
   ...props
 }: MessageRetryProps) {
+  const words = useLabels("messageActions", defaultMessageActionsLabels);
+  const label = ownLabel ?? words.retry;
   // Each press turns the arrow again, or shakes it. A new key restarts the animation from the
   // beginning.
   const [presses, setPresses] = useState(0);
@@ -203,10 +218,12 @@ export type MessageSuggestionsProps = ComponentPropsWithRef<"ul"> & {
  * sit in the empty log.
  */
 export function MessageSuggestions({
-  "aria-label": label = "Suggested questions",
+  "aria-label": ownLabel,
   className = "",
   ...props
 }: MessageSuggestionsProps) {
+  const words = useLabels("messageActions", defaultMessageActionsLabels);
+  const label = ownLabel ?? words.suggestions;
   return (
     <ul
       {...props}

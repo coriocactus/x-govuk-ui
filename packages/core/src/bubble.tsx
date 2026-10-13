@@ -16,6 +16,7 @@ import {
   useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
+import { useLabels } from "./labels";
 import { duration, useMotionTiming } from "./motion";
 import { useShrinkWrap } from "./shrink-wrap";
 import { useScopeSound } from "./sound-scope";
@@ -209,6 +210,16 @@ export type BubbleReactionPickerProps = {
   hold?: number;
 };
 
+/** The words Bubble writes, which a LabelsProvider can change. */
+export type BubbleLabels = {
+  /** Names the picker of reactions for screen readers. */
+  react: string;
+};
+
+export const defaultBubbleLabels: BubbleLabels = {
+  react: "React to this message",
+};
+
 /**
  * Reactions to choose from, which open when the bubble is held, as a phone's messages do. The
  * bubble sinks a little while it is held. It then springs back as the picker rises above it, and
@@ -224,9 +235,11 @@ export function BubbleReactionPicker({
   value,
   defaultValue = [],
   onValueChange,
-  label = "React to this message",
+  label: ownLabel,
   hold = 300,
 }: BubbleReactionPickerProps) {
+  const words = useLabels("bubble", defaultBubbleLabels);
+  const label = ownLabel ?? words.react;
   const bubble = useBubble("BubbleReactionPicker");
   const play = useScopeSound();
   const [open, setOpen] = useState(false);

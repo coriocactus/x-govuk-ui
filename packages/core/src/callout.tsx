@@ -17,6 +17,7 @@ import { flushSync } from "react-dom";
 import { Button, type ButtonProps, withoutButtonLook } from "./button";
 import { useControllableState } from "./controllable-state";
 import { Countdown } from "./countdown";
+import { useLabels } from "./labels";
 import { ArrowShape, CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
 import { useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
@@ -534,16 +535,28 @@ export type CalloutTriggerProps = Omit<ButtonProps, "render"> & {
   render?: Primitive.Trigger.Props["render"];
 };
 
+/** The words Callout writes, which a LabelsProvider can change. */
+export type CalloutLabels = {
+  /** Names the help button, unless it is given a name of its own. */
+  help: string;
+};
+
+export const defaultCalloutLabels: CalloutLabels = {
+  help: "Help",
+};
+
 /**
  * The button that opens help beside a question or a heading, a small round button marked with a
  * question mark. The callout points at it. Name it for what it helps with.
  */
 export function CalloutTrigger({
-  label = "Help",
+  label: ownLabel,
   render,
   className = "",
   ...props
 }: CalloutTriggerProps) {
+  const words = useLabels("callout", defaultCalloutLabels);
+  const label = ownLabel ?? words.help;
   const { trigger, registerTrigger } = useCallout("CalloutTrigger");
   useLayoutEffect(() => registerTrigger(), [registerTrigger]);
   if (render)

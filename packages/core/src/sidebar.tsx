@@ -24,6 +24,7 @@ import { Button, type ButtonProps } from "./button";
 import { isOneGlyph } from "./glyph";
 import { MoreIcon, SearchIcon } from "./icons";
 import { Input, type InputProps } from "./input";
+import { useLabels } from "./labels";
 import { useMediaQuery } from "./media-query";
 import { glideEasing, useMotionTiming } from "./motion";
 import { ResizableHandle } from "./resizable";
@@ -264,6 +265,27 @@ export function SidebarProvider({
   return <SidebarContext value={value}>{children}</SidebarContext>;
 }
 
+/** The words Sidebar writes, which a LabelsProvider can change. */
+export type SidebarLabels = {
+  /** Names the sidebar for screen readers, unless it is given a name. */
+  sidebar: string;
+  /** Names the handle that resizes the sidebar. */
+  resize: string;
+  open: string;
+  close: string;
+  collapse: string;
+  expand: string;
+};
+
+export const defaultSidebarLabels: SidebarLabels = {
+  sidebar: "Sidebar",
+  resize: "Resize sidebar",
+  open: "Open sidebar",
+  close: "Close sidebar",
+  collapse: "Collapse sidebar",
+  expand: "Expand sidebar",
+};
+
 /**
  * The sidebar itself, a column at the page's side. It contains a header, scrolling content of
  * groups and items, and a footer. It collapses to a column of icons or off the edge, and users can
@@ -276,7 +298,7 @@ export function SidebarProvider({
 export function Sidebar({
   ref,
   children,
-  label = "Sidebar",
+  label: ownLabel,
   side = "left",
   variant = "sidebar",
   collapsible = "offcanvas",
@@ -291,6 +313,8 @@ export function Sidebar({
   className = "",
   ...props
 }: SidebarProps) {
+  const words = useLabels("sidebar", defaultSidebarLabels);
+  const label = ownLabel ?? words.sidebar;
   const sidebar = useSidebar();
   const content = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -468,7 +492,7 @@ export function Sidebar({
       {resizable && !collapsed && (
         <ResizableHandle
           className="x-govuk-ui-sidebar-rail"
-          label="Resize sidebar"
+          label={words.resize}
           orientation="vertical"
           // Dragging away from the page widens a left sidebar and narrows a right one.
           panel={side === "left" ? "before" : "after"}
@@ -954,10 +978,11 @@ export function SidebarItemAction({
  */
 export function SidebarTrigger({ className = "", onClick, ...props }: ButtonProps) {
   const sidebar = useSidebar();
+  const words = useLabels("sidebar", defaultSidebarLabels);
   const expanded = sidebar.isMobile ? sidebar.openMobile : sidebar.open;
   let label: string;
-  if (sidebar.isMobile) label = expanded ? "Close sidebar" : "Open sidebar";
-  else label = expanded ? "Collapse sidebar" : "Expand sidebar";
+  if (sidebar.isMobile) label = expanded ? words.close : words.open;
+  else label = expanded ? words.collapse : words.expand;
   return (
     <Tooltip content={label} shortcut={sidebar.shortcut}>
       <Button

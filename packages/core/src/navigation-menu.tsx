@@ -3,6 +3,7 @@
 import { NavigationMenu as Primitive } from "@base-ui/react/navigation-menu";
 import { type ComponentPropsWithRef, createContext, type ReactNode, useContext } from "react";
 import { ChevronIcon } from "./icons";
+import { useLabels } from "./labels";
 
 type MenuContextValue = { disabled: boolean };
 const MenuContext = createContext<MenuContextValue>({ disabled: false });
@@ -21,6 +22,16 @@ export type NavigationMenuProps = ComponentPropsWithRef<"nav"> & {
   closeDelay?: number;
 };
 
+/** The words Navigation menu writes, which a LabelsProvider can change. */
+export type NavigationMenuLabels = {
+  /** Names the navigation for screen readers. */
+  navigation: string;
+};
+
+export const defaultNavigationMenuLabels: NavigationMenuLabels = {
+  navigation: "Services",
+};
+
 /**
  * Service navigation with menus. Compose it from `NavigationMenuItem`, `NavigationMenuLink`,
  * `NavigationMenuTrigger` and `NavigationMenuContent`. One panel contains every menu, and glides
@@ -28,13 +39,15 @@ export type NavigationMenuProps = ComponentPropsWithRef<"nav"> & {
  */
 export function NavigationMenu({
   children,
-  label = "Services",
+  label: ownLabel,
   disabled = false,
   className = "",
   delay = 80,
   closeDelay = 180,
   ...props
 }: NavigationMenuProps) {
+  const words = useLabels("navigationMenu", defaultNavigationMenuLabels);
+  const label = ownLabel ?? words.navigation;
   return (
     <MenuContext value={{ disabled }}>
       <Primitive.Root

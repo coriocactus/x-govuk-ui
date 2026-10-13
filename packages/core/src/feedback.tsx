@@ -1,9 +1,10 @@
 "use client";
 
-import { type ComponentPropsWithRef, useEffect, useRef, useState } from "react";
+import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef, useState } from "react";
 import { AutoHeight } from "./auto-height";
 import { Button, ButtonGroup } from "./button";
 import { Form } from "./form";
+import { useLabels } from "./labels";
 import { Textarea } from "./textarea";
 
 export type FeedbackReport = { doing: string; wrong: string };
@@ -13,8 +14,51 @@ export type FeedbackProps = Omit<ComponentPropsWithRef<"div">, "onAnswer" | "onR
   onAnswer?: (useful: boolean) => void;
   /** Called with what users were doing and what went wrong. */
   onReport?: (report: FeedbackReport) => void;
-  /** The question, as GOV.UK asks it at the foot of every page. */
-  question?: string;
+  /** The question, in place of its `question` label, "Is this page useful?". */
+  question?: ReactNode;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<FeedbackLabels>;
+};
+
+/** The words Feedback writes, which a LabelsProvider or its `labels` can change. */
+export type FeedbackLabels = {
+  /** The question, unless it is given its own. */
+  question: ReactNode;
+  /** Yes, with what it answers for screen readers. */
+  yes: ReactNode;
+  /** No, with what it answers for screen readers. */
+  no: ReactNode;
+  report: ReactNode;
+  formTitle: ReactNode;
+  formHint: ReactNode;
+  doing: ReactNode;
+  wrong: ReactNode;
+  send: ReactNode;
+  cancel: ReactNode;
+  thanks: ReactNode;
+};
+
+export const defaultFeedbackLabels: FeedbackLabels = {
+  question: "Is this page useful?",
+  yes: (
+    <>
+      Yes<span className="x-govuk-ui-visually-hidden"> this page is useful</span>
+    </>
+  ),
+  no: (
+    <>
+      No<span className="x-govuk-ui-visually-hidden"> this page is not useful</span>
+    </>
+  ),
+  report: "Report a problem with this page",
+  formTitle: "Help us improve GOV.UK",
+  formHint:
+    "Don't include personal or financial information like your National Insurance number or credit card details.",
+  doing: "What were you doing?",
+  wrong: "What went wrong?",
+  send: "Send",
+  cancel: "Cancel",
+  thanks: "Thank you for your feedback",
 };
 
 type Stage = "ask" | "report" | "thanks";
@@ -31,10 +75,13 @@ type Stage = "ask" | "report" | "thanks";
 export function Feedback({
   onAnswer,
   onReport,
-  question = "Is this page useful?",
+  question: ownQuestion,
+  labels: ownLabels,
   className = "",
   ...props
 }: FeedbackProps) {
+  const labels = useLabels("feedback", defaultFeedbackLabels, ownLabels);
+  const question = ownQuestion ?? labels.question;
   const [stage, setStage] = useState<Stage>("ask");
   // What users typed is kept if they cancel and come back.
   const [doing, setDoing] = useState("");
@@ -81,7 +128,7 @@ export function Feedback({
                     go("thanks");
                   }}
                 >
-                  Yes<span className="x-govuk-ui-visually-hidden"> this page is useful</span>
+                  {labels.yes}
                 </Button>
                 <Button
                   ref={no}
@@ -92,7 +139,7 @@ export function Feedback({
                     open("no");
                   }}
                 >
-                  No<span className="x-govuk-ui-visually-hidden"> this page is not useful</span>
+                  {labels.no}
                 </Button>
               </ButtonGroup>
             </div>
@@ -103,7 +150,7 @@ export function Feedback({
               className="x-govuk-ui-feedback-report"
               onClick={() => open("report")}
             >
-              Report a problem with this page
+              {labels.report}
             </Button>
           </div>
         )}
@@ -117,36 +164,33 @@ export function Feedback({
               go("thanks");
             }}
           >
-            <h2 className="x-govuk-ui-feedback-form-heading">Help us improve GOV.UK</h2>
-            <p className="x-govuk-ui-feedback-form-hint">
-              Don't include personal or financial information like your National Insurance number or
-              credit card details.
-            </p>
+            <h2 className="x-govuk-ui-feedback-form-heading">{labels.formTitle}</h2>
+            <p className="x-govuk-ui-feedback-form-hint">{labels.formHint}</p>
             <Textarea
               name="doing"
-              label="What were you doing?"
+              label={labels.doing}
               rows={2}
               value={doing}
               onChange={(event) => setDoing(event.target.value)}
             />
             <Textarea
               name="wrong"
-              label="What went wrong?"
+              label={labels.wrong}
               rows={2}
               value={wrong}
               onChange={(event) => setWrong(event.target.value)}
             />
             <ButtonGroup>
-              <Button type="submit">Send</Button>
+              <Button type="submit">{labels.send}</Button>
               <Button variant="outline" onClick={() => go("ask")}>
-                Cancel
+                {labels.cancel}
               </Button>
             </ButtonGroup>
           </Form>
         )}
         {stage === "thanks" && (
           <p ref={thanks} className="x-govuk-ui-feedback-thanks" role="status" tabIndex={-1}>
-            Thank you for your feedback
+            {labels.thanks}
           </p>
         )}
       </AutoHeight>

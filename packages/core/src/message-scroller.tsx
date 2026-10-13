@@ -14,6 +14,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useLabels } from "./labels";
 import { duration, easeOut, motionElementProps, useMotionTiming } from "./motion";
 import { ScrollArea } from "./scroll-area";
 
@@ -67,6 +68,22 @@ const NEAR = 32;
 const atEnd = (scroller: HTMLElement) =>
   scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < NEAR;
 
+/** The words Message scroller writes, which a LabelsProvider can change. */
+export type MessageScrollerLabels = {
+  /** Names the log for screen readers. */
+  messages: string;
+  /** Names the button that goes to messages not yet seen. */
+  newMessages: string;
+  /** Names the button that goes to the latest message. */
+  latest: string;
+};
+
+export const defaultMessageScrollerLabels: MessageScrollerLabels = {
+  messages: "Messages",
+  newMessages: "Go to the new messages",
+  latest: "Go to the latest message",
+};
+
 /**
  * A scrolling log of messages, like shadcn's Message scroller, that never moves the reader against
  * their will. At the end of the log, it follows new messages and streamed text. When the reader
@@ -80,7 +97,7 @@ const atEnd = (scroller: HTMLElement) =>
  */
 export function MessageScroller({
   children,
-  label = "Messages",
+  label: ownLabel,
   autoScroll = true,
   peek = 64,
   defaultPosition = "end",
@@ -92,6 +109,8 @@ export function MessageScroller({
   className = "",
   ...props
 }: MessageScrollerProps) {
+  const words = useLabels("messageScroller", defaultMessageScrollerLabels);
+  const label = ownLabel ?? words.messages;
   const noMessages = Children.toArray(children).length === 0;
   const root = useRef<HTMLDivElement>(null);
   const footerBox = useRef<HTMLDivElement>(null);
@@ -395,7 +414,7 @@ export function MessageScroller({
         className="x-govuk-ui-message-scroller-latest"
         data-shown={away || undefined}
         data-unseen={unseen || undefined}
-        aria-label={unseen ? "Go to the new messages" : "Go to the latest message"}
+        aria-label={unseen ? words.newMessages : words.latest}
         tabIndex={away ? 0 : -1}
         aria-hidden={!away || undefined}
         onClick={toEnd}

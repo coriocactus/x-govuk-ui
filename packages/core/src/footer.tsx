@@ -2,6 +2,7 @@
 
 import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
+import { useLabels } from "./labels";
 import { GovukCrown } from "./logo";
 import { WidthContainer } from "./width-container";
 
@@ -54,6 +55,22 @@ export type FooterProps = ComponentPropsWithRef<"footer"> & {
   navigation?: ReactNode;
 };
 
+/** The words Footer writes, which a LabelsProvider can change. */
+export type FooterLabels = {
+  /** Names the support links for screen readers. */
+  supportLinks: string;
+  /** The copyright line. */
+  copyright: ReactNode;
+  /** The content's licence, by default the Open Government Licence v3.0. */
+  licence: ReactNode;
+};
+
+export const defaultFooterLabels: FooterLabels = {
+  supportLinks: "Support links",
+  copyright: "© Crown copyright",
+  licence: defaultLicence,
+};
+
 /**
  * The foot of every page, as GOV.UK's is, under a band of brand blue. In order, it shows:
  *
@@ -65,14 +82,17 @@ export type FooterProps = ComponentPropsWithRef<"footer"> & {
 export function Footer({
   crown = true,
   crest = "/assets/images/govuk-crest.svg",
-  licence = defaultLicence,
-  copyright = "© Crown copyright",
+  licence: ownLicence,
+  copyright: ownCopyright,
   navigation,
   className = "",
   style,
   children,
   ...props
 }: FooterProps) {
+  const words = useLabels("footer", defaultFooterLabels);
+  const copyright = ownCopyright ?? words.copyright;
+  const licence = ownLicence === undefined ? words.licence : ownLicence;
   return (
     <footer
       {...props}
@@ -150,11 +170,13 @@ export type FooterLinksProps = ComponentPropsWithRef<"nav"> & { children: ReactN
 
 /** The support links, such as Help, Cookies and the accessibility statement, in a row. */
 export function FooterLinks({
-  "aria-label": label = "Support links",
+  "aria-label": ownLabel,
   children,
   className = "",
   ...props
 }: FooterLinksProps) {
+  const words = useLabels("footer", defaultFooterLabels);
+  const label = ownLabel ?? words.supportLinks;
   return (
     <nav {...props} aria-label={label} className={`x-govuk-ui-footer-links ${className}`.trim()}>
       <ul className="x-govuk-ui-footer-inline-list">{children}</ul>

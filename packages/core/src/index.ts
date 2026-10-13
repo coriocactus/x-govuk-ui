@@ -38,14 +38,21 @@ export {
   type AvatarGroupProps,
   type AvatarProps,
 } from "./avatar";
-export { BackLink, type BackLinkProps } from "./back-link";
+export {
+  BackLink,
+  type BackLinkLabels,
+  type BackLinkProps,
+  defaultBackLinkLabels,
+} from "./back-link";
 export {
   Breadcrumbs,
   BreadcrumbsEllipsis,
   type BreadcrumbsEllipsisProps,
   BreadcrumbsItem,
   type BreadcrumbsItemProps,
+  type BreadcrumbsLabels,
   type BreadcrumbsProps,
+  defaultBreadcrumbsLabels,
 } from "./breadcrumbs";
 export {
   Bubble,
@@ -53,6 +60,7 @@ export {
   type BubbleContentProps,
   BubbleGroup,
   type BubbleGroupProps,
+  type BubbleLabels,
   type BubbleProps,
   type BubbleReaction,
   BubbleReactionPicker,
@@ -60,6 +68,7 @@ export {
   BubbleReactions,
   type BubbleReactionsProps,
   type BubbleVariant,
+  defaultBubbleLabels,
 } from "./bubble";
 export { Button, ButtonGroup, type ButtonGroupProps, type ButtonProps } from "./button";
 export {
@@ -74,11 +83,13 @@ export {
   type CalloutAnchor,
   CalloutContent,
   type CalloutContentProps,
+  type CalloutLabels,
   type CalloutProps,
   type CalloutSide,
   CalloutTrigger,
   type CalloutTriggerProps,
   type CalloutVariant,
+  defaultCalloutLabels,
 } from "./callout";
 export {
   Card,
@@ -88,13 +99,16 @@ export {
   type CardProps,
   CardTitle,
   type CardTitleProps,
+  defaultMediaCreditLabels,
   MediaCredit,
+  type MediaCreditLabels,
   type MediaCreditProps,
 } from "./card";
 export {
   Carousel,
   type CarouselButtonProps,
   CarouselControls,
+  type CarouselLabels,
   CarouselNext,
   CarouselPosition,
   CarouselPrevious,
@@ -103,6 +117,7 @@ export {
   type CarouselSlideProps,
   CarouselViewport,
   type CarouselViewportProps,
+  defaultCarouselLabels,
 } from "./carousel";
 export {
   browserRecogniser,
@@ -205,7 +220,13 @@ export {
   defaultThinkingStatuses,
   playfulThinkingStatuses,
 } from "./conversation";
-export { CookieBanner, type CookieBannerProps, type CookieChoice } from "./cookie-banner";
+export {
+  CookieBanner,
+  type CookieBannerLabels,
+  type CookieBannerProps,
+  type CookieChoice,
+  defaultCookieBannerLabels,
+} from "./cookie-banner";
 export { CopyButton, type CopyButtonProps, type CopyLabels, defaultCopyLabels } from "./copy";
 export {
   DataTable,
@@ -257,8 +278,19 @@ export {
   type ErrorSummaryItemProps,
   type ErrorSummaryProps,
 } from "./error-summary";
-export { ExitThisPage, type ExitThisPageProps } from "./exit-this-page";
-export { Feedback, type FeedbackProps, type FeedbackReport } from "./feedback";
+export {
+  defaultExitThisPageLabels,
+  ExitThisPage,
+  type ExitThisPageLabels,
+  type ExitThisPageProps,
+} from "./exit-this-page";
+export {
+  defaultFeedbackLabels,
+  Feedback,
+  type FeedbackLabels,
+  type FeedbackProps,
+  type FeedbackReport,
+} from "./feedback";
 export {
   type ControlBinding,
   ErrorMessage,
@@ -282,21 +314,25 @@ export {
   FieldsetRoot,
 } from "./fieldset";
 export {
+  defaultFigureLabels,
   Figure,
   FigureCaption,
   type FigureCaptionProps,
   FigureData,
   type FigureDataProps,
+  type FigureLabels,
   type FigureProps,
   FigureSource,
   type FigureSourceProps,
 } from "./figure";
 export {
   defaultFileChipLabels,
+  defaultFileChipsLabels,
   FileChip,
   type FileChipLabels,
   type FileChipProps,
   FileChips,
+  type FileChipsLabels,
   type FileChipsProps,
 } from "./file-chips";
 export { FileDiff, type FileDiffProps } from "./file-diff";
@@ -308,7 +344,9 @@ export {
   type FilterChipsProps,
 } from "./filter-chips";
 export {
+  defaultFooterLabels,
   Footer,
+  type FooterLabels,
   FooterLink,
   type FooterLinkProps,
   FooterLinks,
@@ -368,7 +406,12 @@ export {
   SearchIcon,
   TickIcon,
 } from "./icons";
-export { ImageGeneration, type ImageGenerationProps } from "./image-generation";
+export {
+  defaultImageGenerationLabels,
+  ImageGeneration,
+  type ImageGenerationLabels,
+  type ImageGenerationProps,
+} from "./image-generation";
 export {
   type CitationSource,
   defaultInlineCitationLabels,
@@ -406,9 +449,11 @@ export {
   useLocale,
 } from "./labels";
 export {
+  defaultLanguageNavigationLabels,
   LanguageNavigation,
   LanguageNavigationItem,
   type LanguageNavigationItemProps,
+  type LanguageNavigationLabels,
 } from "./language-navigation";
 export {
   defaultLightboxLabels,
@@ -456,10 +501,12 @@ export {
 } from "./menu";
 export { Menubar, type MenubarProps, MenubarTrigger, type MenubarTriggerProps } from "./menubar";
 export {
+  defaultMessageActionsLabels,
   defaultMessageRatingLabels,
   MessageAction,
   type MessageActionProps,
   MessageActions,
+  type MessageActionsLabels,
   type MessageActionsProps,
   MessageRating,
   type MessageRatingLabels,
@@ -473,19 +520,23 @@ export {
   type MessageSuggestionsProps,
 } from "./message-actions";
 export {
+  defaultMessageScrollerLabels,
   MessageScroller,
   type MessageScrollerHandle,
   MessageScrollerItem,
   type MessageScrollerItemProps,
+  type MessageScrollerLabels,
   type MessageScrollerProps,
 } from "./message-scroller";
 export { useMotionTiming } from "./motion";
 export {
+  defaultNavigationMenuLabels,
   NavigationMenu,
   NavigationMenuContent,
   type NavigationMenuContentProps,
   NavigationMenuItem,
   type NavigationMenuItemProps,
+  type NavigationMenuLabels,
   NavigationMenuLink,
   type NavigationMenuLinkProps,
   type NavigationMenuProps,
@@ -536,12 +587,19 @@ export { Progress, type ProgressProps } from "./progress";
 export { Prose } from "./prose";
 export { QrCode, type QrCodeProps } from "./qr-code";
 export {
+  defaultReasoningStepsLabels,
   ReasoningStep,
   type ReasoningStepProps,
   ReasoningSteps,
+  type ReasoningStepsLabels,
   type ReasoningStepsProps,
 } from "./reasoning-steps";
-export { ResizableHandle, type ResizableHandleProps } from "./resizable";
+export {
+  defaultResizableLabels,
+  ResizableHandle,
+  type ResizableHandleProps,
+  type ResizableLabels,
+} from "./resizable";
 export {
   RichText,
   type RichTextComponents,
@@ -587,6 +645,7 @@ export {
 } from "./sheet";
 export { modifierKey, shortcutKeys } from "./shortcut";
 export {
+  defaultSidebarLabels,
   Sidebar,
   type SidebarAnimation,
   SidebarContent,
@@ -602,6 +661,7 @@ export {
   SidebarItemAction,
   type SidebarItemActionProps,
   type SidebarItemProps,
+  type SidebarLabels,
   SidebarLayout,
   SidebarPageBar,
   type SidebarPageBarProps,
@@ -632,7 +692,12 @@ export {
   useSidebarArrangement,
 } from "./sidebar-arrangement";
 export { Skeleton, type SkeletonProps } from "./skeleton";
-export { SkipLink, type SkipLinkProps } from "./skip-link";
+export {
+  defaultSkipLinkLabels,
+  SkipLink,
+  type SkipLinkLabels,
+  type SkipLinkProps,
+} from "./skip-link";
 export { Slider, type SliderProps } from "./slider";
 export {
   type PlayOptions,
@@ -654,6 +719,7 @@ export {
 } from "./stat";
 export { StreamingText, type StreamingTextProps } from "./streaming-text";
 export {
+  defaultSummaryListLabels,
   SummaryCard,
   type SummaryCardProps,
   SummaryList,
@@ -661,6 +727,7 @@ export {
   type SummaryListActionProps,
   SummaryListActions,
   SummaryListKey,
+  type SummaryListLabels,
   type SummaryListProps,
   SummaryListRow,
   type SummaryListRowProps,

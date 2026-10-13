@@ -11,6 +11,7 @@ import {
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
+  BackLink,
   Calendar,
   Checkbox,
   Checkboxes,
@@ -23,11 +24,13 @@ import {
   ChoiceList,
   ChoiceRoot,
   Combobox,
+  CookieBanner,
   DateInput,
   dateFromParts,
   ErrorMessage,
   ErrorSummary,
   ErrorSummaryItem,
+  Feedback,
   Field,
   Fieldset,
   FieldsetLegend,
@@ -826,4 +829,28 @@ test("a toggle group and filter chips with a name send their chosen values with 
       </ToggleGroup>,
     ),
   ).not.toContain('type="hidden"');
+});
+
+test("a part's own name comes first, and its default comes from a labels provider", () => {
+  const html = renderToStaticMarkup(
+    <LabelsProvider
+      labels={{
+        backLink: { back: "Yn ôl" },
+        feedback: { question: "Ydy’r dudalen hon yn ddefnyddiol?" },
+        cookieBanner: { accept: "Derbyn cwcis dadansoddi" },
+      }}
+    >
+      <BackLink href="#" />
+      <BackLink href="#">Previous question</BackLink>
+      <Feedback />
+      <CookieBanner />
+    </LabelsProvider>,
+  );
+  for (const words of [
+    "Yn ôl",
+    "Previous question",
+    "Ydy’r dudalen hon yn ddefnyddiol?",
+    "Derbyn cwcis dadansoddi",
+  ])
+    expect(html).toContain(words);
 });

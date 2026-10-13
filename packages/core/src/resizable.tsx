@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useLabels } from "./labels";
 import { useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
@@ -55,6 +56,16 @@ export type ResizableHandleProps = Omit<
   disabled?: boolean;
 };
 
+/** The words Resizable writes, which a LabelsProvider can change. */
+export type ResizableLabels = {
+  /** Names a handle for screen readers. */
+  resize: string;
+};
+
+export const defaultResizableLabels: ResizableLabels = {
+  resize: "Resize",
+};
+
 /**
  * A line that resizes the panels on either side when it is dragged, or focused and moved with the
  * arrow keys, as WAI-ARIA's window splitter does. Shift moves it four steps at a time, and Home and
@@ -64,7 +75,7 @@ export type ResizableHandleProps = Omit<
  * steps, each gliding into place with its own tick.
  */
 export function ResizableHandle({
-  label = "Resize",
+  label: ownLabel,
   grip = false,
   orientation = "vertical",
   value: controlled,
@@ -83,6 +94,8 @@ export function ResizableHandle({
   ref,
   ...props
 }: ResizableHandleProps) {
+  const words = useLabels("resizable", defaultResizableLabels);
+  const label = ownLabel ?? words.resize;
   const play = useScopeSound();
   const handle = useRef<HTMLDivElement>(null);
   const merged = useMergedRef(handle, ref);

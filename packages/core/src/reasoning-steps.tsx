@@ -3,6 +3,7 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import { type ComponentPropsWithRef, type ReactNode, useEffect, useState } from "react";
 import { ChevronIcon, TickIcon } from "./icons";
+import { useLabels } from "./labels";
 import { Spinner } from "./spinner";
 import { TextShimmer } from "./text-shimmer";
 
@@ -18,6 +19,28 @@ export type ReasoningStepsProps = Omit<ComponentPropsWithRef<"div">, "title" | "
   children: ReactNode;
 };
 
+/** The words Reasoning steps writes, which a LabelsProvider can change. */
+export type ReasoningStepsLabels = {
+  /** The title while the work goes on. */
+  thinking: string;
+  /** The title once the work is done. */
+  showSteps: string;
+  /** Tells screen readers a step is done. */
+  done: string;
+  /** Tells screen readers a step is under way. */
+  active: string;
+  /** Tells screen readers a step has not started. */
+  pending: string;
+};
+
+export const defaultReasoningStepsLabels: ReasoningStepsLabels = {
+  thinking: "Thinking",
+  showSteps: "Show the steps",
+  done: "Done",
+  active: "In progress",
+  pending: "Not started",
+};
+
 /**
  * The steps an assistant took to reach its answer, behind a title that opens them, such as
  * "Checked 3 sources". While the assistant works, the title shimmers and the steps stay open. They
@@ -27,8 +50,8 @@ export type ReasoningStepsProps = Omit<ComponentPropsWithRef<"div">, "title" | "
  */
 export function ReasoningSteps({
   active = false,
-  activeTitle = "Thinking",
-  title = "Show the steps",
+  activeTitle: ownActiveTitle,
+  title: ownTitle,
   open,
   defaultOpen,
   onOpenChange,
@@ -36,6 +59,9 @@ export function ReasoningSteps({
   className = "",
   ...props
 }: ReasoningStepsProps) {
+  const words = useLabels("reasoningSteps", defaultReasoningStepsLabels);
+  const activeTitle = ownActiveTitle ?? words.thinking;
+  const title = ownTitle ?? words.showSteps;
   const [own, setOwn] = useState(defaultOpen ?? active);
   // The steps open when work starts, and fold away when it ends, unless the reader opens or closes
   // them.
@@ -69,8 +95,6 @@ export type ReasoningStepProps = ComponentPropsWithRef<"li"> & {
   children: ReactNode;
 };
 
-const statusWords = { done: "Done", active: "In progress", pending: "Not started" };
-
 /** One step, with a tick once done, a spinner while under way, or a hollow dot before it starts. */
 export function ReasoningStep({
   status = "done",
@@ -79,6 +103,7 @@ export function ReasoningStep({
   className = "",
   ...props
 }: ReasoningStepProps) {
+  const words = useLabels("reasoningSteps", defaultReasoningStepsLabels);
   return (
     <li {...props} className={`x-govuk-ui-reasoning-step ${className}`.trim()} data-status={status}>
       <span className="x-govuk-ui-reasoning-mark" aria-hidden="true">
@@ -86,7 +111,7 @@ export function ReasoningStep({
         {status === "active" && <Spinner size="small" />}
       </span>
       <span className="x-govuk-ui-reasoning-text">
-        <span className="x-govuk-ui-visually-hidden">{statusWords[status]}: </span>
+        <span className="x-govuk-ui-visually-hidden">{words[status]}: </span>
         {children}
         {detail && <span className="x-govuk-ui-reasoning-detail">{detail}</span>}
       </span>

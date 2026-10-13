@@ -10,6 +10,7 @@ import {
   useRef,
 } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
+import { useLabels } from "./labels";
 import { useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 
@@ -122,17 +123,29 @@ export type SummaryListActionProps = Omit<HTMLAttributes<HTMLElement>, "onClick"
   render?: AnchorProps["render"];
 };
 
+/** The words Summary list writes, which a LabelsProvider can change. */
+export type SummaryListLabels = {
+  /** An action's words, unless it is given its own. */
+  change: string;
+};
+
+export const defaultSummaryListLabels: SummaryListLabels = {
+  change: "Change",
+};
+
 /** An action for a row or a card, such as Change or Remove. */
 export function SummaryListAction({
   href,
   onClick,
-  children = "Change",
+  children: ownChildren,
   hiddenText,
   render,
   className = "",
   ref,
   ...props
 }: SummaryListActionProps) {
+  const words = useLabels("summaryList", defaultSummaryListLabels);
+  const children = ownChildren ?? words.change;
   const content = (
     <>
       {children}

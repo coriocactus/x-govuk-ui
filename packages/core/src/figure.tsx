@@ -13,6 +13,7 @@ import {
   useState,
 } from "react";
 import { Details, type DetailsProps } from "./details";
+import { useLabels } from "./labels";
 
 type FigureContextValue = { titleId: string; register: (change: 1 | -1) => void };
 const FigureContext = createContext<FigureContextValue | null>(null);
@@ -117,15 +118,23 @@ export type FigureDataProps = Omit<DetailsProps, "summary"> & {
   summary?: ReactNode;
 };
 
+/** The words Figure writes, which a LabelsProvider can change. */
+export type FigureLabels = {
+  /** The Details that opens the figures. */
+  showTable: string;
+};
+
+export const defaultFigureLabels: FigureLabels = {
+  showTable: "Show the figures as a table",
+};
+
 /**
  * The figure's figures as tables, in a Details that a reader opens. GOV.UK asks this of every
  * chart, for users who cannot see it and users who want the exact figures.
  */
-export function FigureData({
-  summary = "Show the figures as a table",
-  className = "",
-  ...props
-}: FigureDataProps) {
+export function FigureData({ summary: ownSummary, className = "", ...props }: FigureDataProps) {
+  const words = useLabels("figure", defaultFigureLabels);
+  const summary = ownSummary ?? words.showTable;
   return (
     <Details
       {...props}

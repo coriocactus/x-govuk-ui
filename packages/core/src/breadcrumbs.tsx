@@ -2,6 +2,7 @@
 
 import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef, ReactNode } from "react";
+import { useLabels } from "./labels";
 import { DropdownMenu, DropdownMenuTrigger, MenuContent } from "./menu";
 
 export type BreadcrumbsProps = ComponentPropsWithRef<"nav"> & {
@@ -14,6 +15,19 @@ export type BreadcrumbsProps = ComponentPropsWithRef<"nav"> & {
   children: ReactNode;
 };
 
+/** The words Breadcrumbs writes, which a LabelsProvider can change. */
+export type BreadcrumbsLabels = {
+  /** Names the navigation for screen readers. */
+  navigation: string;
+  /** Names the button that shows the pages in between. */
+  showHidden: string;
+};
+
+export const defaultBreadcrumbsLabels: BreadcrumbsLabels = {
+  navigation: "Breadcrumb",
+  showHidden: "Show the pages in between",
+};
+
 /**
  * Where a page sits in a service, as a trail of links from the top. The earlier steps are muted,
  * and the current page is in the text colour. Compose it from `BreadcrumbsItem` parts.
@@ -24,11 +38,13 @@ export function Breadcrumbs({
   separator = "chevron",
   collapseOnMobile = false,
   inverse = false,
-  "aria-label": label = "Breadcrumb",
+  "aria-label": ownLabel,
   className = "",
   children,
   ...props
 }: BreadcrumbsProps) {
+  const words = useLabels("breadcrumbs", defaultBreadcrumbsLabels);
+  const label = ownLabel ?? words.navigation;
   return (
     <nav
       {...props}
@@ -94,11 +110,13 @@ export type BreadcrumbsEllipsisProps = ComponentPropsWithRef<"li"> & {
  * Stands in for steps a long trail leaves out. Pressing it opens a Dropdown menu of them.
  */
 export function BreadcrumbsEllipsis({
-  label = "Show the pages in between",
+  label: ownLabel,
   children,
   className = "",
   ...props
 }: BreadcrumbsEllipsisProps) {
+  const words = useLabels("breadcrumbs", defaultBreadcrumbsLabels);
+  const label = ownLabel ?? words.showHidden;
   return (
     <li {...props} className={`x-govuk-ui-breadcrumbs-item ${className}`.trim()}>
       <DropdownMenu>

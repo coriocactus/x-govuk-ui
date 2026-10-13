@@ -3484,11 +3484,7 @@ const entries = {
       }),
       reference("onExit", "() => void"),
       reference("children", "ReactNode", "Exit this page"),
-      reference(
-        "activatedText / timedOutText / pressTwoMoreTimesText / pressOneMoreTimeText",
-        "string",
-        "GOV.UK's",
-      ),
+      reference("labels", "Partial<ExitThisPageLabels>", "GOV.UK's"),
     ],
   },
   "notification-banner": {

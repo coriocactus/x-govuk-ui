@@ -2,12 +2,22 @@
 
 import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef } from "react";
+import { useLabels } from "./labels";
 
 export type BackLinkProps = ComponentPropsWithRef<"a"> & {
   /** For dark backgrounds. */
   inverse?: boolean;
   /** Renders a router's link in place of the anchor, keeping the back link's look. */
   render?: useRender.RenderProp;
+};
+
+/** The words Back link writes, which a LabelsProvider can change. */
+export type BackLinkLabels = {
+  back: string;
+};
+
+export const defaultBackLinkLabels: BackLinkLabels = {
+  back: "Back",
 };
 
 /**
@@ -18,10 +28,12 @@ export function BackLink({
   href = "#",
   inverse = false,
   render,
-  children = "Back",
+  children: ownChildren,
   className = "",
   ...props
 }: BackLinkProps) {
+  const words = useLabels("backLink", defaultBackLinkLabels);
+  const children = ownChildren ?? words.back;
   return useRender({
     defaultTagName: "a",
     render,

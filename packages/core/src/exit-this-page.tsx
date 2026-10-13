@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { useLabels } from "./labels";
 
 export type ExitThisPageProps = Omit<ComponentPropsWithRef<"div">, "onExit"> & {
   /** Where the page goes, which is a site that looks ordinary, such as a weather forecast. */
@@ -19,11 +20,33 @@ export type ExitThisPageProps = Omit<ComponentPropsWithRef<"div">, "onExit"> & {
    */
   onExit?: () => void;
   children?: ReactNode;
-  /** What screen readers hear as each Shift press counts, and when they stop counting. */
-  activatedText?: string;
-  timedOutText?: string;
-  pressTwoMoreTimesText?: string;
-  pressOneMoreTimeText?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<ExitThisPageLabels>;
+};
+
+/** The words Exit this page writes, which a LabelsProvider or its `labels` can change. */
+export type ExitThisPageLabels = {
+  /** The button's words, which screen readers hear after a hidden "Emergency". */
+  button: ReactNode;
+  /** What screen readers hear as the page leaves. */
+  activated: string;
+  /** What screen readers hear when the Shift presses stop counting. */
+  timedOut: string;
+  /** What screen readers hear after the first and second Shift presses. */
+  pressTwoMoreTimes: string;
+  pressOneMoreTime: string;
+};
+
+export const defaultExitThisPageLabels: ExitThisPageLabels = {
+  button: (
+    <>
+      <span className="x-govuk-ui-visually-hidden">Emergency</span> Exit this page
+    </>
+  ),
+  activated: "Loading.",
+  timedOut: "Exit this page expired.",
+  pressTwoMoreTimes: "Shift, press 2 more times to exit.",
+  pressOneMoreTime: "Shift, press 1 more time to exit.",
 };
 
 const SHIFT_WINDOW = 5000;
@@ -38,13 +61,14 @@ export function ExitThisPage({
   href = "https://www.bbc.co.uk/weather",
   onExit,
   children,
-  activatedText = "Loading.",
-  timedOutText = "Exit this page expired.",
-  pressTwoMoreTimesText = "Shift, press 2 more times to exit.",
-  pressOneMoreTimeText = "Shift, press 1 more time to exit.",
+  labels: ownLabels,
   className = "",
   ...props
 }: ExitThisPageProps) {
+  const labels = useLabels("exitThisPage", defaultExitThisPageLabels, ownLabels);
+  // The words are read as the keys are pressed, so a new object each render restarts nothing.
+  const words = useRef(labels);
+  words.current = labels;
   const [presses, setPresses] = useState(0);
   const [status, setStatus] = useState("");
   const [leaving, setLeaving] = useState(false);
@@ -74,11 +98,13 @@ export function ExitThisPage({
         if (count.current >= 3) exit();
         else {
           setPresses(count.current);
-          setStatus(count.current === 1 ? pressTwoMoreTimesText : pressOneMoreTimeText);
+          setStatus(
+            count.current === 1 ? words.current.pressTwoMoreTimes : words.current.pressOneMoreTime,
+          );
           pressTimer.current = setTimeout(() => {
             count.current = 0;
             setPresses(0);
-            setStatus(timedOutText);
+            setStatus(words.current.timedOut);
             statusTimer.current = setTimeout(() => setStatus(""), SHIFT_WINDOW);
           }, SHIFT_WINDOW);
         }
@@ -99,7 +125,7 @@ export function ExitThisPage({
       clearTimeout(pressTimer.current);
       clearTimeout(statusTimer.current);
     };
-  }, [exit, pressOneMoreTimeText, pressTwoMoreTimesText, timedOutText]);
+  }, [exit]);
 
   return (
     <div {...props} className={`x-govuk-ui-exit-this-page ${className}`.trim()}>
@@ -113,13 +139,7 @@ export function ExitThisPage({
           exit();
         }}
       >
-        <span className="x-govuk-ui-button-label">
-          {children ?? (
-            <>
-              <span className="x-govuk-ui-visually-hidden">Emergency</span> Exit this page
-            </>
-          )}
-        </span>
+        <span className="x-govuk-ui-button-label">{children ?? labels.button}</span>
         <span
           className="x-govuk-ui-exit-this-page-indicator"
           aria-hidden="true"
@@ -136,7 +156,7 @@ export function ExitThisPage({
       {leaving &&
         createPortal(
           <div className="x-govuk-ui-exit-this-page-overlay" role="alert">
-            {activatedText}
+            {labels.activated}
           </div>,
           document.body,
         )}

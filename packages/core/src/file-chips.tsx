@@ -34,12 +34,24 @@ export type FileChipsProps = ComponentPropsWithRef<"ul"> & {
   label?: string;
 };
 
+/** The words File chips writes, which a LabelsProvider can change. */
+export type FileChipsLabels = {
+  /** Names the list of files for screen readers. */
+  files: string;
+};
+
+export const defaultFileChipsLabels: FileChipsLabels = {
+  files: "Files",
+};
+
 /**
  * Files or documents as a row of chips that wraps, named for screen readers. It can sit anywhere,
  * such as under a sent message, to list what went with it. Chat input lists what goes with the next
  * message with the same chips, as ChatInputAttachments.
  */
-export function FileChips({ label = "Files", className = "", ...props }: FileChipsProps) {
+export function FileChips({ label: ownLabel, className = "", ...props }: FileChipsProps) {
+  const words = useLabels("fileChips", defaultFileChipsLabels);
+  const label = ownLabel ?? words.files;
   return (
     <ul aria-label={label} {...props} className={`x-govuk-ui-file-chips ${className}`.trim()} />
   );

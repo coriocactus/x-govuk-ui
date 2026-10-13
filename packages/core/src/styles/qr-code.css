@@ -8,11 +8,11 @@
   forced-color-adjust: none;
 }
 .x-govuk-ui-qr-code-tile {
-  fill: #fff;
+  fill: var(--x-govuk-ui-white);
 }
 .x-govuk-ui-qr-code-modules {
-  fill: #0b0c0c;
-  stroke: #0b0c0c;
+  fill: var(--x-govuk-ui-black);
+  stroke: var(--x-govuk-ui-black);
 }
 .x-govuk-ui-qr-code-modules circle {
   stroke: none;

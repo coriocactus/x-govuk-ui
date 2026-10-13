@@ -44,7 +44,7 @@
    grows from nothing as the gauge first shows. */
 .x-govuk-ui-gauge-value {
   stroke: var(--x-govuk-ui-gauge-colour);
-  transition: stroke-dasharray 700ms var(--x-govuk-ui-ease-out);
+  transition: stroke-dasharray var(--x-govuk-ui-duration-draw) var(--x-govuk-ui-ease-out);
 }
 @starting-style {
   .x-govuk-ui-gauge-value {

@@ -7,7 +7,7 @@
     linear-gradient(var(--x-govuk-ui-marker), var(--x-govuk-ui-marker)) no-repeat 0 0 / 0% 100%;
   color: inherit;
   box-decoration-break: clone;
-  transition: background-size 700ms var(--x-govuk-ui-ease-out);
+  transition: background-size var(--x-govuk-ui-duration-draw) var(--x-govuk-ui-ease-out);
 }
 .x-govuk-ui-marker[data-drawn] {
   background-size: 100% 100%;

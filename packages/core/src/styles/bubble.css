@@ -190,7 +190,7 @@
    with a single overshoot as the picker opens. While it is held, its text is not selected. */
 .x-govuk-ui-bubble-frame:has(> .x-govuk-ui-bubble-react) .x-govuk-ui-bubble-content {
   -webkit-touch-callout: none;
-  transition: scale var(--x-govuk-ui-duration-medium) cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-overshoot);
 }
 .x-govuk-ui-bubble-frame[data-holding] .x-govuk-ui-bubble-content {
   scale: 0.98;
@@ -243,7 +243,7 @@
   transform-origin: var(--transform-origin);
   transition:
     opacity var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
-    scale var(--x-govuk-ui-duration-medium) cubic-bezier(0.34, 1.56, 0.64, 1);
+    scale var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-overshoot);
 }
 .x-govuk-ui-bubble-picker:is([data-starting-style], [data-ending-style]) {
   opacity: 0;
@@ -266,8 +266,8 @@
   transition:
     background-color var(--x-govuk-ui-duration-fast) ease,
     scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
-  animation: x-govuk-ui-bubble-pick var(--x-govuk-ui-duration-slow)
-    cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--x-govuk-ui-pick, 0) * 30ms) backwards;
+  animation: x-govuk-ui-bubble-pick var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-overshoot)
+    calc(var(--x-govuk-ui-pick, 0) * 30ms) backwards;
 }
 @keyframes x-govuk-ui-bubble-pick {
   from {

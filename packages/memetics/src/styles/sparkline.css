@@ -25,7 +25,8 @@
   stroke-width: 2;
   stroke-linejoin: round;
   stroke-linecap: round;
-  animation: x-govuk-ui-sparkline-draw 700ms var(--x-govuk-ui-ease-out) backwards;
+  animation: x-govuk-ui-sparkline-draw var(--x-govuk-ui-duration-draw) var(--x-govuk-ui-ease-out)
+    backwards;
 }
 .x-govuk-ui-sparkline-area {
   fill: currentColor;
@@ -42,7 +43,8 @@
   border-radius: 50%;
   background: currentColor;
   transform: translate(-50%, -50%);
-  animation: x-govuk-ui-sparkline-end 200ms 600ms var(--x-govuk-ui-ease-out) backwards;
+  animation: x-govuk-ui-sparkline-end 200ms calc(var(--x-govuk-ui-duration-draw) - 100ms)
+    var(--x-govuk-ui-ease-out) backwards;
 }
 @keyframes x-govuk-ui-sparkline-draw {
   from {

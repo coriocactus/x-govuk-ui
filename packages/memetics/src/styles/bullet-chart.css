@@ -70,7 +70,7 @@
   height: 8px;
   border-radius: 0 2px 2px 0;
   background: var(--x-govuk-ui-chart-1);
-  transition: width 700ms var(--x-govuk-ui-ease-out);
+  transition: width var(--x-govuk-ui-duration-draw) var(--x-govuk-ui-ease-out);
 }
 @starting-style {
   .x-govuk-ui-bullet-chart-bar {

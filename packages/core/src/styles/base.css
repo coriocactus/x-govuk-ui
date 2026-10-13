@@ -38,12 +38,14 @@
   --x-govuk-ui-code-entity: var(--x-govuk-ui-link);
   --x-govuk-ui-code-property: var(--x-govuk-ui-magenta-shade-25);
 
-  /* Motion. Two curves and four durations, which src/motion.ts repeats for Motion. Looping
-     animations and staggers keep their own timing. */
+  /* Motion. Two curves and four durations, which src/motion.ts repeats for Motion, and a curve
+     and a duration that only CSS uses. Looping animations and staggers keep their own timing. */
   /* Things arriving, settling and gliding into place. */
   --x-govuk-ui-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   /* Sheets, sidebars and folds. */
   --x-govuk-ui-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Small things that pop into place and overshoot a little, such as a reaction. */
+  --x-govuk-ui-ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
   /* Quick fades and presses, such as a tooltip appearing. */
   --x-govuk-ui-duration-instant: 120ms;
   /* Colour, hover and focus feedback, and small things leaving. */
@@ -52,6 +54,8 @@
   --x-govuk-ui-duration-medium: 220ms;
   /* Larger movements, such as sidebars, glides and messages arriving. */
   --x-govuk-ui-duration-slow: 300ms;
+  /* A figure drawing itself as it arrives, such as a gauge filling or a marker's highlight. */
+  --x-govuk-ui-duration-draw: 700ms;
   /* Layers. Every overlay, from a tooltip to a dialog, shares one layer. Base UI puts each overlay
      at the end of the page as it opens, so the one opened last is on top. A dialog covers a popover
      or a tour step that is already open, and a menu opened in a dialog sits above the dialog.

@@ -236,7 +236,7 @@ export function SelectControl(given: SelectControlProps) {
   } = useControlProps(given);
   // A Form can give the field an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(name)?.[0];
-  const defaultValue = givenDefault === undefined ? saved : givenDefault;
+  const defaultValue = saved ?? givenDefault;
   const registered = useItemLabels();
   const labels = { ...registered.labels, ...labelsOf(children) };
   // Check your answers shows the chosen option's label, not its value.

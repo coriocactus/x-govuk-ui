@@ -92,7 +92,7 @@ export function Choices({
   const saved = useFormDefault(name);
   const savedOther = useFormDefault(`${name}-other`)?.[0] ?? "";
   const [own, setOwn] = useState<string[]>(() => [
-    ...(defaultValue ?? saved ?? []),
+    ...(saved ?? defaultValue ?? []),
     ...(savedOther ? [OTHER] : []),
   ]);
   const [words, setWords] = useState(savedOther);

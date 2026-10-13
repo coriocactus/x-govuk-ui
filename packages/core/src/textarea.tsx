@@ -122,7 +122,7 @@ export function TextareaControl(given: TextareaControlProps) {
   const infoId = `${controlId}-info`;
   // A Form can give the field an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(props.name)?.[0];
-  const startWith = props.value === undefined ? (props.defaultValue ?? saved) : undefined;
+  const startWith = props.value === undefined ? (saved ?? props.defaultValue) : undefined;
   const [typed, setTyped] = useState(String(props.value ?? startWith ?? ""));
   const text = props.value === undefined ? typed : String(props.value);
   const count = wordLimit ? countWords(text) : text.length;

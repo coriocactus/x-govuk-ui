@@ -56,7 +56,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added CalloutClose and CommandMenuClose, buttons that close a Callout or a Command menu, as PopoverClose and DialogClose do.
 - Added `defaultOpen` to SidebarCustomise, whose `open` and `onOpenChange` are now optional, and `children` for a SheetTrigger that opens it.
 - Added `labels` to Textarea and TextareaControl, for the words of its character count. Textarea's count and the Editor's share the `characterCount` words of a LabelsProvider.
-- Added `errorMessage` to Switch and Slider. Each now takes part in a Form by its `name`, so a Form's error shows on the field, and its error summary links to it.
+- Added `errorMessage` to Switch and Slider. Each now takes part in a Form by its `name`, so a Form's error shows on the field, and its error summary links to it. Each starts from the answer the Form keeps for it.
 - Added the questions and answers of Combobox, MultiSelect, Slider, Switch, Date input and Time input to FormSteps' Check your answers. Combobox shows its option's label, Slider its value as it shows it, and Switch On or Off.
 - Added the ability to put a FormStep inside a wrapper of your own. Each FormStep now draws its own step, in its place, and FormSteps takes its steps in the page's order. A step in a wrapper shows once the page has loaded. Keep every step on the page, and give a step that applies only to some answers a `when`.
 - Added the ability to put a TourStep inside a wrapper of your own. Each TourStep now leaves an empty, hidden element in its place, which keeps its order among the Tour's steps.
@@ -97,6 +97,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed Card, Item, Avatar, Aspect ratio, Aside, Marker and VisuallyHidden to have a file each, and each component its own stylesheet. Item and Aspect ratio no longer mark themselves as client components, so they render on the server.
 - Changed ErrorSummaryItem to focus the first control inside the element it links to, when that element cannot take focus itself, such as a Slider or a group.
 - Changed SummaryListAction's `hiddenText` to take any React content.
+- Changed a Form's `defaultValues` to come before a field's own `defaultValue`. A field then shows an answer kept from an earlier visit, or the answer in a record being changed, in place of where it usually starts. FormSteps restores every field it kept, even one with a `defaultValue`.
 - Changed `errorMessage` on every field to take any React content, as Fieldset's does. `FormErrors` takes any React content too, so a Form's `validate` and `onSubmit` can give a message with a link.
 
 ### Fixed

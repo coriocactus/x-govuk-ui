@@ -88,7 +88,7 @@ export function FilterChips({
   const saved = useFormDefault(name);
   const [chosen, setChosen] = useControllableState(
     value,
-    () => defaultValue ?? saved ?? [],
+    () => saved ?? defaultValue ?? [],
     onValueChange,
   );
   const [labels] = useState(() => new Map<string, ReactNode>());

@@ -243,7 +243,7 @@ export function ComboboxControl(given: ComboboxControlProps) {
     <Primitive.Root
       items={options}
       value={find(value)}
-      defaultValue={find(defaultValue === undefined ? saved : defaultValue)}
+      defaultValue={find(saved ?? defaultValue)}
       onValueChange={(next) => onValueChange?.((next as ComboboxOption | null)?.value ?? null)}
       onInputValueChange={setQuery}
       itemToStringLabel={(option: ComboboxOption) => option.label}
@@ -342,7 +342,7 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
       multiple
       items={options}
       value={findAll(value)}
-      defaultValue={findAll(defaultValue ?? saved)}
+      defaultValue={findAll(saved ?? defaultValue)}
       onValueChange={(next) =>
         onValueChange?.((next as ComboboxOption[]).map((option) => option.value))
       }

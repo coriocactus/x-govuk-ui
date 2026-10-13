@@ -500,7 +500,7 @@ export function EditorRoot({
   const [body, setBody] = useState<HTMLDivElement | null>(null);
   // A Form can give the document to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(name)?.[0];
-  const startWith = value ?? defaultValue ?? saved ?? "";
+  const startWith = value ?? saved ?? defaultValue ?? "";
   // The document as written, which the hidden field submits. It is a store, so writing it renders
   // only what shows it, instead of the whole editor at each key.
   const [text] = useState(() => createStore(startWith));

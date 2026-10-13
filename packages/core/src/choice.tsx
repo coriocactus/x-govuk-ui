@@ -223,7 +223,7 @@ export function RadiosRoot({
   const saved = useFormDefault(name)?.[0];
   const [value, setValue] = useControllableState<string | null>(
     controlled,
-    () => (defaultValue === undefined ? (saved ?? null) : defaultValue),
+    () => saved ?? (defaultValue === undefined ? null : defaultValue),
     (next) => next !== null && onValueChange?.(next),
   );
   const target = useLinkTarget(controlId);
@@ -281,7 +281,7 @@ export function CheckboxesRoot({
   const saved = useFormDefault(name);
   const [value, set] = useControllableState(
     controlled,
-    () => defaultValue ?? saved ?? [],
+    () => saved ?? defaultValue ?? [],
     onValueChange,
   );
   const exclusive = useRef(new Set<string>());

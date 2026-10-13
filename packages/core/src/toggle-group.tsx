@@ -72,7 +72,7 @@ export function ToggleGroup({
   const saved = useFormDefault(name);
   const [value, setValue] = useControllableState(
     controlled,
-    () => defaultValue ?? saved ?? [],
+    () => saved ?? defaultValue ?? [],
     onValueChange,
   );
   const [labels] = useState(() => new Map<string, ReactNode>());

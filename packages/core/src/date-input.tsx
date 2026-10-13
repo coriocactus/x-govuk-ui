@@ -245,11 +245,9 @@ export function DateInputControl({
   const [parts, set] = useControllableState(
     value,
     () =>
-      defaultValue ?? {
-        day: savedDay ?? "",
-        month: savedMonth ?? "",
-        year: savedYear ?? "",
-      },
+      savedDay !== undefined || savedMonth !== undefined || savedYear !== undefined
+        ? { day: savedDay ?? "", month: savedMonth ?? "", year: savedYear ?? "" }
+        : (defaultValue ?? { day: "", month: "", year: "" }),
     onValueChange,
   );
   const [open, setOpen] = useState(false);

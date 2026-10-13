@@ -9,6 +9,7 @@ import {
   useBoundField,
   useControlProps,
   useFieldSummary,
+  useFormDefault,
 } from "./field";
 import { useLabels } from "./labels";
 
@@ -110,8 +111,11 @@ export function SwitchControl(given: SwitchControlProps) {
     onChange,
     size = "medium",
     className = "",
+    defaultChecked,
     ...props
   } = useControlProps(given);
+  // A Form can give the switch an answer to start with, such as one kept from an earlier visit.
+  const saved = useFormDefault(props.name);
   const labels = useLabels("switch", defaultSwitchLabels);
   const { name } = props;
   // Check your answers says whether the setting is on.
@@ -122,6 +126,7 @@ export function SwitchControl(given: SwitchControlProps) {
       // biome-ignore lint/a11y/useAriaPropsForRole: A native checkbox reports its own checked state.
       role="switch"
       {...props}
+      defaultChecked={props.checked === undefined && saved !== undefined ? true : defaultChecked}
       className={`x-govuk-ui-switch-control ${className}`.trim()}
       data-size={size === "small" ? "small" : undefined}
       onChange={(event) => {

@@ -208,11 +208,9 @@ export function TimeInputControl({
   const [parts, set] = useControllableState<TimeParts>(
     value,
     () =>
-      defaultValue ?? {
-        hour: savedHour ?? "",
-        minute: savedMinute ?? "",
-        period: savedPeriod ?? "",
-      },
+      savedHour !== undefined || savedMinute !== undefined || savedPeriod !== undefined
+        ? { hour: savedHour ?? "", minute: savedMinute ?? "", period: savedPeriod ?? "" }
+        : (defaultValue ?? { hour: "", minute: "", period: "" }),
     onValueChange,
   );
   const invalid = (part: Part) =>

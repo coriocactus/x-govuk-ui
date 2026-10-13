@@ -54,7 +54,8 @@ export type FormProps = Omit<ComponentPropsWithRef<"form">, "onSubmit"> & {
   errorSummary?: boolean;
   /**
    * The answers the fields start with, by the names they submit under, such as answers kept from
-   * an earlier visit. A field's own `defaultValue` comes first.
+   * an earlier visit, or a record being changed. They come before a field's own `defaultValue`,
+   * which is where the field starts when the Form has no answer for it.
    */
   defaultValues?: Partial<Record<string, string | string[]>>;
 };

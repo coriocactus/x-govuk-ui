@@ -20,6 +20,7 @@ import {
   present,
   useBoundField,
   useFieldSummary,
+  useFormDefault,
 } from "./field";
 import { useLocale } from "./labels";
 import { useMotionTiming } from "./motion";
@@ -129,7 +130,7 @@ export type SliderRootProps = Omit<
  */
 export function SliderRoot({
   value,
-  defaultValue,
+  defaultValue: givenDefault,
   onValueChange,
   onValueCommitted,
   min = 0,
@@ -147,6 +148,9 @@ export function SliderRoot({
   const generated = useId();
   const id = ownId ?? field?.id ?? `slider-${generated}`;
   const name = ownName ?? field?.name;
+  // A Form can give the slider a value to start with, such as one kept from an earlier visit.
+  const saved = Number(useFormDefault(name)?.[0] ?? Number.NaN);
+  const defaultValue = Number.isFinite(saved) ? saved : givenDefault;
   // The value is written in the page's language, the same on the server and in the browser.
   const locale = useLocale();
   // Check your answers shows the value as the slider shows it.

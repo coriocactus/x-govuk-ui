@@ -46,7 +46,33 @@ export type TourStepProps = {
   align?: "start" | "center" | "end";
   /** Added to the card while this step shows. */
   className?: string;
+  /**
+   * More buttons in the step's foot, before Back and Next, such as Skip the tour. A button of your
+   * own moves the tour with `useTour`.
+   */
+  actions?: ReactNode;
 };
+
+/** What `useTour` gives a part of the tour's card, such as a step's own action. */
+export type TourControls = {
+  /** The step on show, from 0. */
+  step: number;
+  /** How many steps there are. */
+  count: number;
+  /** Shows another step, by its place, from 0. */
+  goTo: (step: number) => void;
+  /** Ends the tour, as Done does on the last step, so a tour that opens by default stays closed. */
+  finish: () => void;
+  /** Closes the tour, as its × does. */
+  close: () => void;
+};
+
+const TourContext = createContext<TourControls | null>(null);
+
+/** The tour around a part of its card, such as a step's own action. Null outside a tour's card. */
+export function useTour(): TourControls | null {
+  return useContext(TourContext);
+}
 
 /** Where a Tour's steps register, each with its props. */
 const StepsContext = createContext<Registry<TourStepProps> | null>(null);
@@ -84,6 +110,15 @@ export type TourProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * The step on show, from 0, such as the step a help link opens the tour at. Leave it out to let
+   * the tour keep track, and open where someone left it.
+   */
+  step?: number;
+  /** The step an uncontrolled tour opens at, unless it resumes where someone left it. */
+  defaultStep?: number;
+  /** Called as the step changes, by its place, from 0. */
+  onStepChange?: (step: number) => void;
   /** Brand blue, to stand apart from the page, or plain, on the page's own colours. */
   variant?: CalloutVariant;
   /**
@@ -199,6 +234,9 @@ export function Tour({
   open: controlled,
   defaultOpen = false,
   onOpenChange,
+  step: controlledStep,
+  defaultStep = 0,
+  onStepChange,
   variant = "brand",
   dim = false,
   dimPadding = 6,
@@ -221,19 +259,19 @@ export function Tour({
   // How far someone got, in local storage with a key, or else in memory.
   const [progress, setProgress] = useStoredState<Progress>(
     storageKey,
-    { step: 0, ended: null },
+    { step: defaultStep, ended: null },
     storage,
   );
   // The step is kept as asked for, and kept within the steps as it is read. Steps in a wrapper of
   // your own register after the tour first renders, so the steps are not all known before then.
-  const firstStep = () => (!resume || progress.ended === "finished" ? 0 : progress.step);
+  const firstStep = () => (!resume || progress.ended === "finished" ? defaultStep : progress.step);
   // A tour opened by default stays closed once someone has finished it, or ended it by closing.
   const [open, setOpen] = useControllableState(
     controlled,
     () => defaultOpen && progress.ended === null,
     onOpenChange,
   );
-  const [wanted, setStep] = useState(firstStep);
+  const [wanted, setStep] = useControllableState(controlledStep, firstStep, onStepChange);
   const step = Math.max(0, Math.min(steps.length - 1, wanted));
   // The step's target, or the middle of the screen for a step about the whole page.
   const [target, setTarget] = useState<Element | "middle" | null>(null);
@@ -262,7 +300,8 @@ export function Tour({
     if (open && !wasOpen.current) {
       returnTo.current = document.activeElement as HTMLElement | null;
       direction.current = 1;
-      setStep(firstStep());
+      // A tour whose step is controlled opens at the step it is given.
+      if (controlledStep === undefined) setStep(firstStep());
       setHeard("");
     }
     wasOpen.current = open;
@@ -288,7 +327,7 @@ export function Tour({
     const after = step + direction.current;
     if (after >= 0 && after < count) setStep(after);
     else setOpen(false);
-  }, [open, step, aim, count, reduced, setOpen]);
+  }, [open, step, aim, count, reduced, setOpen, setStep]);
 
   // The card glides from where it was to its next place. Base UI places it a moment after the
   // step changes, so the glide starts as it does, before the new place is ever drawn.
@@ -467,6 +506,19 @@ export function Tour({
                   </span>
                   {stepLabel(step + 1, steps.length)}
                 </span>
+                {current?.actions && (
+                  <TourContext
+                    value={{
+                      step,
+                      count: steps.length,
+                      goTo: (index) => void go(index),
+                      finish: () => end("finished"),
+                      close: () => end("closed"),
+                    }}
+                  >
+                    <span className="x-govuk-ui-tour-actions">{current.actions}</span>
+                  </TourContext>
+                )}
                 {step > 0 && (
                   <Button variant="quiet" size="small" onClick={() => go(step - 1)}>
                     {labels.back}

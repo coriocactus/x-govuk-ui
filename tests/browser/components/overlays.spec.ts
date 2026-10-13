@@ -247,6 +247,11 @@ test("a tour steps through its targets, and a service chooses its dimming, memor
   await start.click();
   await expect(page.getByRole("dialog", { name: "Find an application" })).toBeVisible();
   await page.keyboard.press("Escape");
+  // A step's own button, Skip, ends the tour as Done does.
+  await start.click();
+  await card.getByRole("button", { name: "Skip" }).click();
+  await expect(card).toHaveCount(0);
+  expect(await stored()).toBe('{"step":0,"ended":"finished"}');
 
   // A welcome, with no target, sits in the middle of the screen, with no arrow.
   await playground.set("welcome", true);

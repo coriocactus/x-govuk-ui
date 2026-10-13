@@ -914,10 +914,12 @@ export {
 export {
   defaultTourLabels,
   Tour,
+  type TourControls,
   type TourLabels,
   type TourProps,
   TourStep,
   type TourStepProps,
+  useTour,
 } from "./tour";
 export {
   VisuallyHidden,

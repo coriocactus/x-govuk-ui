@@ -22,6 +22,11 @@
 .x-govuk-ui-tour:has(> .x-govuk-ui-callout-close) .x-govuk-ui-tour-foot {
   margin-right: -28px;
 }
+/* A step's own buttons, such as Skip the tour, sit before Back and Next. */
+.x-govuk-ui-tour-actions {
+  display: inline-flex;
+  gap: 6px;
+}
 .x-govuk-ui-tour-count {
   display: inline-flex;
   flex: 1;

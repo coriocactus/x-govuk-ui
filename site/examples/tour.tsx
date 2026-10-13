@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Link, SearchBox, Tag, Tour, TourStep } from "x-govuk-ui";
+import { Button, Link, SearchBox, Tag, Tour, TourStep, useTour } from "x-govuk-ui";
 
 type Props = {
   variant?: "brand" | "plain";
@@ -80,7 +80,7 @@ export default function TourExample({
             This short tour shows you where everything is. It takes about a minute.
           </TourStep>
         )}
-        <TourStep target=".preview-tour-search" title="Find an application">
+        <TourStep target=".preview-tour-search" title="Find an application" actions={<SkipTour />}>
           Search by the service’s name, or by the reference number we sent you.
         </TourStep>
         <TourStep target="#tour-passport" title="Carry on where you left off">
@@ -89,6 +89,16 @@ export default function TourExample({
         <ActionSteps />
       </Tour>
     </div>
+  );
+}
+
+/** Ends the tour from its first step, for someone who knows the page already. */
+function SkipTour() {
+  const tour = useTour();
+  return (
+    <Button variant="quiet" size="small" onClick={() => tour?.finish()}>
+      Skip
+    </Button>
   );
 }
 

@@ -1200,7 +1200,8 @@ const entries = {
       toggle("closeOnPressOutside", false),
       toggle("closeButton", true, { note: "The × in the corner, as Popover's closeButton." }),
       reference("open / defaultOpen / onOpenChange", "boolean", "false"),
-      reference("storageKey", "string, to keep progress between visits", "None"),
+      reference("step / defaultStep / onStepChange", "number / (step) => void", "Uncontrolled"),
+      reference("storageKey / storage", "string, to keep progress between visits", "None"),
       reference("onFinish", "() => void", "None"),
       reference("labels", "Partial<TourLabels>", "2 of 4, Next, Back, Done"),
       reference(
@@ -1208,7 +1209,12 @@ const entries = {
         "CSS colour / length",
         "48% black",
       ),
-      reference("TourStep", "{ target?, title, children, side, align, className }", "Part"),
+      reference(
+        "TourStep",
+        "{ target?, title, children, side, align, className, actions }",
+        "Part",
+      ),
+      reference("useTour", "() => { step, count, goTo, finish, close }", "Hook"),
     ],
     example: [
       toggle("welcome", false, { note: "Starts with a welcome in the middle of the screen." }),

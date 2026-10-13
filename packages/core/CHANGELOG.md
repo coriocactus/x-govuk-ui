@@ -61,6 +61,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added `step`, `defaultStep` and `onStepChange` to Tour, so a service can open a tour at a step, such as from a help link, and hear each step change. An uncontrolled tour opens at `defaultStep`, unless it resumes where someone left it.
+- Added `actions` to TourStep, more buttons in the step's foot before Back and Next, such as Skip, and `useTour`, with which a button of your own in the card moves to a step, finishes the tour or closes it.
 - Added `storage` to every part that keeps something under a `storageKey`, which are FormSteps, QuestionCard, Tour, SidebarProvider and ThemePicker, and to `useTheme` and `useSidebarArrangement`. Give `sessionStorage`, to keep answers only while the tab is open, or a store of your own with `getItem`, `setItem` and `removeItem`, typed as `StorageLike`. By default, it is local storage, as before.
 - Added a fieldset's props to FormStep, such as `id`, `style`, `ref` and data attributes, which go on the step's fieldset beside its `className`, and `titleLevel`, the level of its title's heading, 1 on a page and 3 in a card by default.
 - Added `closeOnPressOutside` to Dialog and Sheet, as Callout and Tour have. Give false for a decision that must be made in the dialog or the sheet, such as confirming a deletion. Escape and its own close still close it.

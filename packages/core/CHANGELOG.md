@@ -102,6 +102,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Fixed an answer in a wrapper of your own, inside Radios or Checkboxes, taking the first answer's id. Its label then named the wrong answer. Such an answer now takes an id of its own, including in a group inside a follow-up question. A Form's error summary links to the first answer on the page.
 - Fixed FormSteps with a `storageKey` rendering different first HTML in the browser than on the server. Kept answers and the step now come back once the page has loaded, before it is drawn.
 - Fixed the browser's Back and Forward in FormSteps with `history` using the form as it was when the page loaded, such as which steps were skipped.
+- Fixed FormSteps' Check your answers listing nothing when the form starts on it, such as from `step`, or comes back to it from a `storageKey`.
+- Fixed the browser's Back and Forward in FormSteps with `history` and a `storageKey` going to the step the form started on, in place of the step it came back to.
 - Fixed Tour failing to render on the server.
 - Fixed File upload losing its files' Remove when given a `ref`, which took the place of its own.
 - Fixed Slider putting its own `aria-describedby` on its root, which nothing reads. It now describes the thumb, before the hint and the error, as every field's control is described.

@@ -154,8 +154,9 @@ export type FormStepsProps = Omit<
   history?: boolean;
   /**
    * Keeps the answers and the step in local storage under this key, so users continue where they
-   * left off. They are cleared once the form is sent. Answers stay in the browser, so leave out
-   * anything sensitive.
+   * left off. They come back once the page has loaded, and `onStepChange` is told the step. They
+   * are cleared once the form is sent. Answers stay in the browser, so leave out anything
+   * sensitive.
    */
   storageKey?: string;
   /**
@@ -414,7 +415,8 @@ export function FormSteps({
     for (const [name, value] of saved.answers) answers[name] = [...(answers[name] ?? []), value];
     setPassed(new Set(saved.passed));
     setSkipped(new Set(saved.skipped));
-    if (controlledStep === undefined) setAt(saved.at);
+    // A form whose step is controlled is told the kept step, so it can take it.
+    setAt(saved.at);
     setRestored({ answers, round: 1 });
   }, []);
 
@@ -555,18 +557,25 @@ export function FormSteps({
   }, [at, sent]);
 
   // Check your answers lists the answers each time the form comes to it, however it does, such as
-  // by Continue, by a `step` given by the page, or by answers restored from an earlier visit.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are listed as the form arrives.
+  // by Continue, by a `step` given by the page, or by answers restored from an earlier visit. It
+  // lists them again as the steps register, because restored answers start the form again, and the
+  // steps register anew after it.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are listed as the form arrives, and as its steps register.
   useLayoutEffect(() => {
     if (reviewing && !sent) setRows(planFor().flatMap((index) => summaryRows(index, skipped)));
-  }, [reviewing, sent, restored.round]);
+  }, [reviewing, sent, restored.round, registered]);
 
-  // With history, the browser's Back and Forward move between the steps.
+  // With history, the page's place in the browser's history is the step the form starts on, and
+  // then the step restored from an earlier visit.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the place is set as the form starts, and again once answers are restored.
+  useEffect(() => {
+    if (historyOn) window.history.replaceState({ ...window.history.state, [historyKey]: at }, "");
+  }, [historyOn, historyKey, restored.round]);
+  // The browser's Back and Forward move between the steps. The listener is set once, and calls the
+  // latest go.
   const goNow = useLatest(go);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the listener is set once, and calls the latest go.
   useEffect(() => {
     if (!historyOn) return;
-    window.history.replaceState({ ...window.history.state, [historyKey]: at }, "");
     const moved = (event: PopStateEvent) => {
       const where = event.state?.[historyKey];
       if (typeof where === "number") goNow.current(where, { push: false });

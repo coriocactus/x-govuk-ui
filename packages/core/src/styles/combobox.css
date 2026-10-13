@@ -81,6 +81,13 @@
   cursor: pointer;
   user-select: none;
 }
+/* An option's description sits on its own line beneath its label, in the muted colour. */
+.x-govuk-ui-combobox-description {
+  display: block;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.4;
+}
 .x-govuk-ui-combobox-match {
   background: none;
   color: inherit;

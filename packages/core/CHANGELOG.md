@@ -62,6 +62,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added `filter`, `inputValue`, `defaultInputValue` and `onInputValueChange` to Combobox, MultiSelect and their controls. A service hears the text as users type, such as to ask a server for options, and gives `filter={null}` to show the options it found as they are, or a `filter` of its own. Added `description` to a ComboboxOption, a line beneath its label in the list.
 - Added `files` and `defaultFiles` to FileUpload and FileUploadControl, so a service can control the chosen files, show a file it already has, such as for a record being changed, or take one away. The input sends the files the field shows. Added `list`, which, given false, leaves the list of files beneath the zone to the service, such as to draw them with FileChips.
 - Added `step`, `defaultStep` and `onStepChange` to Tour, so a service can open a tour at a step, such as from a help link, and hear each step change. An uncontrolled tour opens at `defaultStep`, unless it resumes where someone left it.
 - Added `actions` to TourStep, more buttons in the step's foot before Back and Next, such as Skip, and `useTour`, with which a button of your own in the card moves to a step, finishes the tour or closes it.

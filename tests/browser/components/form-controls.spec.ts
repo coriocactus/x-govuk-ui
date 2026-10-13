@@ -1228,12 +1228,31 @@ test("a file upload lists and removes files", async ({ frame, open }) => {
   await expect(frame.getByText("No file chosen")).toBeVisible();
 });
 
-test("a combobox narrows as people type", async ({ page, frame, open }) => {
+test("a combobox narrows as people type, or shows what a search of the service's own finds", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
   await open("combobox");
-  await frame.getByRole("combobox", { name: "Which country do you live in?" }).fill("uni");
+  const field = frame.getByRole("combobox", { name: "Which country do you live in?" });
+  await field.fill("uni");
   await expect(page.getByRole("option")).toHaveCount(3);
   await page.getByRole("option", { name: "United Kingdom" }).click();
   await expect(frame.getByRole("status")).toHaveText("You chose United Kingdom.");
+  // By default, an option matches wherever its label has the text. A search of the service's own
+  // finds names that start with it, and the field shows those as they are, with their descriptions.
+  await field.fill("land");
+  await expect(page.getByRole("option")).toHaveCount(5);
+  await page.keyboard.press("Escape");
+  await playground.set("ownSearch", true);
+  await field.fill("land");
+  await expect(page.getByRole("option")).toHaveCount(0);
+  await field.fill("sw");
+  await expect(page.getByRole("option")).toHaveText([
+    "SwedenStarts with what you typed",
+    "SwitzerlandStarts with what you typed",
+  ]);
 });
 
 test("a select shows the label of an option from a component of the service's own", async ({

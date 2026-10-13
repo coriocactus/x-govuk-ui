@@ -8,8 +8,8 @@ import {
   useId,
   useMemo,
   useRef,
-  useState,
 } from "react";
+import { useControllableState } from "./controllable-state";
 import {
   ErrorMessage,
   Field,
@@ -25,7 +25,12 @@ import { ChevronIcon, CrossIcon, TickIcon } from "./icons";
 import { useLabels } from "./labels";
 import { ScrollArea } from "./scroll-area";
 
-export type ComboboxOption = { value: string; label: string };
+export type ComboboxOption = {
+  value: string;
+  label: string;
+  /** A line beneath the label in the list, such as a code or a place. */
+  description?: string;
+};
 /** An option as a value and its label, or as text that is both. */
 export type ComboboxItem = string | ComboboxOption;
 
@@ -53,6 +58,18 @@ type FieldWords = {
 type ControlShared = {
   /** The options to search. */
   items: readonly ComboboxItem[];
+  /**
+   * Whether an option matches what users type. By default, its label contains the text. Give null
+   * where `items` are already the matches, such as options a server found for the text, so the
+   * field shows them all.
+   */
+  filter?: ((option: ComboboxOption, search: string) => boolean) | null;
+  /** The text users type. Leave it out to let the field keep track. */
+  inputValue?: string;
+  /** The text an uncontrolled field starts with. */
+  defaultInputValue?: string;
+  /** Called as the text changes, such as to ask a server for options that match it. */
+  onInputValueChange?: (inputValue: string) => void;
   placeholder?: string;
   /** Its words, in place of a LabelsProvider's or the defaults. */
   labels?: Partial<ComboboxLabels>;
@@ -156,6 +173,9 @@ function Options({
                 >
                   <span className="x-govuk-ui-combobox-label">
                     <Match label={option.label} query={query} />
+                    {option.description && (
+                      <span className="x-govuk-ui-combobox-description">{option.description}</span>
+                    )}
                   </span>
                   <Primitive.ItemIndicator className="x-govuk-ui-combobox-tick">
                     <TickIcon />
@@ -230,6 +250,10 @@ export function ComboboxControl(given: ComboboxControlProps) {
     labels: ownLabels,
     name,
     disabled,
+    filter,
+    inputValue,
+    defaultInputValue = "",
+    onInputValueChange,
     className = "",
     style,
     ...props
@@ -242,7 +266,7 @@ export function ComboboxControl(given: ComboboxControlProps) {
   const saved = useFormDefault(name);
   const find = (wanted: string | null | undefined) =>
     wanted == null ? wanted : (options.find((option) => option.value === wanted) ?? null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useControllableState(inputValue, defaultInputValue, onInputValueChange);
   const group = useRef<HTMLDivElement>(null);
   return (
     <Primitive.Root
@@ -250,7 +274,13 @@ export function ComboboxControl(given: ComboboxControlProps) {
       value={find(value)}
       defaultValue={find(saved ? (saved[0] ?? null) : defaultValue)}
       onValueChange={(next) => onValueChange?.((next as ComboboxOption | null)?.value ?? null)}
-      onInputValueChange={setQuery}
+      inputValue={query}
+      onInputValueChange={(next) => setQuery(next)}
+      filter={
+        filter === undefined
+          ? undefined
+          : filter && ((option: ComboboxOption, search: string) => filter(option, search))
+      }
       itemToStringLabel={(option: ComboboxOption) => option.label}
       itemToStringValue={(option: ComboboxOption) => option.value}
       name={name}
@@ -334,6 +364,10 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
     labels: ownLabels,
     name,
     disabled,
+    filter,
+    inputValue,
+    defaultInputValue = "",
+    onInputValueChange,
     className = "",
     style,
     ...props
@@ -345,7 +379,7 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
   const saved = useFormDefault(name);
   const findAll = (wanted: string[] | undefined) =>
     wanted?.flatMap((each) => options.filter((option) => option.value === each));
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useControllableState(inputValue, defaultInputValue, onInputValueChange);
   const chips = useRef<HTMLDivElement>(null);
   return (
     <Primitive.Root
@@ -356,7 +390,13 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
       onValueChange={(next) =>
         onValueChange?.((next as ComboboxOption[]).map((option) => option.value))
       }
-      onInputValueChange={setQuery}
+      inputValue={query}
+      onInputValueChange={(next) => setQuery(next)}
+      filter={
+        filter === undefined
+          ? undefined
+          : filter && ((option: ComboboxOption, search: string) => filter(option, search))
+      }
       itemToStringLabel={(option: ComboboxOption) => option.label}
       itemToStringValue={(option: ComboboxOption) => option.value}
       name={name}

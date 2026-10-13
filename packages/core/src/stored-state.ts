@@ -6,7 +6,9 @@ const STORED = "x-govuk-ui-stored";
 
 /**
  * Where a part keeps what it keeps between visits, such as `localStorage`, `sessionStorage`, or a
- * store of your own with the same three methods. Each answers at once, as the browser's do.
+ * store of your own with the same three methods. Each answers at once, as the browser's do. A
+ * server has no browser storage, so where a page also renders on the server, give the browser's
+ * only in the browser, such as `typeof window === "undefined" ? undefined : sessionStorage`.
  */
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 

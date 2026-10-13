@@ -61,8 +61,10 @@ type ControlShared = {
   /**
    * Whether an option matches what users type, as CommandMenu's `filter` is given the search
    * first. By default, its label contains the text. Give null where `items` are already the
-   * matches, such as options a server found for the text, so the field shows them all. The field
-   * keeps each option it has shown, so a chosen option stays chosen when new results leave it out.
+   * matches, such as options a server found for the text, so the field shows them all. Give the
+   * same array while the results stay the same, because Base UI puts the chosen option's label back
+   * in the input as `items` change before users type. The field keeps each option it has shown, so
+   * a chosen option stays chosen when new results leave it out.
    */
   filter?: ((search: string, option: ComboboxOption) => boolean) | null;
   /**

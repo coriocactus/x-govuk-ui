@@ -239,7 +239,10 @@ export type FormStepsProps = Omit<
    * `value`. A controlled field of your own can read `useFormDefault` to start from its answer.
    */
   storageKey?: string;
-  /** Where `storageKey` keeps the answers. By default, local storage. */
+  /**
+   * Where `storageKey` keeps the answers. By default, local storage. On a page that also renders
+   * on the server, give the browser's storage only in the browser, as StorageLike says.
+   */
   storage?: StorageLike;
   /**
    * Called with every answer once the last step, or Check your answers, is sent. Answers to steps
@@ -1295,6 +1298,8 @@ export function useFormSteps(): UseFormStepsResult | null {
  *
  * As the answers come, focus moves to the form's first `h1` on a page, or else to a heading with
  * the class `x-govuk-ui-form-steps-review-title`. Give your list one, or move focus to it yourself.
+ * The words FormStepsSummary writes for an answer skipped or not given come from
+ * `useLabels("formSteps", defaultFormStepsLabels)`.
  */
 export function useFormStepsAnswers({
   summary = false,
@@ -1369,7 +1374,10 @@ export type FormStepsSummaryProps = Omit<ComponentPropsWithRef<"div">, "title"> 
    * answers", until the answers are sent. Give null for none, such as below a heading of your own.
    */
   title?: ReactNode;
-  /** The level of its heading. By default, 1 on a page, as the page's heading, and 3 in a card. */
+  /**
+   * The level of its heading. By default, 1 on a page, as the page's heading, and 3 in a card. A
+   * section beneath a heading of your own takes 2.
+   */
   titleLevel?: 1 | 2 | 3 | 4;
   /**
    * The steps whose answers it lists, by their places among the steps, from 0, such as a section

@@ -1,12 +1,15 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
+import type { QuestionCardLabels } from "./agent-cards";
 import type { CalendarLabels } from "./calendar";
 import type { DateInputLabels } from "./date-input";
 import type { ErrorLabels } from "./error-summary";
+import type { FormStepsLabels } from "./form-steps";
 import type { InputLabels } from "./input";
 import type { PaginationLabels } from "./pagination";
 import type { TimeInputLabels } from "./time-input";
+import type { TourLabels } from "./tour";
 
 /**
  * The words each component writes itself, by component, such as Pagination's Previous and Next.
@@ -17,9 +20,12 @@ export interface ComponentLabels {
   calendar: CalendarLabels;
   dateInput: DateInputLabels;
   errors: ErrorLabels;
+  formSteps: FormStepsLabels;
   input: InputLabels;
   pagination: PaginationLabels;
+  questionCard: QuestionCardLabels;
   timeInput: TimeInputLabels;
+  tour: TourLabels;
 }
 
 /**

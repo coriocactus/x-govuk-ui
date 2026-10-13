@@ -11,11 +11,13 @@ export {
   type AccordionTriggerProps,
 } from "./accordion";
 export {
+  defaultQuestionCardLabels,
   PlanCard,
   type PlanCardProps,
   type Question,
   type QuestionAnswers,
   QuestionCard,
+  type QuestionCardLabels,
   type QuestionCardProps,
   type QuestionOption,
 } from "./agent-cards";
@@ -303,7 +305,14 @@ export {
   type ValidateWithOptions,
   validateWith,
 } from "./form";
-export { FormStep, type FormStepProps, FormSteps, type FormStepsProps } from "./form-steps";
+export {
+  defaultFormStepsLabels,
+  FormStep,
+  type FormStepProps,
+  FormSteps,
+  type FormStepsLabels,
+  type FormStepsProps,
+} from "./form-steps";
 export {
   GroupedTable,
   type GroupedTableColumn,
@@ -680,7 +689,14 @@ export {
   type TooltipProviderProps,
   type TooltipSide,
 } from "./tooltip";
-export { Tour, type TourProps, TourStep, type TourStepProps } from "./tour";
+export {
+  defaultTourLabels,
+  Tour,
+  type TourLabels,
+  type TourProps,
+  TourStep,
+  type TourStepProps,
+} from "./tour";
 export { WarningText, type WarningTextProps } from "./warning-text";
 export {
   GridColumn,

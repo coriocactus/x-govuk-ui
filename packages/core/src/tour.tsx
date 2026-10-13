@@ -26,6 +26,7 @@ import {
   useCalloutSide,
 } from "./callout";
 import { useControllableState } from "./controllable-state";
+import { useLabels } from "./labels";
 import { glideEasing, useMotionTiming } from "./motion";
 import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
 import { useMergedRef } from "./refs";
@@ -139,12 +140,8 @@ export type TourProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   closeButton?: boolean;
   /** Called when someone presses Done on the last step. */
   onFinish?: () => void;
-  /** How far along the tour is, shown beside the dots and read out with each step. */
-  stepLabel?: (step: number, total: number) => string;
-  nextLabel?: string;
-  backLabel?: string;
-  doneLabel?: string;
-  closeLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<TourLabels>;
   /** Added to the card at every step. */
   className?: string;
 };
@@ -183,7 +180,25 @@ function settled(element: Element) {
   });
 }
 
-const count = (step: number, total: number) => `${step} of ${total}`;
+/** The words Tour writes, which a LabelsProvider or its `labels` can change. */
+export type TourLabels = {
+  /** How far along the tour is, shown beside the dots and read out with each step. */
+  step: (step: number, total: number) => string;
+  next: string;
+  back: string;
+  /** The last step's button. */
+  done: string;
+  /** Names the × in the card's corner. */
+  close: string;
+};
+
+export const defaultTourLabels: TourLabels = {
+  step: (step, total) => `${step} of ${total}`,
+  next: "Next",
+  back: "Back",
+  done: "Done",
+  close: "Close the tour",
+};
 
 /**
  * A walk through a page, one step at a time. Each step is a card pointing at a part of the page,
@@ -210,16 +225,14 @@ export function Tour({
   closeOnPressOutside = false,
   closeButton = true,
   onFinish,
-  stepLabel = count,
-  nextLabel = "Next",
-  backLabel = "Back",
-  doneLabel = "Done",
-  closeLabel = "Close the tour",
+  labels: ownLabels,
   className = "",
   ref,
   onKeyDown,
   ...props
 }: TourProps) {
+  const labels = useLabels("tour", defaultTourLabels, ownLabels);
+  const stepLabel = labels.step;
   const { steps, register } = useSteps(children);
   const stepsNow = useRef(steps);
   stepsNow.current = steps;
@@ -471,7 +484,7 @@ export function Tour({
                 </span>
                 {step > 0 && (
                   <Button variant="quiet" size="small" onClick={() => go(step - 1)}>
-                    {backLabel}
+                    {labels.back}
                   </Button>
                 )}
                 <Button
@@ -480,13 +493,13 @@ export function Tour({
                   data-sound={last ? "success" : undefined}
                   onClick={() => (last ? end("finished") : go(step + 1))}
                 >
-                  {last ? doneLabel : nextLabel}
+                  {last ? labels.done : labels.next}
                 </Button>
               </div>
               {closeButton && (
                 <Primitive.Close
                   render={
-                    <CloseIconButton label={closeLabel} className="x-govuk-ui-callout-close" />
+                    <CloseIconButton label={labels.close} className="x-govuk-ui-callout-close" />
                   }
                 />
               )}

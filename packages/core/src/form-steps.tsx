@@ -21,6 +21,7 @@ import { Button, ButtonGroup } from "./button";
 import { FormContext, type FormField, present } from "./field";
 import { Form, type FormErrors, type FormProps } from "./form";
 import { Kbd } from "./kbd";
+import { useLabels } from "./labels";
 import { Panel } from "./panel";
 import { SummaryList, SummaryListAction, SummaryListRow } from "./summary-list";
 import { Tag } from "./tag";
@@ -52,8 +53,8 @@ export type FormStepProps = {
   when?: (data: FormData) => boolean;
   /** Offers Skip, which moves on without checking and leaves the step's answers out. */
   optional?: boolean;
-  /** The step's button, in place of the form's own. */
-  continueLabel?: string;
+  /** The step's words, such as its own `continue` button, in place of the form's. */
+  labels?: Partial<Pick<FormStepsLabels, "continue">>;
   /** The step's answer in Check your answers, in place of each field's own answer. */
   summary?: (data: FormData) => ReactNode;
   /** Added to the step. */
@@ -88,12 +89,10 @@ export type FormStepsProps = Omit<
    * sent.
    */
   checkAnswers?: boolean;
-  checkAnswersTitle?: ReactNode;
   /** Offers Back from the second step on. */
   back?: boolean;
   /** Shows how far along the form is, such as "Question 2 of 5", or the card's ring. */
   progress?: boolean;
-  progressLabel?: (step: number, total: number) => string;
   /**
    * Lists the errors in an Error summary that takes focus, as GOV.UK does. Without it, each field
    * shows only its own message. On by default, except in a card.
@@ -121,16 +120,55 @@ export type FormStepsProps = Omit<
    * with Change.
    */
   done?: ReactNode;
-  continueLabel?: string;
-  backLabel?: string;
-  skipLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<FormStepsLabels>;
+};
+
+/** The words FormSteps writes, which a LabelsProvider or its `labels` can change. */
+export type FormStepsLabels = {
+  /** Each step's button. */
+  continue: string;
+  back: string;
+  skip: string;
   /** The last button, which sends the answers. */
-  submitLabel?: string;
-  /** Says that the answers have been sent, when there is no `done`. */
-  doneLabel?: string;
-  /** Shown for a question that was skipped, or left empty. */
-  skippedLabel?: string;
-  notAnsweredLabel?: string;
+  submit: string;
+  /** Heads the list of answers before they are sent. */
+  checkAnswers: ReactNode;
+  /** How far along the form is, such as "Question 2 of 5". */
+  progress: (step: number, total: number) => string;
+  /** Names the card's ring of progress for screen readers. */
+  progressRing: string;
+  /** What the card's ring says once every question is answered. */
+  allAnswered: string;
+  /** Says on a page that the answers have been sent, when there is no `done`. */
+  sent: string;
+  /** Says in a card that the answers have been sent. */
+  answered: string;
+  /** Shown for a question that was skipped. */
+  skipped: string;
+  /** Shown for a question left empty. */
+  notAnswered: string;
+  /** Each answer's Change. */
+  change: string;
+  /** Follows Change for screen readers, as in "Change your answer to What is your name?". */
+  changeAnswer: (question: ReactNode) => ReactNode;
+};
+
+export const defaultFormStepsLabels: FormStepsLabels = {
+  continue: "Continue",
+  back: "Back",
+  skip: "Skip",
+  submit: "Submit",
+  checkAnswers: "Check your answers",
+  progress: (step, total) => `Question ${step} of ${total}`,
+  progressRing: "Questions answered",
+  allAnswered: "All answered",
+  sent: "Your answers have been sent",
+  answered: "Answered",
+  skipped: "Skipped",
+  notAnswered: "Not answered",
+  change: "Change",
+  changeAnswer: (question) => <>your answer to {question}</>,
 };
 
 type Saved = { at: number; passed: number[]; skipped: number[]; answers: [string, string][] };
@@ -232,10 +270,8 @@ export function FormSteps({
   title,
   icon,
   checkAnswers = true,
-  checkAnswersTitle = "Check your answers",
   back = true,
   progress = true,
-  progressLabel = (step, total) => `Question ${step} of ${total}`,
   errorSummary = layout !== "card",
   shortcut = true,
   history: historyOn = false,
@@ -243,16 +279,12 @@ export function FormSteps({
   onComplete,
   onStepChange,
   done: doneContent,
-  continueLabel = "Continue",
-  backLabel = "Back",
-  skipLabel = "Skip",
-  submitLabel = "Submit",
-  doneLabel = layout === "card" ? "Answered" : "Your answers have been sent",
-  skippedLabel = "Skipped",
-  notAnsweredLabel = "Not answered",
+  labels: ownLabels,
   className = "",
   ...formProps
 }: FormStepsProps) {
+  const labels = useLabels("formSteps", defaultFormStepsLabels, ownLabels);
+  const doneLabel = layout === "card" ? labels.answered : labels.sent;
   const steps = Children.toArray(children)
     .filter(isValidElement)
     .map((child) => child.props as FormStepProps);
@@ -339,12 +371,12 @@ export function FormSteps({
       return {
         step: index,
         label: field.label,
-        values: values.length > 0 ? values : [notAnsweredLabel],
+        values: values.length > 0 ? values : [labels.notAnswered],
         id: field.id,
       };
     });
     if (skipping.has(index))
-      return each.map((row) => ({ ...row, values: [skippedLabel], skipped: true }));
+      return each.map((row) => ({ ...row, values: [labels.skipped], skipped: true }));
     const own = steps[index]?.summary;
     if (own)
       return [
@@ -527,7 +559,7 @@ export function FormSteps({
   const position = reviewing ? plan.length : plan.indexOf(at);
   const settled = plan.filter((index) => passed.has(index) || skipped.has(index)).length;
   const last = !checkAnswers && plan.at(-1) === at;
-  const label = reviewing || last ? submitLabel : (step?.continueLabel ?? continueLabel);
+  const label = reviewing || last ? labels.submit : (step?.labels?.continue ?? labels.continue);
   const card = layout === "card";
   const showSteps = !(sent && doneContent);
 
@@ -536,11 +568,13 @@ export function FormSteps({
     <span
       className="x-govuk-ui-form-steps-ring"
       role="progressbar"
-      aria-label="Questions answered"
+      aria-label={labels.progressRing}
       aria-valuemin={0}
       aria-valuemax={plan.length}
       aria-valuenow={sent ? plan.length : settled}
-      aria-valuetext={sent || reviewing ? "All answered" : progressLabel(position + 1, plan.length)}
+      aria-valuetext={
+        sent || reviewing ? labels.allAnswered : labels.progress(position + 1, plan.length)
+      }
     >
       <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
         <circle className="x-govuk-ui-form-steps-ring-track" cx="9" cy="9" r="7" />
@@ -560,7 +594,7 @@ export function FormSteps({
     back && !sent && previous !== undefined ? (
       card ? (
         <Button variant="outline" size="small" onClick={goBack}>
-          {backLabel}
+          {labels.back}
         </Button>
       ) : (
         <BackLink
@@ -571,7 +605,7 @@ export function FormSteps({
             goBack();
           }}
         >
-          {backLabel}
+          {labels.back}
         </BackLink>
       )
     ) : null;
@@ -597,7 +631,7 @@ export function FormSteps({
         size={card ? "small" : undefined}
         onClick={skip}
       >
-        {skipLabel}
+        {labels.skip}
       </Button>
     ) : null;
 
@@ -607,7 +641,7 @@ export function FormSteps({
       {!card && sent && <Panel title={doneLabel} titleLevel={2} />}
       {!card && !sent && (
         <h2 className="x-govuk-ui-form-steps-review-title" tabIndex={-1}>
-          {checkAnswersTitle}
+          {labels.checkAnswers}
         </h2>
       )}
       <SummaryList
@@ -621,7 +655,9 @@ export function FormSteps({
             label={row.label}
             actions={
               <SummaryListAction
-                hiddenText={<>your answer to {row.label}</>}
+                hiddenText={labels.changeAnswer(row.label)}
+                // biome-ignore lint/correctness/noChildrenProp: The words are its label.
+                children={labels.change}
                 onClick={() => {
                   returning.current = true;
                   setSent(false);
@@ -640,7 +676,7 @@ export function FormSteps({
                     className="x-govuk-ui-form-steps-answer"
                     data-muted={
                       row.skipped ||
-                      (value === notAnsweredLabel && row.values.length === 1) ||
+                      (value === labels.notAnswered && row.values.length === 1) ||
                       undefined
                     }
                   >
@@ -656,7 +692,9 @@ export function FormSteps({
   const body = (
     <div className="x-govuk-ui-form-steps-body">
       {!card && progress && !reviewing && !sent && plan.length > 1 && (
-        <p className="x-govuk-ui-form-steps-progress">{progressLabel(position + 1, plan.length)}</p>
+        <p className="x-govuk-ui-form-steps-progress">
+          {labels.progress(position + 1, plan.length)}
+        </p>
       )}
       {steps.map((each, index) => (
         // Every step stays in the form, so answers are kept as users move back and forth. Steps

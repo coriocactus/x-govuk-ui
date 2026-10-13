@@ -142,14 +142,14 @@ function FeedbackInStages({
         checkAnswers={checkAnswers}
         history={history}
         storageKey={remember ? "x-govuk-ui-example-feedback" : undefined}
-        submitLabel="Send feedback"
+        labels={{ submit: "Send feedback" }}
         onComplete={async () => {
           await wait(250);
         }}
         done={<p>Thank you for your feedback.</p>}
       >
         <FormStep
-          continueLabel="Submit and continue"
+          labels={{ continue: "Submit and continue" }}
           validate={(data): FormErrors => ({
             experience: data.get("experience") ? undefined : "Select a rating to continue",
           })}

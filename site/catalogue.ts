@@ -942,7 +942,7 @@ const entries = {
       ),
       reference(
         "FormStep",
-        "{ title?, hint?, validate, onContinue, when, optional, continueLabel, summary }",
+        "{ title?, hint?, validate, onContinue, when, optional, labels: { continue }, summary }",
         "Part",
       ),
     ],
@@ -1175,8 +1175,7 @@ const entries = {
       reference("open / defaultOpen / onOpenChange", "boolean", "false"),
       reference("storageKey", "string, to keep progress between visits", "None"),
       reference("onFinish", "() => void", "None"),
-      reference("stepLabel", "(step, total) => string", "2 of 4"),
-      reference("nextLabel / backLabel / doneLabel / closeLabel", "string", "Next, Back, Done"),
+      reference("labels", "Partial<TourLabels>", "2 of 4, Next, Back, Done"),
       reference(
         "--x-govuk-ui-tour-dim / --x-govuk-ui-tour-radius",
         "CSS colour / length",
@@ -2650,7 +2649,7 @@ const entries = {
       ),
       reference("title", "ReactNode", "Questions"),
       reference("onComplete", "(answers: Record<string, string | string[] | null>) => void"),
-      reference("submitLabel", "string", "Continue"),
+      reference("labels", "Partial<QuestionCardLabels>", "Next, Previous, Continue"),
       reference("storageKey", "string", "None"),
     ],
   },

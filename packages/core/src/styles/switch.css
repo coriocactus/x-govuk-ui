@@ -90,32 +90,38 @@
 }
 /* Under the pointer, over the switch or its label, the thumb reaches 6px towards where it would
    go. Only its far edge moves, so the near edge stays put. Pressing changes nothing until the
-   press is let go, as a native checkbox does. */
-.x-govuk-ui-switch:hover .x-govuk-ui-switch-control:not(:disabled)::before {
+   press is let go, as a native checkbox does. A control on its own, in a Field of your own,
+   reaches under the pointer over itself. */
+.x-govuk-ui-switch:hover .x-govuk-ui-switch-control:not(:disabled)::before,
+.x-govuk-ui-switch-control:hover:not(:disabled)::before {
   right: 15px;
 }
-.x-govuk-ui-switch:hover .x-govuk-ui-switch-control:checked:not(:disabled)::before {
+.x-govuk-ui-switch:hover .x-govuk-ui-switch-control:checked:not(:disabled)::before,
+.x-govuk-ui-switch-control:checked:hover:not(:disabled)::before {
   right: 1px;
   left: 15px;
 }
-/* Small has a 36 by 22 track, with the thumb's travel and reach in step. */
-.x-govuk-ui-switch[data-size="small"] .x-govuk-ui-switch-control {
+/* Small has a 36 by 22 track, with the thumb's travel and reach in step. The control carries its
+   size, so it is small in a Field of your own too. */
+.x-govuk-ui-switch-control[data-size="small"] {
   width: 36px;
   height: 22px;
   border-radius: 11px;
 }
-.x-govuk-ui-switch[data-size="small"] .x-govuk-ui-switch-control::before {
+.x-govuk-ui-switch-control[data-size="small"]::before {
   right: 15px;
 }
-.x-govuk-ui-switch[data-size="small"] .x-govuk-ui-switch-control:checked::before {
+.x-govuk-ui-switch-control[data-size="small"]:checked::before {
   left: 15px;
   right: 1px;
 }
-.x-govuk-ui-switch[data-size="small"]:hover .x-govuk-ui-switch-control:not(:disabled)::before {
+.x-govuk-ui-switch:hover .x-govuk-ui-switch-control[data-size="small"]:not(:disabled)::before,
+.x-govuk-ui-switch-control[data-size="small"]:hover:not(:disabled)::before {
   right: 11px;
 }
-.x-govuk-ui-switch[data-size="small"]:hover
-  .x-govuk-ui-switch-control:checked:not(:disabled)::before {
+.x-govuk-ui-switch:hover
+  .x-govuk-ui-switch-control[data-size="small"]:checked:not(:disabled)::before,
+.x-govuk-ui-switch-control[data-size="small"]:checked:hover:not(:disabled)::before {
   right: 1px;
   left: 11px;
 }

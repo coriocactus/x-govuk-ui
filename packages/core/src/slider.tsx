@@ -246,10 +246,16 @@ export function SliderValue({
 }
 
 /**
- * The slider's track and thumb. The thumb is named by the `SliderLabel` and, in a bound Field,
- * described by the field's hint and error.
+ * The slider's track and thumb. The thumb is named by the `SliderLabel`, unless it is given an
+ * `aria-label` or an `aria-labelledby` of its own, which go on the thumb. In a bound Field, the
+ * thumb is described by the field's hint and error.
  */
-export function SliderControl({ className = "", ...props }: ComponentPropsWithRef<"div">) {
+export function SliderControl({
+  className = "",
+  "aria-label": label,
+  "aria-labelledby": labelledBy,
+  ...props
+}: ComponentPropsWithRef<"div">) {
   const { id, thumb } = useSlider("SliderControl");
   const field = useBoundField();
   return (
@@ -259,7 +265,8 @@ export function SliderControl({ className = "", ...props }: ComponentPropsWithRe
         <Primitive.Thumb
           ref={thumb}
           className="x-govuk-ui-slider-thumb"
-          aria-labelledby={`${id}-label`}
+          aria-label={label}
+          aria-labelledby={label ? labelledBy : (labelledBy ?? `${id}-label`)}
           aria-describedby={field?.controlProps["aria-describedby"]}
         />
       </Primitive.Track>

@@ -60,7 +60,7 @@ export function Switch({
       label={label}
     >
       <SwitchRow label={label} hint={hint} hideLabel={hideLabel} size={size} className={className}>
-        <SwitchControl {...props} />
+        <SwitchControl {...props} size={size} />
       </SwitchRow>
     </FieldBinding>
   );
@@ -96,18 +96,22 @@ function SwitchRow({
   );
 }
 
-export type SwitchControlProps = Omit<
-  SwitchProps,
-  "label" | "hint" | "hideLabel" | "errorMessage" | "size"
->;
+export type SwitchControlProps = Omit<SwitchProps, "label" | "hint" | "hideLabel" | "errorMessage">;
 
 /**
  * Switch's control on its own, the native checkbox drawn as a switch, for a field composed from
  * Field's parts. In a bound Field, it takes its id, name and descriptions from the field, and Check
- * your answers says whether it is on.
+ * your answers says whether it is on. It takes `size` itself, so it is small in a field of your own
+ * too.
  */
 export function SwitchControl(given: SwitchControlProps) {
-  const { onCheckedChange, onChange, className = "", ...props } = useControlProps(given);
+  const {
+    onCheckedChange,
+    onChange,
+    size = "medium",
+    className = "",
+    ...props
+  } = useControlProps(given);
   const labels = useLabels("switch", defaultSwitchLabels);
   const { name } = props;
   // Check your answers says whether the setting is on.
@@ -119,6 +123,7 @@ export function SwitchControl(given: SwitchControlProps) {
       role="switch"
       {...props}
       className={`x-govuk-ui-switch-control ${className}`.trim()}
+      data-size={size === "small" ? "small" : undefined}
       onChange={(event) => {
         onChange?.(event);
         onCheckedChange?.(event.target.checked);

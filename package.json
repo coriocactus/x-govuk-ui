@@ -23,7 +23,7 @@
     "format": "biome check --write .",
     "test": "bun test tests/unit",
     "test:browser": "bunx --bun playwright test",
-    "check:static": "bun run lint && bun run typecheck && bun run test && bun run build && bun run build:lib && bun run build:mcp",
+    "check:static": "bun run lint && bun run typecheck && bun run test && bun run build && bun run build:lib && bun run build:mcp && bun scripts/consumer.ts",
     "check": "bun run check:static && bun run test:browser",
     "checkout": "bun scripts/checkout.ts",
     "commits": "bun scripts/commits.ts"

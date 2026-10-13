@@ -26,6 +26,10 @@ import {
   AccordionShowAll,
   AccordionTrigger,
   Details,
+  DetailsPanel,
+  DetailsRoot,
+  DetailsSummary,
+  DetailsText,
   ResizableHandle,
   ScrollArea,
   Separator,
@@ -75,6 +79,20 @@ test("details, tabs and separator render their roles on the server", () => {
   const details = renderToStaticMarkup(<Details summary="Help with nationality">Help</Details>);
   expect(details).toContain('aria-expanded="false"');
   expect(details).toContain("Help with nationality");
+  // Details are their parts, so details composed from them match, apart from Base UI's ids.
+  const ids = (html: string) => html.replace(/base-ui-[^"]*/g, "id");
+  expect(ids(details)).toBe(
+    ids(
+      renderToStaticMarkup(
+        <DetailsRoot>
+          <DetailsSummary>Help with nationality</DetailsSummary>
+          <DetailsPanel>
+            <DetailsText>Help</DetailsText>
+          </DetailsPanel>
+        </DetailsRoot>,
+      ),
+    ),
+  );
   const tabs = renderToStaticMarkup(
     <Tabs defaultValue="day">
       <TabsList aria-label="Cases closed">

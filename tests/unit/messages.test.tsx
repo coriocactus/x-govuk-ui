@@ -5,6 +5,10 @@ import {
   EmptyStateTitle,
   Link,
   NotificationBanner,
+  NotificationBannerContent,
+  NotificationBannerHeader,
+  NotificationBannerRoot,
+  NotificationBannerTitle,
   Panel,
   Progress,
   Prose,
@@ -113,6 +117,23 @@ test("status components carry their roles and are quiet where they should be", (
   );
   expect(success).toContain('role="alert"');
   expect(success).toContain('data-sound-enter="success"');
+  // A banner is its parts, so a banner composed from them matches.
+  expect(
+    renderToStaticMarkup(
+      <NotificationBanner id="notice" title="Deadline" titleLevel={3}>
+        Seven days left
+      </NotificationBanner>,
+    ).replace(/_R_[^"]*_/g, "title"),
+  ).toBe(
+    renderToStaticMarkup(
+      <NotificationBannerRoot id="notice" titleId="title">
+        <NotificationBannerHeader>
+          <NotificationBannerTitle level={3}>Deadline</NotificationBannerTitle>
+        </NotificationBannerHeader>
+        <NotificationBannerContent>Seven days left</NotificationBannerContent>
+      </NotificationBannerRoot>,
+    ),
+  );
   expect(renderToStaticMarkup(<Panel title="Application complete" />)).toContain(
     '<h1 class="x-govuk-ui-panel-title">Application complete</h1>',
   );

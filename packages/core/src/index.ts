@@ -188,7 +188,15 @@ export {
 export { CookieBanner, type CookieBannerProps, type CookieChoice } from "./cookie-banner";
 export { DataTable, type DataTableColumn, type DataTableProps } from "./data-table";
 export { DateInput, type DateInputProps } from "./date-input";
-export { Details, type DetailsProps } from "./details";
+export {
+  Details,
+  DetailsPanel,
+  type DetailsProps,
+  DetailsRoot,
+  type DetailsRootProps,
+  DetailsSummary,
+  DetailsText,
+} from "./details";
 export {
   Dialog,
   DialogClose,
@@ -398,8 +406,14 @@ export {
 } from "./navigation-menu";
 export {
   NotificationBanner,
+  NotificationBannerContent,
+  NotificationBannerHeader,
   NotificationBannerHeading,
   type NotificationBannerProps,
+  NotificationBannerRoot,
+  type NotificationBannerRootProps,
+  NotificationBannerTitle,
+  type NotificationBannerTitleProps,
 } from "./notification-banner";
 export { OrganisationName, type OrganisationNameProps } from "./organisation-name";
 export {

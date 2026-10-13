@@ -33,6 +33,8 @@ import {
   FieldsetLegend,
   FieldsetRoot,
   FileUpload,
+  FilterChip,
+  FilterChips,
   Hint,
   Input,
   InputControl,
@@ -53,6 +55,8 @@ import {
   Textarea,
   TextareaControl,
   TimeInput,
+  ToggleGroup,
+  ToggleGroupItem,
   useControlProps,
   useField,
   validateWith,
@@ -796,4 +800,30 @@ test("an extension's component takes its words from a labels provider too", () =
     </LabelsProvider>,
   );
   expect(html).toContain('aria-label="Fformatio"');
+});
+
+test("a toggle group and filter chips with a name send their chosen values with a form", () => {
+  const toggles = renderToStaticMarkup(
+    <ToggleGroup aria-label="View" name="view" defaultValue={["grid"]}>
+      <ToggleGroupItem value="list">List</ToggleGroupItem>
+      <ToggleGroupItem value="grid">Grid</ToggleGroupItem>
+    </ToggleGroup>,
+  );
+  expect(toggles).toContain('<input type="hidden" name="view" value="grid"/>');
+  expect(toggles).not.toContain('value="list"/>');
+  const chips = renderToStaticMarkup(
+    <FilterChips label="Status" name="status" defaultValue={["open", "closed"]}>
+      <FilterChip value="open">Open</FilterChip>
+      <FilterChip value="closed">Closed</FilterChip>
+    </FilterChips>,
+  );
+  expect(chips.match(/<input type="hidden" name="status"/g)).toHaveLength(2);
+  // Without a name, nothing is sent.
+  expect(
+    renderToStaticMarkup(
+      <ToggleGroup aria-label="View" defaultValue={["grid"]}>
+        <ToggleGroupItem value="grid">Grid</ToggleGroupItem>
+      </ToggleGroup>,
+    ),
+  ).not.toContain('type="hidden"');
 });

@@ -9,11 +9,20 @@ import {
   type ReactNode,
   useContext,
   useId,
+  useLayoutEffect,
+  useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
+import { useField } from "./field";
 import { springs, useMotionTiming } from "./motion";
 
-type GroupContextValue = { id: string; multiple: boolean; value: readonly string[] };
+type GroupContextValue = {
+  id: string;
+  multiple: boolean;
+  value: readonly string[];
+  /** Each item's words, by its value, for Check your answers. */
+  labels: Map<string, ReactNode>;
+};
 const GroupContext = createContext<GroupContextValue | null>(null);
 
 export type ToggleGroupProps = Omit<
@@ -35,6 +44,11 @@ export type ToggleGroupProps = Omit<
   size?: "medium" | "small";
   /** Names the group for screen readers, such as "Preview width". */
   "aria-label"?: string;
+  /**
+   * The name the pressed items submit under, each as its value, so the group takes part in a form.
+   * In a Form, its error summary links to the group, and Check your answers lists its items' words.
+   */
+  name?: string;
 };
 
 /**
@@ -48,15 +62,25 @@ export function ToggleGroup({
   multiple = false,
   disabled = false,
   size = "medium",
+  name,
+  id: ownId,
   className = "",
   ...props
 }: ToggleGroupProps) {
   const id = useId();
   const [value, setValue] = useControllableState(controlled, defaultValue, onValueChange);
+  const [labels] = useState(() => new Map<string, ReactNode>());
+  const field = useField({
+    id: ownId,
+    name,
+    label: props["aria-label"],
+    answer: (data) => (name ? data.getAll(name).map((each) => labels.get(String(each))) : []),
+  });
   return (
-    <GroupContext value={{ id, multiple, value }}>
+    <GroupContext value={{ id, multiple, value, labels }}>
       <Primitive
         {...props}
+        id={name || ownId ? field.id : undefined}
         className={`x-govuk-ui-toggle-group ${className}`.trim()}
         data-size={size}
         value={value}
@@ -69,6 +93,7 @@ export function ToggleGroup({
         }}
       >
         {children}
+        {name && value.map((each) => <input key={each} type="hidden" name={name} value={each} />)}
       </Primitive>
     </GroupContext>
   );
@@ -91,6 +116,10 @@ export function ToggleGroupItem({
   if (!group) throw new Error("ToggleGroupItem must be inside ToggleGroup.");
   const timing = useMotionTiming();
   const pressed = group.value.includes(value);
+  const { labels } = group;
+  useLayoutEffect(() => {
+    labels.set(value, children);
+  });
   return (
     <Toggle {...props} value={value} className={`x-govuk-ui-toggle ${className}`.trim()}>
       {pressed && !group.multiple && (

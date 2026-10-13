@@ -5,14 +5,17 @@ import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { AnimatePresence, motion, type TargetAndTransition } from "motion/react";
 import {
   type ComponentPropsWithRef,
+  createContext,
   type ReactNode,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
+import { useField } from "./field";
 import { duration, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 
@@ -34,7 +37,15 @@ export type FilterChipsProps = Omit<
   multiple?: boolean;
   /** `small` suits a panel of settings, such as the workbench's playground. */
   size?: "medium" | "small";
+  /**
+   * The name the chosen chips submit under, each as its value, so the filters take part in a form.
+   * In a Form, its error summary links to the chips, and Check your answers lists their words.
+   */
+  name?: string;
 };
+
+/** Each chip's words, by its value, for Check your answers. */
+const ChipLabels = createContext<Map<string, ReactNode> | null>(null);
 
 type Box = { left: number; top: number; width: number; height: number };
 /** A run of chosen chips side by side on one line, drawn as one shape. */
@@ -66,11 +77,20 @@ export function FilterChips({
   onValueChange,
   multiple = true,
   size = "medium",
+  name,
+  id: ownId,
   className = "",
   ref,
   ...props
 }: FilterChipsProps) {
   const [chosen, setChosen] = useControllableState(value, defaultValue, onValueChange);
+  const [labels] = useState(() => new Map<string, ReactNode>());
+  const field = useField({
+    id: ownId,
+    name,
+    label,
+    answer: (data) => (name ? data.getAll(name).map((each) => labels.get(String(each))) : []),
+  });
   const group = useRef<HTMLDivElement>(null);
   const timing = useMotionTiming();
   const [runs, setRuns] = useState<Run[]>([]);
@@ -196,11 +216,13 @@ export function FilterChips({
       ref={mergedRef}
       className={`x-govuk-ui-filter-chips ${className}`.trim()}
       data-size={size === "small" ? "small" : undefined}
+      id={name || ownId ? field.id : undefined}
       aria-label={label}
       multiple={multiple}
       value={chosen}
       onValueChange={(next: string[]) => setChosen(next)}
     >
+      {name && chosen.map((each) => <input key={each} type="hidden" name={name} value={each} />)}
       <AnimatePresence initial={false} custom={exits.current}>
         {runs.map((run) => (
           <motion.span
@@ -219,7 +241,7 @@ export function FilterChips({
           />
         ))}
       </AnimatePresence>
-      {children}
+      <ChipLabels value={labels}>{children}</ChipLabels>
     </ToggleGroup>
   );
 }
@@ -244,6 +266,10 @@ export function FilterChip({
   className = "",
   ...props
 }: FilterChipProps) {
+  const labels = useContext(ChipLabels);
+  useLayoutEffect(() => {
+    labels?.set(value, children);
+  });
   return (
     <Toggle
       {...props}

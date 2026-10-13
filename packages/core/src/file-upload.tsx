@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { chain } from "./events";
+import { both } from "./events";
 import { ErrorMessage, Field, Hint, Label, present, useControlProps } from "./field";
 import { useLabels, useLocale } from "./labels";
 import { useMergedRef } from "./refs";
@@ -105,6 +105,9 @@ export type FileUploadControlProps = Omit<
  * with the native input over it, and the list of chosen files beneath. In a bound Field, the input
  * takes its id, name and descriptions from the field. The input is described by the list too, so
  * screen readers hear which files are chosen. Its `className` goes on the zone.
+ *
+ * Your own drag and drop handlers run before the zone's own, which run whatever yours do, because
+ * preventing a drop's default is how a page takes files.
  */
 export function FileUploadControl(given: FileUploadControlProps) {
   const {
@@ -188,16 +191,16 @@ export function FileUploadControl(given: FileUploadControlProps) {
             update(next);
             if (next.length) play("select");
           }}
-          onDragEnter={chain(onDragEnter, (event) => {
+          onDragEnter={both(onDragEnter, (event) => {
             setDragging(true);
             lean(event);
           })}
-          onDragOver={chain(onDragOver, lean)}
-          onDragLeave={chain(onDragLeave, () => {
+          onDragOver={both(onDragOver, lean)}
+          onDragLeave={both(onDragLeave, () => {
             setDragging(false);
             setPull({ x: 0, y: 0 });
           })}
-          onDrop={chain(onDrop, () => {
+          onDrop={both(onDrop, () => {
             setDragging(false);
             setPull({ x: 0, y: 0 });
           })}

@@ -36,6 +36,7 @@ import {
   useContext,
   useId,
   useLayoutEffect,
+  useRef,
   useState,
 } from "react";
 import { defaultErrorLabels } from "./error-summary";
@@ -78,6 +79,11 @@ export const FormContext = createContext<{
   errors: Partial<Record<string, ReactNode>>;
   register: (name: string, field: FormField) => () => void;
   defaults?: Partial<Record<string, string[]>>;
+  /**
+   * Told when a field's question, answer or place changes after it registered, such as when a
+   * Select's labels arrive from items in a wrapper. Check your answers lists the answers again.
+   */
+  changed?: () => void;
 } | null>(null);
 
 /**
@@ -178,12 +184,17 @@ export function useField({
     };
     return entry;
   });
+  const changed = form?.changed;
   useLayoutEffect(() => {
-    field.own.id = controlId;
-    field.own.linkTo = linkTo;
+    const { own } = field;
+    const differs =
+      own.id !== controlId || own.linkTo !== linkTo || own.label !== label || own.answer !== answer;
+    own.id = controlId;
+    own.linkTo = linkTo;
     field.shown = shown;
-    field.own.label = label;
-    field.own.answer = answer;
+    own.label = label;
+    own.answer = answer;
+    if (differs) changed?.();
   });
   // The field registers as it mounts, before any layout effect of the Form's, such as FormSteps'
   // Check your answers reading the fields as it first appears.
@@ -265,7 +276,10 @@ export type FieldSummary = {
 export function useFieldSummary(summary: FieldSummary) {
   const bound = useContext(FieldContext);
   const entry = bound?.field;
+  const changed = useContext(FormContext)?.changed;
   const [owner] = useState(() => ({}));
+  // What the part gave after its last render, to tell whether it changed.
+  const last = useRef<FieldSummary>({});
   // The label and answer change with each render, so they are kept after each one, with no state.
   useLayoutEffect(() => {
     if (!entry) return;
@@ -273,6 +287,14 @@ export function useFieldSummary(summary: FieldSummary) {
     if ("label" in summary) given.label = { owner, value: summary.label };
     if ("answer" in summary && summary.answer) given.answer = { owner, value: summary.answer };
     if (summary.linkTo) given.linkTo = { owner, value: summary.linkTo };
+    const before = last.current;
+    last.current = summary;
+    if (
+      before.label !== summary.label ||
+      before.answer !== summary.answer ||
+      before.linkTo !== summary.linkTo
+    )
+      changed?.();
     return () => {
       if (given.label?.owner === owner) given.label = undefined;
       if (given.answer?.owner === owner) given.answer = undefined;

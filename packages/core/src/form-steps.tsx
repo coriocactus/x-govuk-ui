@@ -229,7 +229,17 @@ export const defaultFormStepsLabels: FormStepsLabels = {
   changeAnswer: (question) => <>your answer to {question}</>,
 };
 
-type Saved = { at: number; passed: number[]; skipped: number[]; answers: [string, string][] };
+/**
+ * What the form keeps under its key. `empty` names each field that sent nothing, such as a switch
+ * that is off or a group with no box ticked, so it comes back empty, not at its own default.
+ */
+type Saved = {
+  at: number;
+  passed: number[];
+  skipped: number[];
+  answers: [string, string][];
+  empty: string[];
+};
 
 const isNumbers = (value: unknown): value is number[] =>
   Array.isArray(value) && value.every((each) => Number.isInteger(each) && each >= 0);
@@ -258,10 +268,11 @@ function readSaved(key: string | undefined): Saved | null {
   try {
     const saved: unknown = JSON.parse(localStorage.getItem(key) ?? "null");
     if (typeof saved !== "object" || saved === null) return null;
-    const { at, passed, skipped, answers } = saved as Record<string, unknown>;
+    const { at, passed, skipped, answers, empty = [] } = saved as Record<string, unknown>;
     if (typeof at !== "number" || !Number.isInteger(at) || at < 0) return null;
     if (!isNumbers(passed) || !isNumbers(skipped) || !isAnswers(answers)) return null;
-    return { at, passed, skipped, answers };
+    if (!Array.isArray(empty) || !empty.every((name) => typeof name === "string")) return null;
+    return { at, passed, skipped, answers, empty };
   } catch {
     return null;
   }
@@ -300,11 +311,14 @@ function answersOf(field: FormField, name: string, data: FormData): ReactNode[] 
 function StepFields({
   step,
   fields,
+  changed,
   children,
 }: {
   /** The step's own id, which stays the same while the step moves among the others. */
   step: string;
   fields: RefObject<Map<string, Map<string, FormField>>>;
+  /** Told when a field's question or answer changes. */
+  changed: () => void;
   children: ReactNode;
 }) {
   const form = useContext(FormContext);
@@ -322,7 +336,7 @@ function StepFields({
     },
     [parent, fields, step],
   );
-  const value = useMemo(() => form && { ...form, register }, [form, register]);
+  const value = useMemo(() => form && { ...form, register, changed }, [form, register, changed]);
   return <FormContext value={value}>{children}</FormContext>;
 }
 
@@ -406,12 +420,20 @@ export function FormSteps({
   const ready = count > 0;
   const reviewing = ready && at >= count;
   const step = steps[at];
+  // Check your answers lists the answers again when a field's question or answer changes while it
+  // shows, such as when a Select's labels arrive from items in a wrapper after a restore.
+  const [summaries, setSummaries] = useState(0);
+  const listing = useLatest(reviewing && !sent);
+  const fieldChanged = useCallback(() => {
+    if (listing.current) setSummaries((count) => count + 1);
+  }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: answers are restored once, as the form first mounts.
   useLayoutEffect(() => {
     const saved = readSaved(storageKey);
     if (!saved) return;
     const answers: Record<string, string[]> = {};
+    for (const name of saved.empty) answers[name] = [];
     for (const [name, value] of saved.answers) answers[name] = [...(answers[name] ?? []), value];
     setPassed(new Set(saved.passed));
     setSkipped(new Set(saved.skipped));
@@ -445,10 +467,19 @@ export function FormSteps({
   /** Keeps the answers and the step, when there is a key. */
   const remember = (where = at, passing = passed, skipping = skipped) => {
     if (!storageKey || !form.current) return;
-    const answers = [...new FormData(form.current).entries()].flatMap(([name, value]) =>
+    const data = new FormData(form.current);
+    const answers = [...data.entries()].flatMap(([name, value]) =>
       typeof value === "string" ? [[name, value] as [string, string]] : [],
     );
-    writeSaved(storageKey, { at: where, passed: [...passing], skipped: [...skipping], answers });
+    const names = new Set([...stepFields.current.values()].flatMap((fields) => [...fields.keys()]));
+    const empty = [...names].filter((name) => !data.has(name));
+    writeSaved(storageKey, {
+      at: where,
+      passed: [...passing],
+      skipped: [...skipping],
+      answers,
+      empty,
+    });
   };
   const rememberSoon = useRef(0);
 
@@ -563,14 +594,14 @@ export function FormSteps({
   // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are listed as the form arrives, and as its steps register.
   useLayoutEffect(() => {
     if (reviewing && !sent) setRows(planFor().flatMap((index) => summaryRows(index, skipped)));
-  }, [reviewing, sent, restored.round, registered]);
+  }, [reviewing, sent, restored.round, registered, summaries]);
 
-  // With history, the page's place in the browser's history is the step the form starts on, and
-  // then the step restored from an earlier visit.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the place is set as the form starts, and again once answers are restored.
+  // With history, the browser's current entry always records the step the form is on. Continue and
+  // Back add an entry first. Otherwise the step changes in place, such as when the steps in a
+  // wrapper of your own register and the step asked for is known, or answers are restored.
   useEffect(() => {
     if (historyOn) window.history.replaceState({ ...window.history.state, [historyKey]: at }, "");
-  }, [historyOn, historyKey, restored.round]);
+  }, [historyOn, historyKey, at]);
   // The browser's Back and Forward move between the steps. The listener is set once, and calls the
   // latest go.
   const goNow = useLatest(go);
@@ -843,7 +874,7 @@ export function FormSteps({
           ))}
         {each.hint && <div className="x-govuk-ui-hint">{each.hint}</div>}
         <div className="x-govuk-ui-form-step-fields">
-          <StepFields step={id} fields={stepFields}>
+          <StepFields step={id} fields={stepFields} changed={fieldChanged}>
             {each.children}
           </StepFields>
         </div>

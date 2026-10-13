@@ -999,8 +999,13 @@ const entries = {
         restart: true,
       }),
       toggle("moreKinds", false, {
-        note: "Adds a step asked with a toggle group, a slider, a switch, and radios whose answers come from a component of the survey's own. Check your answers lists each.",
+        note: "Adds a step asked with a toggle group, a slider, a switch, and radios and a select whose answers come from a component of the survey's own. Check your answers lists each.",
         needs: [when("example", "stages")],
+        restart: true,
+      }),
+      toggle("fromVisit", false, {
+        note: "Starts on the added step, as a link to one question would.",
+        needs: [when("example", "stages"), whenOn("moreKinds")],
         restart: true,
       }),
     ],

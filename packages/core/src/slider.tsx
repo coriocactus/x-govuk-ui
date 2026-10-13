@@ -149,7 +149,8 @@ export function SliderRoot({
   const id = ownId ?? field?.id ?? `slider-${generated}`;
   const name = ownName ?? field?.name;
   // A Form can give the slider a value to start with, such as one kept from an earlier visit.
-  const saved = Number(useFormDefault(name)?.[0] ?? Number.NaN);
+  const kept = useFormDefault(name)?.[0];
+  const saved = kept ? Number(kept) : Number.NaN;
   const defaultValue = Number.isFinite(saved) ? saved : givenDefault;
   // The value is written in the page's language, the same on the server and in the browser.
   const locale = useLocale();

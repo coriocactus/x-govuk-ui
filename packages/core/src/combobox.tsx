@@ -233,8 +233,9 @@ export function ComboboxControl(given: ComboboxControlProps) {
   const options = useMemo(() => items.map(optionOf), [items]);
   const labels = useLabels("combobox", defaultComboboxLabels, ownLabels);
   useFieldSummary({ answer: (data) => labelsOf(options, name ? data.getAll(name) : []) });
-  // A Form can give the field an answer to start with, such as one kept from an earlier visit.
-  const saved = useFormDefault(name)?.[0];
+  // A Form can give the field an answer to start with, such as one kept from an earlier visit. A
+  // kept answer with nothing in it means that nothing was chosen.
+  const saved = useFormDefault(name);
   const find = (wanted: string | null | undefined) =>
     wanted == null ? wanted : (options.find((option) => option.value === wanted) ?? null);
   const [query, setQuery] = useState("");
@@ -243,7 +244,7 @@ export function ComboboxControl(given: ComboboxControlProps) {
     <Primitive.Root
       items={options}
       value={find(value)}
-      defaultValue={find(saved ?? defaultValue)}
+      defaultValue={find(saved ? (saved[0] ?? null) : defaultValue)}
       onValueChange={(next) => onValueChange?.((next as ComboboxOption | null)?.value ?? null)}
       onInputValueChange={setQuery}
       itemToStringLabel={(option: ComboboxOption) => option.label}

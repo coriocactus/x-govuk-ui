@@ -213,19 +213,35 @@ test("check your answers lists every kind of field, links an error to an answer 
   await frame.getByRole("radio", { name: "GOV.UK" }).check();
   await frame.getByRole("button", { name: "Computer" }).click();
   await frame.getByRole("slider", { name: "How easy was it, from 1 to 5?" }).press("ArrowRight");
-  await frame.getByRole("switch", { name: "Take part in research about this service" }).check();
+  // The select's options come from a component of the survey's own too.
+  await frame.getByRole("combobox", { name: "Which part did you use most?" }).click();
+  await page.getByRole("option", { name: "Reporting a catch" }).click();
+  // The switch starts on. Turned off, it sends nothing, and comes back off all the same.
+  const research = frame.getByRole("switch", { name: "Take part in research about this service" });
+  await expect(research).toBeChecked();
+  await research.uncheck();
   await frame.getByRole("button", { name: "Continue" }).click();
   // Each field gives its answer as it shows it.
   const review = frame.locator(".x-govuk-ui-form-steps-summary");
-  const answers = ["Satisfied", "No", "Not answered", "GOV.UK", "Computer", "4", "On"];
+  const answers = [
+    "Satisfied",
+    "No",
+    "Not answered",
+    "GOV.UK",
+    "Computer",
+    "4",
+    "Reporting a catch",
+    "Off",
+  ];
   await expect(review.locator(".x-govuk-ui-summary-list-value")).toHaveText(answers);
   await expect(review.locator(".x-govuk-ui-summary-list-key")).toContainText([
     "What did you use?",
     "How easy was it, from 1 to 5?",
     "Take part in research about this service",
   ]);
-  // Reloaded on Check your answers, the survey comes back to it, with every answer listed. The
-  // playground starts again after a reload, so the survey is chosen again.
+  // Reloaded on Check your answers, the survey comes back to it, with every answer listed, the
+  // select's by its label and the switch still off. The playground starts again after a reload, so
+  // the survey is chosen again.
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? ""))
     .toContain('"at":3');
@@ -237,4 +253,27 @@ test("check your answers lists every kind of field, links an error to an answer 
   await expect(frame.getByRole("heading", { name: "About your visit" })).toBeVisible();
   await page.goForward();
   await expect(review.locator(".x-govuk-ui-summary-list-value")).toHaveText(answers);
+});
+
+test("a survey that starts on a step in a wrapper goes back to it from Check your answers", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  await open("form");
+  await playground.set("example", /In stages/);
+  await playground.set("layout", "Page");
+  for (const name of ["checkAnswers", "history", "moreKinds", "fromVisit"])
+    await playground.set(name, true);
+  // The step it starts on is in a component of the survey's own, so it is known only once it
+  // registers. The browser's history then records it, not the step before it.
+  const visit = frame.getByRole("heading", { name: "About your visit" });
+  await expect(visit).toBeVisible();
+  await frame.getByRole("radio", { name: "GOV.UK" }).check();
+  await frame.getByRole("button", { name: "Continue" }).click();
+  await expect(frame.locator(".x-govuk-ui-form-steps-summary")).toBeVisible();
+  await page.goBack();
+  await expect(visit).toBeVisible();
+  await expect(frame.getByRole("radio", { name: "GOV.UK" })).toBeChecked();
 });

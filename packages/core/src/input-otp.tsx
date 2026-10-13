@@ -9,7 +9,15 @@ import {
   type ReactNode,
   useId,
 } from "react";
-import { ErrorMessage, Field, Hint, Label, present, useControlProps } from "./field";
+import {
+  ErrorMessage,
+  Field,
+  Hint,
+  Label,
+  present,
+  useControlProps,
+  useFormDefault,
+} from "./field";
 import { duration, easeOut, springs, useMotionTiming } from "./motion";
 
 /**
@@ -88,8 +96,12 @@ export function InputOTPControl(given: InputOTPControlProps) {
     success = false,
     containerClassName = "",
     readOnly,
+    defaultValue: givenDefault,
     ...props
   } = useControlProps(given);
+  // A Form can give the code to start with, such as the code in a record being changed.
+  const saved = useFormDefault(props.name)?.[0];
+  const defaultValue = props.value === undefined ? (saved ?? givenDefault) : undefined;
   const timing = useMotionTiming();
   const generated = useId();
   const controlId = props.id ?? `otp-${generated}`;
@@ -104,6 +116,7 @@ export function InputOTPControl(given: InputOTPControlProps) {
       pattern={REGEXP_ONLY_DIGITS}
       pasteTransformer={(value) => value.replace(/[\s-]/g, "")}
       {...props}
+      defaultValue={defaultValue}
       id={controlId}
       // The digits cannot change while the code is checked or once it is accepted.
       readOnly={readOnly || verifying || success}

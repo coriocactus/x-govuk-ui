@@ -219,11 +219,12 @@ export function RadiosRoot({
   children,
   ...field
 }: RadiosRootProps) {
-  // A Form can give the group an answer to start with, such as one kept from an earlier visit.
-  const saved = useFormDefault(name)?.[0];
+  // A Form can give the group an answer to start with, such as one kept from an earlier visit. A
+  // kept answer with nothing in it means that nothing was chosen.
+  const saved = useFormDefault(name);
   const [value, setValue] = useControllableState<string | null>(
     controlled,
-    () => saved ?? (defaultValue === undefined ? null : defaultValue),
+    () => (saved ? (saved[0] ?? null) : defaultValue === undefined ? null : defaultValue),
     (next) => next !== null && onValueChange?.(next),
   );
   const target = useLinkTarget(controlId);

@@ -98,7 +98,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed Card, Item, Avatar, Aspect ratio, Aside, Marker and VisuallyHidden to have a file each, and each component its own stylesheet. Item and Aspect ratio no longer mark themselves as client components, so they render on the server.
 - Changed ErrorSummaryItem to focus the first control inside the element it links to, when that element cannot take focus itself, such as a Slider or a group.
 - Changed SummaryListAction's `hiddenText` to take any React content.
-- Changed a Form's `defaultValues` to come before a field's own `defaultValue`. A field then shows an answer kept from an earlier visit, or the answer in a record being changed, in place of where it usually starts. FormSteps restores every field it kept, even one with a `defaultValue`.
+- Changed a Form's `defaultValues` to come before a field's own `defaultValue`. A field then shows an answer kept from an earlier visit, or the answer in a record being changed, in place of where it usually starts. FormSteps restores every field it kept, even one with a `defaultValue`. A kept answer with nothing in it, such as a switch that is off, means that nothing was chosen. InputOTP starts from the Form's answer too.
 - Changed `errorMessage` on every field to take any React content, as Fieldset's does. `FormErrors` takes any React content too, so a Form's `validate` and `onSubmit` can give a message with a link.
 
 ### Fixed
@@ -107,7 +107,9 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Fixed FormSteps with a `storageKey` rendering different first HTML in the browser than on the server. Kept answers and the step now come back once the page has loaded, before it is drawn.
 - Fixed the browser's Back and Forward in FormSteps with `history` using the form as it was when the page loaded, such as which steps were skipped.
 - Fixed FormSteps' Check your answers listing nothing when the form starts on it, such as from `step`, or comes back to it from a `storageKey`.
-- Fixed the browser's Back and Forward in FormSteps with `history` and a `storageKey` going to the step the form started on, in place of the step it came back to.
+- Fixed the browser's Back and Forward in FormSteps with `history` going to the wrong step after the form started on a step in a wrapper of your own, or came back to a step from a `storageKey`. The browser's current entry now always records the step the form is on.
+- Fixed FormSteps with a `storageKey` bringing back a field's own default after a reload, where users had cleared the answer, such as a switch turned off or a group with nothing ticked. A field that sends nothing is now kept as empty.
+- Fixed Check your answers showing a Select's value in place of its option's label after a reload, when its options are in a component of your own. Check your answers now lists the answers again when a field's question or answer changes while it shows.
 - Fixed Tour failing to render on the server.
 - Fixed File upload losing its files' Remove when given a `ref`, which took the place of its own.
 - Fixed Slider putting its own `aria-describedby` on its root, which nothing reads. It now describes the thumb, before the hint and the error, as every field's control is described.

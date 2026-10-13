@@ -115,6 +115,8 @@ export function SwitchControl(given: SwitchControlProps) {
     ...props
   } = useControlProps(given);
   // A Form can give the switch an answer to start with, such as one kept from an earlier visit.
+  // The switch is on when the answer has its value. A switch that is off sends nothing, so its kept
+  // answer is empty.
   const saved = useFormDefault(props.name);
   const labels = useLabels("switch", defaultSwitchLabels);
   const { name } = props;
@@ -126,7 +128,11 @@ export function SwitchControl(given: SwitchControlProps) {
       // biome-ignore lint/a11y/useAriaPropsForRole: A native checkbox reports its own checked state.
       role="switch"
       {...props}
-      defaultChecked={props.checked === undefined && saved !== undefined ? true : defaultChecked}
+      defaultChecked={
+        props.checked === undefined && saved !== undefined
+          ? saved.includes(String(props.value ?? "on"))
+          : defaultChecked
+      }
       className={`x-govuk-ui-switch-control ${className}`.trim()}
       data-size={size === "small" ? "small" : undefined}
       onChange={(event) => {

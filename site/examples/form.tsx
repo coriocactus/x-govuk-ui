@@ -11,6 +11,8 @@ import {
   Input,
   Radio,
   Radios,
+  Select,
+  SelectItem,
   ServicePage,
   Slider,
   Switch,
@@ -34,6 +36,8 @@ type Props = {
   fail?: boolean;
   /** Adds a step asked with other kinds of field, which Check your answers lists too. */
   moreKinds?: boolean;
+  /** Starts on the added step, as a link to one question would. */
+  fromVisit?: boolean;
 };
 
 const answer = (data: FormData, name: string) => String(data.get(name) ?? "").trim();
@@ -174,8 +178,21 @@ function VisitStep() {
         <ToggleGroupItem value="computer">Computer</ToggleGroupItem>
       </ToggleGroup>
       <Slider name="ease" label="How easy was it, from 1 to 5?" min={1} max={5} defaultValue={3} />
-      <Switch name="research" label="Take part in research about this service" />
+      <Select name="part" label="Which part did you use most?" defaultValue="renew">
+        <ServiceParts />
+      </Select>
+      <Switch name="research" label="Take part in research about this service" defaultChecked />
     </FormStep>
+  );
+}
+
+/** The parts of the service, which several of its questions offer. */
+function ServiceParts() {
+  return (
+    <>
+      <SelectItem value="renew">Renewing a licence</SelectItem>
+      <SelectItem value="report">Reporting a catch</SelectItem>
+    </>
   );
 }
 
@@ -206,6 +223,7 @@ function FeedbackInStages({
   history = false,
   fail = false,
   moreKinds = false,
+  fromVisit = false,
 }: Props) {
   const [run, setRun] = useState(0);
   const failed = useRef(false);
@@ -221,6 +239,7 @@ function FeedbackInStages({
         checkAnswers={checkAnswers}
         history={history}
         storageKey={remember ? "x-govuk-ui-example-feedback" : undefined}
+        defaultStep={moreKinds && fromVisit ? 2 : 0}
         labels={{ submit: "Send feedback" }}
         onComplete={async () => {
           await wait(250);

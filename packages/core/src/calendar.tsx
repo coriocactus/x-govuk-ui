@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { Button } from "./button";
+import { useControllableState } from "./controllable-state";
 import { directionOf } from "./helpers";
 import { Select, SelectItem } from "./select";
 
@@ -147,8 +148,22 @@ export function Calendar(props: CalendarProps) {
       }
     }
   };
-  const [own, setOwn] = useState(() => listOf("defaultValue"));
-  const selected = props.value === undefined ? own : listOf("value");
+  const [selected, commit] = useControllableState(
+    props.value === undefined ? undefined : listOf("value"),
+    () => listOf("defaultValue"),
+    (list) => {
+      switch (props.mode) {
+        case "range":
+          props.onValueChange?.({ from: list[0] ?? null, to: list[1] ?? null });
+          break;
+        case "multiple":
+          props.onValueChange?.(list.filter((date): date is Date => Boolean(date)));
+          break;
+        default:
+          props.onValueChange?.(list[0] ?? null);
+      }
+    },
+  );
   const anchor = selected.find(Boolean) ?? null;
 
   const [month, setMonth] = useState(() => startOfMonth(defaultMonth ?? anchor ?? today));
@@ -182,20 +197,6 @@ export function Calendar(props: CalendarProps) {
     const last = max?.getFullYear() ?? thisYear + 10;
     return Array.from({ length: last - first + 1 }, (_, index) => first + index);
   }, [ownYears, min, max, thisYear]);
-
-  const commit = (list: (Date | null)[]) => {
-    if (props.value === undefined) setOwn(list);
-    switch (props.mode) {
-      case "range":
-        props.onValueChange?.({ from: list[0] ?? null, to: list[1] ?? null });
-        break;
-      case "multiple":
-        props.onValueChange?.(list.filter((date): date is Date => Boolean(date)));
-        break;
-      default:
-        props.onValueChange?.(list[0] ?? null);
-    }
-  };
 
   const choose = (date: Date) => {
     if (isDisabled(date)) return;

@@ -1,6 +1,7 @@
 "use client";
 
-import { type ComponentPropsWithRef, type FormEvent, type ReactNode, useState } from "react";
+import type { ComponentPropsWithRef, FormEvent, ReactNode } from "react";
+import { useControllableState } from "./controllable-state";
 import { Label, useField } from "./field";
 
 export type SearchBoxProps = Omit<
@@ -50,8 +51,7 @@ export function SearchBox({
   ...props
 }: SearchBoxProps) {
   const field = useField({ id });
-  const [own, setOwn] = useState(defaultValue);
-  const query = value ?? own;
+  const [query, setQuery] = useControllableState(value, defaultValue, onValueChange);
   return (
     // biome-ignore lint/a11y/useSemanticElements: A form with the search role is a search landmark in every browser, and submits as a form.
     <form
@@ -76,10 +76,7 @@ export function SearchBox({
           className="x-govuk-ui-input x-govuk-ui-search-box-input"
           placeholder={placeholder}
           value={query}
-          onChange={(event) => {
-            if (value === undefined) setOwn(event.target.value);
-            onValueChange?.(event.target.value);
-          }}
+          onChange={(event) => setQuery(event.target.value)}
         />
         <button type="submit" className="x-govuk-ui-search-box-button" aria-label={buttonLabel}>
           <svg

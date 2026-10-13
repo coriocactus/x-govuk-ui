@@ -4,6 +4,7 @@ import { Popover as Primitive } from "@base-ui/react/popover";
 import { type ComponentPropsWithRef, type ReactNode, useId, useRef, useState } from "react";
 import { Button } from "./button";
 import { Calendar } from "./calendar";
+import { useControllableState } from "./controllable-state";
 import { Dial } from "./dial";
 import { ErrorMessage, Field, Hint, useField, useFormDefault } from "./field";
 import { type DateParts, dateFromParts } from "./helpers";
@@ -100,22 +101,19 @@ export function DateInput({
   const savedDay = useFormDefault(name && `${name}-day`)?.[0];
   const savedMonth = useFormDefault(name && `${name}-month`)?.[0];
   const savedYear = useFormDefault(name && `${name}-year`)?.[0];
-  const [own, setOwn] = useState(
+  const [parts, set] = useControllableState(
+    value,
     () =>
       defaultValue ?? {
         day: savedDay ?? "",
         month: savedMonth ?? "",
         year: savedYear ?? "",
       },
+    onValueChange,
   );
-  const parts = value ?? own;
   const [open, setOpen] = useState(false);
   const popup = useRef<HTMLDivElement>(null);
   const sound = useOverlaySound();
-  const set = (next: DateParts) => {
-    if (value === undefined) setOwn(next);
-    onValueChange?.(next);
-  };
   const chosen = dateFromParts(parts);
   const invalid = (part: Part) => field.invalid && (!errorFields || errorFields.includes(part));
 

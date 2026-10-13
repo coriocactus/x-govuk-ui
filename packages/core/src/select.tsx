@@ -12,6 +12,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useControllableState } from "./controllable-state";
 import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "./field";
 import { trackHighlight } from "./highlight";
 import { ChevronIcon, TickIcon } from "./icons";
@@ -128,8 +129,11 @@ export function Select({
   const long = Object.keys(labels).length > SHORT_LIST;
   const list = <Primitive.List className="x-govuk-ui-select-list">{children}</Primitive.List>;
   // An uncontrolled select keeps its own value, so the tick can be read from it as the list opens.
-  const [own, setOwn] = useState(defaultValue ?? null);
-  const current = value === undefined ? own : value;
+  const [current, choose] = useControllableState<string | null>(
+    value,
+    defaultValue ?? null,
+    (next) => next !== null && onValueChange?.(next),
+  );
   const [ticked, setTicked] = useState(current);
   // The list is at least as wide as the field. Its width is read from the field's own layout as it
   // opens. Base UI's --anchor-width is not used, because it follows the field on screen. Inside a
@@ -137,10 +141,6 @@ export function Select({
   // would report a loop of resize observers.
   const trigger = useRef<HTMLButtonElement>(null);
   const [width, setWidth] = useState<number>();
-  const choose = (next: string) => {
-    setOwn(next);
-    onValueChange?.(next);
-  };
 
   const mergedRef = useMergedRef(trigger, ref);
   return (

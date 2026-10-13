@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { Button } from "./button";
+import { useControllableState } from "./controllable-state";
 import { ResizableHandle } from "./resizable";
 import { ScrollArea } from "./scroll-area";
 import { TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "./table";
@@ -97,15 +98,12 @@ export function DataTable<Row>({
     Object.fromEntries(columns.map((column) => [column.id, column.width])),
   );
   const [sort, setSort] = useState<Sort>(null);
-  const [own, setOwn] = useState<string[]>([]);
   const [summed, setSummed] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
-  const chosen = controlled ?? own;
-  const choose = (next: string[]) => {
-    if (controlled === undefined) setOwn(next);
-    onSelectedChange?.(next);
-  };
+  const [chosen, choose] = useControllableState<readonly string[]>(controlled, [], (next) =>
+    onSelectedChange?.([...next]),
+  );
 
   // The pinned columns cast a shadow once the rest has scrolled under them.
   useEffect(() => {

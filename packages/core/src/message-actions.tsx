@@ -2,6 +2,7 @@
 
 import { type ComponentPropsWithRef, type ReactNode, useState } from "react";
 import { Button, type ButtonProps } from "./button";
+import { useControllableState } from "./controllable-state";
 import { CopyButton, type CopyButtonProps } from "./copy";
 import { Tooltip } from "./tooltip";
 
@@ -96,13 +97,8 @@ export function MessageRating({
   className = "",
   ...props
 }: MessageRatingProps) {
-  const [own, setOwn] = useState(defaultValue);
-  const rating = value === undefined ? own : value;
-  const rate = (next: MessageRatingValue) => {
-    const chosen = rating === next ? null : next;
-    if (value === undefined) setOwn(chosen);
-    onValueChange?.(chosen);
-  };
+  const [rating, setRating] = useControllableState(value, defaultValue, onValueChange);
+  const rate = (next: MessageRatingValue) => setRating(rating === next ? null : next);
   return (
     <span {...props} className={`x-govuk-ui-message-rating ${className}`.trim()}>
       <MessageAction

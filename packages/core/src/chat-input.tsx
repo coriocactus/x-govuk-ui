@@ -12,6 +12,7 @@ import {
   useState,
 } from "react";
 import { Button } from "./button";
+import { useControllableState } from "./controllable-state";
 import { useField } from "./field";
 import { FileChip, type FileChipProps, FileChips, type FileChipsProps } from "./file-chips";
 import {
@@ -152,26 +153,22 @@ export function ChatInput({
   ...props
 }: ChatInputProps) {
   const field = useField({ id });
-  const [own, setOwn] = useState(defaultValue);
-  const text = value ?? own;
+  const [text, setText] = useControllableState(value, defaultValue, onValueChange);
   const area = useRef<HTMLTextAreaElement>(null);
-  const [ownFiles, setOwnFiles] = useState<File[]>(defaultFiles ?? []);
-  const files = givenFiles ?? ownFiles;
+  const [files, setOwnFiles] = useControllableState(givenFiles, defaultFiles ?? [], onFilesChange);
   // The latest files, so files attached between renders join the end of them.
   const latestFiles = useRef(files);
   latestFiles.current = files;
   const setFiles = (next: File[]) => {
     latestFiles.current = next;
-    if (givenFiles === undefined) setOwnFiles(next);
-    onFilesChange?.(next);
+    setOwnFiles(next);
   };
   // The latest text, so words dictated between renders join the end of it.
   const latest = useRef(text);
   latest.current = text;
   const set = (next: string) => {
     latest.current = next;
-    if (value === undefined) setOwn(next);
-    onValueChange?.(next);
+    setText(next);
   };
   const ready = Boolean(text.trim()) || files.length > 0;
   const send = () => {
@@ -618,8 +615,11 @@ export function ChatInputModel({
   className = "",
   ...props
 }: ChatInputModelProps) {
-  const [own, setOwn] = useState(defaultValue ?? models[0]?.value ?? "");
-  const chosen = value ?? own;
+  const [chosen, choose] = useControllableState(
+    value,
+    defaultValue ?? models[0]?.value ?? "",
+    onValueChange,
+  );
   const current = models.find((model) => model.value === chosen) ?? models[0];
   return (
     <DropdownMenu>
@@ -633,13 +633,7 @@ export function ChatInputModel({
         {current?.label}
       </DropdownMenuTrigger>
       <MenuContent align="end" className="x-govuk-ui-chat-model-menu">
-        <MenuRadioGroup
-          value={chosen}
-          onValueChange={(next) => {
-            if (value === undefined) setOwn(next);
-            onValueChange?.(next);
-          }}
-        >
+        <MenuRadioGroup value={chosen} onValueChange={(next) => choose(next)}>
           {models.map((model) => (
             <MenuRadioItem key={model.value} value={model.value} icon={model.icon} closeOnClick>
               <span className="x-govuk-ui-chat-model">

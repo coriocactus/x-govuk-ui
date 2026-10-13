@@ -13,6 +13,7 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 import { Button, type ButtonProps } from "./button";
+import { useControllableState } from "./controllable-state";
 import { Countdown } from "./countdown";
 import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
 import { useMergedRef } from "./refs";
@@ -303,12 +304,7 @@ export function Callout({
   onBlur,
   ...props
 }: CalloutProps) {
-  const [own, setOwn] = useState(defaultOpen);
-  const open = controlled ?? own;
-  const setOpen = (next: boolean) => {
-    if (controlled === undefined) setOwn(next);
-    onOpenChange?.(next);
-  };
+  const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
   const asked = Boolean(trigger);
   const sound = useOverlaySound();
   const play = useScopeSound();

@@ -12,6 +12,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useControllableState } from "./controllable-state";
 import { duration, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 
@@ -69,8 +70,7 @@ export function FilterChips({
   ref,
   ...props
 }: FilterChipsProps) {
-  const [own, setOwn] = useState(defaultValue);
-  const chosen = value ?? own;
+  const [chosen, setChosen] = useControllableState(value, defaultValue, onValueChange);
   const group = useRef<HTMLDivElement>(null);
   const timing = useMotionTiming();
   const [runs, setRuns] = useState<Run[]>([]);
@@ -199,10 +199,7 @@ export function FilterChips({
       aria-label={label}
       multiple={multiple}
       value={chosen}
-      onValueChange={(next: string[]) => {
-        if (value === undefined) setOwn(next);
-        onValueChange?.(next);
-      }}
+      onValueChange={(next: string[]) => setChosen(next)}
     >
       <AnimatePresence initial={false} custom={exits.current}>
         {runs.map((run) => (

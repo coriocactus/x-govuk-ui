@@ -14,8 +14,8 @@ import {
   useId,
   useLayoutEffect,
   useRef,
-  useState,
 } from "react";
+import { useControllableState } from "./controllable-state";
 import { useFormDefault } from "./field";
 import { Fieldset, type FieldsetProps } from "./fieldset";
 import { duration, useMotionTiming } from "./motion";
@@ -229,17 +229,16 @@ export function Checkboxes({
   const generated = useId();
   // A Form can give the group its answers to start with, such as ones kept from an earlier visit.
   const saved = useFormDefault(name);
-  const [own, setOwn] = useState(() => defaultValue ?? saved ?? []);
-  const value = controlled ?? own;
+  const [value, set] = useControllableState(
+    controlled,
+    () => defaultValue ?? saved ?? [],
+    onValueChange,
+  );
   const exclusive = useRef(new Set<string>());
   const registerExclusive = useCallback((item: string) => {
     exclusive.current.add(item);
     return () => void exclusive.current.delete(item);
   }, []);
-  const set = (next: string[]) => {
-    if (controlled === undefined) setOwn(next);
-    onValueChange?.(next);
-  };
   const group: Group = {
     kind: "checkbox",
     name,
@@ -281,20 +280,18 @@ export function Radios({
   const generated = useId();
   // A Form can give the group an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(name)?.[0];
-  const [own, setOwn] = useState(() =>
-    defaultValue === undefined ? (saved ?? null) : defaultValue,
+  const [value, setValue] = useControllableState<string | null>(
+    controlled,
+    () => (defaultValue === undefined ? (saved ?? null) : defaultValue),
+    (next) => next !== null && onValueChange?.(next),
   );
-  const value = controlled === undefined ? own : controlled;
   const group: Group = {
     kind: "radio",
     name,
     idPrefix: id ?? `${name}-${generated}`,
     disabled,
     isChecked: (item) => value === item,
-    choose: (item) => {
-      if (controlled === undefined) setOwn(item);
-      onValueChange?.(item);
-    },
+    choose: (item) => setValue(item),
     registerExclusive: noExclusive,
   };
   return <ChoiceGroup kind="radio" group={group} chosen={value} Item={Radio} {...props} />;

@@ -21,6 +21,7 @@ import {
   resolveAnchor,
   useCalloutSide,
 } from "./callout";
+import { useControllableState } from "./controllable-state";
 import { glideEasing, useMotionTiming } from "./motion";
 import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
 import { useMergedRef } from "./refs";
@@ -184,14 +185,11 @@ export function Tour({
     return Math.max(0, Math.min(steps.length - 1, progress.step));
   };
   // A tour opened by default stays closed once someone has finished it, or ended it by closing.
-  const [own, setOwn] = useState(() => defaultOpen && progress.ended === null);
-  const open = controlled ?? own;
-  const setOpen = (next: boolean) => {
-    if (controlled === undefined) setOwn(next);
-    onOpenChange?.(next);
-  };
-  const setOpenNow = useRef(setOpen);
-  setOpenNow.current = setOpen;
+  const [open, setOpen] = useControllableState(
+    controlled,
+    () => defaultOpen && progress.ended === null,
+    onOpenChange,
+  );
   const [step, setStep] = useState(firstStep);
   // The step's target, or the middle of the screen for a step about the whole page.
   const [target, setTarget] = useState<Element | "middle" | null>(null);
@@ -244,8 +242,8 @@ export function Tour({
     }
     const after = step + direction.current;
     if (after >= 0 && after < stepsNow.current.length) setStep(after);
-    else setOpenNow.current(false);
-  }, [open, step, reduced]);
+    else setOpen(false);
+  }, [open, step, reduced, setOpen]);
 
   // The card glides from where it was to its next place. Base UI places it a moment after the
   // step changes, so the glide starts as it does, before the new place is ever drawn.

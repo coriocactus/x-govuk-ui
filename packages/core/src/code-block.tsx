@@ -8,9 +8,9 @@ import {
   type ReactNode,
   useContext,
   useMemo,
-  useState,
 } from "react";
 import { type CodeToken, codeTokens } from "./code-tokens";
+import { useControllableState } from "./controllable-state";
 import { CopyButton, type CopyLabels } from "./copy";
 import { ScrollArea } from "./scroll-area";
 
@@ -153,8 +153,7 @@ export function CodeBlock({
   style,
   ...props
 }: CodeBlockProps) {
-  const [own, setOwn] = useState(defaultCode ?? "");
-  const code = given ?? own;
+  const [code, setCode] = useControllableState(given, defaultCode ?? "", onCodeChange);
   const lines = useMemo(() => lineTokens(code, language, editable), [code, language, editable]);
   const name = filename ?? label;
   return (
@@ -227,8 +226,7 @@ export function CodeBlock({
                 value={code}
                 onChange={(event) => {
                   inputProps?.onChange?.(event);
-                  if (given === undefined) setOwn(event.target.value);
-                  onCodeChange?.(event.target.value);
+                  setCode(event.target.value);
                 }}
                 // Safari scrolls the box itself to show the caret as a line grows past it, before
                 // the code beneath grows. The region takes the scroll instead, and the box goes

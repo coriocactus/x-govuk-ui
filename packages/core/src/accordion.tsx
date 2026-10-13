@@ -11,6 +11,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useControllableState } from "./controllable-state";
 
 type HeadingLevel = 2 | 3 | 4 | 5 | 6;
 
@@ -56,16 +57,8 @@ export function Accordion({
   children,
   ...props
 }: AccordionProps) {
-  const [own, setOwn] = useState(defaultValue);
+  const [value, setValue] = useControllableState(controlled, defaultValue, onValueChange);
   const [values, setValues] = useState<string[]>([]);
-  const value = controlled ?? own;
-  const setValue = useCallback(
-    (next: string[]) => {
-      if (controlled === undefined) setOwn(next);
-      onValueChange?.(next);
-    },
-    [controlled, onValueChange],
-  );
   // Each item registers its value, so Show all knows every section.
   const register = useCallback((item: string) => {
     setValues((current) => [...current, item]);

@@ -37,7 +37,12 @@ import {
   Tooltip,
   useScopeSound,
 } from "x-govuk-ui";
-import { useMediaQuery, useMergedRef, useStoredState } from "x-govuk-ui/internal";
+import {
+  useControllableState,
+  useMediaQuery,
+  useMergedRef,
+  useStoredState,
+} from "x-govuk-ui/internal";
 import {
   balanceTiles,
   dividerPixels,
@@ -451,16 +456,12 @@ export function TilesProvider({
   const ids = tileIds(layout);
   const idsText = JSON.stringify(ids);
 
-  const [ownMaximised, setOwnMaximised] = useState<string | null>(null);
-  const wanted = maximisedValue !== undefined ? maximisedValue : ownMaximised;
-  const maximised = wanted !== null && ids.includes(wanted) ? wanted : null;
-  const setMaximised = useCallback(
-    (id: string | null) => {
-      if (maximisedValue === undefined) setOwnMaximised(id);
-      onMaximisedChange?.(id);
-    },
-    [maximisedValue, onMaximisedChange],
+  const [wanted, setMaximised] = useControllableState<string | null>(
+    maximisedValue,
+    null,
+    onMaximisedChange,
   );
+  const maximised = wanted !== null && ids.includes(wanted) ? wanted : null;
 
   // The tile in use, while it is open. The service is told as a user changes it, and as it closes,
   // but not when the service gives a new one itself.

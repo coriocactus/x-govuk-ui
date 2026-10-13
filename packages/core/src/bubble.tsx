@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useControllableState } from "./controllable-state";
 import { duration, useMotionTiming } from "./motion";
 import { useShrinkWrap } from "./shrink-wrap";
 import { useScopeSound } from "./sound-scope";
@@ -229,12 +230,7 @@ export function BubbleReactionPicker({
   const bubble = useBubble("BubbleReactionPicker");
   const play = useScopeSound();
   const [open, setOpen] = useState(false);
-  const [own, setOwn] = useState(defaultValue);
-  const chosen = value ?? own;
-  const choose = (next: string[]) => {
-    if (value === undefined) setOwn(next);
-    onValueChange?.(next);
-  };
+  const [chosen, choose] = useControllableState(value, defaultValue, onValueChange);
 
   // Holding the bubble opens the picker. Moving the pointer, such as to select text or to scroll,
   // cancels the hold. Once the picker opens, a held link or button does not follow its press.

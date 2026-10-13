@@ -9,8 +9,8 @@ import {
   type ReactNode,
   useContext,
   useId,
-  useState,
 } from "react";
+import { useControllableState } from "./controllable-state";
 import { springs, useMotionTiming } from "./motion";
 
 type GroupContextValue = { id: string; multiple: boolean; value: readonly string[] };
@@ -52,8 +52,7 @@ export function ToggleGroup({
   ...props
 }: ToggleGroupProps) {
   const id = useId();
-  const [own, setOwn] = useState<string[]>(defaultValue);
-  const value = controlled ?? own;
+  const [value, setValue] = useControllableState(controlled, defaultValue, onValueChange);
   return (
     <GroupContext value={{ id, multiple, value }}>
       <Primitive
@@ -66,8 +65,7 @@ export function ToggleGroup({
         onValueChange={(next: string[]) => {
           // One item always stays pressed unless the group allows several.
           if (!multiple && next.length === 0) return;
-          if (controlled === undefined) setOwn(next);
-          onValueChange?.(next);
+          setValue(next);
         }}
       >
         {children}

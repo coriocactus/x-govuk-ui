@@ -9,7 +9,6 @@ import {
   type ReactElement,
   type ReactNode,
   type RefObject,
-  useCallback,
   useContext,
   useEffect,
   useId,
@@ -18,6 +17,7 @@ import {
   useState,
 } from "react";
 import { Button } from "./button";
+import { useControllableState } from "./controllable-state";
 import { trackHighlight } from "./highlight";
 import { Kbd } from "./kbd";
 import { duration, easeOut, useMotionTiming } from "./motion";
@@ -146,8 +146,7 @@ export function CommandMenu({
 }: CommandMenuProps) {
   const play = useScopeSound();
   const { reduced } = useMotionTiming();
-  const [own, setOwn] = useState(false);
-  const open = controlled ?? own;
+  const [open, setOpen] = useControllableState(controlled, false, onOpenChange);
   const isOpen = useRef(open);
   isOpen.current = open;
   const input = useRef<HTMLInputElement>(null);
@@ -169,13 +168,6 @@ export function CommandMenu({
     return entry?.page === page && matches(query, entry.text);
   });
 
-  const setOpen = useCallback(
-    (next: boolean) => {
-      setOwn(next);
-      onOpenChange?.(next);
-    },
-    [onOpenChange],
-  );
   const go = (next: string[]) => {
     setNavigated(true);
     setStack(next);

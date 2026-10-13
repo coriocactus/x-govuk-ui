@@ -1,6 +1,7 @@
 "use client";
 
-import { type ComponentPropsWithRef, type ReactNode, useId, useState } from "react";
+import { type ComponentPropsWithRef, type ReactNode, useId } from "react";
+import { useControllableState } from "./controllable-state";
 import { Dial } from "./dial";
 import { ErrorMessage, Field, Hint, useField, useFormDefault } from "./field";
 import { ToggleGroup, ToggleGroupItem } from "./toggle-group";
@@ -79,19 +80,16 @@ export function TimeInput({
   const savedHour = useFormDefault(name && `${name}-hour`)?.[0];
   const savedMinute = useFormDefault(name && `${name}-minute`)?.[0];
   const savedPeriod = useFormDefault(name && `${name}-period`)?.[0];
-  const [own, setOwn] = useState<TimeParts>(
+  const [parts, set] = useControllableState<TimeParts>(
+    value,
     () =>
       defaultValue ?? {
         hour: savedHour ?? "",
         minute: savedMinute ?? "",
         period: savedPeriod ?? "",
       },
+    onValueChange,
   );
-  const parts = value ?? own;
-  const set = (next: TimeParts) => {
-    if (value === undefined) setOwn(next);
-    onValueChange?.(next);
-  };
   const invalid = (part: Part) => field.invalid && (!errorFields || errorFields.includes(part));
   const twelve = hourCycle === 12;
   const dials: { part: Part; label: string; options: string[]; width: number }[] = [

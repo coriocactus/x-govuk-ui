@@ -96,7 +96,8 @@ export type FieldsetLegendProps = ComponentPropsWithRef<"legend"> & {
  * its words are the question that Check your answers lists.
  */
 export function FieldsetLegend({
-  size = "small",
+  // The class names the size as Fieldset's `legendSize` does, so their styling contracts agree.
+  size: legendSize = "small",
   pageHeading = false,
   className = "",
   children,
@@ -106,7 +107,7 @@ export function FieldsetLegend({
   return (
     <legend
       {...props}
-      className={`x-govuk-ui-legend x-govuk-ui-legend--${size} ${className}`.trim()}
+      className={`x-govuk-ui-legend x-govuk-ui-legend--${legendSize} ${className}`.trim()}
     >
       {pageHeading ? <h1 className="x-govuk-ui-legend-heading">{children}</h1> : children}
     </legend>

@@ -58,6 +58,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Changed
 
+- Changed the styling contracts of Date input, Time input and Code block, which list the classes a service styles. The legend's classes now belong to Fieldset, and the copy button's to CopyButton, whose parts draw them. The classes on the page do not change.
 - Changed SoundScope to choose a press's sound from data attributes that parts set, in place of their classes and names. A warning Button sets `data-sound="destructive"`, a quiet one `data-sound-soft`, and every close button, such as an overlay's ×, `data-sound="close"`. A button of your own named Close no longer plays the close sound by its name. Give it `data-sound="close"`.
 - Changed ErrorSummaryItem to focus the first control inside the element it links to, when that element cannot take focus itself, such as a Slider or a group.
 - Changed SummaryListAction's `hiddenText` to take any React content.

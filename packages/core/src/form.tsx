@@ -290,7 +290,7 @@ export function Form({
     const first = listed.find((problem) => problem.id);
     if (first?.id && !errorSummary)
       requestAnimationFrame(() => {
-        if (shown.current === 0) document.getElementById(first.id ?? "")?.focus();
+        if (!claimed()) document.getElementById(first.id ?? "")?.focus();
       });
     return listed.length > 0;
   };

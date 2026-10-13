@@ -2,6 +2,7 @@
 
 import { type ComponentPropsWithRef, useEffect, useRef, useState } from "react";
 import { Button } from "./button";
+import { chain } from "./events";
 import { useLabels } from "./labels";
 import { Tooltip } from "./tooltip";
 
@@ -104,10 +105,8 @@ export function CopyButton({
         className={`x-govuk-ui-copy-button ${className}`.trim()}
         aria-label={name}
         data-sound="copy"
-        onClick={async (event) => {
-          // A service's own handler runs first, and can stop the copy by preventing the default.
-          onClick?.(event);
-          if (event.defaultPrevented) return;
+        // A service's own handler runs first, and can stop the copy by preventing the default.
+        onClick={chain(onClick, async (event) => {
           let next: typeof status = "copied";
           try {
             await writeText(typeof text === "string" ? text : text(), event.currentTarget);
@@ -117,7 +116,7 @@ export function CopyButton({
           setStatus(next);
           clearTimeout(timer.current);
           timer.current = setTimeout(() => setStatus("idle"), 1600);
-        }}
+        })}
       >
         {/* Both icons share one spot and cross-fade, so nothing moves as the tick arrives. */}
         <span className="x-govuk-ui-copy-icons" data-copied={status === "copied" || undefined}>

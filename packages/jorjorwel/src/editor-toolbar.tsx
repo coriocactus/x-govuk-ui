@@ -50,7 +50,7 @@ import {
   Tooltip,
   TooltipGroup,
 } from "x-govuk-ui";
-import { useMergedRef } from "x-govuk-ui/internal";
+import { chain, useMergedRef } from "x-govuk-ui/internal";
 import {
   $clearFormatting,
   $insertLink,
@@ -602,9 +602,8 @@ export function EditorControl({
             className={`x-govuk-ui-editor-control ${className}`.trim()}
             aria-label={label}
             aria-pressed={ownActive || spec?.active ? on : undefined}
-            onClick={(event) => {
-              onClick?.(event);
-              if (event.defaultPrevented || blocked || !can) return;
+            onClick={chain(onClick, (event) => {
+              if (blocked || !can) return;
               if (action)
                 runControl(
                   context,
@@ -612,7 +611,7 @@ export function EditorControl({
                   event,
                 );
               else if (spec) runControl(context, () => spec.run(context), event);
-            }}
+            })}
           >
             {children ?? (kind ? controlIcons[kind] : null)}
           </Button>
@@ -851,7 +850,7 @@ function normaliseAddress(text: string) {
  * and Unlink. Mod K opens the same popover from the document, wherever the control is, even behind
  * More, or with no control in the toolbar.
  */
-function LinkControl({ label, blocked, className, ...props }: ChoiceControlProps) {
+function LinkControl({ label, blocked, className, onClick, ...props }: ChoiceControlProps) {
   const context = useEditorContext("EditorControl");
   const format = useStore(context.format);
   const link = useStore(context.link);
@@ -872,10 +871,9 @@ function LinkControl({ label, blocked, className, ...props }: ChoiceControlProps
             aria-pressed={format.link}
             aria-haspopup="dialog"
             aria-expanded={link.open}
-            onClick={(event) => {
-              props.onClick?.(event);
-              if (!event.defaultPrevented && !blocked) context.openLink(button.current);
-            }}
+            onClick={chain(onClick, () => {
+              if (!blocked) context.openLink(button.current);
+            })}
           >
             {controlIcons.link}
           </Button>

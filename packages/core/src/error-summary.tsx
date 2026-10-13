@@ -1,6 +1,7 @@
 "use client";
 
 import { type ComponentPropsWithRef, type ReactNode, type Ref, useEffect, useRef } from "react";
+import { chain } from "./events";
 import { useLabels } from "./labels";
 
 /** The words about errors, which a LabelsProvider can change, as GOV.UK's Welsh pages do. */
@@ -110,18 +111,17 @@ export function ErrorSummaryItem({
         {...props}
         href={href}
         className={`x-govuk-ui-error-summary-link ${className}`.trim()}
-        onClick={(event) => {
-          onClick?.(event);
+        onClick={chain(onClick, (event) => {
           const id = decodeURIComponent(event.currentTarget.hash.slice(1));
           const field = id && event.currentTarget.ownerDocument.getElementById(id);
-          if (event.defaultPrevented || !field) return;
+          if (!field) return;
           event.preventDefault();
           const control = field.matches(FOCUSABLE)
             ? field
             : (field.querySelector<HTMLElement>(FOCUSABLE) ?? field);
           captionFor(control).scrollIntoView({ block: "start" });
           control.focus({ preventScroll: true });
-        }}
+        })}
       />
     </li>
   );

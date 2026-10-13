@@ -24,6 +24,7 @@ import {
   useCalloutSide,
 } from "./callout";
 import { useControllableState } from "./controllable-state";
+import { chain } from "./events";
 import { useLabels } from "./labels";
 import { glideEasing, useMotionTiming } from "./motion";
 import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
@@ -371,8 +372,6 @@ export function Tour({
   if (centred) sideOffset = ({ positioner: box }) => -box.height / 2;
 
   const keys = (event: KeyboardEvent<HTMLDivElement>) => {
-    onKeyDown?.(event);
-    if (event.defaultPrevented) return;
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)
       return;
     if (event.key === "ArrowRight" && !last) go(step + 1);
@@ -426,7 +425,7 @@ export function Tour({
               initialFocus={next}
               finalFocus={returnTo}
               data-moving={moving || undefined}
-              onKeyDown={keys}
+              onKeyDown={chain(onKeyDown, keys)}
             >
               {!centred && (
                 <Primitive.Arrow className="x-govuk-ui-floating-arrow">

@@ -12,6 +12,7 @@ import {
 } from "react";
 import { AutoHeight } from "./auto-height";
 import { defaultErrorLabels, ErrorSummary, ErrorSummaryItem } from "./error-summary";
+import { both } from "./events";
 import { FormContext, type FormField, present } from "./field";
 import { useLabels } from "./labels";
 import { useMergedRef } from "./refs";
@@ -297,23 +298,13 @@ export function Form({
           const errors = await onSubmit(data, event);
           if (errors) show(errors, data);
         }}
-        onInput={(event) => {
-          onInput?.(event);
-          recheck();
-        }}
-        onChange={(event) => {
-          onChange?.(event);
-          recheck();
-        }}
+        // The answers are checked again whatever a service's own handlers do, because a click
+        // prevented for a reason of its own, such as a link's, can still change an answer.
+        onInput={both(onInput, recheck)}
+        onChange={both(onChange, recheck)}
         // Some answers change without an input event, such as a choice from a Select's list.
-        onClick={(event) => {
-          onClick?.(event);
-          recheck();
-        }}
-        onKeyUp={(event) => {
-          onKeyUp?.(event);
-          recheck();
-        }}
+        onClick={both(onClick, recheck)}
+        onKeyUp={both(onKeyUp, recheck)}
       >
         {/* The summary opens above the fields, and the fields move down smoothly to make room. */}
         <AutoHeight className="x-govuk-ui-form-summary">

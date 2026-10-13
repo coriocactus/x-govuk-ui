@@ -999,10 +999,7 @@ export function SidebarTrigger({ className = "", onClick, ...props }: ButtonProp
         aria-controls={sidebar.isMobile ? undefined : `${sidebar.id}-sidebar`}
         {...props}
         className={`x-govuk-ui-sidebar-trigger ${className}`.trim()}
-        onClick={(event) => {
-          onClick?.(event);
-          if (!event.defaultPrevented) sidebar.toggleSidebar();
-        }}
+        onClick={chain(onClick, () => sidebar.toggleSidebar())}
       >
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
           <path

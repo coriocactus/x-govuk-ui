@@ -5,7 +5,6 @@ import {
   type ComponentPropsWithRef,
   type CSSProperties,
   createContext,
-  type MouseEvent,
   memo,
   type ReactElement,
   type ReactNode,
@@ -39,6 +38,7 @@ import {
   useScopeSound,
 } from "x-govuk-ui";
 import {
+  chain,
   useControllableState,
   useLatest,
   useMediaQuery,
@@ -1509,10 +1509,7 @@ function Control({
         variant="quiet"
         size="small-icon"
         className={`x-govuk-ui-tile-control ${className}`.trim()}
-        onClick={(event: MouseEvent<HTMLButtonElement>) => {
-          onClick?.(event);
-          if (!event.defaultPrevented) action();
-        }}
+        onClick={chain(onClick, () => action())}
       >
         {icon}
       </Button>
@@ -1888,10 +1885,7 @@ export function TilesDockItem({
       ref={merged}
       className={`x-govuk-ui-tiles-dock-tile ${className}`.trim()}
       data-dragging={dragging || undefined}
-      onClick={(event) => {
-        onClick?.(event);
-        if (!event.defaultPrevented) open(tile, place);
-      }}
+      onClick={chain(onClick, () => open(tile, place))}
     >
       {gripDots}
       {children ?? titleOf(tile)}
@@ -1923,10 +1917,7 @@ export function TilesTidy({
       size={size}
       className={`x-govuk-ui-tiles-tidy ${className}`.trim()}
       disabled={disabled || tileIds(layout).length < 2}
-      onClick={(event: MouseEvent<HTMLButtonElement>) => {
-        onClick?.(event);
-        if (!event.defaultPrevented) tiles.tidy();
-      }}
+      onClick={chain(onClick, () => tiles.tidy())}
     >
       {icons.tidy}
       {children ?? tiles.labels.tidy}

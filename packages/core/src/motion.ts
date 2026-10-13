@@ -1,7 +1,8 @@
 "use client";
 
 import type { HTMLMotionProps, Transition } from "motion/react";
-import { type ComponentPropsWithRef, type SyntheticEvent, useSyncExternalStore } from "react";
+import { type ComponentPropsWithRef, useSyncExternalStore } from "react";
+import { both } from "./events";
 
 type Bezier = readonly [number, number, number, number];
 
@@ -115,17 +116,6 @@ export function useMotionTiming() {
     () => false,
   );
   return reduced ? still : moving;
-}
-
-type Handler<E extends SyntheticEvent> = ((event: E) => void) | undefined;
-
-/** Calls both handlers, so a twin given by the caller still runs. */
-function both<E extends SyntheticEvent>(first: Handler<E>, second: Handler<E>): Handler<E> {
-  if (!first || !second) return first ?? second;
-  return (event) => {
-    first(event);
-    second(event);
-  };
 }
 
 /**

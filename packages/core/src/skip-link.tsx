@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentPropsWithRef } from "react";
+import { chain } from "./events";
 import { useLabels } from "./labels";
 
 export type SkipLinkProps = Omit<ComponentPropsWithRef<"a">, "href"> & {
@@ -36,10 +37,9 @@ export function SkipLink({
       {...props}
       href={href}
       className={`x-govuk-ui-skip-link ${className}`.trim()}
-      onClick={(event) => {
-        onClick?.(event);
+      onClick={chain(onClick, (event) => {
         const target = href.startsWith("#") ? document.getElementById(href.slice(1)) : null;
-        if (!target || event.defaultPrevented) return;
+        if (!target) return;
         event.preventDefault();
         // The content takes focus for as long as it has it, without becoming a Tab stop.
         if (!target.hasAttribute("tabindex")) {
@@ -50,7 +50,7 @@ export function SkipLink({
         }
         target.focus();
         target.scrollIntoView({ block: "start" });
-      }}
+      })}
     >
       {children}
     </a>

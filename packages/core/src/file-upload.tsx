@@ -158,14 +158,22 @@ export function FileUploadControl(given: FileUploadControlProps) {
       : labels.megabytes(number.format(bytes / 1024 / 1024));
   const input = useRef<HTMLInputElement>(null);
   const inputRef = useMergedRef(input, ref);
-  const [files, update] = useControllableState(controlled, defaultFiles, onFilesChange);
+  const [files, setFiles] = useControllableState(controlled, defaultFiles, onFilesChange);
+  // Each pick or removal draws the field again, even when a service's `files` refuse it, so the
+  // input goes back to the files the field shows.
+  const [attempts, setAttempts] = useState(0);
+  const update = (next: File[]) => {
+    setFiles(next);
+    setAttempts((count) => count + 1);
+  };
   const [dragging, setDragging] = useState(false);
   const [pull, setPull] = useState({ x: 0, y: 0 });
   const play = useScopeSound();
   const listId = `${controlId}-files`;
 
   // The input sends the files the field shows, so files given by a service, or taken away, are
-  // the files the form sends.
+  // the files the form sends. A pick that a service's `files` refuse is taken back out.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: each attempt is checked, whether or not the files change.
   useLayoutEffect(() => {
     const element = input.current;
     if (!element) return;
@@ -174,16 +182,11 @@ export function FileUploadControl(given: FileUploadControlProps) {
     const transfer = new DataTransfer();
     for (const file of files) transfer.items.add(file);
     element.files = transfer.files;
-  }, [files]);
+  }, [files, attempts]);
+  // The field shows the files without it, and the input follows once they are taken.
   const remove = (file: File) => {
-    const element = input.current;
-    if (!element) return;
-    // A file input's list cannot be edited, so it is replaced by one without the file.
-    const transfer = new DataTransfer();
-    for (const each of files) if (each !== file) transfer.items.add(each);
-    element.files = transfer.files;
-    update(Array.from(transfer.files));
-    element.focus();
+    update(files.filter((each) => each !== file));
+    input.current?.focus();
   };
   // While files are dragged over the zone, its contents lean a little towards the pointer.
   const lean = (event: DragEvent<HTMLInputElement>) => {

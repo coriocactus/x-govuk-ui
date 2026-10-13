@@ -2,6 +2,7 @@
 
 import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
+import { Anchor, type AnchorProps } from "./anchor";
 import { useLabels } from "./labels";
 import { GovukCrown } from "./logo";
 import { WidthContainer } from "./width-container";
@@ -58,6 +59,8 @@ export type FooterProps = ComponentPropsWithRef<"footer"> & {
    * GOV.UK that owns its own content.
    */
   copyrightUrl?: string | null;
+  /** Renders a router's link in place of the copyright line's anchor, keeping its look. */
+  copyrightRender?: AnchorProps["render"];
   /** Wider navigation, as `FooterSection` parts, above a rule at the top of the footer. */
   navigation?: ReactNode;
 };
@@ -96,6 +99,7 @@ export function Footer({
   licence: ownLicence,
   copyright: ownCopyright,
   copyrightUrl = crownCopyright,
+  copyrightRender,
   navigation,
   className = "",
   style,
@@ -141,13 +145,14 @@ export function Footer({
               {copyright}
             </span>
           ) : (
-            <a
+            <Anchor
               className="x-govuk-ui-footer-link x-govuk-ui-footer-copyright"
               data-crest={(crown && crest !== undefined) || undefined}
               href={copyrightUrl}
+              render={copyrightRender}
             >
               {copyright}
-            </a>
+            </Anchor>
           )}
         </div>
       </WidthContainer>

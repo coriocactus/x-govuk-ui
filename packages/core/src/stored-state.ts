@@ -10,9 +10,18 @@ const STORED = "x-govuk-ui-stored";
  */
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
-/** Local storage, where there is one, as the server has none. @internal */
-export const browserStorage = (): StorageLike | null =>
-  typeof localStorage === "undefined" ? null : localStorage;
+/**
+ * Local storage, where there is one. The server has none, and a browser that blocks storage throws
+ * as the page reads it, so the part keeps what it keeps for this visit alone.
+ * @internal
+ */
+export function browserStorage(): StorageLike | null {
+  try {
+    return typeof localStorage === "undefined" ? null : localStorage;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * State kept in storage when there is a key, or else in memory. Every part that uses the key, in

@@ -9,8 +9,11 @@ import { Editor } from "@x-govuk-ui/jorjorwel";
 import { Chart } from "@x-govuk-ui/memetics";
 import { type ComponentPropsWithRef, useRef } from "react";
 import {
+  Aside,
   defaultPaginationLabels,
   FieldBinding,
+  FormErrorSummary,
+  FormStepsSummary,
   Hint,
   Label,
   type Labels,
@@ -90,3 +93,15 @@ export function DialField() {
     </FieldBinding>
   );
 }
+
+/**
+ * A part's title takes any content, as the heading it draws does, not the string of the HTML
+ * attribute it shadows. A summary's title can be left out.
+ */
+export const titles = (
+  <>
+    <Aside title={<span lang="cy">Cysylltiedig</span>}>Links</Aside>
+    <FormErrorSummary title={<span lang="cy">Mae problem</span>} />
+    <FormStepsSummary title={null} steps={[0]} />
+  </>
+);

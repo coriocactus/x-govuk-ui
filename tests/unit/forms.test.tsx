@@ -92,6 +92,7 @@ import {
 } from "x-govuk-ui";
 import { z } from "zod";
 import { fieldOf } from "../../packages/core/src/form";
+import { browserStorage } from "../../packages/core/src/stored-state";
 import { controlIcons } from "../../packages/jorjorwel/src/editor-controls";
 import { matchPosition } from "../../packages/jorjorwel/src/editor-prompt";
 
@@ -1201,7 +1202,7 @@ test("a form in steps draws once each part a service places, and its buttons bes
   const steps = (
     <FormSteps actions={<Button>Save and come back later</Button>}>
       <FormStepsProgress className="own-progress" />
-      <FormStep actions={<Button>I do not know</Button>}>
+      <FormStep>
         <Input name="name" label="What is your name?" />
       </FormStep>
       <FormStep>
@@ -1213,8 +1214,8 @@ test("a form in steps draws once each part a service places, and its buttons bes
   // The progress placed among the steps is drawn once, in its place, with the service's class.
   expect(html.match(/Question 1 of 2/g)).toHaveLength(1);
   expect(html).toContain('<p class="x-govuk-ui-form-steps-progress own-progress">');
-  // The step's own buttons come before the form's, after Continue.
-  expect(html).toMatch(/Continue.*I do not know.*Save and come back later/s);
+  // The form's own buttons come after Continue.
+  expect(html).toMatch(/Continue.*Save and come back later/s);
   // The first step has no way back, wherever the Back link is placed.
   const provided = renderToStaticMarkup(
     <FormStepsProvider>
@@ -1243,6 +1244,38 @@ test("the answers' summary shows only on Check your answers, with its heading at
   // The form lists no answers of its own beside it.
   expect(review.match(/x-govuk-ui-form-steps-review[ "]/g)).toHaveLength(1);
   expect(review).not.toContain("Check your answers");
+});
+
+test("storage that the browser blocks is no storage, not an error", () => {
+  const before = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    get() {
+      throw new DOMException("The operation is insecure.", "SecurityError");
+    },
+  });
+  try {
+    expect(browserStorage()).toBeNull();
+  } finally {
+    if (before) Object.defineProperty(globalThis, "localStorage", before);
+    else Reflect.deleteProperty(globalThis, "localStorage");
+  }
+});
+
+test("a combobox starts with its chosen option's label in its input", () => {
+  const items = [
+    { value: "uk", label: "United Kingdom" },
+    { value: "fr", label: "France" },
+  ];
+  expect(
+    renderToStaticMarkup(<Combobox label="Country" items={items} defaultValue="uk" />),
+  ).toMatch(/<input[^>]*value="United Kingdom"/);
+  // Text of the service's own comes first.
+  expect(
+    renderToStaticMarkup(
+      <Combobox label="Country" items={items} defaultValue="uk" defaultInputValue="Uni" />,
+    ),
+  ).toMatch(/<input[^>]*value="Uni"/);
 });
 
 test("a file upload starts from files given to it, and can leave their list to a service", () => {

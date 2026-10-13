@@ -11,6 +11,7 @@ import {
   useContext,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -28,7 +29,7 @@ import { chain } from "./events";
 import { useLabels } from "./labels";
 import { glideEasing, useMotionTiming } from "./motion";
 import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
-import { useMergedRef } from "./refs";
+import { useLatest, useMergedRef } from "./refs";
 import { type Registry, useRegister, useRegistry } from "./registry";
 import { type StorageLike, useStoredState } from "./stored-state";
 
@@ -417,6 +418,20 @@ export function Tour({
   let sideOffset: Primitive.Positioner.Props["sideOffset"] = dim ? 12 + dimPadding : 12;
   if (centred) sideOffset = ({ positioner: box }) => -box.height / 2;
 
+  // What a part of the card gives `useTour`, such as a button in a step's words or its actions.
+  // Its ways to move call the latest go and end, so it changes only as the step does.
+  const latest = useLatest({ go, end });
+  const controls = useMemo<TourControls>(
+    () => ({
+      step,
+      count,
+      goTo: (index) => void latest.current.go(index),
+      finish: () => latest.current.end("finished"),
+      close: () => latest.current.end("closed"),
+    }),
+    [step, count],
+  );
+
   const keys = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)
       return;
@@ -473,76 +488,68 @@ export function Tour({
               data-moving={moving || undefined}
               onKeyDown={chain(onKeyDown, keys)}
             >
-              {!centred && (
-                <Primitive.Arrow className="x-govuk-ui-floating-arrow">
-                  <ArrowShape />
-                </Primitive.Arrow>
-              )}
-              {/* Each step's words fade in as it comes. */}
-              <div key={step} className="x-govuk-ui-tour-step">
-                <Primitive.Title className="x-govuk-ui-callout-title">
-                  {current?.title}
-                </Primitive.Title>
-                {current?.children && (
-                  <Primitive.Description
-                    className="x-govuk-ui-callout-description"
-                    render={<div />}
-                  >
-                    {current.children}
-                  </Primitive.Description>
+              <TourContext value={controls}>
+                {!centred && (
+                  <Primitive.Arrow className="x-govuk-ui-floating-arrow">
+                    <ArrowShape />
+                  </Primitive.Arrow>
                 )}
-              </div>
-              <div className="x-govuk-ui-tour-foot">
-                <span className="x-govuk-ui-tour-count">
-                  <span className="x-govuk-ui-tour-dots" aria-hidden="true">
-                    {steps.map((_, index) => (
-                      <span
-                        // biome-ignore lint/suspicious/noArrayIndexKey: a dot is only a place.
-                        key={index}
-                        data-current={index === step || undefined}
-                        data-done={index < step || undefined}
-                      />
-                    ))}
+                {/* Each step's words fade in as it comes. */}
+                <div key={step} className="x-govuk-ui-tour-step">
+                  <Primitive.Title className="x-govuk-ui-callout-title">
+                    {current?.title}
+                  </Primitive.Title>
+                  {current?.children && (
+                    <Primitive.Description
+                      className="x-govuk-ui-callout-description"
+                      render={<div />}
+                    >
+                      {current.children}
+                    </Primitive.Description>
+                  )}
+                </div>
+                <div className="x-govuk-ui-tour-foot">
+                  <span className="x-govuk-ui-tour-count">
+                    <span className="x-govuk-ui-tour-dots" aria-hidden="true">
+                      {steps.map((_, index) => (
+                        <span
+                          // biome-ignore lint/suspicious/noArrayIndexKey: a dot is only a place.
+                          key={index}
+                          data-current={index === step || undefined}
+                          data-done={index < step || undefined}
+                        />
+                      ))}
+                    </span>
+                    {stepLabel(step + 1, steps.length)}
                   </span>
-                  {stepLabel(step + 1, steps.length)}
-                </span>
-                {current?.actions && (
-                  <TourContext
-                    value={{
-                      step,
-                      count: steps.length,
-                      goTo: (index) => void go(index),
-                      finish: () => end("finished"),
-                      close: () => end("closed"),
-                    }}
-                  >
+                  {current?.actions && (
                     <span className="x-govuk-ui-tour-actions">{current.actions}</span>
-                  </TourContext>
-                )}
-                {step > 0 && (
-                  <Button variant="quiet" size="small" onClick={() => go(step - 1)}>
-                    {labels.back}
+                  )}
+                  {step > 0 && (
+                    <Button variant="quiet" size="small" onClick={() => go(step - 1)}>
+                      {labels.back}
+                    </Button>
+                  )}
+                  <Button
+                    ref={next}
+                    size="small"
+                    data-sound={last ? "success" : undefined}
+                    onClick={() => (last ? end("finished") : go(step + 1))}
+                  >
+                    {last ? labels.done : labels.next}
                   </Button>
+                </div>
+                {closeButton && (
+                  <Primitive.Close
+                    render={
+                      <CloseIconButton label={labels.close} className="x-govuk-ui-callout-close" />
+                    }
+                  />
                 )}
-                <Button
-                  ref={next}
-                  size="small"
-                  data-sound={last ? "success" : undefined}
-                  onClick={() => (last ? end("finished") : go(step + 1))}
-                >
-                  {last ? labels.done : labels.next}
-                </Button>
-              </div>
-              {closeButton && (
-                <Primitive.Close
-                  render={
-                    <CloseIconButton label={labels.close} className="x-govuk-ui-callout-close" />
-                  }
-                />
-              )}
-              <span className="x-govuk-ui-visually-hidden" aria-live="polite">
-                {heard}
-              </span>
+                <span className="x-govuk-ui-visually-hidden" aria-live="polite">
+                  {heard}
+                </span>
+              </TourContext>
             </Primitive.Popup>
           </Primitive.Positioner>
         </Primitive.Portal>

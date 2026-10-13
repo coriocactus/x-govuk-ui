@@ -102,6 +102,16 @@ function SkipTour() {
   );
 }
 
+/** Goes back to the tour's first step, from among a step's words. */
+function StartAgain() {
+  const tour = useTour();
+  return (
+    <Button variant="link" onClick={() => tour?.goTo(0)}>
+      See the tour from the start
+    </Button>
+  );
+}
+
 /**
  * The steps about the actions, kept with them in a component of their own, as a part of a page can
  * keep its own steps. The Tour finds them inside it, in their place among the others.
@@ -113,7 +123,8 @@ function ActionSteps() {
         Apply for another service. Your details are filled in for you.
       </TourStep>
       <TourStep target="#tour-help" title="Get help">
-        Talk to us by phone or webchat, Monday to Friday, 8am to 6pm.
+        <p>Talk to us by phone or webchat, Monday to Friday, 8am to 6pm.</p>
+        <StartAgain />
       </TourStep>
     </>
   );

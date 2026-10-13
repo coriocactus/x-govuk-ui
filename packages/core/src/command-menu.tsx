@@ -207,7 +207,8 @@ type Shared = {
   current: Page | undefined;
   pages: Map<string, Page>;
   visible: string[];
-  order: string[];
+  /** Null until the list has been read, so nothing says that nothing matches before then. */
+  order: string[] | null;
   setOrder: (order: string[]) => void;
   navigated: boolean;
   back: (depth: number) => void;
@@ -252,8 +253,8 @@ export function CommandMenu({
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
-  // Every command on the open page, in the order the page shows them.
-  const [order, setOrder] = useState<string[]>([]);
+  // Every command on the open page, in the order the page shows them, once the list is read.
+  const [order, setOrder] = useState<string[] | null>(null);
   const [stack, setStack] = useState<string[]>([]);
   // False until the user moves to another page, so the first page arrives with the dialog.
   const [navigated, setNavigated] = useState(false);
@@ -265,7 +266,7 @@ export function CommandMenu({
   // The commands that match, in the order the page shows them. A command among the best matches
   // is drawn there, so the page's order follows it, and Base UI highlights and moves through them
   // in this order.
-  const visible = order.filter((id) => {
+  const visible = (order ?? []).filter((id) => {
     const entry = entries.get(id);
     return entry?.page === page && filter(query, entry.command);
   });
@@ -468,11 +469,12 @@ export type CommandMenuContentProps = ComponentPropsWithRef<"div"> & {
   finalFocus?: Dialog.Popup.Props["finalFocus"];
   /**
    * What shows when nothing matches the search, in place of its `empty` label, such as a button to
-   * make what was searched for. `useCommandMenu` gives the search.
+   * make what was searched for. `useCommandMenu` gives the search. Give null for nothing.
    */
   empty?: ReactNode;
   /**
-   * The help beneath the list, in place of its `help` and `helpBack` labels. Give null for none.
+   * The help beneath the list, in place of its `help` and `helpBack` labels, such as a row of
+   * buttons. Give null for none.
    */
   help?: ReactNode;
 };
@@ -578,7 +580,7 @@ export function CommandMenuContent({
         <span className="x-govuk-ui-visually-hidden" role="status">
           {current?.label ?? ""}
         </span>
-        {open && visible.length === 0 && order.length > 0 && (
+        {open && order !== null && visible.length === 0 && empty !== null && (
           <div className="x-govuk-ui-command-menu-empty">{empty ?? labels.empty}</div>
         )}
         <ScrollArea
@@ -600,15 +602,15 @@ export function CommandMenuContent({
           </Autocomplete.List>
           <TrackOrder list={list} onOrder={setOrder} />
         </ScrollArea>
-        {help !== null && (
+        {/* The help of a service's own can be any content, such as a row of buttons, so it sits
+            in a box of its own. */}
+        {help === undefined ? (
           <p className="x-govuk-ui-command-menu-help">
-            {help ?? (
-              <>
-                {labels.help}
-                {stack.length > 0 && ` ${labels.helpBack}`}
-              </>
-            )}
+            {labels.help}
+            {stack.length > 0 && ` ${labels.helpBack}`}
           </p>
+        ) : (
+          help !== null && <div className="x-govuk-ui-command-menu-help">{help}</div>
         )}
       </Dialog.Popup>
     </Dialog.Portal>
@@ -626,7 +628,8 @@ function TrackOrder({
   list: RefObject<HTMLDivElement | null>;
   onOrder: (order: string[]) => void;
 }) {
-  const last = useRef("");
+  // Null until the list is first read, so a page with no commands is read too.
+  const last = useRef<string | null>(null);
   useLayoutEffect(() => {
     const ids = [...(list.current?.querySelectorAll<HTMLElement>("[data-command]") ?? [])].map(
       (element) => element.dataset.command ?? "",

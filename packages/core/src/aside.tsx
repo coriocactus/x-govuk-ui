@@ -1,7 +1,8 @@
 "use client";
 import { type ComponentPropsWithRef, type ReactNode, useId } from "react";
 
-export type AsideProps = ComponentPropsWithRef<"aside"> & {
+export type AsideProps = Omit<ComponentPropsWithRef<"aside">, "title"> & {
+  /** The heading that names it, which takes any content. */
   title: ReactNode;
   headingLevel?: 2 | 3 | 4;
 };

@@ -249,4 +249,16 @@ test("a footer's copyright links to Crown copyright, to a service's own terms, o
   );
   expect(none).toContain('<span class="x-govuk-ui-footer-copyright">© Example Ltd</span>');
   expect(none).not.toContain("crown-copyright");
+  // A router's link stands in for the line's anchor, with its look.
+  const routed = renderToStaticMarkup(
+    <Footer
+      crown={false}
+      copyright="© Example Ltd"
+      copyrightUrl="/copyright"
+      copyrightRender={(given: object) => <a data-router="" {...given} />}
+    />,
+  );
+  expect(routed).toMatch(
+    /<a data-router="" class="x-govuk-ui-footer-link x-govuk-ui-footer-copyright" href="\/copyright">© Example Ltd<\/a>/,
+  );
 });

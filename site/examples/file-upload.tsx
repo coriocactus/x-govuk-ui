@@ -9,6 +9,9 @@ type Props = {
   disabled?: boolean;
 };
 
+/** Whether a file is of a kind the service takes, as its own check would say. */
+const taken = (file: File) => /\.(jpe?g|png|pdf)$/i.test(file.name);
+
 export default function FileUploadExample({
   label = "Upload a photo of your passport",
   hint = "It must be a JPG, PNG or PDF, and smaller than 10 MB.",
@@ -49,10 +52,14 @@ export default function FileUploadExample({
         multiple={multiple}
         errorMessage={problem || undefined}
         disabled={disabled}
+        // The service keeps the files, and refuses a file of a kind it does not take, so the field
+        // keeps the files it had.
+        files={files}
         onFilesChange={(next) => {
+          setStatus("");
+          if (!next.every(taken)) return setProblem("The selected file must be a JPG, PNG or PDF.");
           setFiles(next);
           setProblem("");
-          setStatus("");
         }}
       />
       <div className="preview-actions">

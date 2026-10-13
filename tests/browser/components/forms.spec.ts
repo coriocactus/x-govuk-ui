@@ -473,7 +473,8 @@ test("an application in pages takes its Back link, buttons and answers where it 
   const buttons = frame.locator(".x-govuk-ui-form-steps-buttons").getByRole("button");
   await expect(buttons).toHaveText(["Continue", "Save and come back later"]);
   await frame.getByRole("button", { name: "Save and come back later" }).click();
-  await expect(frame.getByRole("status")).toHaveText("Your answers are saved. Nothing was sent.");
+  // It saves the answers the form would send now.
+  await expect(frame.getByRole("status")).toHaveText("3 answers are saved. Nothing was sent.");
   await frame.getByRole("button", { name: "Continue" }).click();
   // Check your answers takes focus at the example's own heading, and lists the answers in two
   // sections, without the button that is only for the questions.

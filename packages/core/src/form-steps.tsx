@@ -79,11 +79,6 @@ export type FormStepProps = Omit<
   labels?: Partial<Pick<FormStepsLabels, "continue">>;
   /** The step's answer in Check your answers, in place of each field's own answer. */
   summary?: (data: FormData) => ReactNode;
-  /**
-   * Buttons of the step's own beside Continue, such as a way to say that an answer is not known.
-   * They come before the form's own `actions`.
-   */
-  actions?: ReactNode;
 };
 
 /** A step as its FormSteps knows it, by an id of its own, which keeps its fields while it moves. */
@@ -217,7 +212,9 @@ export type FormStepsProps = Omit<
   keyboardShortcut?: boolean;
   /**
    * Buttons of your own beside Continue, such as GOV.UK's Save and come back later, while the
-   * form's buttons show. `useFormSteps` tells them where the form is.
+   * form's buttons show. On a page they come after Continue and Skip, as GOV.UK puts a secondary
+   * button. In a card they come before Skip and Continue, which end the footer's row.
+   * `useFormSteps` tells them where the form is, such as for a button that one step needs.
    */
   actions?: ReactNode;
   /** Each step is a place in the browser's history, so Back in the browser goes back a step. */
@@ -369,6 +366,11 @@ export type FormStepsControls = {
   answers: FormStepsAnswer[];
   /** Asks an answer's question again, then comes back to Check your answers. */
   change: (answer: FormStepsAnswer) => void;
+  /**
+   * The answers as the form would send them now, leaving out steps that were skipped or do not
+   * apply, such as for Save and come back later. Null before the form is drawn.
+   */
+  data: () => FormData | null;
 };
 
 const noAnswers: FormStepsAnswer[] = [];
@@ -413,6 +415,60 @@ function answersOf(field: FormField, name: string, data: FormData): ReactNode[] 
     .getAll(name)
     .map((value) => (typeof value === "string" ? value.trim() : value.name))
     .filter(Boolean);
+}
+
+/**
+ * Moves focus to the first element that takes it, passing over any out of sight. An element that
+ * cannot take focus, such as a heading, is made to take it from a script alone.
+ */
+function focusFirst(elements: (HTMLElement | null | undefined)[]) {
+  for (const element of elements) {
+    if (!element) continue;
+    if (!element.hasAttribute("tabindex") && element.tabIndex < 0) element.tabIndex = -1;
+    element.focus();
+    if (element.ownerDocument.activeElement === element) return;
+  }
+}
+
+/**
+ * Whether two things show alike, such as a label drawn again as a new element with the same type
+ * and props. Functions are alike, because a handler does not change what is shown.
+ */
+function alike(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  if (typeof a === "function" && typeof b === "function") return true;
+  if (Array.isArray(a) && Array.isArray(b))
+    return a.length === b.length && a.every((each, place) => alike(each, b[place]));
+  if (isValidElement(a) && isValidElement(b)) {
+    if (a.type !== b.type || a.key !== b.key) return false;
+    const [first, second] = [a.props, b.props] as Record<string, unknown>[];
+    const keys = Object.keys(first ?? {});
+    return (
+      keys.length === Object.keys(second ?? {}).length &&
+      keys.every((key) => alike(first?.[key], second?.[key]))
+    );
+  }
+  return false;
+}
+
+/** Whether two lists of answers show the same answers. */
+function sameAnswers(current: FormStepsAnswer[], next: FormStepsAnswer[]) {
+  return (
+    current.length === next.length &&
+    current.every((row, place) => {
+      const other = next[place];
+      return (
+        other !== undefined &&
+        row.step === other.step &&
+        row.id === other.id &&
+        row.skipped === other.skipped &&
+        "summary" in row === "summary" in other &&
+        alike(row.question, other.question) &&
+        alike(row.values, other.values) &&
+        alike(row.summary, other.summary)
+      );
+    })
+  );
 }
 
 /**
@@ -468,6 +524,14 @@ function StepFields({
  * Its progress, its Back, its errors, its keys and its history can each be turned on or off. With
  * a `storageKey`, it remembers how far users got. Focus moves to each step as it comes, and a card
  * eases to each step's height.
+ *
+ * Its Back link, its progress and its list of answers are parts too: FormStepsBack,
+ * FormStepsProgress and FormStepsSummary. Each one you place takes the place of the form's own. A
+ * card's own Back is a button and its progress a ring, which the parts replace with a link and
+ * words. `actions` puts buttons of your own beside Continue, and `useFormSteps` gives a part of
+ * your own where the form is. A part among the steps is found as the server renders. One in a
+ * wrapper of your own, or outside the form, is found once the page has loaded, so the first HTML
+ * can show the form's own as well.
  *
  * Its `className` and `style` go on the section that users see, around the title, the progress
  * and the form. Every other prop, including `ref`, goes on the form, as a Form's do.
@@ -528,6 +592,11 @@ export function FormSteps({
   const [skipped, setSkipped] = useState(() => new Set<number>());
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
   const [rows, setRows] = useState<FormStepsAnswer[]>([]);
+  // Answers listed again that show what they showed keep the list as it was. A page that reads
+  // `useFormSteps` and draws the form is drawn again as the list changes, and draws its fields'
+  // labels anew, which lists the answers again. Keeping the list stops that going round.
+  const list = (next: FormStepsAnswer[]) =>
+    setRows((current) => (sameAnswers(current, next) ? current : next));
   const rememberSoon = useRef(0);
   // Whether the answers are kept, which they are not while they are sent or once they are.
   const keeping = useRef(true);
@@ -726,22 +795,20 @@ export function FormSteps({
       const root = form.current;
       if (!root) return;
       if (wanted === "summary") {
-        const section = root.closest(".x-govuk-ui-form-steps");
+        const section = root.closest<HTMLElement>(".x-govuk-ui-form-steps");
+        const all = (selector: string) => [
+          ...(section?.querySelectorAll<HTMLElement>(selector) ?? []),
+        ];
         // On a page, the page's heading takes focus, such as Check your answers, a heading of your
         // own above the answers, or the Panel once they are sent. The steps' own are out of sight.
-        const heading =
-          layout === "page"
-            ? [...(section?.querySelectorAll<HTMLElement>("h1") ?? [])].find(
-                (each) => !each.closest("[hidden]"),
-              )
-            : undefined;
-        if (heading && !heading.hasAttribute("tabindex")) heading.tabIndex = -1;
-        return (
-          heading ??
-          section?.querySelector<HTMLElement>(
+        // Otherwise the first heading of the answers does, or the answers themselves.
+        focusFirst([
+          ...(layout === "page" ? all("h1") : []),
+          ...all(
             ".x-govuk-ui-form-steps-review-title, .x-govuk-ui-form-steps-summary, .x-govuk-ui-form-steps-done",
-          )
-        )?.focus();
+          ),
+        ]);
+        return;
       }
       if (wanted.startsWith("#")) {
         // A question asked again takes focus at its answer, or at the chosen answer of a group.
@@ -750,18 +817,23 @@ export function FormSteps({
         return (group?.querySelector<HTMLElement>("input:checked") ?? field)?.focus();
       }
       const current = root.querySelector<HTMLElement>(`[data-step="${at}"]`);
-      const heading = layout === "page" ? current?.querySelector<HTMLElement>("h1") : null;
-      if (heading) {
-        heading.tabIndex = -1;
-        heading.focus();
-        return;
-      }
-      (
-        current?.querySelector<HTMLElement>("input:checked") ??
-        current?.querySelector<HTMLElement>(
+      // On a page, the step's title takes focus at whatever level it is, or else its question's
+      // heading.
+      // In a card, the step's chosen answer takes focus, or else its first.
+      const headings =
+        layout === "page"
+          ? [
+              current?.querySelector<HTMLElement>(":scope > .x-govuk-ui-form-step-title"),
+              current?.querySelector<HTMLElement>("h1"),
+            ]
+          : [];
+      focusFirst([
+        ...headings,
+        current?.querySelector<HTMLElement>("input:checked"),
+        ...(current?.querySelectorAll<HTMLElement>(
           "input:not([type=hidden]), textarea, select, button[role=combobox], [tabindex='0']",
-        )
-      )?.focus();
+        ) ?? []),
+      ]);
     });
     return () => cancelAnimationFrame(frame);
   }, [at, sent]);
@@ -772,7 +844,7 @@ export function FormSteps({
   // steps register anew after it.
   // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are listed as the form arrives, and as its steps register.
   useLayoutEffect(() => {
-    if (reviewing && !sent) setRows(planFor().flatMap((index) => summaryRows(index, skipped)));
+    if (reviewing && !sent) list(planFor().flatMap((index) => summaryRows(index, skipped)));
   }, [reviewing, sent, restored.round, registered, summaries]);
 
   // With history, the browser's current entry always records the step the form is on. Continue and
@@ -836,7 +908,7 @@ export function FormSteps({
     keeping.current = false;
     writeSaved(storageKey, ownStorage ?? browserStorage(), null);
     // The answers stay on show once sent, unless something else takes their place.
-    setRows(planFor().flatMap((index) => summaryRows(index, skipping)));
+    list(planFor().flatMap((index) => summaryRows(index, skipping)));
     setSent(true);
     focusNext.current = "summary";
   };
@@ -927,6 +999,8 @@ export function FormSteps({
   const backNow = useCallback(() => latest.current.goBack(), []);
   const skipNow = useCallback(() => latest.current.skip(), []);
   const changeNow = useCallback((row: FormStepsAnswer) => latest.current.change(row), []);
+  // Steps skipped or not asked are disabled, so the form leaves their answers out.
+  const dataNow = useCallback(() => (form.current ? new FormData(form.current) : null), []);
   const canGoBack = !sent && previous !== undefined;
   const canSkip = Boolean(step?.optional) && !reviewing && !sent;
   const listed = reviewing || sent ? rows : noAnswers;
@@ -944,6 +1018,7 @@ export function FormSteps({
       skip: canSkip ? skipNow : null,
       answers: listed,
       change: changeNow,
+      data: dataNow,
     }),
     [
       at,
@@ -960,6 +1035,7 @@ export function FormSteps({
       backNow,
       skipNow,
       changeNow,
+      dataNow,
     ],
   );
   const shared = useMemo(
@@ -1067,7 +1143,6 @@ export function FormSteps({
         optional: _optional,
         labels: _labels,
         summary: _summary,
-        actions: _actions,
         ref: _ref,
         className = "",
         ...props
@@ -1173,7 +1248,6 @@ export function FormSteps({
                     <>
                       {backControl}
                       <span className="x-govuk-ui-form-steps-gap" />
-                      {step?.actions}
                       {actions}
                       {skipControl}
                       {submit}
@@ -1185,7 +1259,6 @@ export function FormSteps({
                   <ButtonGroup className="x-govuk-ui-form-steps-buttons">
                     {submit}
                     {skipControl}
-                    {step?.actions}
                     {actions}
                   </ButtonGroup>
                 )
@@ -1208,6 +1281,10 @@ export type FormStepsProviderProps = {
  * ServicePage's `back`, above the page's main content, where GOV.UK puts a Back link.
  * `useFormSteps` reads the form there too. Put it around one FormSteps and its parts. It renders no
  * element.
+ *
+ * The form tells it where it is once the page has loaded, so a part outside the form shows nothing
+ * in the first HTML. Give ServicePage's `back` a FormStepsBack only while `useFormSteps().back` is
+ * there, so the page keeps no empty place for it.
  */
 export function FormStepsProvider({ children }: FormStepsProviderProps) {
   const [shared, publish] = useState<StepsShared | null>(null);
@@ -1288,7 +1365,7 @@ export function FormStepsProgress(props: FormStepsProgressProps) {
   return <StepsProgress {...props} />;
 }
 
-export type FormStepsSummaryProps = ComponentPropsWithRef<"div"> & {
+export type FormStepsSummaryProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
   /**
    * The heading above the answers. By default, on a page, its `checkAnswers` label, "Check your
    * answers", until the answers are sent. Give null for none, such as below a heading of your own.

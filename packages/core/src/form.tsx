@@ -156,8 +156,8 @@ export function fieldOf(name: string, fields: Iterable<string>) {
   return owners.sort((a, b) => b.length - a.length)[0] ?? name;
 }
 
-/** An error a Form shows. */
-export type FormError = {
+/** An answer that needs fixing, as a Form shows it. */
+export type FormProblem = {
   /** The name it was given under, which is its field's, or another, such as "form". */
   name: string;
   message: ReactNode;
@@ -168,7 +168,15 @@ export type FormError = {
   id: string | null;
 };
 
-type Problem = FormError;
+type Problem = FormProblem;
+
+/** What `useFormErrors` gives a part of your own. */
+export type UseFormErrorsResult = {
+  /** The answers that need fixing, in the order of their fields. */
+  errors: FormProblem[];
+  /** How many times the form has been sent with errors, as a key that moves focus again. */
+  attempt: number;
+};
 
 /** What a field submits, with any parts, such as a date's `{name}-day`, `-month` and `-year`. */
 function answer(data: FormData, name: string) {
@@ -229,11 +237,18 @@ export function Form({
       }),
     ),
   );
-  // How many FormErrorSummary parts of a service's own show the errors, in place of the Form's own.
+  // How many parts of a service's own show the errors, in place of the Form's own summary, such as
+  // a FormErrorSummary. The count is read again as focus moves, so a part that comes with the
+  // errors counts too.
   const [summaries, setSummaries] = useState(0);
+  const shown = useRef(0);
   const addSummary = useCallback(() => {
+    shown.current += 1;
     setSummaries((count) => count + 1);
-    return () => setSummaries((count) => count - 1);
+    return () => {
+      shown.current -= 1;
+      setSummaries((count) => count - 1);
+    };
   }, []);
   const context = useMemo(
     () => ({
@@ -271,8 +286,10 @@ export function Form({
     if (listed.length > 0) setAttempt((count) => count + 1);
     // Without a summary to take focus, the first field that needs fixing does.
     const first = listed.find((problem) => problem.id);
-    if (first?.id && !errorSummary && summaries === 0)
-      requestAnimationFrame(() => document.getElementById(first.id ?? "")?.focus());
+    if (first?.id && !errorSummary)
+      requestAnimationFrame(() => {
+        if (shown.current === 0) document.getElementById(first.id ?? "")?.focus();
+      });
     return listed.length > 0;
   };
 
@@ -352,12 +369,25 @@ export function Form({
   );
 }
 
+export type UseFormErrorsOptions = {
+  /**
+   * Says that the part shows the errors in place of the Form's summary. While it is on the page,
+   * the Form shows no summary of its own and moves focus nowhere, so the part moves it, as an
+   * Error summary does.
+   */
+  summary?: boolean;
+};
+
 /**
  * The errors of the Form around it, and how many times it has been sent with errors, for a part of
  * your own that shows them its own way. Null outside a Form.
  */
-export function useFormErrors(): { errors: FormError[]; attempt: number } | null {
+export function useFormErrors({
+  summary = false,
+}: UseFormErrorsOptions = {}): UseFormErrorsResult | null {
   const form = useContext(FormContext);
+  const addSummary = summary ? form?.addSummary : undefined;
+  useLayoutEffect(() => addSummary?.(), [addSummary]);
   return form ? { errors: form.problems ?? [], attempt: form.attempt ?? 0 } : null;
 }
 
@@ -396,7 +426,7 @@ function Summary({ title, description }: Pick<ErrorSummaryProps, "title" | "desc
   );
 }
 
-export type FormErrorSummaryProps = ComponentPropsWithRef<"div"> &
+export type FormErrorSummaryProps = Omit<ComponentPropsWithRef<"div">, "title" | "children"> &
   Pick<ErrorSummaryProps, "title" | "description">;
 
 /**
@@ -412,9 +442,7 @@ export function FormErrorSummary({
   className = "",
   ...props
 }: FormErrorSummaryProps) {
-  const form = useContext(FormContext);
-  const addSummary = form?.addSummary;
-  useLayoutEffect(() => addSummary?.(), [addSummary]);
+  useFormErrors({ summary: true });
   return (
     <div {...props} className={`x-govuk-ui-form-error-summary ${className}`.trim()}>
       <AutoHeight className="x-govuk-ui-form-summary">

@@ -247,8 +247,14 @@ test("a tour steps through its targets, and a service chooses its dimming, memor
   await start.click();
   await expect(page.getByRole("dialog", { name: "Find an application" })).toBeVisible();
   await page.keyboard.press("Escape");
-  // A step's own button, Skip, ends the tour as Done does.
+  // A button among a step's words moves the tour too, back to its first step.
   await start.click();
+  for (let step = 1; step < 4; step++)
+    await card.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(card).toContainText("4 of 4");
+  await card.getByRole("button", { name: "See the tour from the start" }).click();
+  await expect(card).toContainText("1 of 4");
+  // A step's own button, Skip, ends the tour as Done does.
   await card.getByRole("button", { name: "Skip" }).click();
   await expect(card).toHaveCount(0);
   expect(await stored()).toBe('{"step":0,"ended":"finished"}');

@@ -3,7 +3,7 @@ import type { ComponentPropsWithRef, ReactNode } from "react";
 export type PanelProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
   title: ReactNode;
   /** The title's heading level. A confirmation page's panel contains its main heading. */
-  titleLevel?: 1 | 2 | 3;
+  titleLevel?: 1 | 2 | 3 | 4;
 };
 
 /**

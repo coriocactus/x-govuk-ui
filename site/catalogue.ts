@@ -320,7 +320,7 @@ const entries = {
       toggle("disabled"),
       reference("items", "(string | { value, label, description? })[]", "Required"),
       reference("value / onValueChange", "string | null / (value) => void"),
-      reference("filter", "((option, search) => boolean) | null", "Label contains search"),
+      reference("filter", "((search, option) => boolean) | null", "Label contains search"),
       reference("inputValue / defaultInputValue / onInputValueChange", "string / (text) => void"),
       reference("labels", "Partial<ComboboxLabels>", "No results found"),
       reference("name / errorMessage", "string"),
@@ -346,7 +346,7 @@ const entries = {
       text("placeholder", "Start typing a language"),
       toggle("disabled"),
       reference("items", "(string | { value, label, description? })[]", "Required"),
-      reference("filter", "((option, search) => boolean) | null", "Label contains search"),
+      reference("filter", "((search, option) => boolean) | null", "Label contains search"),
       reference("inputValue / defaultInputValue / onInputValueChange", "string / (text) => void"),
       reference("value / onValueChange", "string[] / (value: string[]) => void"),
       reference("labels", "Partial<ComboboxLabels>", "No results found"),
@@ -953,7 +953,11 @@ const entries = {
       }),
       reference("errorSummary", "boolean", "true"),
       reference("FormErrorSummary", "{ title, description } and div props", "Part"),
-      reference("useFormErrors", "() => { errors: { name, message, id }[], attempt }", "Hook"),
+      reference(
+        "useFormErrors",
+        "({ summary? }) => { errors: { name, message, id }[], attempt }",
+        "Hook",
+      ),
       reference("defaultValues", "Record<string, string | string[]>", "None"),
       reference("children", "Fields with a name, and a submit Button"),
       reference(
@@ -963,7 +967,7 @@ const entries = {
       ),
       reference(
         "FormStep",
-        "Fieldset props and { title?, titleLevel?, hint?, validate, onContinue, when, optional, labels: { continue }, summary, actions }",
+        "Fieldset props and { title?, titleLevel?, hint?, validate, onContinue, when, optional, labels: { continue }, summary }",
         "Part",
       ),
       reference("FormStepsBack", "BackLink props, without href", "Part"),
@@ -3349,6 +3353,7 @@ const entries = {
       reference("licence", "ReactNode | null", "Open Government Licence"),
       reference("copyright", "ReactNode", "© Crown copyright"),
       reference("copyrightUrl", "string | null", "Crown copyright's terms"),
+      reference("copyrightRender", "A router's link", "None"),
       reference("navigation", "ReactNode", "FooterSection parts"),
       reference(
         "FooterSection",

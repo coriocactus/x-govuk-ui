@@ -8,8 +8,8 @@ import {
   useId,
   useMemo,
   useRef,
+  useState,
 } from "react";
-import { useControllableState } from "./controllable-state";
 import {
   ErrorMessage,
   Field,
@@ -59,14 +59,18 @@ type ControlShared = {
   /** The options to search. */
   items: readonly ComboboxItem[];
   /**
-   * Whether an option matches what users type. By default, its label contains the text. Give null
-   * where `items` are already the matches, such as options a server found for the text, so the
-   * field shows them all.
+   * Whether an option matches what users type, as CommandMenu's `filter` is given the search
+   * first. By default, its label contains the text. Give null where `items` are already the
+   * matches, such as options a server found for the text, so the field shows them all. The field
+   * keeps each option it has shown, so a chosen option stays chosen when new results leave it out.
    */
-  filter?: ((option: ComboboxOption, search: string) => boolean) | null;
-  /** The text users type. Leave it out to let the field keep track. */
+  filter?: ((search: string, option: ComboboxOption) => boolean) | null;
+  /**
+   * The text in the input. Leave it out to let the field keep track, and it starts with the chosen
+   * option's label.
+   */
   inputValue?: string;
-  /** The text an uncontrolled field starts with. */
+  /** The text an uncontrolled field starts with. By default, the chosen option's label. */
   defaultInputValue?: string;
   /** Called as the text changes, such as to ask a server for options that match it. */
   onInputValueChange?: (inputValue: string) => void;
@@ -231,6 +235,45 @@ export function Combobox({
   );
 }
 
+/**
+ * Every option the field has been given, each by its value, as last given. A chosen option stays
+ * chosen when `items` change and leave it out, such as when a server's results for a new search
+ * come.
+ */
+function useKnownOptions(options: readonly ComboboxOption[]) {
+  const [known] = useState(() => new Map<string, ComboboxOption>());
+  for (const option of options) known.set(option.value, option);
+  return known;
+}
+
+/**
+ * What the field passes to Base UI about the search, and the text to show in bold in each option.
+ * Base UI starts the input with the chosen option's label only when it is given neither text, so
+ * each is passed only when a service gives it. The text users type is followed alongside.
+ */
+function useSearch(
+  inputValue: string | undefined,
+  defaultInputValue: string | undefined,
+  onInputValueChange: ((inputValue: string) => void) | undefined,
+  filter: ControlShared["filter"],
+) {
+  const [typed, setTyped] = useState(inputValue ?? defaultInputValue ?? "");
+  return {
+    query: inputValue ?? typed,
+    root: {
+      ...(inputValue !== undefined && { inputValue }),
+      ...(defaultInputValue !== undefined && { defaultInputValue }),
+      onInputValueChange: (next: string) => {
+        setTyped(next);
+        onInputValueChange?.(next);
+      },
+      ...(filter !== undefined && {
+        filter: filter && ((option: ComboboxOption, text: string) => filter(text, option)),
+      }),
+    },
+  };
+}
+
 export type ComboboxControlProps = Omit<ComboboxProps, keyof FieldWords> & { id?: string };
 
 /**
@@ -252,7 +295,7 @@ export function ComboboxControl(given: ComboboxControlProps) {
     disabled,
     filter,
     inputValue,
-    defaultInputValue = "",
+    defaultInputValue,
     onInputValueChange,
     className = "",
     style,
@@ -264,9 +307,10 @@ export function ComboboxControl(given: ComboboxControlProps) {
   // A Form can give the field an answer to start with, such as one kept from an earlier visit. A
   // kept answer with nothing in it means that nothing was chosen.
   const saved = useFormDefault(name);
+  const known = useKnownOptions(options);
   const find = (wanted: string | null | undefined) =>
-    wanted == null ? wanted : (options.find((option) => option.value === wanted) ?? null);
-  const [query, setQuery] = useControllableState(inputValue, defaultInputValue, onInputValueChange);
+    wanted == null ? wanted : (known.get(wanted) ?? null);
+  const search = useSearch(inputValue, defaultInputValue, onInputValueChange, filter);
   const group = useRef<HTMLDivElement>(null);
   return (
     <Primitive.Root
@@ -274,15 +318,12 @@ export function ComboboxControl(given: ComboboxControlProps) {
       value={find(value)}
       defaultValue={find(saved ? (saved[0] ?? null) : defaultValue)}
       onValueChange={(next) => onValueChange?.((next as ComboboxOption | null)?.value ?? null)}
-      inputValue={query}
-      onInputValueChange={(next) => setQuery(next)}
-      filter={
-        filter === undefined
-          ? undefined
-          : filter && ((option: ComboboxOption, search: string) => filter(option, search))
-      }
+      {...search.root}
       itemToStringLabel={(option: ComboboxOption) => option.label}
       itemToStringValue={(option: ComboboxOption) => option.value}
+      isItemEqualToValue={(item: ComboboxOption, chosen: ComboboxOption) =>
+        item.value === chosen.value
+      }
       name={name}
       disabled={disabled}
     >
@@ -299,7 +340,7 @@ export function ComboboxControl(given: ComboboxControlProps) {
           <ChevronIcon size={16} />
         </Primitive.Trigger>
       </div>
-      <Options query={query} emptyText={labels.empty} field={group} />
+      <Options query={search.query} emptyText={labels.empty} field={group} />
     </Primitive.Root>
   );
 }
@@ -366,7 +407,7 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
     disabled,
     filter,
     inputValue,
-    defaultInputValue = "",
+    defaultInputValue,
     onInputValueChange,
     className = "",
     style,
@@ -377,9 +418,10 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
   useFieldSummary({ answer: (data) => labelsOf(options, name ? data.getAll(name) : []) });
   // A Form can give the field its answers to start with, such as ones kept from an earlier visit.
   const saved = useFormDefault(name);
+  const known = useKnownOptions(options);
   const findAll = (wanted: string[] | undefined) =>
-    wanted?.flatMap((each) => options.filter((option) => option.value === each));
-  const [query, setQuery] = useControllableState(inputValue, defaultInputValue, onInputValueChange);
+    wanted?.flatMap((each) => known.get(each) ?? []);
+  const search = useSearch(inputValue, defaultInputValue, onInputValueChange, filter);
   const chips = useRef<HTMLDivElement>(null);
   return (
     <Primitive.Root
@@ -390,15 +432,12 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
       onValueChange={(next) =>
         onValueChange?.((next as ComboboxOption[]).map((option) => option.value))
       }
-      inputValue={query}
-      onInputValueChange={(next) => setQuery(next)}
-      filter={
-        filter === undefined
-          ? undefined
-          : filter && ((option: ComboboxOption, search: string) => filter(option, search))
-      }
+      {...search.root}
       itemToStringLabel={(option: ComboboxOption) => option.label}
       itemToStringValue={(option: ComboboxOption) => option.value}
+      isItemEqualToValue={(item: ComboboxOption, chosen: ComboboxOption) =>
+        item.value === chosen.value
+      }
       name={name}
       disabled={disabled}
     >
@@ -430,7 +469,7 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
           )}
         </Primitive.Value>
       </Primitive.Chips>
-      <Options query={query} emptyText={labels.empty} field={chips} />
+      <Options query={search.query} emptyText={labels.empty} field={chips} />
     </Primitive.Root>
   );
 }

@@ -1224,8 +1224,24 @@ test("a file upload lists and removes files", async ({ frame, open }) => {
     .locator('input[type="file"]')
     .setInputFiles([{ name: "passport.jpg", mimeType: "image/jpeg", buffer: Buffer.alloc(2048) }]);
   await expect(frame.locator(".x-govuk-ui-file-upload-name")).toHaveText("passport.jpg");
+  // The example refuses a file of another kind. The field keeps the file it had, and so does the
+  // input, which the form sends.
+  const input = frame.locator('input[type="file"]');
+  await input.setInputFiles([
+    { name: "notes.txt", mimeType: "text/plain", buffer: Buffer.alloc(16) },
+  ]);
+  await expect(frame.getByText("The selected file must be a JPG, PNG or PDF.")).toBeVisible();
+  await expect(frame.locator(".x-govuk-ui-file-upload-name")).toHaveText("passport.jpg");
+  await expect
+    .poll(() =>
+      input.evaluate((element: HTMLInputElement) =>
+        [...(element.files ?? [])].map((file) => file.name),
+      ),
+    )
+    .toEqual(["passport.jpg"]);
   await frame.getByRole("button", { name: "Remove passport.jpg" }).click();
   await expect(frame.getByText("No file chosen")).toBeVisible();
+  expect(await input.evaluate((element: HTMLInputElement) => element.files?.length)).toBe(0);
 });
 
 test("a combobox narrows as people type, or shows what a search of the service's own finds", async ({
@@ -1253,6 +1269,13 @@ test("a combobox narrows as people type, or shows what a search of the service's
     "SwedenStarts with what you typed",
     "SwitzerlandStarts with what you typed",
   ]);
+  await page.getByRole("option", { name: /Switzerland/ }).click();
+  await expect(frame.getByRole("status")).toHaveText("You chose Switzerland.");
+  // The chosen option stays chosen, and is sent, while new results leave it out.
+  await field.press("End");
+  await field.pressSequentially("x");
+  await expect(page.getByRole("option")).toHaveCount(0);
+  await expect(frame.locator('input[name="country"]')).toHaveValue("Switzerland");
 });
 
 test("a select shows the label of an option from a component of the service's own", async ({

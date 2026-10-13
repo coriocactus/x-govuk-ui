@@ -147,7 +147,7 @@ h4.x-govuk-ui-form-steps-review-title {
 }
 
 /* Card. An agent's card, with its title and a ring in the header that fills as the steps are
-   answered. Back, Skip and Continue sit in a footer that keeps its height. */
+   answered. Back, Skip and Continue sit in a footer that keeps its height from step to step. */
 .x-govuk-ui-form-steps[data-layout="card"] {
   box-sizing: border-box;
   padding: 18px 20px;
@@ -209,14 +209,17 @@ h4.x-govuk-ui-form-steps-review-title {
 .x-govuk-ui-form-steps[data-layout="card"] .x-govuk-ui-hint {
   font-size: 16px;
 }
+/* The footer is one row of small buttons. Buttons of a service's own that do not fit wrap onto
+   another row, and the footer grows to hold them. */
 .x-govuk-ui-form-steps-footer {
   box-sizing: border-box;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  height: 56px;
+  min-height: 56px;
   margin: 2px -20px -18px;
-  padding: 0 20px;
+  padding: 10px 20px;
   border-top: 1px solid var(--x-govuk-ui-line);
   background: var(--x-govuk-ui-surface);
   font-size: 16px;

@@ -1,6 +1,6 @@
 /* Form. The error summary opens above everything inside the form in a box that eases to its height,
-   so what is beneath moves down smoothly. The box reaches a little past the summary on every side, so the summary's
-   focus ring shows in full, and the box takes no extra space for it. */
+   so what is beneath moves down smoothly. The box reaches a little past the summary on every side,
+   so the summary's focus ring shows in full, and the box takes no extra space for it. */
 .x-govuk-ui-form-summary.x-govuk-ui-auto-height {
   margin: -4px;
   padding: 4px;

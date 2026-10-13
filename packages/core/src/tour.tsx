@@ -374,9 +374,10 @@ export function Tour({
 
   const go = async (index: number) => {
     if (moving || index < 0 || index >= steps.length) return;
-    // Focus on a button among the step's words, which leave with the step, moves on to Next first.
-    // Otherwise Base UI puts it on the card as the words go.
-    if (card?.querySelector(".x-govuk-ui-tour-step")?.contains(document.activeElement))
+    // Focus on a button among the step's words or its own buttons, which leave with the step, moves
+    // on to Next first. Otherwise Base UI puts it on the card as they go.
+    const leaving = card?.querySelectorAll(".x-govuk-ui-tour-step, .x-govuk-ui-tour-actions");
+    if ([...(leaving ?? [])].some((part) => part.contains(document.activeElement)))
       next.current?.focus();
     direction.current = index > step ? 1 : -1;
     const wanted = steps[index]?.target;

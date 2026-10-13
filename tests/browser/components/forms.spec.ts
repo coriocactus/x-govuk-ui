@@ -452,7 +452,7 @@ test("an application in pages takes its Back link, buttons and answers where it 
   const back = frame.getByRole("link", { name: "Back", exact: true });
   // The first question has no way back, and shows how far along it is.
   await expect(back).toHaveCount(0);
-  await expect(frame.getByText("Question 1 of 3")).toBeVisible();
+  await expect(frame.getByText("Step 1 of 3")).toBeVisible();
   await frame.getByRole("textbox", { name: "What is your full name?" }).fill("Jo Bloggs");
   await frame.getByRole("button", { name: "Continue" }).click();
   const email = frame.getByRole("textbox", { name: "What is your email address?" });
@@ -490,7 +490,7 @@ test("an application in pages takes its Back link, buttons and answers where it 
     "jo@example.com",
   ]);
   await expect(frame.getByRole("button", { name: "Save and come back later" })).toHaveCount(0);
-  await expect(frame.getByText("Question 1 of 3")).toHaveCount(0);
+  await expect(frame.getByText("Step 1 of 3")).toHaveCount(0);
   // Change asks the question again, then comes back.
   await frame
     .getByRole("button", { name: /Change your answer to What is your email address/ })

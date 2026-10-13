@@ -40,6 +40,9 @@ const countries = [
   "United States",
 ];
 
+/** The code a country is sent under, as a server's own key for it. */
+const codeOf = (name: string) => name.toLowerCase().replaceAll(" ", "-");
+
 export default function ComboboxExample({
   label = "Which country do you live in?",
   hint = "Start typing, then choose from the list.",
@@ -50,10 +53,16 @@ export default function ComboboxExample({
   const [country, setCountry] = useState<string | null>(null);
   const [typed, setTyped] = useState("");
   // A search of the service's own, as a server would answer it. It finds the countries whose names
-  // start with the text, and says so beneath each.
+  // start with the text, and says so beneath each. Each answer is a new object, sent under a code,
+  // as a server's would be.
   const found: ComboboxOption[] = countries
     .filter((name) => typed.trim() && name.toLowerCase().startsWith(typed.trim().toLowerCase()))
-    .map((name) => ({ value: name, label: name, description: "Starts with what you typed" }));
+    .map((name) => ({
+      value: codeOf(name),
+      label: name,
+      description: "Starts with what you typed",
+    }));
+  const chosen = countries.find((name) => country === name || country === codeOf(name));
   return (
     <>
       <Combobox
@@ -63,16 +72,16 @@ export default function ComboboxExample({
         hint={hint || undefined}
         placeholder={placeholder || undefined}
         items={ownSearch ? found : countries}
-        // The service's search has chosen the options already, so the field shows them all.
+        // The service's search has chosen the options already, so the field shows them all. The
+        // field keeps its own text, and tells the search each change.
         filter={ownSearch ? null : undefined}
-        inputValue={typed}
         onInputValueChange={setTyped}
         value={country}
         onValueChange={setCountry}
         disabled={disabled}
       />
       <p className="preview-message" role="status">
-        {country ? `You chose ${country}.` : ""}
+        {chosen ? `You chose ${chosen}.` : ""}
       </p>
     </>
   );

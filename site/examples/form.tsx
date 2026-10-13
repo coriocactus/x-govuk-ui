@@ -202,7 +202,11 @@ function Application() {
     >
       <FormSteps
         title="Apply for a fishing licence"
-        labels={{ submit: "Accept and send" }}
+        // The page counts steps, not questions. Its words are given inline, as a service writes them.
+        labels={{
+          submit: "Accept and send",
+          progress: (step, total) => `Step ${step} of ${total}`,
+        }}
         actions={
           <SaveForLater
             saved={(data) => {

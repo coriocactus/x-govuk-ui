@@ -104,11 +104,11 @@ export const defaultComboboxLabels: ComboboxLabels = {
   remove: (option) => `Remove ${option}`,
 };
 
-/** The labels of the options sent, for Check your answers. */
-function labelsOf(options: readonly ComboboxOption[], sent: FormDataEntryValue[]) {
+/** The labels of the options sent, for Check your answers, from every option the field has shown. */
+function labelsOf(known: Map<string, ComboboxOption>, sent: FormDataEntryValue[]) {
   return sent
     .filter((value): value is string => typeof value === "string" && value !== "")
-    .map((value) => options.find((option) => option.value === value)?.label ?? value);
+    .map((value) => known.get(value)?.label ?? value);
 }
 
 /** The part of an option's label that matches what was typed, in bold. */
@@ -236,13 +236,19 @@ export function Combobox({
 }
 
 /**
- * Every option the field has been given, each by its value, as last given. A chosen option stays
- * chosen when `items` change and leave it out, such as when a server's results for a new search
- * come.
+ * Every option the field has been given, each by its value. A chosen option stays chosen when
+ * `items` change and leave it out, such as when a server's results for a new search come. An
+ * option given again as a new object that shows the same is kept as the object first given, because
+ * Base UI takes a chosen option of a new identity as a new choice, and puts its label in the input
+ * over what users are typing.
  */
 function useKnownOptions(options: readonly ComboboxOption[]) {
   const [known] = useState(() => new Map<string, ComboboxOption>());
-  for (const option of options) known.set(option.value, option);
+  for (const option of options) {
+    const kept = known.get(option.value);
+    if (!kept || kept.label !== option.label || kept.description !== option.description)
+      known.set(option.value, option);
+  }
   return known;
 }
 
@@ -303,11 +309,11 @@ export function ComboboxControl(given: ComboboxControlProps) {
   } = useControlProps(given);
   const options = useMemo(() => items.map(optionOf), [items]);
   const labels = useLabels("combobox", defaultComboboxLabels, ownLabels);
-  useFieldSummary({ answer: (data) => labelsOf(options, name ? data.getAll(name) : []) });
+  const known = useKnownOptions(options);
+  useFieldSummary({ answer: (data) => labelsOf(known, name ? data.getAll(name) : []) });
   // A Form can give the field an answer to start with, such as one kept from an earlier visit. A
   // kept answer with nothing in it means that nothing was chosen.
   const saved = useFormDefault(name);
-  const known = useKnownOptions(options);
   const find = (wanted: string | null | undefined) =>
     wanted == null ? wanted : (known.get(wanted) ?? null);
   const search = useSearch(inputValue, defaultInputValue, onInputValueChange, filter);
@@ -415,10 +421,10 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
   } = useControlProps(given);
   const options = useMemo(() => items.map(optionOf), [items]);
   const labels = useLabels("combobox", defaultComboboxLabels, ownLabels);
-  useFieldSummary({ answer: (data) => labelsOf(options, name ? data.getAll(name) : []) });
+  const known = useKnownOptions(options);
+  useFieldSummary({ answer: (data) => labelsOf(known, name ? data.getAll(name) : []) });
   // A Form can give the field its answers to start with, such as ones kept from an earlier visit.
   const saved = useFormDefault(name);
-  const known = useKnownOptions(options);
   const findAll = (wanted: string[] | undefined) =>
     wanted?.flatMap((each) => known.get(each) ?? []);
   const search = useSearch(inputValue, defaultInputValue, onInputValueChange, filter);

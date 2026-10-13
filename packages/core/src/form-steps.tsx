@@ -113,6 +113,11 @@ type StepsShared = {
   replaced: boolean;
 };
 const SharedContext = createContext<StepsShared | null>(null);
+/**
+ * The controls alone, for `useFormSteps`. A page that reads them and draws the form is drawn again
+ * only as the form changes, not as its words are given again, such as a function given inline.
+ */
+const ControlsContext = createContext<FormStepsControls | null>(null);
 const ClaimContext = createContext<Claim | null>(null);
 /** A FormStepsProvider, which a FormSteps inside it tells where it is, and asks what is placed. */
 const ProviderContext = createContext<{
@@ -439,20 +444,31 @@ function alike(a: unknown, b: unknown): boolean {
   if (typeof a === "function" && typeof b === "function") return true;
   if (Array.isArray(a) && Array.isArray(b))
     return a.length === b.length && a.every((each, place) => alike(each, b[place]));
-  if (isValidElement(a) && isValidElement(b)) {
-    if (a.type !== b.type || a.key !== b.key) return false;
-    const [first, second] = [a.props, b.props] as Record<string, unknown>[];
-    const keys = Object.keys(first ?? {});
-    return (
-      keys.length === Object.keys(second ?? {}).length &&
-      keys.every((key) => alike(first?.[key], second?.[key]))
-    );
-  }
+  if (isValidElement(a) && isValidElement(b))
+    return a.type === b.type && a.key === b.key && sameEntries(a.props, b.props);
+  // A plain object in a label's props, such as a style or a translation's values.
+  if (plain(a) && plain(b)) return sameEntries(a, b);
   return false;
 }
 
-/** Whether two lists of answers show the same answers. */
-function sameAnswers(current: FormStepsAnswer[], next: FormStepsAnswer[]) {
+/** Whether a value is an object written as `{ … }`, not a DOM node or an instance of a class. */
+const plain = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" &&
+  value !== null &&
+  [Object.prototype, null].includes(Object.getPrototypeOf(value));
+
+/** Whether two objects have the same keys, each with a value that shows alike. */
+function sameEntries(a: unknown, b: unknown) {
+  const [first, second] = [a ?? {}, b ?? {}] as Record<string, unknown>[];
+  const keys = Object.keys(first);
+  return (
+    keys.length === Object.keys(second).length &&
+    keys.every((key) => alike(first[key], second[key]))
+  );
+}
+
+/** Whether two lists of answers show the same answers. @internal */
+export function sameAnswers(current: FormStepsAnswer[], next: FormStepsAnswer[]) {
   return (
     current.length === next.length &&
     current.every((row, place) => {
@@ -1194,78 +1210,80 @@ export function FormSteps({
     // A FormSteps inside one of the steps answers to no FormStepsProvider of the form's.
     <ProviderContext value={null}>
       <ClaimContext value={claim}>
-        <SharedContext value={shared}>
-          <section
-            className={`x-govuk-ui-form-steps ${className}`.trim()}
-            style={style}
-            data-layout={layout}
-            data-done={sent || undefined}
-            // SoundScope plays the success sound as the answers are taken.
-            data-success={sent || undefined}
-            aria-labelledby={card && title ? titleId : undefined}
-          >
-            {card && (
-              <header className="x-govuk-ui-form-steps-header">
-                {icon && <span className="x-govuk-ui-form-steps-icon">{icon}</span>}
-                <h3 id={titleId} className="x-govuk-ui-form-steps-title">
-                  {title}
-                </h3>
-                {progressRing}
-              </header>
-            )}
-            {!card && backControl}
-            <Form
-              {...formProps}
-              // Restored answers start the form again, because each field reads its answer once.
-              key={restored.round}
-              ref={formRef}
-              className="x-govuk-ui-form-steps-form"
-              // Pressing anywhere in it that is not a control puts focus in the form, so keys that work
-              // across it, such as Choices' letters, reach it.
-              tabIndex={-1}
-              errorSummary={errorSummary}
-              defaultValues={restored.answers}
-              validate={(data) => (reviewing || !step?.validate ? {} : step.validate(data))}
-              onSubmit={(data) => onSubmit(data)}
-              onKeyDown={chain(givenKeyDown, onKeyDown)}
-              // Keeping the answers and working out the steps again follow every change, whatever a
-              // service's own handlers do. A control that sends its value from a hidden input, such as a
-              // slider or a toggle group, changes it with a key or a press, not with typing.
-              onInput={both(givenInput, keepSoon)}
-              onChange={both(givenChange, () => {
-                replan();
-                keepSoon();
-              })}
-              onClick={both(givenClick, keepSoon)}
-              onKeyUp={both(givenKeyUp, keepSoon)}
+        <ControlsContext value={controls}>
+          <SharedContext value={shared}>
+            <section
+              className={`x-govuk-ui-form-steps ${className}`.trim()}
+              style={style}
+              data-layout={layout}
+              data-done={sent || undefined}
+              // SoundScope plays the success sound as the answers are taken.
+              data-success={sent || undefined}
+              aria-labelledby={card && title ? titleId : undefined}
             >
-              {card ? <AutoHeight>{body}</AutoHeight> : body}
-              {card ? (
-                <div className="x-govuk-ui-form-steps-footer">
-                  {sent ? (
-                    <Tag colour="green">{doneLabel}</Tag>
-                  ) : (
-                    <>
-                      {backControl}
-                      <span className="x-govuk-ui-form-steps-gap" />
-                      {actions}
-                      {skipControl}
-                      {submit}
-                    </>
-                  )}
-                </div>
-              ) : (
-                !sent && (
-                  <ButtonGroup className="x-govuk-ui-form-steps-buttons">
-                    {submit}
-                    {skipControl}
-                    {actions}
-                  </ButtonGroup>
-                )
+              {card && (
+                <header className="x-govuk-ui-form-steps-header">
+                  {icon && <span className="x-govuk-ui-form-steps-icon">{icon}</span>}
+                  <h3 id={titleId} className="x-govuk-ui-form-steps-title">
+                    {title}
+                  </h3>
+                  {progressRing}
+                </header>
               )}
-            </Form>
-          </section>
-        </SharedContext>
+              {!card && backControl}
+              <Form
+                {...formProps}
+                // Restored answers start the form again, because each field reads its answer once.
+                key={restored.round}
+                ref={formRef}
+                className="x-govuk-ui-form-steps-form"
+                // Pressing anywhere in it that is not a control puts focus in the form, so keys that work
+                // across it, such as Choices' letters, reach it.
+                tabIndex={-1}
+                errorSummary={errorSummary}
+                defaultValues={restored.answers}
+                validate={(data) => (reviewing || !step?.validate ? {} : step.validate(data))}
+                onSubmit={(data) => onSubmit(data)}
+                onKeyDown={chain(givenKeyDown, onKeyDown)}
+                // Keeping the answers and working out the steps again follow every change, whatever a
+                // service's own handlers do. A control that sends its value from a hidden input, such as a
+                // slider or a toggle group, changes it with a key or a press, not with typing.
+                onInput={both(givenInput, keepSoon)}
+                onChange={both(givenChange, () => {
+                  replan();
+                  keepSoon();
+                })}
+                onClick={both(givenClick, keepSoon)}
+                onKeyUp={both(givenKeyUp, keepSoon)}
+              >
+                {card ? <AutoHeight>{body}</AutoHeight> : body}
+                {card ? (
+                  <div className="x-govuk-ui-form-steps-footer">
+                    {sent ? (
+                      <Tag colour="green">{doneLabel}</Tag>
+                    ) : (
+                      <>
+                        {backControl}
+                        <span className="x-govuk-ui-form-steps-gap" />
+                        {actions}
+                        {skipControl}
+                        {submit}
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  !sent && (
+                    <ButtonGroup className="x-govuk-ui-form-steps-buttons">
+                      {submit}
+                      {skipControl}
+                      {actions}
+                    </ButtonGroup>
+                  )
+                )}
+              </Form>
+            </section>
+          </SharedContext>
+        </ControlsContext>
       </ClaimContext>
     </ProviderContext>
   );
@@ -1293,7 +1311,9 @@ export function FormStepsProvider({ children }: FormStepsProviderProps) {
   return (
     <ProviderContext value={provider}>
       <ClaimContext value={claim}>
-        <SharedContext value={shared}>{children}</SharedContext>
+        <ControlsContext value={shared?.controls ?? null}>
+          <SharedContext value={shared}>{children}</SharedContext>
+        </ControlsContext>
       </ClaimContext>
     </ProviderContext>
   );
@@ -1305,7 +1325,7 @@ export function FormStepsProvider({ children }: FormStepsProviderProps) {
  * outside both.
  */
 export function useFormSteps(): FormStepsControls | null {
-  return useContext(SharedContext)?.controls ?? null;
+  return useContext(ControlsContext);
 }
 
 export type FormStepsBackProps = Omit<BackLinkProps, "href" | "render" | "children">;

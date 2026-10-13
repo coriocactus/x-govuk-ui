@@ -1271,11 +1271,16 @@ test("a combobox narrows as people type, or shows what a search of the service's
   ]);
   await page.getByRole("option", { name: /Switzerland/ }).click();
   await expect(frame.getByRole("status")).toHaveText("You chose Switzerland.");
+  await expect(field).toHaveValue("Switzerland");
+  // Typing over the choice keeps what is typed, though each result comes again as a new object.
+  await field.fill("Sw");
+  await expect(page.getByRole("option")).toHaveCount(2);
+  await expect(field).toHaveValue("Sw");
   // The chosen option stays chosen, and is sent, while new results leave it out.
-  await field.press("End");
   await field.pressSequentially("x");
   await expect(page.getByRole("option")).toHaveCount(0);
-  await expect(frame.locator('input[name="country"]')).toHaveValue("Switzerland");
+  await expect(field).toHaveValue("Swx");
+  await expect(frame.locator('input[name="country"]')).toHaveValue("switzerland");
 });
 
 test("a select shows the label of an option from a component of the service's own", async ({

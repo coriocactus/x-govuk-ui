@@ -1,3 +1,10 @@
+.x-govuk-ui-label
+  display: block
+  font-size: 18px
+  font-weight: 700
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  margin-bottom: 7px
 .x-govuk-ui-slider
   display: block
   font-size: 14px

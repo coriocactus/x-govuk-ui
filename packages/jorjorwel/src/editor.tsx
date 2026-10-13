@@ -37,13 +37,32 @@ import {
   type RefObject,
   useCallback,
   useEffect,
+  useId,
   useImperativeHandle,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { ErrorMessage, Field, Hint, Label, useField, useFormDefault, useLabels } from "x-govuk-ui";
-import { parseHtmlTree, treeText, useMergedRef } from "x-govuk-ui/internal";
+import {
+  ErrorMessage,
+  Field,
+  type FieldProps,
+  Hint,
+  type LabelProps,
+  useFieldSummary,
+  useFormDefault,
+  useLabels,
+} from "x-govuk-ui";
+import {
+  chain,
+  NamingLabel,
+  parseHtmlTree,
+  present,
+  treeText,
+  useBoundField,
+  useLatest,
+  useMergedRef,
+} from "x-govuk-ui/internal";
 import { registerAttachments } from "./editor-attachment-behaviour";
 import { attachmentState } from "./editor-attachment-state";
 import { AttachmentNode, EmbedNode, GalleryNode } from "./editor-attachments";
@@ -288,6 +307,38 @@ const richNodes: readonly (Klass<LexicalNode> | LexicalNodeReplacement)[] = [
   MentionNode,
 ];
 
+/** The props that set up an editor, which EditorRoot takes, beside its parts. */
+type RootKeys =
+  | "name"
+  | "value"
+  | "defaultValue"
+  | "onValueChange"
+  | "format"
+  | "placeholder"
+  | "disabled"
+  | "readOnly"
+  | "required"
+  | "characterLimit"
+  | "wordLimit"
+  | "threshold"
+  | "richText"
+  | "multiLine"
+  | "markdown"
+  | "headings"
+  | "colours"
+  | "permittedColours"
+  | "attachments"
+  | "onUpload"
+  | "permittedAttachmentTypes"
+  | "onFileAccept"
+  | "onLinkPaste"
+  | "onMarkdownPaste"
+  | "checkLists"
+  | "nodes"
+  | "labels"
+  | "editorRef"
+  | "autoFocus";
+
 /**
  * A field for rich text, such as a caseworker's note or a letter, built on Lexical, after
  * 37signals' Lexxy and with its defaults. It has a toolbar of formatting over the document, and
@@ -301,20 +352,115 @@ const richNodes: readonly (Klass<LexicalNode> | LexicalNodeReplacement)[] = [
  * the Textarea does. Compose it from `EditorToolbar` and `EditorContent`, or leave them as the
  * default. Add prompts, such as mentions, with `EditorPrompt`, and suggestions from a model with
  * the AI parts.
+ *
+ * It is an `EditorRoot` holding a bound Field, with an `EditorLabel`, a `Hint`, an `ErrorMessage`
+ * and an `EditorBox`. Compose those parts yourself to put something between them.
  */
 export function Editor({
   label,
   hint,
   hideLabel = false,
   errorMessage,
+  id,
+  "aria-describedby": describedBy,
+  name,
+  value,
+  defaultValue,
+  onValueChange,
+  format,
+  placeholder,
+  disabled,
+  readOnly,
+  required,
+  characterLimit,
+  wordLimit,
+  threshold,
+  richText,
+  multiLine,
+  markdown,
+  headings,
+  colours,
+  permittedColours,
+  attachments,
+  onUpload,
+  permittedAttachmentTypes,
+  onFileAccept,
+  onLinkPaste,
+  onMarkdownPaste,
+  checkLists,
+  nodes,
+  labels,
+  editorRef,
+  autoFocus,
+  ...box
+}: EditorProps) {
+  const generated = useId();
+  return (
+    <EditorRoot
+      name={name}
+      value={value}
+      defaultValue={defaultValue}
+      onValueChange={onValueChange}
+      format={format}
+      placeholder={placeholder}
+      disabled={disabled}
+      readOnly={readOnly}
+      required={required}
+      characterLimit={characterLimit}
+      wordLimit={wordLimit}
+      threshold={threshold}
+      richText={richText}
+      multiLine={multiLine}
+      markdown={markdown}
+      headings={headings}
+      colours={colours}
+      permittedColours={permittedColours}
+      attachments={attachments}
+      onUpload={onUpload}
+      permittedAttachmentTypes={permittedAttachmentTypes}
+      onFileAccept={onFileAccept}
+      onLinkPaste={onLinkPaste}
+      onMarkdownPaste={onMarkdownPaste}
+      checkLists={checkLists}
+      nodes={nodes}
+      labels={labels}
+      editorRef={editorRef}
+      autoFocus={autoFocus}
+    >
+      <EditorField
+        controlId={id ?? `field-${generated}`}
+        name={name}
+        hasHint={present(hint)}
+        errorMessage={errorMessage}
+        describedBy={describedBy}
+      >
+        <EditorLabel visuallyHidden={hideLabel}>{label}</EditorLabel>
+        <Hint>{hint}</Hint>
+        <ErrorMessage />
+        <EditorBox {...box} />
+      </EditorField>
+    </EditorRoot>
+  );
+}
+
+export type EditorRootProps = Pick<EditorProps, RootKeys> & {
+  /** The editor's parts, which are a bound Field with an `EditorLabel` and an `EditorBox`. */
+  children: ReactNode;
+};
+
+/**
+ * An editor of your own. It makes the Lexical editor, keeps the document and sends it with a form,
+ * and holds the editor's parts. Put a bound Field in it, with an `EditorLabel`, a `Hint`, an
+ * `ErrorMessage` and an `EditorBox`, and anything else between them. It takes every prop of
+ * Editor's that is not the field's words or the box's.
+ */
+export function EditorRoot({
   name,
   value,
   defaultValue,
   onValueChange,
   format = "html",
   placeholder,
-  rows = 8,
-  maxRows = null,
   disabled = false,
   readOnly = false,
   required = false,
@@ -338,37 +484,18 @@ export function Editor({
   labels: ownLabels,
   editorRef,
   autoFocus = false,
-  id,
-  className = "",
-  style,
   children,
-  ref,
-  "aria-describedby": describedBy,
-  ...props
-}: EditorProps) {
+}: EditorRootProps) {
   // A form sent while files are uploading is stopped, and the field says why.
   const [waiting, setWaiting] = useState(false);
   const labels = useLabels("editor", defaultEditorLabels, ownLabels);
-  const field = useField({
-    id,
-    name,
-    hint,
-    errorMessage: errorMessage ?? (waiting ? labels.uploadsBusy : undefined),
-    "aria-describedby": describedBy,
-    label,
-    // Check your answers shows the document's words, without its markup.
-    answer: (data) => {
-      const sent = name ? data.get(name) : null;
-      if (typeof sent !== "string" || !sent.trim()) return undefined;
-      return format === "html" ? treeText(parseHtmlTree(sent)) : sent;
-    },
-  });
-  const labelId = `${field.id}-label`;
-  const countId = `${field.id}-info`;
   const limit = wordLimit ?? characterLimit;
   const unit = wordLimit ? "word" : "character";
+  const count = useMemo(
+    () => (limit === undefined ? null : { limit, unit, threshold }),
+    [limit, unit, threshold],
+  ) as EditorShared["count"];
   const box = useRef<HTMLDivElement>(null);
-  const boxRef = useMergedRef(box, ref);
   // Kept as state, because the floating tools follow its scrolling once it is there.
   const [body, setBody] = useState<HTMLDivElement | null>(null);
   // A Form can give the document to start with, such as one kept from an earlier visit.
@@ -380,8 +507,7 @@ export function Editor({
   // What the document has been written as since a `value` came from outside. A `value` that only
   // echoes one of these, however late it comes, is then not set again.
   const emitted = useRef([startWith]);
-  const change = useRef(onValueChange);
-  change.current = onValueChange;
+  const change = useLatest(onValueChange);
   const [source, setSource] = useState(false);
 
   // Read once, because Lexical creates the editor once with its nodes, and the nodes decide what it
@@ -449,17 +575,9 @@ export function Editor({
     [optionsKey, initial],
   );
 
-  const describes =
-    [field.controlProps["aria-describedby"], limit ? countId : undefined]
-      .filter(Boolean)
-      .join(" ") || undefined;
-
   return (
     <LexicalComposer initialConfig={initial.config}>
-      <EditorRoot
-        field={field}
-        labelId={labelId}
-        describes={describes}
+      <EditorCore
         labels={labels}
         options={options}
         transformers={transformers}
@@ -468,12 +586,12 @@ export function Editor({
         box={box}
         body={body}
         setBody={setBody}
-        maxRows={maxRows}
         disabled={disabled}
         readOnly={readOnly}
         required={required}
         placeholder={placeholder}
         text={text}
+        waiting={waiting}
         setWaiting={setWaiting}
         emitted={emitted}
         change={change}
@@ -488,71 +606,125 @@ export function Editor({
         autoFocus={autoFocus}
         initialValue={startWith}
         name={name}
+        count={count}
       >
-        <Field invalid={field.invalid}>
-          {/* The label names the content by id, because a label cannot be for a box of prose.
-              Pressing it puts the caret in the document, as pressing a field's label would. */}
-          <EditorLabel id={labelId} hidden={hideLabel}>
-            {label}
-          </EditorLabel>
-          <Hint id={field.hintId}>{hint}</Hint>
-          <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
-          <div
-            {...props}
-            ref={boxRef}
-            className={`x-govuk-ui-editor ${className}`.trim()}
-            data-disabled={disabled || undefined}
-            data-invalid={field.invalid || undefined}
-            data-capped={maxRows !== null || undefined}
-            data-source={source || undefined}
-            data-plain={!initial.richText || undefined}
-            style={
-              {
-                "--x-govuk-ui-editor-rows": rows,
-                "--x-govuk-ui-editor-max-rows": maxRows ?? undefined,
-                ...style,
-              } as CSSProperties
-            }
-          >
-            {children ?? (
-              <>
-                {initial.richText && <EditorToolbar />}
-                <EditorContent />
-              </>
-            )}
-          </div>
-          {name && <EditorValue name={name} text={text} />}
-          {limit !== undefined && (
-            <EditorCount id={countId} limit={limit} unit={unit} threshold={threshold} />
-          )}
-        </Field>
-      </EditorRoot>
+        {children}
+      </EditorCore>
     </LexicalComposer>
   );
 }
 
-/** The label, which puts the caret in the document when pressed. @internal */
-function EditorLabel({
-  id,
-  hidden,
-  children,
-}: {
-  id: string;
-  hidden: boolean;
-  children: ReactNode;
-}) {
-  const [editor] = useLexicalComposerContext();
+/** The Editor's bound Field, which says to wait while files upload. @internal */
+function EditorField({ errorMessage, ...props }: FieldProps) {
+  const { waiting, labels } = useEditorContext("Editor");
   return (
-    <Label id={id} visuallyHidden={hidden} onClick={() => focusDocument(editor)}>
-      {children}
-    </Label>
+    <Field {...props} errorMessage={errorMessage ?? (waiting ? labels.uploadsBusy : undefined)} />
+  );
+}
+
+/**
+ * The editor's label, in a bound Field. It names the document by its id, because a label cannot
+ * be for a box of prose. Pressing it puts the caret in the document, as pressing a field's label
+ * would.
+ */
+export function EditorLabel({ onClick, ...props }: Omit<LabelProps, "htmlFor" | "id">) {
+  const [editor] = useLexicalComposerContext();
+  const field = useBoundField();
+  return (
+    <NamingLabel
+      {...props}
+      id={`${field?.id ?? "editor"}-label`}
+      onClick={chain(onClick, () => focusDocument(editor))}
+    />
+  );
+}
+
+export type EditorBoxProps = Omit<ComponentPropsWithRef<"div">, "children"> &
+  Pick<EditorProps, "rows" | "maxRows" | "children">;
+
+/**
+ * The editor's box on its own, with the toolbar and the document, for an editor composed from
+ * Field's parts. Its count, when the editor has a limit, comes after it. In a bound Field, the
+ * document takes its id from the field, and is described by the field's hint and error. Check
+ * your answers shows the document's words, without its markup.
+ */
+export function EditorBox({
+  rows = 8,
+  maxRows = null,
+  className = "",
+  style,
+  children,
+  ref,
+  ...props
+}: EditorBoxProps) {
+  const shared = useEditorContext("EditorBox");
+  const { box, count, name, text, options } = shared;
+  const field = useBoundField();
+  const generated = useId();
+  const id = field?.id ?? `editor-${generated}`;
+  const countId = `${id}-info`;
+  const describedBy =
+    [field?.controlProps["aria-describedby"], count ? countId : undefined]
+      .filter(Boolean)
+      .join(" ") || undefined;
+  const invalid = field?.invalid ?? false;
+  const capped = maxRows !== null;
+  const boxRef = useMergedRef(box, ref);
+  // Check your answers shows the document's words, without its markup.
+  useFieldSummary({
+    answer: (data) => {
+      const sent = name ? data.get(name) : null;
+      if (typeof sent !== "string" || !sent.trim()) return undefined;
+      return options.format === "html" ? treeText(parseHtmlTree(sent)) : sent;
+    },
+  });
+  // The parts inside take the field's ids from the box, which knows its field.
+  const inside = useMemo(
+    () => ({ ...shared, id, labelId: `${id}-label`, describedBy, invalid, capped }),
+    [shared, id, describedBy, invalid, capped],
+  );
+  return (
+    <>
+      <div
+        {...props}
+        ref={boxRef}
+        className={`x-govuk-ui-editor ${className}`.trim()}
+        data-disabled={shared.disabled || undefined}
+        data-invalid={invalid || undefined}
+        data-capped={capped || undefined}
+        data-source={shared.source || undefined}
+        data-plain={!options.richText || undefined}
+        style={
+          {
+            "--x-govuk-ui-editor-rows": rows,
+            "--x-govuk-ui-editor-max-rows": maxRows ?? undefined,
+            ...style,
+          } as CSSProperties
+        }
+      >
+        <EditorContext value={inside}>
+          {children ?? (
+            <>
+              {options.richText && <EditorToolbar />}
+              <EditorContent />
+            </>
+          )}
+        </EditorContext>
+      </div>
+      {name && <EditorValue name={name} text={text} />}
+      {count && (
+        <EditorCount
+          id={countId}
+          limit={count.limit}
+          unit={count.unit}
+          threshold={count.threshold}
+        />
+      )}
+    </>
   );
 }
 
 type RootProps = {
-  field: ReturnType<typeof useField>;
-  labelId: string;
-  describes: string | undefined;
   labels: EditorLabels;
   options: EditorOptions;
   transformers: Transformer[];
@@ -561,12 +733,12 @@ type RootProps = {
   box: RefObject<HTMLDivElement | null>;
   body: HTMLDivElement | null;
   setBody: (body: HTMLDivElement | null) => void;
-  maxRows: number | null;
   disabled: boolean;
   readOnly: boolean;
   required: boolean;
   placeholder: string | undefined;
   text: ReturnType<typeof createStore<string>>;
+  waiting: boolean;
   setWaiting: (waiting: boolean) => void;
   emitted: RefObject<string[]>;
   change: RefObject<((value: string) => void) | undefined>;
@@ -583,6 +755,7 @@ type RootProps = {
   initialValue: string;
   /** What the value is sent as. */
   name: string | undefined;
+  count: EditorShared["count"];
   children: ReactNode;
 };
 
@@ -628,10 +801,7 @@ function emit(emitted: RefObject<string[]>, next: string) {
  * Everything inside the composer, which creates the editor. That is what the parts share, and the
  * behaviour registered on the editor. @internal
  */
-function EditorRoot({
-  field,
-  labelId,
-  describes,
+function EditorCore({
   labels,
   options,
   transformers,
@@ -640,12 +810,12 @@ function EditorRoot({
   box,
   body,
   setBody,
-  maxRows,
   disabled,
   readOnly,
   required,
   placeholder,
   text,
+  waiting,
   setWaiting,
   emitted,
   change,
@@ -660,6 +830,7 @@ function EditorRoot({
   autoFocus,
   initialValue,
   name,
+  count,
   children,
 }: RootProps) {
   const [editor] = useLexicalComposerContext();
@@ -956,15 +1127,19 @@ function EditorRoot({
     [emitted, text, change],
   );
 
-  // The parts render again only when what they share changes, not at every key.
-  const capped = maxRows !== null;
+  // The parts render again only when what they share changes, not at every key. The field's ids
+  // and the box's size are the EditorBox's, which gives them to the parts inside it.
   const shared: EditorShared = useMemo(
     () => ({
       editor,
-      id: field.id,
-      labelId,
-      describedBy: describes,
-      invalid: field.invalid,
+      id: "",
+      labelId: "",
+      describedBy: undefined,
+      invalid: false,
+      capped: false,
+      waiting,
+      name,
+      count,
       required,
       placeholder,
       labels,
@@ -976,7 +1151,6 @@ function EditorRoot({
       box,
       body,
       setBody,
-      capped,
       format,
       history,
       text,
@@ -994,10 +1168,9 @@ function EditorRoot({
     }),
     [
       editor,
-      field.id,
-      labelId,
-      describes,
-      field.invalid,
+      waiting,
+      name,
+      count,
       required,
       placeholder,
       labels,
@@ -1009,7 +1182,6 @@ function EditorRoot({
       box,
       body,
       setBody,
-      capped,
       format,
       history,
       text,
@@ -1059,6 +1231,8 @@ function EditorRoot({
  * - attachments, stored by `onUpload` or already stored, such as from the service's own library
  * - whether the source shows in place of the document, and a way to show or hide it, as the
  *   Source control has
+ * - whether a form was stopped because files are still uploading, so a field of your own can say
+ *   to wait, as Editor's says its `uploadsBusy` label
  */
 export function useEditor() {
   const {
@@ -1072,6 +1246,7 @@ export function useEditor() {
     insertAttachment,
     source,
     toggleSource,
+    waiting,
   } = useEditorContext("useEditor");
   return {
     editor,
@@ -1084,5 +1259,6 @@ export function useEditor() {
     insertAttachment,
     source,
     toggleSource,
+    waiting,
   };
 }

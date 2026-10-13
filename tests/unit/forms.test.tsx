@@ -3,8 +3,11 @@ import {
   defaultEditorLabels,
   defaultEditorToolbar,
   Editor,
+  EditorBox,
   EditorContent,
   EditorControl,
+  EditorLabel,
+  EditorRoot,
   EditorToolbar,
   editorToolbarGroups,
 } from "@x-govuk-ui/jorjorwel";
@@ -24,6 +27,7 @@ import {
   ChoiceList,
   ChoiceRoot,
   Combobox,
+  ComboboxControl,
   CookieBanner,
   DateInput,
   DateInputControl,
@@ -37,6 +41,7 @@ import {
   FieldsetLegend,
   FieldsetRoot,
   FileUpload,
+  FileUploadControl,
   FilterChip,
   FilterChips,
   Form,
@@ -47,6 +52,7 @@ import {
   Label,
   LabelsProvider,
   MultiSelect,
+  MultiSelectControl,
   Pagination,
   passwordStrength,
   Radio,
@@ -56,7 +62,13 @@ import {
   Select,
   SelectControl,
   SelectItem,
+  Slider,
+  SliderControl,
+  SliderLabel,
+  SliderRoot,
+  SliderValue,
   Switch,
+  SwitchControl,
   Textarea,
   TextareaControl,
   TimeInput,
@@ -314,6 +326,102 @@ test("date and time inputs are their parts in a bound field, so a composed one m
   );
   expect(same(time)).toBe(same(composedTime));
   expect(composedTime).toContain('name="start-period"');
+});
+
+test("comboboxes, file uploads, sliders and the editor are their parts in a bound field, so a composed one matches", () => {
+  // Base UI numbers its parts by their place in the tree, which composing changes.
+  const same = (html: string) =>
+    normalised(html).replace(/ (?:id|aria-controls|aria-labelledby)="base-ui-[^"]*"/g, "");
+  const field = { name: "country", hasHint: true, errorMessage: "Choose one" };
+  const words = (control: ReactNode) => (
+    <Field controlId="country" {...field}>
+      <Label>Country</Label>
+      <Hint>Where you live</Hint>
+      <ErrorMessage />
+      {control}
+    </Field>
+  );
+  const shorthand = { label: "Country", hint: "Where you live", errorMessage: "Choose one" };
+  const items = ["United Kingdom", "France"];
+  expect(
+    same(
+      renderToStaticMarkup(<Combobox id="country" name="country" items={items} {...shorthand} />),
+    ),
+  ).toBe(same(renderToStaticMarkup(words(<ComboboxControl items={items} />))));
+  expect(
+    same(
+      renderToStaticMarkup(
+        <MultiSelect
+          id="country"
+          name="country"
+          items={items}
+          defaultValue={["France"]}
+          {...shorthand}
+        />,
+      ),
+    ),
+  ).toBe(
+    same(
+      renderToStaticMarkup(words(<MultiSelectControl items={items} defaultValue={["France"]} />)),
+    ),
+  );
+  expect(
+    same(renderToStaticMarkup(<FileUpload id="country" name="country" multiple {...shorthand} />)),
+  ).toBe(same(renderToStaticMarkup(words(<FileUploadControl multiple />))));
+  // A slider's label names its thumb, so it is the slider's own label, beside its value.
+  const slider = renderToStaticMarkup(
+    <Slider id="volume" name="volume" label="Volume" hint="How loud" defaultValue={40} />,
+  );
+  const composedSlider = renderToStaticMarkup(
+    <Field controlId="volume" name="volume" hasHint>
+      <SliderRoot defaultValue={40}>
+        <div className="x-govuk-ui-slider-header">
+          <SliderLabel>Volume</SliderLabel>
+          <SliderValue />
+        </div>
+        <Hint>How loud</Hint>
+        <ErrorMessage />
+        <SliderControl />
+      </SliderRoot>
+    </Field>,
+  );
+  expect(same(slider)).toBe(same(composedSlider));
+  expect(slider).toContain('id="volume-label"');
+  expect(slider).not.toContain('for="volume"');
+  // The editor's label names its document by id, and its count describes it.
+  const editor = renderToStaticMarkup(
+    <Editor id="notes" name="notes" label="Notes" hint="What was said" characterLimit={200} />,
+  );
+  const composedEditor = renderToStaticMarkup(
+    <EditorRoot name="notes" characterLimit={200}>
+      <Field controlId="notes" name="notes" hasHint>
+        <EditorLabel>Notes</EditorLabel>
+        <Hint>What was said</Hint>
+        <ErrorMessage />
+        <EditorBox />
+      </Field>
+    </EditorRoot>,
+  );
+  expect(same(editor)).toBe(same(composedEditor));
+  expect(editor).toContain('id="notes-label"');
+  expect(editor).toContain('aria-describedby="notes-hint notes-info"');
+});
+
+test("a switch's control takes its id, name and descriptions from a Field of your own", () => {
+  const html = renderToStaticMarkup(
+    <Field controlId="alerts" name="alerts" hasHint errorMessage="Turn alerts on">
+      <Label>Alerts</Label>
+      <Hint>By email</Hint>
+      <ErrorMessage />
+      <SwitchControl />
+    </Field>,
+  );
+  expect(html).toContain('role="switch"');
+  expect(html).toContain('id="alerts"');
+  expect(html).toContain('name="alerts"');
+  expect(html).toContain('aria-describedby="alerts-hint alerts-error"');
+  expect(html).toContain('aria-invalid="true"');
+  expect(html).toContain('for="alerts"');
 });
 
 test("inputs generate distinct IDs and escape content during server rendering", () => {

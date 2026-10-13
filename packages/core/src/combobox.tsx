@@ -5,11 +5,21 @@ import {
   type ComponentPropsWithRef,
   type ReactNode,
   type RefObject,
+  useId,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "./field";
+import {
+  ErrorMessage,
+  Field,
+  Hint,
+  Label,
+  present,
+  useControlProps,
+  useFieldSummary,
+  useFormDefault,
+} from "./field";
 import { trackHighlight } from "./highlight";
 import { ChevronIcon, CrossIcon, TickIcon } from "./icons";
 import { useLabels } from "./labels";
@@ -26,12 +36,21 @@ const optionOf = (item: ComboboxItem): ComboboxOption =>
 type Shared = Omit<
   ComponentPropsWithRef<"input">,
   "value" | "defaultValue" | "onChange" | "id" | "name" | "disabled" | "placeholder" | "size"
-> & {
+> &
+  FieldWords &
+  ControlShared;
+
+/** What a field says around its control. */
+type FieldWords = {
   label: ReactNode;
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
   errorMessage?: ReactNode;
+};
+
+/** What both controls take, beside an input's attributes. */
+type ControlShared = {
   /** The options to search. */
   items: readonly ComboboxItem[];
   placeholder?: string;
@@ -161,34 +180,59 @@ export type ComboboxProps = Shared & {
  * A field that suggests options as users type, as GOV.UK's accessible autocomplete does, for a
  * long list such as countries. The part of each option that matches is bold. One highlight glides
  * between the options. The arrow keys and Enter choose one. Base UI provides the behaviour.
+ *
+ * It is a bound Field with a Label, a Hint, an ErrorMessage and a ComboboxControl. Compose those
+ * parts yourself to put something between them.
  */
 export function Combobox({
   label,
   hint,
   hideLabel = false,
   errorMessage,
-  items,
-  value,
-  defaultValue,
-  onValueChange,
-  placeholder,
-  labels: ownLabels,
-  name,
-  disabled,
   id,
-  className = "",
+  "aria-describedby": describedBy,
   ...props
 }: ComboboxProps) {
+  const generated = useId();
+  return (
+    <Field
+      controlId={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Hint>{hint}</Hint>
+      <ErrorMessage />
+      <ComboboxControl {...props} />
+    </Field>
+  );
+}
+
+export type ComboboxControlProps = Omit<ComboboxProps, keyof FieldWords> & { id?: string };
+
+/**
+ * Combobox's control on its own, for a field composed from Field's parts. It is the field that
+ * takes typing, with its buttons and its list. In a bound Field, it takes its id, name and
+ * descriptions from the field, and Check your answers shows its option's label.
+ */
+export function ComboboxControl(given: ComboboxControlProps) {
+  const {
+    items,
+    value,
+    defaultValue,
+    onValueChange,
+    placeholder,
+    labels: ownLabels,
+    name,
+    disabled,
+    className = "",
+    ...props
+  } = useControlProps(given);
   const options = useMemo(() => items.map(optionOf), [items]);
   const labels = useLabels("combobox", defaultComboboxLabels, ownLabels);
-  const field = useField({
-    id,
-    name,
-    hint,
-    errorMessage,
-    label,
-    answer: (data) => labelsOf(options, name ? data.getAll(name) : []),
-  });
+  useFieldSummary({ answer: (data) => labelsOf(options, name ? data.getAll(name) : []) });
   // A Form can give the field an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(name)?.[0];
   const find = (wanted: string | null | undefined) =>
@@ -196,43 +240,31 @@ export function Combobox({
   const [query, setQuery] = useState("");
   const group = useRef<HTMLDivElement>(null);
   return (
-    <Field invalid={field.invalid}>
-      <Label htmlFor={field.id} visuallyHidden={hideLabel}>
-        {label}
-      </Label>
-      <Hint id={field.hintId}>{hint}</Hint>
-      <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
-      <Primitive.Root
-        items={options}
-        value={find(value)}
-        defaultValue={find(defaultValue === undefined ? saved : defaultValue)}
-        onValueChange={(next) => onValueChange?.((next as ComboboxOption | null)?.value ?? null)}
-        onInputValueChange={setQuery}
-        itemToStringLabel={(option: ComboboxOption) => option.label}
-        itemToStringValue={(option: ComboboxOption) => option.value}
-        name={name}
-        disabled={disabled}
+    <Primitive.Root
+      items={options}
+      value={find(value)}
+      defaultValue={find(defaultValue === undefined ? saved : defaultValue)}
+      onValueChange={(next) => onValueChange?.((next as ComboboxOption | null)?.value ?? null)}
+      onInputValueChange={setQuery}
+      itemToStringLabel={(option: ComboboxOption) => option.label}
+      itemToStringValue={(option: ComboboxOption) => option.value}
+      name={name}
+      disabled={disabled}
+    >
+      <div
+        ref={group}
+        className={`x-govuk-ui-input-group x-govuk-ui-combobox-field ${className}`.trim()}
       >
-        <div
-          ref={group}
-          className={`x-govuk-ui-input-group x-govuk-ui-combobox-field ${className}`.trim()}
-        >
-          <Primitive.Input
-            {...props}
-            {...field.controlProps}
-            className="x-govuk-ui-input"
-            placeholder={placeholder}
-          />
-          <Primitive.Clear className="x-govuk-ui-combobox-button" aria-label={labels.clear}>
-            <CrossIcon />
-          </Primitive.Clear>
-          <Primitive.Trigger className="x-govuk-ui-combobox-button" aria-label={labels.showAll}>
-            <ChevronIcon size={16} />
-          </Primitive.Trigger>
-        </div>
-        <Options query={query} emptyText={labels.empty} field={group} />
-      </Primitive.Root>
-    </Field>
+        <Primitive.Input {...props} className="x-govuk-ui-input" placeholder={placeholder} />
+        <Primitive.Clear className="x-govuk-ui-combobox-button" aria-label={labels.clear}>
+          <CrossIcon />
+        </Primitive.Clear>
+        <Primitive.Trigger className="x-govuk-ui-combobox-button" aria-label={labels.showAll}>
+          <ChevronIcon size={16} />
+        </Primitive.Trigger>
+      </div>
+      <Options query={query} emptyText={labels.empty} field={group} />
+    </Primitive.Root>
   );
 }
 
@@ -246,34 +278,59 @@ export type MultiSelectProps = Shared & {
  * Lets users choose several options from a long list by typing, such as the languages they
  * speak. Each choice becomes a chip in the field, with a button to remove it, and Backspace in an
  * empty field removes the last. The list stays open, with ticks by the choices.
+ *
+ * It is a bound Field with a Label, a Hint, an ErrorMessage and a MultiSelectControl. Compose
+ * those parts yourself to put something between them.
  */
 export function MultiSelect({
   label,
   hint,
   hideLabel = false,
   errorMessage,
-  items,
-  value,
-  defaultValue,
-  onValueChange,
-  placeholder,
-  labels: ownLabels,
-  name,
-  disabled,
   id,
-  className = "",
+  "aria-describedby": describedBy,
   ...props
 }: MultiSelectProps) {
+  const generated = useId();
+  return (
+    <Field
+      controlId={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Hint>{hint}</Hint>
+      <ErrorMessage />
+      <MultiSelectControl {...props} />
+    </Field>
+  );
+}
+
+export type MultiSelectControlProps = Omit<MultiSelectProps, keyof FieldWords> & { id?: string };
+
+/**
+ * MultiSelect's control on its own, for a field composed from Field's parts. It is the field of
+ * chips that takes typing, with its list. In a bound Field, it takes its id, name and descriptions
+ * from the field, and Check your answers lists the chosen options' labels.
+ */
+export function MultiSelectControl(given: MultiSelectControlProps) {
+  const {
+    items,
+    value,
+    defaultValue,
+    onValueChange,
+    placeholder,
+    labels: ownLabels,
+    name,
+    disabled,
+    className = "",
+    ...props
+  } = useControlProps(given);
   const options = useMemo(() => items.map(optionOf), [items]);
   const labels = useLabels("combobox", defaultComboboxLabels, ownLabels);
-  const field = useField({
-    id,
-    name,
-    hint,
-    errorMessage,
-    label,
-    answer: (data) => labelsOf(options, name ? data.getAll(name) : []),
-  });
+  useFieldSummary({ answer: (data) => labelsOf(options, name ? data.getAll(name) : []) });
   // A Form can give the field its answers to start with, such as ones kept from an earlier visit.
   const saved = useFormDefault(name);
   const findAll = (wanted: string[] | undefined) =>
@@ -281,56 +338,48 @@ export function MultiSelect({
   const [query, setQuery] = useState("");
   const chips = useRef<HTMLDivElement>(null);
   return (
-    <Field invalid={field.invalid}>
-      <Label htmlFor={field.id} visuallyHidden={hideLabel}>
-        {label}
-      </Label>
-      <Hint id={field.hintId}>{hint}</Hint>
-      <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
-      <Primitive.Root
-        multiple
-        items={options}
-        value={findAll(value)}
-        defaultValue={findAll(defaultValue ?? saved)}
-        onValueChange={(next) =>
-          onValueChange?.((next as ComboboxOption[]).map((option) => option.value))
-        }
-        onInputValueChange={setQuery}
-        itemToStringLabel={(option: ComboboxOption) => option.label}
-        itemToStringValue={(option: ComboboxOption) => option.value}
-        name={name}
-        disabled={disabled}
+    <Primitive.Root
+      multiple
+      items={options}
+      value={findAll(value)}
+      defaultValue={findAll(defaultValue ?? saved)}
+      onValueChange={(next) =>
+        onValueChange?.((next as ComboboxOption[]).map((option) => option.value))
+      }
+      onInputValueChange={setQuery}
+      itemToStringLabel={(option: ComboboxOption) => option.label}
+      itemToStringValue={(option: ComboboxOption) => option.value}
+      name={name}
+      disabled={disabled}
+    >
+      <Primitive.Chips
+        ref={chips}
+        className={`x-govuk-ui-input-group x-govuk-ui-multi-select-field ${className}`.trim()}
       >
-        <Primitive.Chips
-          ref={chips}
-          className={`x-govuk-ui-input-group x-govuk-ui-multi-select-field ${className}`.trim()}
-        >
-          <Primitive.Value>
-            {(chosen: ComboboxOption[]) => (
-              <>
-                {chosen.map((option) => (
-                  <Primitive.Chip key={option.value} className="x-govuk-ui-chip">
-                    {option.label}
-                    <Primitive.ChipRemove
-                      className="x-govuk-ui-chip-remove"
-                      aria-label={labels.remove(option.label)}
-                    >
-                      <CrossIcon size={12} />
-                    </Primitive.ChipRemove>
-                  </Primitive.Chip>
-                ))}
-                <Primitive.Input
-                  {...props}
-                  {...field.controlProps}
-                  className="x-govuk-ui-input"
-                  placeholder={chosen.length ? undefined : placeholder}
-                />
-              </>
-            )}
-          </Primitive.Value>
-        </Primitive.Chips>
-        <Options query={query} emptyText={labels.empty} field={chips} />
-      </Primitive.Root>
-    </Field>
+        <Primitive.Value>
+          {(chosen: ComboboxOption[]) => (
+            <>
+              {chosen.map((option) => (
+                <Primitive.Chip key={option.value} className="x-govuk-ui-chip">
+                  {option.label}
+                  <Primitive.ChipRemove
+                    className="x-govuk-ui-chip-remove"
+                    aria-label={labels.remove(option.label)}
+                  >
+                    <CrossIcon size={12} />
+                  </Primitive.ChipRemove>
+                </Primitive.Chip>
+              ))}
+              <Primitive.Input
+                {...props}
+                className="x-govuk-ui-input"
+                placeholder={chosen.length ? undefined : placeholder}
+              />
+            </>
+          )}
+        </Primitive.Value>
+      </Primitive.Chips>
+      <Options query={query} emptyText={labels.empty} field={chips} />
+    </Primitive.Root>
   );
 }

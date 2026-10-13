@@ -1,7 +1,15 @@
 "use client";
 
-import type { ComponentPropsWithRef, ReactNode } from "react";
-import { ErrorMessage, Hint, useField } from "./field";
+import { type ComponentPropsWithRef, type ReactNode, useId } from "react";
+import {
+  ErrorMessage,
+  FieldBinding,
+  Hint,
+  present,
+  useBoundField,
+  useControlProps,
+  useFieldSummary,
+} from "./field";
 import { useLabels } from "./labels";
 
 /** The words Switch writes in Check your answers, which a LabelsProvider can change. */
@@ -25,56 +33,96 @@ export type SwitchProps = Omit<ComponentPropsWithRef<"input">, "type" | "role" |
  * Turns a setting on or off at once, such as notifications. The label sits on the left and the
  * switch on the right. It is a native checkbox, so it works in a form with `name` and `value`.
  * Use Checkboxes for answers that are submitted later.
+ *
+ * Its row holds its label, a `Hint`, an `ErrorMessage` and a `SwitchControl`, bound to the control
+ * as a Field binds its parts. Compose a Field of your own around a SwitchControl for another
+ * layout.
  */
 export function Switch({
   label,
   hint,
   hideLabel = false,
   errorMessage,
-  onCheckedChange,
-  onChange,
   size = "medium",
   id,
   className = "",
   "aria-describedby": describedBy,
   ...props
 }: SwitchProps) {
-  const labels = useLabels("switch", defaultSwitchLabels);
-  const field = useField({
-    id,
-    name: props.name,
-    hint,
-    errorMessage,
-    "aria-describedby": describedBy,
-    label,
-    // Check your answers says whether the setting is on.
-    answer: (data) => (props.name && data.has(props.name) ? labels.on : labels.off),
-  });
+  const generated = useId();
+  return (
+    <FieldBinding
+      id={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+      label={label}
+    >
+      <SwitchRow label={label} hint={hint} hideLabel={hideLabel} size={size} className={className}>
+        <SwitchControl {...props} />
+      </SwitchRow>
+    </FieldBinding>
+  );
+}
+
+/** Switch's row, with its words on the left and its control on the right. @internal */
+function SwitchRow({
+  label,
+  hint,
+  hideLabel,
+  size,
+  className,
+  children,
+}: Pick<SwitchProps, "label" | "hint" | "hideLabel" | "size" | "className"> & {
+  children: ReactNode;
+}) {
+  const field = useBoundField();
   return (
     <div
       className={`x-govuk-ui-switch ${className}`.trim()}
       data-size={size === "small" ? "small" : undefined}
-      data-invalid={field.invalid || undefined}
+      data-invalid={field?.invalid || undefined}
     >
       <span className={`x-govuk-ui-switch-text${hideLabel ? " x-govuk-ui-visually-hidden" : ""}`}>
-        <label className="x-govuk-ui-switch-label" htmlFor={field.id}>
+        <label className="x-govuk-ui-switch-label" htmlFor={field?.id}>
           {label}
         </label>
-        <Hint id={field.hintId}>{hint}</Hint>
-        <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
+        <Hint>{hint}</Hint>
+        <ErrorMessage />
       </span>
-      <input
-        type="checkbox"
-        // biome-ignore lint/a11y/useAriaPropsForRole: A native checkbox reports its own checked state.
-        role="switch"
-        {...props}
-        {...field.controlProps}
-        className="x-govuk-ui-switch-control"
-        onChange={(event) => {
-          onChange?.(event);
-          onCheckedChange?.(event.target.checked);
-        }}
-      />
+      {children}
     </div>
+  );
+}
+
+export type SwitchControlProps = Omit<
+  SwitchProps,
+  "label" | "hint" | "hideLabel" | "errorMessage" | "size"
+>;
+
+/**
+ * Switch's control on its own, the native checkbox drawn as a switch, for a field composed from
+ * Field's parts. In a bound Field, it takes its id, name and descriptions from the field, and Check
+ * your answers says whether it is on.
+ */
+export function SwitchControl(given: SwitchControlProps) {
+  const { onCheckedChange, onChange, className = "", ...props } = useControlProps(given);
+  const labels = useLabels("switch", defaultSwitchLabels);
+  const { name } = props;
+  // Check your answers says whether the setting is on.
+  useFieldSummary({ answer: (data) => (name && data.has(name) ? labels.on : labels.off) });
+  return (
+    <input
+      type="checkbox"
+      // biome-ignore lint/a11y/useAriaPropsForRole: A native checkbox reports its own checked state.
+      role="switch"
+      {...props}
+      className={`x-govuk-ui-switch-control ${className}`.trim()}
+      onChange={(event) => {
+        onChange?.(event);
+        onCheckedChange?.(event.target.checked);
+      }}
+    />
   );
 }

@@ -5,12 +5,14 @@ import {
   type CSSProperties,
   type DragEvent,
   type ReactNode,
+  useId,
   useRef,
   useState,
 } from "react";
 import { chain } from "./events";
-import { ErrorMessage, Field, Hint, Label, useField } from "./field";
+import { ErrorMessage, Field, Hint, Label, present, useControlProps } from "./field";
 import { useLabels, useLocale } from "./labels";
+import { useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
 export type FileUploadProps = Omit<
@@ -63,33 +65,64 @@ export const defaultFileUploadLabels: FileUploadLabels = {
  * anywhere opens the picker, and dropping files onto it works as the browser's own does. While
  * files are dragged over it, the zone lights up in brand blue, and its contents lean towards the
  * pointer. Each chosen file is listed with its size and a button to remove it.
+ *
+ * It is a bound Field with a Label, a Hint, an ErrorMessage and a FileUploadControl. Compose those
+ * parts yourself to put something between them.
  */
 export function FileUpload({
   label,
   hint,
   hideLabel = false,
   errorMessage,
-  onFilesChange,
-  multiple = false,
-  labels: ownLabels,
   id,
-  className = "",
-  disabled,
   "aria-describedby": describedBy,
-  onDragEnter,
-  onDragOver,
-  onDragLeave,
-  onDrop,
   ...props
 }: FileUploadProps) {
-  const field = useField({
-    id,
-    name: props.name,
-    hint,
-    errorMessage,
-    "aria-describedby": describedBy,
-    label,
-  });
+  const generated = useId();
+  return (
+    <Field
+      controlId={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Hint>{hint}</Hint>
+      <ErrorMessage />
+      <FileUploadControl {...props} />
+    </Field>
+  );
+}
+
+export type FileUploadControlProps = Omit<
+  FileUploadProps,
+  "label" | "hint" | "hideLabel" | "errorMessage"
+>;
+
+/**
+ * File upload's control on its own, for a field composed from Field's parts. It is the drop zone,
+ * with the native input over it, and the list of chosen files beneath. In a bound Field, the input
+ * takes its id, name and descriptions from the field. The input is described by the list too, so
+ * screen readers hear which files are chosen. Its `className` goes on the zone.
+ */
+export function FileUploadControl(given: FileUploadControlProps) {
+  const {
+    onFilesChange,
+    multiple = false,
+    labels: ownLabels,
+    className = "",
+    disabled,
+    ref,
+    onDragEnter,
+    onDragOver,
+    onDragLeave,
+    onDrop,
+    ...props
+  } = useControlProps(given);
+  const generated = useId();
+  const controlId = props.id ?? `file-${generated}`;
+  const invalid = props["aria-invalid"] === true || props["aria-invalid"] === "true";
   const labels = useLabels("fileUpload", defaultFileUploadLabels, ownLabels);
   const number = new Intl.NumberFormat(useLocale(), { maximumFractionDigits: 1 });
   const sizeOf = (bytes: number) =>
@@ -97,11 +130,12 @@ export function FileUpload({
       ? labels.kilobytes(number.format(Math.max(1, bytes / 1024)))
       : labels.megabytes(number.format(bytes / 1024 / 1024));
   const input = useRef<HTMLInputElement>(null);
+  const inputRef = useMergedRef(input, ref);
   const [files, setFiles] = useState<File[]>([]);
   const [dragging, setDragging] = useState(false);
   const [pull, setPull] = useState({ x: 0, y: 0 });
   const play = useScopeSound();
-  const listId = `${field.id}-files`;
+  const listId = `${controlId}-files`;
 
   const update = (next: File[]) => {
     setFiles(next);
@@ -127,17 +161,12 @@ export function FileUpload({
   };
 
   return (
-    <Field invalid={field.invalid}>
-      <Label htmlFor={field.id} visuallyHidden={hideLabel}>
-        {label}
-      </Label>
-      <Hint id={field.hintId}>{hint}</Hint>
-      <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
+    <>
       <div
         className={`x-govuk-ui-file-upload ${className}`.trim()}
         data-dragging={dragging || undefined}
         data-disabled={disabled || undefined}
-        data-invalid={field.invalid || undefined}
+        data-invalid={invalid || undefined}
         style={
           {
             "--x-govuk-ui-pull-x": `${pull.x}px`,
@@ -146,15 +175,13 @@ export function FileUpload({
         }
       >
         <input
-          ref={input}
+          ref={inputRef}
           type="file"
           multiple={multiple}
           disabled={disabled}
           {...props}
-          {...field.controlProps}
-          aria-describedby={[field.controlProps["aria-describedby"], listId]
-            .filter(Boolean)
-            .join(" ")}
+          id={controlId}
+          aria-describedby={[props["aria-describedby"], listId].filter(Boolean).join(" ")}
           className="x-govuk-ui-file-upload-input"
           onChange={(event) => {
             const next = Array.from(event.target.files ?? []);
@@ -223,6 +250,6 @@ export function FileUpload({
           </p>
         )}
       </div>
-    </Field>
+    </>
   );
 }

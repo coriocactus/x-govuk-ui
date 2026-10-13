@@ -112,6 +112,13 @@
   border-top-left-radius: 3.5px
   border-top-right-radius: 3.5px
   border-bottom: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-label
+  display: block
+  font-size: 18px
+  font-weight: 700
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  margin-bottom: 7px
 .x-govuk-ui-scroll-area-content
   display: block
   font-size: 14px
@@ -119,3 +126,9 @@
   line-height: 1.5
   color: rgb(11, 12, 12)
   min-height: 398.2px
+.x-govuk-ui-visually-hidden
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)

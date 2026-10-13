@@ -188,12 +188,16 @@ export {
 } from "./code-block";
 export {
   Combobox,
+  ComboboxControl,
+  type ComboboxControlProps,
   type ComboboxItem,
   type ComboboxLabels,
   type ComboboxOption,
   type ComboboxProps,
   defaultComboboxLabels,
   MultiSelect,
+  MultiSelectControl,
+  type MultiSelectControlProps,
   type MultiSelectProps,
 } from "./combobox";
 export {
@@ -360,6 +364,8 @@ export {
 export {
   defaultFileUploadLabels,
   FileUpload,
+  FileUploadControl,
+  type FileUploadControlProps,
   type FileUploadLabels,
   type FileUploadProps,
 } from "./file-upload";
@@ -742,7 +748,15 @@ export {
   type SkipLinkLabels,
   type SkipLinkProps,
 } from "./skip-link";
-export { Slider, type SliderProps } from "./slider";
+export {
+  Slider,
+  SliderControl,
+  SliderLabel,
+  type SliderProps,
+  SliderRoot,
+  type SliderRootProps,
+  SliderValue,
+} from "./slider";
 export {
   type PlayOptions,
   type PlaySound,
@@ -781,6 +795,8 @@ export {
 export {
   defaultSwitchLabels,
   Switch,
+  SwitchControl,
+  type SwitchControlProps,
   type SwitchLabels,
   type SwitchProps,
 } from "./switch";

@@ -1,8 +1,26 @@
 "use client";
 
 import { Slider as Primitive } from "@base-ui/react/slider";
-import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef } from "react";
-import { ErrorMessage, Field, Hint, Label, useField } from "./field";
+import {
+  type ComponentPropsWithRef,
+  createContext,
+  type ReactNode,
+  type RefObject,
+  useContext,
+  useEffect,
+  useId,
+  useRef,
+} from "react";
+import {
+  ErrorMessage,
+  Field,
+  Hint,
+  type LabelProps,
+  NamingLabel,
+  present,
+  useBoundField,
+  useFieldSummary,
+} from "./field";
 import { useLocale } from "./labels";
 import { useMotionTiming } from "./motion";
 import { useScopeSound } from "./sound-scope";
@@ -38,15 +56,78 @@ export type SliderProps = Omit<
 /** How long the thumb waits before it settles, in milliseconds, keyed by how the value changed. */
 const SETTLE_AFTER: Partial<Record<string, number>> = { drag: 130, keyboard: 160 };
 
+/** What a slider's parts share, from its root. */
+type SliderShared = {
+  /** The root's id, which a Form's error summary links to. */
+  id: string;
+  /** The thumb, which settles after a drag or a run of keys. */
+  thumb: RefObject<HTMLDivElement | null>;
+};
+
+const SliderContext = createContext<SliderShared | null>(null);
+
+function useSlider(part: string) {
+  const slider = useContext(SliderContext);
+  if (!slider) throw new Error(`${part} must be inside SliderRoot.`);
+  return slider;
+}
+
 /**
  * Picks a number from a range by dragging, or with the arrow keys. Base UI provides the behaviour,
  * and the Field parts label it. For exact numbers, an Input is easier to use.
+ *
+ * It is a bound Field holding a `SliderRoot`, with a `SliderLabel` and a `SliderValue` side by
+ * side, a `Hint`, an `ErrorMessage` and a `SliderControl`. Compose those parts yourself to put
+ * something between them.
  */
 export function Slider({
   label,
   hint,
   hideLabel = false,
   errorMessage,
+  showValue = true,
+  id,
+  "aria-describedby": describedBy,
+  ...props
+}: SliderProps) {
+  const generated = useId();
+  return (
+    <Field
+      controlId={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <SliderRoot {...props}>
+        <div className="x-govuk-ui-slider-header">
+          <SliderLabel visuallyHidden={hideLabel}>{label}</SliderLabel>
+          {showValue && <SliderValue />}
+        </div>
+        <Hint>{hint}</Hint>
+        <ErrorMessage />
+        <SliderControl />
+      </SliderRoot>
+    </Field>
+  );
+}
+
+export type SliderRootProps = Omit<
+  SliderProps,
+  "label" | "hint" | "hideLabel" | "errorMessage" | "showValue"
+> & {
+  /** The slider's parts, which are a `SliderLabel`, a `SliderValue` and a `SliderControl`. */
+  children?: ReactNode;
+};
+
+/**
+ * A slider of your own. It keeps the value, and holds the slider's parts, which are a
+ * `SliderLabel`, a `SliderValue` and a `SliderControl`, with a `Hint` and an `ErrorMessage`
+ * between them. In a bound Field, it takes its id and name from the field, so a Form's error
+ * summary links to it and focuses the thumb inside. Check your answers shows the value as the
+ * slider shows it.
+ */
+export function SliderRoot({
   value,
   defaultValue,
   onValueChange,
@@ -55,22 +136,21 @@ export function Slider({
   max = 100,
   step = 1,
   format,
-  showValue = true,
   disabled = false,
-  name,
-  id,
+  name: ownName,
+  id: ownId,
   className = "",
+  children,
   ...props
-}: SliderProps) {
+}: SliderRootProps) {
+  const field = useBoundField();
+  const generated = useId();
+  const id = ownId ?? field?.id ?? `slider-${generated}`;
+  const name = ownName ?? field?.name;
   // The value is written in the page's language, the same on the server and in the browser.
   const locale = useLocale();
-  const field = useField({
-    id,
-    name,
-    hint,
-    errorMessage,
-    label,
-    // Check your answers shows the value as the slider shows it.
+  // Check your answers shows the value as the slider shows it.
+  useFieldSummary({
     answer: (data) => {
       const sent = name ? data.get(name) : null;
       return typeof sent === "string" && sent !== ""
@@ -78,7 +158,6 @@ export function Slider({
         : undefined;
     },
   });
-  const labelId = `${field.id}-label`;
   const play = useScopeSound();
   const { reduced } = useMotionTiming();
   const lastTick = useRef(0);
@@ -121,11 +200,11 @@ export function Slider({
     play("sliderTick", { detune: ((next - min) / (max - min || 1)) * 900 });
   };
   return (
-    <Field invalid={field.invalid}>
+    <SliderContext value={{ id, thumb }}>
       <Primitive.Root
         {...props}
         // A Form's error summary links here, and focuses the thumb inside.
-        id={field.id}
+        id={id}
         className={`x-govuk-ui-slider ${className}`.trim()}
         value={value}
         defaultValue={defaultValue}
@@ -143,26 +222,47 @@ export function Slider({
         disabled={disabled}
         name={name}
       >
-        <div className="x-govuk-ui-slider-header">
-          <Label id={labelId} visuallyHidden={hideLabel}>
-            {label}
-          </Label>
-          {showValue && <Primitive.Value className="x-govuk-ui-slider-value" />}
-        </div>
-        <Hint id={field.hintId}>{hint}</Hint>
-        <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
-        <Primitive.Control className="x-govuk-ui-slider-control">
-          <Primitive.Track className="x-govuk-ui-slider-track">
-            <Primitive.Indicator className="x-govuk-ui-slider-indicator" />
-            <Primitive.Thumb
-              ref={thumb}
-              className="x-govuk-ui-slider-thumb"
-              aria-labelledby={labelId}
-              aria-describedby={field.controlProps["aria-describedby"]}
-            />
-          </Primitive.Track>
-        </Primitive.Control>
+        {children}
       </Primitive.Root>
-    </Field>
+    </SliderContext>
+  );
+}
+
+/**
+ * A slider's label. The thumb is named by its id, because a label cannot be for a slider's thumb.
+ * In a bound Field, its words are the question that Check your answers lists.
+ */
+export function SliderLabel(props: Omit<LabelProps, "htmlFor" | "id">) {
+  const { id } = useSlider("SliderLabel");
+  return <NamingLabel {...props} id={`${id}-label`} />;
+}
+
+/** The slider's value, as it reads, such as 40%, which changes as the thumb moves. */
+export function SliderValue({
+  className = "",
+  ...props
+}: Omit<ComponentPropsWithRef<"output">, "children">) {
+  return <Primitive.Value {...props} className={`x-govuk-ui-slider-value ${className}`.trim()} />;
+}
+
+/**
+ * The slider's track and thumb. The thumb is named by the `SliderLabel` and, in a bound Field,
+ * described by the field's hint and error.
+ */
+export function SliderControl({ className = "", ...props }: ComponentPropsWithRef<"div">) {
+  const { id, thumb } = useSlider("SliderControl");
+  const field = useBoundField();
+  return (
+    <Primitive.Control {...props} className={`x-govuk-ui-slider-control ${className}`.trim()}>
+      <Primitive.Track className="x-govuk-ui-slider-track">
+        <Primitive.Indicator className="x-govuk-ui-slider-indicator" />
+        <Primitive.Thumb
+          ref={thumb}
+          className="x-govuk-ui-slider-thumb"
+          aria-labelledby={`${id}-label`}
+          aria-describedby={field?.controlProps["aria-describedby"]}
+        />
+      </Primitive.Track>
+    </Primitive.Control>
   );
 }

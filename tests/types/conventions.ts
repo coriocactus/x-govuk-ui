@@ -74,7 +74,8 @@ type Elementless =
   | "CommandMenuPage"
   | "BubbleReactionPicker"
   | "ScrollAreaBars"
-  | "EditorAI";
+  | "EditorAI"
+  | "EditorRoot";
 
 export type WithoutClassName = None<
   {

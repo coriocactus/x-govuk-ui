@@ -1,8 +1,13 @@
 export {
   Editor,
+  EditorBox,
+  type EditorBoxProps,
+  EditorLabel,
   type EditorLinkPaste,
   type EditorMarkdownPaste,
   type EditorProps,
+  EditorRoot,
+  type EditorRootProps,
   type EditorUpload,
   type EditorUploadHelpers,
   type EditorValueFormat,

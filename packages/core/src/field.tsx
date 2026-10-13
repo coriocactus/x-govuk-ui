@@ -413,6 +413,25 @@ function BoundField({
   invalid,
   ...props
 }: ComponentPropsWithRef<"div"> & { invalid?: boolean; binding: Binding }) {
+  return (
+    <FieldBinding {...binding}>
+      <BoundBox {...props} invalid={invalid} />
+    </FieldBinding>
+  );
+}
+
+/** A bound Field's box, marked invalid when its field has an error, unless told otherwise. */
+function BoundBox({ invalid, ...props }: ComponentPropsWithRef<"div"> & { invalid?: boolean }) {
+  const field = useContext(FieldContext);
+  return <FieldBox {...props} invalid={invalid ?? field?.invalid} />;
+}
+
+/**
+ * Binds the parts inside to a control's id, as a bound Field does, without the Field's box. A part
+ * with a layout of its own, such as Switch's row, holds its bound parts in it.
+ * @internal
+ */
+export function FieldBinding({ children, ...binding }: Binding & { children: ReactNode }) {
   const field = useField({
     id: binding.id,
     name: binding.name,
@@ -423,11 +442,7 @@ function BoundField({
     answer: binding.answer,
     label: binding.label,
   });
-  return (
-    <FieldContext value={{ ...field, name: binding.name }}>
-      <FieldBox {...props} invalid={invalid ?? field.invalid} />
-    </FieldContext>
-  );
+  return <FieldContext value={{ ...field, name: binding.name }}>{children}</FieldContext>;
 }
 
 function FieldBox({
@@ -458,6 +473,27 @@ export function Label({ visuallyHidden = false, className = "", ...props }: Labe
     <label
       {...props}
       htmlFor={props.htmlFor ?? field?.id}
+      className={`x-govuk-ui-label${visuallyHidden ? " x-govuk-ui-visually-hidden" : ""} ${className}`.trim()}
+    />
+  );
+}
+
+/**
+ * A label that names its control through the control's `aria-labelledby`, by the label's own id,
+ * instead of by `for`. It suits a control that a label cannot be for, such as a box of prose or a
+ * slider's thumb. It looks as Label does, and gives its field its question.
+ * @internal
+ */
+export function NamingLabel({
+  visuallyHidden = false,
+  className = "",
+  ...props
+}: Omit<LabelProps, "htmlFor"> & { id: string }) {
+  useFieldSummary({ label: props.children });
+  return (
+    // biome-ignore lint/a11y/noLabelWithoutControl: The control names itself by the label's id.
+    <label
+      {...props}
       className={`x-govuk-ui-label${visuallyHidden ? " x-govuk-ui-visually-hidden" : ""} ${className}`.trim()}
     />
   );

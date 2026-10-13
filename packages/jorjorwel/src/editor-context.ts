@@ -132,12 +132,21 @@ export type UploadProgress = { progress: number; file: File; preview: string | n
 
 export type EditorShared = {
   editor: LexicalEditor;
-  /** The content's id, which the label names, and the label's own id. */
+  /**
+   * The content's id, which the label names, and the label's own id. These, what describes the
+   * content, whether it is invalid and whether it is capped come from the EditorBox around a part.
+   */
   id: string;
   labelId: string;
   /** What describes the content, which is the hint, the error and the count. */
   describedBy: string | undefined;
   invalid: boolean;
+  /** Whether a form was stopped because files are still uploading. */
+  waiting: boolean;
+  /** The name the document is sent under. */
+  name: string | undefined;
+  /** The count beneath the box, when the editor has a limit. */
+  count: { limit: number; unit: "character" | "word"; threshold: number } | null;
   required: boolean;
   placeholder: string | undefined;
   labels: EditorLabels;

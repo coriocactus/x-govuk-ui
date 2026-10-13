@@ -419,6 +419,8 @@ export function FormSteps({
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
   const [rows, setRows] = useState<Row[]>([]);
   const rememberSoon = useRef(0);
+  // Whether the answers are kept, which they are not while they are sent or once they are.
+  const keeping = useRef(true);
   // The fields each step asks, by the step's id and the field's name, as they register.
   const stepFields = useRef(new Map<string, Map<string, FormField>>());
   const [sent, setSent] = useState(false);
@@ -479,23 +481,23 @@ export function FormSteps({
 
   /**
    * Keeps the answers and the step, when there is a key. Keeping them now cancels keeping them a
-   * moment after typing.
+   * moment after a change. Answers being sent, or sent, are not kept, so a reload never brings back
+   * a form that has gone.
    */
   const remember = (where = at, passing = passed, skipping = skipped) => {
     window.clearTimeout(rememberSoon.current);
     rememberSoon.current = 0;
-    if (!storageKey || !form.current) return;
+    if (!keeping.current || !storageKey || !form.current) return;
     const data = new FormData(form.current);
     const answers = [...data.entries()].flatMap(([name, value]) =>
       typeof value === "string" ? [[name, value] as [string, string]] : [],
     );
     // A field that sends nothing is kept as empty, so it comes back empty. A field on a step that
     // was skipped or does not apply sends nothing because its answers are left out, so it is not
-    // kept, and comes back at its own default.
+    // kept, and comes back at its own default. The steps that apply are those the page shows, as
+    // drawn, so a step that a change has just brought in is not read before it can send.
     const live = new Set(
-      planFor()
-        .filter((index) => !skipping.has(index))
-        .map((index) => registered[index]?.id),
+      plan.filter((index) => !skipping.has(index)).map((index) => registered[index]?.id),
     );
     const names = new Set(
       [...stepFields.current]
@@ -513,20 +515,28 @@ export function FormSteps({
   };
 
   // Answers are kept a moment after the last change, once React has drawn it, such as in a hidden
-  // input that a control fills from its state. They are kept with the form as it is then, not as
-  // it was at the change. A page that closes or reloads within that moment, or a form that leaves
-  // it, keeps them at once.
-  const later = useLatest((andPlan: boolean) => {
-    if (andPlan) replan();
-    remember();
+  // input that a control fills from its state. The steps that apply are worked out again first,
+  // and the answers kept once those are drawn too. They are kept with the form as it is then, not
+  // as it was at the change. A page that closes or reloads within that moment, or a form that
+  // leaves it, keeps them at once, as they are drawn.
+  const [saving, setSaving] = useState(0);
+  const later = useLatest(() => {
+    replan();
+    setSaving((count) => count + 1);
   });
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are kept after the render that a change and its new steps cause.
+  useEffect(() => {
+    if (saving) remember();
+  }, [saving]);
+  const keepNow = useLatest(() => remember());
   const keepSoon = () => {
+    if (!keeping.current) return;
     window.clearTimeout(rememberSoon.current);
-    rememberSoon.current = window.setTimeout(() => later.current(true), 300);
+    rememberSoon.current = window.setTimeout(() => later.current(), 300);
   };
   useLayoutEffect(() => {
     const flush = () => {
-      if (rememberSoon.current) later.current(false);
+      if (rememberSoon.current) keepNow.current();
     };
     window.addEventListener("pagehide", flush);
     return () => {
@@ -669,6 +679,9 @@ export function FormSteps({
 
   const finish = async (data: FormData, skipping = skipped) => {
     const element = form.current;
+    window.clearTimeout(rememberSoon.current);
+    rememberSoon.current = 0;
+    keeping.current = false;
     if (!onComplete) {
       writeSaved(storageKey, null);
       element?.submit();
@@ -679,6 +692,7 @@ export function FormSteps({
     setBusy(false);
     const wrong = Object.entries(errors ?? {}).filter(([, message]) => present(message));
     if (wrong.length > 0) {
+      keeping.current = true;
       // The form goes back to the first step with something to fix.
       const first = plan.find((index) =>
         wrong.some(([name]) =>
@@ -868,6 +882,7 @@ export function FormSteps({
                 children={labels.change}
                 onClick={() => {
                   returning.current = true;
+                  keeping.current = true;
                   setSent(false);
                   go(row.step);
                   if (row.id) focusNext.current = `#${row.id}`;
@@ -989,7 +1004,10 @@ export function FormSteps({
         // service's own handlers do. A control that sends its value from a hidden input, such as a
         // slider or a toggle group, changes it with a key or a press, not with typing.
         onInput={both(givenInput, keepSoon)}
-        onChange={both(givenChange, () => replan())}
+        onChange={both(givenChange, () => {
+          replan();
+          keepSoon();
+        })}
         onClick={both(givenClick, keepSoon)}
         onKeyUp={both(givenKeyUp, keepSoon)}
       >

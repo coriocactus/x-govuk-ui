@@ -281,7 +281,7 @@ test("a survey that starts on a step in a wrapper goes back to it from Check you
   await expect(frame.getByRole("radio", { name: "GOV.UK" })).toBeChecked();
 });
 
-test("a remembered survey keeps a slider's value as it shows, and an answer given just before the page reloads", async ({
+test("a remembered survey keeps a slider's value as it shows, and an answer given just before the page reloads, and forgets them once sent", async ({
   page,
   frame,
   open,
@@ -318,4 +318,10 @@ test("a remembered survey keeps a slider's value as it shows, and an answer give
     frame.getByRole("slider", { name: "How easy was it, from 1 to 5?" }),
   ).toHaveAttribute("aria-valuenow", "4");
   await expect(frame.getByRole("radio", { name: "GOV.UK" })).toBeChecked();
+  // Once sent, the answers are gone from the browser, and the press that sent them, which would
+  // otherwise keep them a moment later, keeps nothing. The survey sends in less than that moment.
+  await frame.getByRole("button", { name: "Send feedback" }).click();
+  await expect(frame.getByText("Thank you for your feedback.")).toBeVisible();
+  await page.waitForTimeout(600);
+  expect(await page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback"))).toBeNull();
 });

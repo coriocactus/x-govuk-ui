@@ -270,12 +270,12 @@ test("an overlay opened during a tour covers its step, as the one opened last is
       const top = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
       return element.contains(top)
         ? "step"
-        : (top?.closest("[class*=x-govuk-ui-command]")?.className ?? "other");
+        : (top?.closest("[class*=x-govuk-ui-command-menu]")?.className ?? "other");
     });
   expect(await above()).toBe("step");
   await page.keyboard.press("ControlOrMeta+k");
   await expect(page.getByPlaceholder("Search components and actions…")).toBeFocused();
-  await expect.poll(above).toMatch(/x-govuk-ui-command/);
+  await expect.poll(above).toMatch(/x-govuk-ui-command-menu/);
 });
 
 test("a tour set to close on a press outside closes on the first one, and not when focus moves on", async ({

@@ -1,10 +1,10 @@
-.x-govuk-ui-otp-placeholder
+.x-govuk-ui-input-otp-placeholder
   display: block
   font-size: 24px
   font-weight: 400
   line-height: 1
   color: color(srgb 0.0431373 0.0470588 0.0470588 / 0.22)
-.x-govuk-ui-otp-separator
+.x-govuk-ui-input-otp-separator
   display: block
   font-size: 14px
   font-weight: 400
@@ -17,7 +17,7 @@
   border-top-right-radius: 1px
   border-bottom-right-radius: 1px
   border-bottom-left-radius: 1px
-.x-govuk-ui-otp-slot
+.x-govuk-ui-input-otp-slot
   display: grid
   font-size: 24px
   font-weight: 700
@@ -29,7 +29,7 @@
   border-bottom-right-radius: 11px
   border-bottom-left-radius: 11px
   box-shadow: color(srgb 0.0431373 0.0470588 0.0470588 / 0.07) 0px 0px 0px 1px inset
-.x-govuk-ui-otp-slots
+.x-govuk-ui-input-otp-slots
   display: flex
   font-size: 14px
   font-weight: 400

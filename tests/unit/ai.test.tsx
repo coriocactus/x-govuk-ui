@@ -124,7 +124,7 @@ test("conversation parts name each speaker, and the thinking status is plain for
   expect(html).toContain('<h3 class="x-govuk-ui-visually-hidden">Benefits assistant</h3>');
   expect(html).toContain('aria-label="Copy"');
   expect(html).toContain('role="status">Benefits assistant is writing a reply</span>');
-  expect(html).toContain('<p class="x-govuk-ui-thinking" aria-hidden="true">');
+  expect(html).toContain('<p class="x-govuk-ui-conversation-thinking" aria-hidden="true">');
   // A message's props and class go on its row, one element, as every part's do.
   const message = renderToStaticMarkup(
     <Conversation>
@@ -134,9 +134,9 @@ test("conversation parts name each speaker, and the thinking status is plain for
     </Conversation>,
   );
   expect(message).toMatch(
-    /<div class="x-govuk-ui-message-row mine"[^>]*data-turn="1"|<div data-turn="1"[^>]*class="x-govuk-ui-message-row mine"/,
+    /<div class="x-govuk-ui-conversation-message-row mine"[^>]*data-turn="1"|<div data-turn="1"[^>]*class="x-govuk-ui-conversation-message-row mine"/,
   );
-  expect(message).toContain('<article class="x-govuk-ui-message"');
+  expect(message).toContain('<article class="x-govuk-ui-conversation-message"');
 });
 
 test("the assistant thinks in plain words unless a service chooses livelier ones", () => {
@@ -240,7 +240,7 @@ test("a streaming message hides its content from screen readers and says a reply
   );
   expect(html).toMatch(/<article [^>]*aria-busy="true"/);
   expect(html).toContain('role="status">Benefits assistant is writing a reply</span>');
-  expect(html).toMatch(/class="x-govuk-ui-message-content" aria-hidden="true"/);
+  expect(html).toMatch(/class="x-govuk-ui-conversation-content" aria-hidden="true"/);
 });
 
 test("a conversation's messages are headed at the level it is given, and a quiet note is muted text", () => {
@@ -252,7 +252,7 @@ test("a conversation's messages are headed at the level it is given, and a quiet
     </Conversation>,
   );
   expect(html).toContain('<h4 class="x-govuk-ui-visually-hidden">Service assistant</h4>');
-  expect(html).toContain('<p class="x-govuk-ui-message-note">You stopped this reply.</p>');
+  expect(html).toContain('<p class="x-govuk-ui-conversation-note">You stopped this reply.</p>');
 });
 
 test("an empty conversation shows its start beside the log, not in it, with the composer at its foot", () => {

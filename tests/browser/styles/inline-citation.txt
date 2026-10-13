@@ -1,4 +1,4 @@
-.x-govuk-ui-citation
+.x-govuk-ui-inline-citation
   display: inline-flex
   font-size: 12px
   font-weight: 400
@@ -15,7 +15,7 @@
   border-top-right-radius: 10px
   border-bottom-right-radius: 10px
   border-bottom-left-radius: 10px
-.x-govuk-ui-citation-mark
+.x-govuk-ui-inline-citation-mark
   display: grid
   font-size: 9px
   font-weight: 700
@@ -26,13 +26,13 @@
   border-top-right-radius: 50%
   border-bottom-right-radius: 50%
   border-bottom-left-radius: 50%
-.x-govuk-ui-citation-more
+.x-govuk-ui-inline-citation-more
   display: block
   font-size: 12px
   font-weight: 400
   line-height: 1
   color: rgb(72, 73, 73)
-.x-govuk-ui-citation-site
+.x-govuk-ui-inline-citation-site
   display: block
   font-size: 12px
   font-weight: 400

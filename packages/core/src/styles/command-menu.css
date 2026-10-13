@@ -1,16 +1,16 @@
 /* Command menu. */
-.x-govuk-ui-command-popup {
+.x-govuk-ui-command-menu-popup {
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
 }
-.x-govuk-ui-command-backdrop {
+.x-govuk-ui-command-menu-backdrop {
   position: fixed;
   inset: 0;
   z-index: var(--x-govuk-ui-layer-overlay);
   background: rgb(11 12 12 / 44%);
   transition: opacity var(--x-govuk-ui-duration-fast) ease;
 }
-.x-govuk-ui-command-popup {
+.x-govuk-ui-command-menu-popup {
   position: fixed;
   inset-inline: 20px;
   top: 15%;
@@ -29,20 +29,20 @@
     transform var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
 }
 /* The dialog grows into place and shrinks away. */
-.x-govuk-ui-command-popup[data-starting-style] {
+.x-govuk-ui-command-menu-popup[data-starting-style] {
   opacity: 0;
   transform: translateY(-4px) scale(0.96);
 }
-.x-govuk-ui-command-popup[data-ending-style] {
+.x-govuk-ui-command-menu-popup[data-ending-style] {
   opacity: 0;
   transform: scale(0.97);
   transition-duration: var(--x-govuk-ui-duration-fast);
 }
-.x-govuk-ui-command-backdrop[data-starting-style],
-.x-govuk-ui-command-backdrop[data-ending-style] {
+.x-govuk-ui-command-menu-backdrop[data-starting-style],
+.x-govuk-ui-command-menu-backdrop[data-ending-style] {
   opacity: 0;
 }
-.x-govuk-ui-command-search {
+.x-govuk-ui-command-menu-search {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -53,12 +53,12 @@
 }
 /* While typing, the whole search area shows GOV.UK's focus pair, yellow outside and dark inside.
    Both are drawn inside the area, so the ring stops at the results. */
-.x-govuk-ui-command-search:has(.x-govuk-ui-command-input:focus) {
+.x-govuk-ui-command-menu-search:has(.x-govuk-ui-command-menu-input:focus) {
   box-shadow:
     inset 0 0 0 3px var(--x-govuk-ui-focus),
     inset 0 0 0 5px var(--x-govuk-ui-focus-text);
 }
-.x-govuk-ui-command-input {
+.x-govuk-ui-command-menu-input {
   flex: 1;
   min-width: 0;
   width: 100%;
@@ -69,10 +69,10 @@
   font: 16px / 1.5 var(--x-govuk-ui-font);
   outline: none;
 }
-.x-govuk-ui-command-input::placeholder {
+.x-govuk-ui-command-menu-input::placeholder {
   color: var(--x-govuk-ui-placeholder);
 }
-.x-govuk-ui-command-close {
+.x-govuk-ui-command-menu-close {
   align-self: center;
   padding: 5px 7px;
   border: 1px solid var(--x-govuk-ui-line);
@@ -85,37 +85,40 @@
 /* The list scrolls in a Scroll area. The component sets the area's height to follow its commands,
    and the height eases between sizes. Its scrollbar floats over the edge, so the list's width never
    changes. The highlight is placed in the viewport. */
-.x-govuk-ui-command-scroll {
+.x-govuk-ui-command-menu-scroll {
   box-sizing: border-box;
   transition: height var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
 }
-.x-govuk-ui-command-scroll > .x-govuk-ui-scroll-area-viewport {
+.x-govuk-ui-command-menu-scroll > .x-govuk-ui-scroll-area-viewport {
   position: relative;
 }
-.x-govuk-ui-command-scroll > .x-govuk-ui-scroll-area-viewport > .x-govuk-ui-scroll-area-content {
+.x-govuk-ui-command-menu-scroll
+  > .x-govuk-ui-scroll-area-viewport
+  > .x-govuk-ui-scroll-area-content {
   padding: 7px;
 }
 /* On moving to another page, the commands fade up from half opacity, while the dialog pulses
    slightly. The commands that are there when the menu opens arrive with the dialog. */
-.x-govuk-ui-command-page[data-navigated] {
-  animation: x-govuk-ui-command-page-in var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+.x-govuk-ui-command-menu-page[data-navigated] {
+  animation: x-govuk-ui-command-menu-page-in var(--x-govuk-ui-duration-medium)
+    var(--x-govuk-ui-ease-out);
 }
-@keyframes x-govuk-ui-command-page-in {
+@keyframes x-govuk-ui-command-menu-page-in {
   from {
     opacity: 0.5;
   }
 }
 
-.x-govuk-ui-command-group + .x-govuk-ui-command-group,
-.x-govuk-ui-command-item + .x-govuk-ui-command-group {
+.x-govuk-ui-command-menu-group + .x-govuk-ui-command-menu-group,
+.x-govuk-ui-command-menu-item + .x-govuk-ui-command-menu-group {
   margin-top: 6px;
 }
 /* A group with no matching commands gives way. */
-.x-govuk-ui-command-group:not(:has(.x-govuk-ui-command-item)) {
+.x-govuk-ui-command-menu-group:not(:has(.x-govuk-ui-command-menu-item)) {
   display: none;
 }
 /* Labels sit above the highlight, so it glides behind them, as in the Sidebar. */
-.x-govuk-ui-command-group-label {
+.x-govuk-ui-command-menu-group-label {
   position: relative;
   z-index: 1;
   padding: 8px 13px 4px;
@@ -125,7 +128,7 @@
   line-height: 1.5;
 }
 /* The trail of pages above the commands. Earlier pages are buttons that go back to them. */
-.x-govuk-ui-command-crumbs {
+.x-govuk-ui-command-menu-crumbs {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -134,12 +137,12 @@
   font-size: 13px;
   line-height: 1.5;
 }
-.x-govuk-ui-command-crumbs > * + *::before {
+.x-govuk-ui-command-menu-crumbs > * + *::before {
   content: "›";
   margin-inline: 4px 6px;
   color: var(--x-govuk-ui-muted);
 }
-.x-govuk-ui-command-crumbs button {
+.x-govuk-ui-command-menu-crumbs button {
   padding: 2px 4px;
   border: 0;
   border-radius: 3px;
@@ -150,22 +153,22 @@
   text-underline-offset: 3px;
   cursor: pointer;
 }
-.x-govuk-ui-command-crumbs button:hover {
+.x-govuk-ui-command-menu-crumbs button:hover {
   text-decoration-thickness: 2px;
 }
-.x-govuk-ui-command-crumbs button:focus-visible {
+.x-govuk-ui-command-menu-crumbs button:focus-visible {
   outline: 3px solid transparent;
   background: var(--x-govuk-ui-focus);
   color: var(--x-govuk-ui-focus-text);
   box-shadow: 0 2px var(--x-govuk-ui-focus-text);
   text-decoration: none;
 }
-.x-govuk-ui-command-crumbs [aria-current] {
+.x-govuk-ui-command-menu-crumbs [aria-current] {
   padding: 2px 4px;
   font-weight: 700;
 }
 /* One highlight slides to the active command, like the workbench's navigation indicator. */
-.x-govuk-ui-command-indicator {
+.x-govuk-ui-command-menu-indicator {
   position: absolute;
   top: 0;
   inset-inline: 7px;
@@ -181,7 +184,7 @@
     height var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out),
     opacity var(--x-govuk-ui-duration-instant) ease;
 }
-.x-govuk-ui-command-item {
+.x-govuk-ui-command-menu-item {
   position: relative;
   z-index: 1;
   display: flex;
@@ -193,55 +196,55 @@
   line-height: 1.4;
   cursor: pointer;
 }
-.x-govuk-ui-command-item[data-disabled] {
+.x-govuk-ui-command-menu-item[data-disabled] {
   opacity: 0.55;
   cursor: not-allowed;
 }
-.x-govuk-ui-command-icon {
+.x-govuk-ui-command-menu-icon {
   display: grid;
   flex-shrink: 0;
   color: var(--x-govuk-ui-muted);
 }
-.x-govuk-ui-command-text {
+.x-govuk-ui-command-menu-text {
   display: grid;
   flex: 1;
   gap: 2px;
   min-width: 0;
 }
-.x-govuk-ui-command-item > .x-govuk-ui-kbd,
-.x-govuk-ui-command-more {
+.x-govuk-ui-command-menu-item > .x-govuk-ui-kbd,
+.x-govuk-ui-command-menu-more {
   flex-shrink: 0;
   color: var(--x-govuk-ui-muted);
 }
-.x-govuk-ui-command-description,
-.x-govuk-ui-command-help,
-.x-govuk-ui-command-empty {
+.x-govuk-ui-command-menu-description,
+.x-govuk-ui-command-menu-help,
+.x-govuk-ui-command-menu-empty {
   color: var(--x-govuk-ui-muted);
   font-size: 13px;
   line-height: 1.6;
 }
-.x-govuk-ui-command-help {
+.x-govuk-ui-command-menu-help {
   margin: 0;
   padding: 12px 17px;
   border-top: 1px solid var(--x-govuk-ui-line);
 }
-.x-govuk-ui-command-empty {
+.x-govuk-ui-command-menu-empty {
   padding: 17px;
 }
-.x-govuk-ui-command-empty:empty {
+.x-govuk-ui-command-menu-empty:empty {
   display: none;
 }
-.x-govuk-ui-command-close:focus-visible {
+.x-govuk-ui-command-menu-close:focus-visible {
   outline: 3px solid var(--x-govuk-ui-focus);
   outline-offset: 3px;
 }
 @media (forced-colors: active) {
-  .x-govuk-ui-command-indicator {
+  .x-govuk-ui-command-menu-indicator {
     outline: 2px solid Highlight;
   }
 }
 /* The trigger shows its shortcut after the label. */
-.x-govuk-ui-command-trigger .x-govuk-ui-button-label {
+.x-govuk-ui-command-menu-trigger .x-govuk-ui-button-label {
   display: inline-flex;
   align-items: center;
   gap: 12px;

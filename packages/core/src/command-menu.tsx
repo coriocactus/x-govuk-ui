@@ -85,8 +85,8 @@ function followHeight(scroller: HTMLDivElement | null) {
  */
 function followScroller(viewport: HTMLDivElement | null) {
   const highlight = trackHighlight(viewport, {
-    indicator: ".x-govuk-ui-command-indicator",
-    item: ".x-govuk-ui-command-item[data-highlighted]",
+    indicator: ".x-govuk-ui-command-menu-indicator",
+    item: ".x-govuk-ui-command-menu-item[data-highlighted]",
   });
   const height = followHeight(viewport);
   return () => {
@@ -349,7 +349,7 @@ export function CommandMenuTrigger({
         <Button
           variant="outline"
           {...props}
-          className={`x-govuk-ui-command-trigger ${className}`.trim()}
+          className={`x-govuk-ui-command-menu-trigger ${className}`.trim()}
         />
       }
       disabled={disabled}
@@ -401,21 +401,21 @@ export function CommandMenuContent({
   const placeholder = ownPlaceholder ?? labels.search;
   return (
     <Dialog.Portal>
-      <Dialog.Backdrop className="x-govuk-ui-command-backdrop" />
+      <Dialog.Backdrop className="x-govuk-ui-command-menu-backdrop" />
       <Dialog.Popup
         ref={popup}
         {...props}
-        className={`x-govuk-ui-command-popup ${className}`.trim()}
+        className={`x-govuk-ui-command-menu-popup ${className}`.trim()}
         // SoundScope plays the command cue for its options.
         data-sound-list="command"
         initialFocus={input}
         finalFocus={finalFocus}
       >
         <Dialog.Title className="x-govuk-ui-visually-hidden">{labels.commands}</Dialog.Title>
-        <div className="x-govuk-ui-command-search">
+        <div className="x-govuk-ui-command-menu-search">
           <Autocomplete.Input
             ref={input}
-            className="x-govuk-ui-command-input"
+            className="x-govuk-ui-command-menu-input"
             placeholder={current?.placeholder ?? placeholder}
             aria-label={(current?.placeholder ?? placeholder).replace(/…$/, "")}
             onKeyDown={(event) => {
@@ -426,7 +426,7 @@ export function CommandMenuContent({
             }}
           />
           <Dialog.Close
-            className="x-govuk-ui-command-close"
+            className="x-govuk-ui-command-menu-close"
             aria-label={labels.close}
             data-sound="close"
           >
@@ -434,7 +434,7 @@ export function CommandMenuContent({
           </Dialog.Close>
         </div>
         {stack.length > 0 && (
-          <div className="x-govuk-ui-command-crumbs">
+          <div className="x-govuk-ui-command-menu-crumbs">
             <button type="button" onClick={() => back(0)}>
               {labels.home}
             </button>
@@ -455,20 +455,20 @@ export function CommandMenuContent({
           {current?.label ?? ""}
         </span>
         {open && visible.length === 0 && order.length > 0 && (
-          <p className="x-govuk-ui-command-empty">{labels.empty}</p>
+          <p className="x-govuk-ui-command-menu-empty">{labels.empty}</p>
         )}
         <ScrollArea
           viewportRef={followScroller}
           label={current?.label ?? labels.commands}
-          className="x-govuk-ui-command-scroll"
+          className="x-govuk-ui-command-menu-scroll"
           fade
         >
-          <span className="x-govuk-ui-command-indicator" aria-hidden="true" />
-          <Autocomplete.List ref={list} className="x-govuk-ui-command-list">
+          <span className="x-govuk-ui-command-menu-indicator" aria-hidden="true" />
+          <Autocomplete.List ref={list} className="x-govuk-ui-command-menu-list">
             {/* Keyed by page, so each page slides in from the side it was opened from. */}
             <div
               key={page ?? ""}
-              className="x-govuk-ui-command-page"
+              className="x-govuk-ui-command-menu-page"
               data-navigated={navigated || undefined}
             >
               {children}
@@ -476,7 +476,7 @@ export function CommandMenuContent({
           </Autocomplete.List>
           <TrackOrder list={list} onOrder={setOrder} />
         </ScrollArea>
-        <p className="x-govuk-ui-command-help">
+        <p className="x-govuk-ui-command-menu-help">
           {labels.help}
           {stack.length > 0 && ` ${labels.helpBack}`}
         </p>
@@ -522,8 +522,8 @@ export function CommandMenuGroup({
   ...props
 }: CommandMenuGroupProps) {
   return (
-    <Autocomplete.Group {...props} className={`x-govuk-ui-command-group ${className}`.trim()}>
-      <Autocomplete.GroupLabel className="x-govuk-ui-command-group-label">
+    <Autocomplete.Group {...props} className={`x-govuk-ui-command-menu-group ${className}`.trim()}>
+      <Autocomplete.GroupLabel className="x-govuk-ui-command-menu-group-label">
         {label}
       </Autocomplete.GroupLabel>
       {children}
@@ -584,22 +584,22 @@ export function CommandMenuItem({
       {...props}
       value={id}
       disabled={disabled}
-      className={`x-govuk-ui-command-item ${className}`.trim()}
+      className={`x-govuk-ui-command-menu-item ${className}`.trim()}
       data-command={id}
       onClick={() => menu.choose(opens, onSelect)}
     >
       {icon && (
-        <span className="x-govuk-ui-command-icon" aria-hidden="true">
+        <span className="x-govuk-ui-command-menu-icon" aria-hidden="true">
           {icon}
         </span>
       )}
-      <span className="x-govuk-ui-command-text">
+      <span className="x-govuk-ui-command-menu-text">
         <span>{children}</span>
-        {description && <span className="x-govuk-ui-command-description">{description}</span>}
+        {description && <span className="x-govuk-ui-command-menu-description">{description}</span>}
       </span>
       {opens ? (
         <svg
-          className="x-govuk-ui-command-more"
+          className="x-govuk-ui-command-menu-more"
           viewBox="0 0 16 16"
           width="16"
           height="16"

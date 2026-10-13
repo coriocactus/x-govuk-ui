@@ -63,13 +63,13 @@ function SiteMark({ source }: { source: CitationSource }) {
   // The mark is decoration. The site's name is always beside it.
   if (source.icon)
     return (
-      <span className="x-govuk-ui-citation-mark" aria-hidden="true">
+      <span className="x-govuk-ui-inline-citation-mark" aria-hidden="true">
         {source.icon}
       </span>
     );
   if (source.crown ?? (source.url !== undefined && hostOf(source.url).endsWith("gov.uk")))
     return (
-      <span className="x-govuk-ui-citation-mark" aria-hidden="true">
+      <span className="x-govuk-ui-inline-citation-mark" aria-hidden="true">
         <GovukCrown />
       </span>
     );
@@ -77,7 +77,7 @@ function SiteMark({ source }: { source: CitationSource }) {
   const tint =
     tints[[...site].reduce((sum, letter) => sum + letter.charCodeAt(0), 0) % tints.length];
   return (
-    <span className="x-govuk-ui-citation-mark" data-tint={tint} aria-hidden="true">
+    <span className="x-govuk-ui-inline-citation-mark" data-tint={tint} aria-hidden="true">
       {site.charAt(0).toUpperCase()}
     </span>
   );
@@ -91,7 +91,7 @@ function CitationTitle({ source }: { source: CitationSource }) {
     render: plain ? undefined : source.render,
     props: {
       href: source.url,
-      className: "x-govuk-ui-citation-title",
+      className: "x-govuk-ui-inline-citation-title",
       "data-plain": plain ? "" : undefined,
       children: source.title,
     },
@@ -158,13 +158,13 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
         {...props}
         openOnHover
         delay={200}
-        className={`x-govuk-ui-citation ${className}`.trim()}
+        className={`x-govuk-ui-inline-citation ${className}`.trim()}
         data-copy="skip"
         aria-label={more ? `Sources: ${site} and ${more} more` : `Source: ${site}`}
       >
         <SiteMark source={first} />
-        <span className="x-govuk-ui-citation-site">{site}</span>
-        {more > 0 && <span className="x-govuk-ui-citation-more">+{more}</span>}
+        <span className="x-govuk-ui-inline-citation-site">{site}</span>
+        {more > 0 && <span className="x-govuk-ui-inline-citation-more">+{more}</span>}
       </Primitive.Trigger>
       <Primitive.Portal>
         <Primitive.Positioner
@@ -175,13 +175,13 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
           collisionPadding={8}
         >
           <Primitive.Popup
-            className="x-govuk-ui-floating x-govuk-ui-citation-card"
+            className="x-govuk-ui-floating x-govuk-ui-inline-citation-card"
             aria-label={more ? words.sources : words.source}
             // Focus moves in when the card opens from the keyboard or a touch, not from hovering.
             initialFocus={(type) => type !== "mouse"}
           >
             {more > 0 && (
-              <div className="x-govuk-ui-citation-nav">
+              <div className="x-govuk-ui-inline-citation-nav">
                 <Button
                   variant="quiet"
                   size="small-icon"
@@ -198,7 +198,7 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
                 >
                   {arrow("m6 3 5 5-5 5")}
                 </Button>
-                <span className="x-govuk-ui-citation-count" aria-live="polite">
+                <span className="x-govuk-ui-inline-citation-count" aria-live="polite">
                   <span className="x-govuk-ui-visually-hidden">Source </span>
                   {index + 1}
                   <span aria-hidden="true">/</span>
@@ -209,19 +209,21 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
             )}
             <div
               key={index}
-              className="x-govuk-ui-citation-source"
+              className="x-govuk-ui-inline-citation-source"
               data-direction={directionOf(direction)}
             >
-              <span className="x-govuk-ui-citation-from">
+              <span className="x-govuk-ui-inline-citation-from">
                 <SiteMark source={shown} />
                 {siteOf(shown)}
               </span>
               <CitationTitle source={shown} />
-              {shown.detail && <span className="x-govuk-ui-citation-detail">{shown.detail}</span>}
-              {shown.description && (
-                <span className="x-govuk-ui-citation-description">{shown.description}</span>
+              {shown.detail && (
+                <span className="x-govuk-ui-inline-citation-detail">{shown.detail}</span>
               )}
-              {shown.date && <span className="x-govuk-ui-citation-date">{shown.date}</span>}
+              {shown.description && (
+                <span className="x-govuk-ui-inline-citation-description">{shown.description}</span>
+              )}
+              {shown.date && <span className="x-govuk-ui-inline-citation-date">{shown.date}</span>}
             </div>
           </Primitive.Popup>
         </Primitive.Positioner>

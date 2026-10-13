@@ -280,7 +280,7 @@ test("a command menu's list, once it scrolls, is a region named for its commands
   const list = page.getByRole("region", { name: "Commands" });
   await expect(list).toBeVisible();
   const { violations } = await new AxeBuilder({ page })
-    .include(".x-govuk-ui-command-popup")
+    .include(".x-govuk-ui-command-menu-popup")
     .withRules(["scrollable-region-focusable"])
     .analyze();
   expect(violations).toEqual([]);

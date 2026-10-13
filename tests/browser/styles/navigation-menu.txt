@@ -1,22 +1,22 @@
-.x-govuk-ui-navigation
+.x-govuk-ui-navigation-menu
   display: block
   font-size: 14px
   font-weight: 400
   line-height: 1.5
   color: rgb(11, 12, 12)
-.x-govuk-ui-navigation-icon
+.x-govuk-ui-navigation-menu-icon
   display: flex
   font-size: 15px
   font-weight: 700
   line-height: 1.5
   color: rgb(26, 101, 166)
-.x-govuk-ui-navigation-item
+.x-govuk-ui-navigation-menu-item
   display: list-item
   font-size: 14px
   font-weight: 400
   line-height: 1.5
   color: rgb(11, 12, 12)
-.x-govuk-ui-navigation-link
+.x-govuk-ui-navigation-menu-link
   display: flex
   font-size: 15px
   font-weight: 700
@@ -32,7 +32,7 @@
   border-top-right-radius: 5px
   border-bottom-right-radius: 5px
   border-bottom-left-radius: 5px
-.x-govuk-ui-navigation-list
+.x-govuk-ui-navigation-menu-list
   display: flex
   font-size: 14px
   font-weight: 400
@@ -40,7 +40,7 @@
   color: rgb(11, 12, 12)
   row-gap: 4px
   column-gap: 4px
-.x-govuk-ui-navigation-trigger
+.x-govuk-ui-navigation-menu-trigger
   display: flex
   font-size: 15px
   font-weight: 700

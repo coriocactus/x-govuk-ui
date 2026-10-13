@@ -6,6 +6,14 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Renamed the classes of five components to start with the component's name, as every other component's do, so a class says which component it belongs to:
+  - Command menu's `x-govuk-ui-command-*` classes are now `x-govuk-ui-command-menu-*`, such as `x-govuk-ui-command-menu-item`.
+  - Navigation menu's `x-govuk-ui-navigation` and `x-govuk-ui-navigation-*` are now `x-govuk-ui-navigation-menu` and `x-govuk-ui-navigation-menu-*`.
+  - Inline citation's `x-govuk-ui-citation` and `x-govuk-ui-citation-*` are now `x-govuk-ui-inline-citation` and `x-govuk-ui-inline-citation-*`.
+  - One-time code's `x-govuk-ui-otp` and `x-govuk-ui-otp-*` are now `x-govuk-ui-input-otp` and `x-govuk-ui-input-otp-*`.
+  - Conversation's `x-govuk-ui-message`, `x-govuk-ui-message-row`, `x-govuk-ui-message-content`, `x-govuk-ui-message-actions`, `x-govuk-ui-message-note`, `x-govuk-ui-thinking` and `x-govuk-ui-thinking-word` are now `x-govuk-ui-conversation-message`, `x-govuk-ui-conversation-message-row`, `x-govuk-ui-conversation-content`, `x-govuk-ui-conversation-actions`, `x-govuk-ui-conversation-note`, `x-govuk-ui-conversation-thinking` and `x-govuk-ui-conversation-thinking-word`, after the parts that draw them.
+
+  Rename them in your own styles.
 - Changed CommandMenu to be built from parts, as Dialog is. CommandMenu keeps its state, `keyboardShortcut`, `disabled` and `labels`. Its dialog is now CommandMenuContent, which holds the groups and takes `placeholder` and `finalFocus`. Its button is CommandMenuTrigger, which takes `render` for another element, in place of the `trigger` prop. Leave the trigger out when something else opens the menu. Write `<CommandMenu><CommandMenuTrigger /><CommandMenuContent>…</CommandMenuContent></CommandMenu>`.
 - Changed Callout to be built from parts, as Popover is. Callout keeps its state, its `anchor` and `closeOnPressOutside`. Its card is now CalloutContent, which takes `title`, `actions`, `variant`, `side`, `align`, `timeout`, `countdown`, `closeButton`, `labels` and the card's other props. CalloutTrigger goes inside Callout, in place of its `trigger` prop, and takes `render` for another element, as the other triggers do. Write `<Callout><CalloutTrigger label="…" /><CalloutContent title="…">…</CalloutContent></Callout>`.
 - Changed ServicePage's `footerLinks` to take FooterLink parts, in place of a list of labels and addresses, so a router's link can be one. It no longer shows GOV.UK's support links at placeholder addresses, such as `#help`, when it is given none. Give your service's own. `ServicePageLink` is removed.
@@ -30,7 +38,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed Footer to take its navigation in `navigation`, as `FooterSection` parts, in place of finding FooterSection among its children. A FooterSection among its children now stays with the support links. Move each FooterSection into `navigation`.
 - Changed FormSteps' Check your answers to list the fields that take part in its Form, each with the question and answer the field gives. The library's fields take part, as does a field of your own in a Field with `controlId` and `name`, or one that calls `useField` with a `name`. A plain input of your own, outside such a field, is no longer listed. Put it in a bound Field, or give its step a `summary`.
 - Changed ConversationMessage, ConversationThinking, MessageScrollerItem and CookieBanner to take an element's props, as every other part does, in place of Motion's. Their types no longer take Motion's props, such as `animate`, `whileHover` or a `style` of motion values. To animate one of them, wrap it in a Motion element of your own. `onAnimationStart`, `onDrag`, `onDragStart` and `onDragEnd` are now the DOM's events, as on any element.
-- Changed ConversationMessage to put its `className` on the message's row, where its other props already go, in place of the `article` inside. A rule that styled the message through the class should now select `.x-govuk-ui-message` inside it.
+- Changed ConversationMessage to put its `className` on the message's row, where its other props already go, in place of the `article` inside. A rule that styled the message through the class should now select `.x-govuk-ui-conversation-message` inside it.
 - Changed `small` on Radios and Checkboxes to `size`, `"medium"` or `"small"`, as other parts name their size. Give `size="small"` instead of `small`. The list's `data-small` attribute is now `data-size="small"`.
 
 ### Added

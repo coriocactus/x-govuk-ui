@@ -78,7 +78,7 @@ export function InputOTP({
         maxLength={maxLength}
         // SoundScope plays a key's sound as each digit is typed.
         data-sound-typing=""
-        containerClassName={`x-govuk-ui-otp ${containerClassName}`.trim()}
+        containerClassName={`x-govuk-ui-input-otp ${containerClassName}`.trim()}
         aria-busy={verifying || undefined}
         render={({ slots, isFocused }) => {
           const complete = slots.every((slot) => slot.char !== null);
@@ -89,7 +89,7 @@ export function InputOTP({
           const caret = isFocused && active === 1 && !complete && !verifying && !success;
           return (
             <div
-              className="x-govuk-ui-otp-slots"
+              className="x-govuk-ui-input-otp-slots"
               aria-hidden="true"
               dir="ltr"
               data-invalid={field.invalid || undefined}
@@ -101,17 +101,17 @@ export function InputOTP({
               {slots.map((slot, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: Each OTP slot is identified by its fixed digit position.
                 <Fragment key={index}>
-                  {index === groupAt && <span className="x-govuk-ui-otp-separator" />}
+                  {index === groupAt && <span className="x-govuk-ui-input-otp-separator" />}
                   <span
-                    className="x-govuk-ui-otp-slot"
+                    className="x-govuk-ui-input-otp-slot"
                     data-selected={(active > 1 && slot.isActive) || undefined}
                     data-filled={slot.char !== null || undefined}
-                    style={{ "--x-govuk-ui-otp-index": index } as CSSProperties}
+                    style={{ "--x-govuk-ui-input-otp-index": index } as CSSProperties}
                   >
                     {caret && slot.isActive && (
                       <motion.span
                         layoutId={`${field.id}-ring`}
-                        className="x-govuk-ui-otp-ring"
+                        className="x-govuk-ui-input-otp-ring"
                         transition={timing.spring(springs.hop)}
                       />
                     )}
@@ -119,7 +119,7 @@ export function InputOTP({
                       {slot.char !== null ? (
                         <motion.span
                           key={`char-${slot.char}`}
-                          className="x-govuk-ui-otp-char"
+                          className="x-govuk-ui-input-otp-char"
                           initial={{ opacity: 0, y: 10, scale: 0.8, filter: "blur(3px)" }}
                           animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
                           // Cleared together, the digits leave from the last back to the first,
@@ -145,7 +145,7 @@ export function InputOTP({
                         placeholder[index] && (
                           <motion.span
                             key="placeholder"
-                            className="x-govuk-ui-otp-placeholder"
+                            className="x-govuk-ui-input-otp-placeholder"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}

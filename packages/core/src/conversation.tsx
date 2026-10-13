@@ -262,14 +262,14 @@ export function ConversationMessage({
     <MessageContext value={{ from, content, streaming }}>
       <motion.div
         {...motionElementProps(props)}
-        className={`x-govuk-ui-message-row ${className}`.trim()}
+        className={`x-govuk-ui-conversation-message-row ${className}`.trim()}
         data-role={from}
         data-message=""
         data-sound-enter={from === "assistant" ? "notification" : undefined}
         {...arrival}
       >
         <motion.article
-          className="x-govuk-ui-message"
+          className="x-govuk-ui-conversation-message"
           data-role={from}
           aria-busy={streaming || undefined}
           initial={{ scale: 0.86, x: from === "user" ? 14 : -14, filter: "blur(2px)" }}
@@ -305,7 +305,7 @@ export function ConversationMessage({
  */
 export function ConversationContent({ className = "", ...props }: ComponentPropsWithRef<"div">) {
   const message = useMessage("ConversationContent");
-  const classes = `x-govuk-ui-message-content ${className}`.trim();
+  const classes = `x-govuk-ui-conversation-content ${className}`.trim();
   if (message.from === "user")
     return (
       <Bubble variant="secondary" align="end">
@@ -330,7 +330,7 @@ export function ConversationContent({ className = "", ...props }: ComponentProps
  */
 export function ConversationNote({ className = "", ...props }: ComponentPropsWithRef<"p">) {
   useMessage("ConversationNote");
-  return <p {...props} className={`x-govuk-ui-message-note ${className}`.trim()} />;
+  return <p {...props} className={`x-govuk-ui-conversation-note ${className}`.trim()} />;
 }
 
 /**
@@ -342,7 +342,9 @@ export function ConversationNote({ className = "", ...props }: ComponentPropsWit
  */
 export function ConversationActions({ className = "", ...props }: ComponentPropsWithRef<"div">) {
   useMessage("ConversationActions");
-  return <MessageActions {...props} className={`x-govuk-ui-message-actions ${className}`.trim()} />;
+  return (
+    <MessageActions {...props} className={`x-govuk-ui-conversation-actions ${className}`.trim()} />
+  );
 }
 
 export type ConversationCopyProps = Omit<CopyButtonProps, "text">;
@@ -390,15 +392,15 @@ export function ConversationThinking({
   return (
     <motion.div
       {...motionElementProps(props)}
-      className={`x-govuk-ui-message-row ${className}`.trim()}
+      className={`x-govuk-ui-conversation-message-row ${className}`.trim()}
       data-role="assistant"
       {...arrival}
     >
-      <p className="x-govuk-ui-thinking" aria-hidden="true">
+      <p className="x-govuk-ui-conversation-thinking" aria-hidden="true">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
             key={word}
-            className="x-govuk-ui-thinking-word"
+            className="x-govuk-ui-conversation-thinking-word"
             initial={{ opacity: 0, y: 8, filter: "blur(3px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: -8, filter: "blur(3px)" }}

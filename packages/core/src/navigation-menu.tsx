@@ -53,21 +53,21 @@ export function NavigationMenu({
       <Primitive.Root
         {...props}
         aria-label={label}
-        className={`x-govuk-ui-navigation ${className}`.trim()}
+        className={`x-govuk-ui-navigation-menu ${className}`.trim()}
         delay={delay}
         closeDelay={closeDelay}
       >
-        <Primitive.List className="x-govuk-ui-navigation-list">{children}</Primitive.List>
+        <Primitive.List className="x-govuk-ui-navigation-menu-list">{children}</Primitive.List>
         {/* Portalled to the body, so the panel overlays the page and avoids only the
             window's edges. */}
         <Primitive.Portal>
           <Primitive.Positioner
             sideOffset={8}
             align="start"
-            className="x-govuk-ui-navigation-positioner"
+            className="x-govuk-ui-navigation-menu-positioner"
           >
-            <Primitive.Popup className="x-govuk-ui-navigation-popup" aria-label={label}>
-              <Primitive.Viewport className="x-govuk-ui-navigation-viewport" />
+            <Primitive.Popup className="x-govuk-ui-navigation-menu-popup" aria-label={label}>
+              <Primitive.Viewport className="x-govuk-ui-navigation-menu-viewport" />
             </Primitive.Popup>
           </Primitive.Positioner>
         </Primitive.Portal>
@@ -93,7 +93,7 @@ export function NavigationMenuItem({
     <Primitive.Item
       {...props}
       value={value}
-      className={`x-govuk-ui-navigation-item ${className}`.trim()}
+      className={`x-govuk-ui-navigation-menu-item ${className}`.trim()}
     >
       {children}
     </Primitive.Item>
@@ -112,11 +112,11 @@ export function NavigationMenuTrigger({
   return (
     <Primitive.Trigger
       {...props}
-      className={`x-govuk-ui-navigation-trigger ${className}`.trim()}
+      className={`x-govuk-ui-navigation-menu-trigger ${className}`.trim()}
       disabled={disabled}
     >
       {children}
-      <Primitive.Icon className="x-govuk-ui-navigation-icon">
+      <Primitive.Icon className="x-govuk-ui-navigation-menu-icon">
         <ChevronIcon />
       </Primitive.Icon>
     </Primitive.Trigger>
@@ -132,8 +132,11 @@ export function NavigationMenuContent({
   ...props
 }: NavigationMenuContentProps) {
   return (
-    <Primitive.Content {...props} className={`x-govuk-ui-navigation-content ${className}`.trim()}>
-      <ul className="x-govuk-ui-navigation-links">
+    <Primitive.Content
+      {...props}
+      className={`x-govuk-ui-navigation-menu-content ${className}`.trim()}
+    >
+      <ul className="x-govuk-ui-navigation-menu-links">
         <InPanel value={true}>{children}</InPanel>
       </ul>
     </Primitive.Content>
@@ -168,7 +171,7 @@ export function NavigationMenuLink({
   const link = (
     <Primitive.Link
       {...props}
-      className={`x-govuk-ui-navigation-link ${className}`.trim()}
+      className={`x-govuk-ui-navigation-menu-link ${className}`.trim()}
       href={disabled ? undefined : href}
       aria-disabled={disabled || undefined}
       active={current}
@@ -176,7 +179,7 @@ export function NavigationMenuLink({
       rel={rel ?? (target === "_blank" ? "noreferrer" : undefined)}
     >
       <span>{children}</span>
-      {description && <span className="x-govuk-ui-navigation-description">{description}</span>}
+      {description && <span className="x-govuk-ui-navigation-menu-description">{description}</span>}
     </Primitive.Link>
   );
   return inPanel ? <li>{link}</li> : link;

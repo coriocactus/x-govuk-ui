@@ -14,7 +14,7 @@ test("a conversation reply works through its steps, streams, cites and can be st
   await expect(tip).toBeVisible();
   const composer = frame.locator(".x-govuk-ui-chat-input");
   const conversation = frame.locator(".x-govuk-ui-conversation");
-  await expect(frame.locator(".x-govuk-ui-message")).toHaveCount(0);
+  await expect(frame.locator(".x-govuk-ui-conversation-message")).toHaveCount(0);
   expect(Math.abs((await middleOf(composer)) - (await middleOf(conversation)))).toBeLessThan(2);
   // A file attaches as a chip, which can be removed, and is sent with the message.
   const file = { name: "passport.pdf", mimeType: "application/pdf", buffer: Buffer.alloc(1024) };
@@ -108,8 +108,8 @@ test("a reply streamed as Markdown is hidden from screen readers until it is don
   await message.fill("Can I renew online?");
   await message.press("Enter");
   const log = frame.getByRole("log");
-  const reply = frame.locator('.x-govuk-ui-message[data-role="assistant"]');
-  const content = reply.locator(".x-govuk-ui-message-content");
+  const reply = frame.locator('.x-govuk-ui-conversation-message[data-role="assistant"]');
+  const content = reply.locator(".x-govuk-ui-conversation-content");
   // While it streams, the log and the reply are busy, and screen readers do not hear the reply.
   await expect(reply).toHaveAttribute("aria-busy", "true");
   await expect(log).toHaveAttribute("aria-busy", "true");
@@ -132,7 +132,7 @@ test("a composer that grows and shrinks by a fraction of a pixel never sets the 
   const message = frame.getByRole("textbox", { name: "Message" });
   await message.fill("How do I renew my passport? ".repeat(60));
   await message.press("Enter");
-  await expect(frame.locator('.x-govuk-ui-message[data-role="user"]')).toHaveCount(1);
+  await expect(frame.locator('.x-govuk-ui-conversation-message[data-role="user"]')).toHaveCount(1);
   // A button a fraction of a pixel taller than the bar's own appears and disappears in it, as a
   // menu's trigger can in a service. The composer's height then changes by fractions, frame after
   // frame.
@@ -184,7 +184,7 @@ test("a bubble is as wide as its longest line", async ({ page, frame, open }) =>
     );
   await page.keyboard.press("Enter");
   const bubble = frame
-    .locator('.x-govuk-ui-message[data-role="user"] .x-govuk-ui-message-content')
+    .locator('.x-govuk-ui-conversation-message[data-role="user"] .x-govuk-ui-conversation-content')
     .last();
   await expect(bubble).toHaveAttribute("style", /width/);
   // The bubble leaves no more than a few pixels beside its longest line, and breaks its lines just
@@ -365,7 +365,7 @@ test("a citation stack opens from the keyboard, takes focus, and steps through i
   await expect(card.getByRole("button", { name: "Previous source" })).toBeFocused();
   await card.getByRole("button", { name: "Next source" }).click();
   await expect(card.getByRole("link", { name: "Passport photo checker" })).toBeVisible();
-  await expect(card.locator(".x-govuk-ui-citation-count")).toHaveText("Source 2/ of 3");
+  await expect(card.locator(".x-govuk-ui-inline-citation-count")).toHaveText("Source 2/ of 3");
   await page.keyboard.press("Escape");
   await expect(card).toBeHidden();
   await expect(stack).toBeFocused();
@@ -383,7 +383,7 @@ test("a citation of a document with no address names where it is, and its title 
   const card = page.getByRole("dialog", { name: "Source" });
   await expect(card.getByText("Your passport renewal letter")).toBeVisible();
   await expect(card.getByRole("link")).toHaveCount(0);
-  await expect(card.locator(".x-govuk-ui-citation-detail")).toHaveText("Page 2");
+  await expect(card.locator(".x-govuk-ui-inline-citation-detail")).toHaveText("Page 2");
 });
 
 test("a plan runs its steps without changing height", async ({ frame, open }) => {

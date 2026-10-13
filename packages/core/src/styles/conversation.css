@@ -37,7 +37,7 @@
   padding: 24px 20px;
 }
 /* A quiet note, such as a reply stopped before it was written. */
-.x-govuk-ui-message-note {
+.x-govuk-ui-conversation-note {
   margin: 0;
   color: var(--x-govuk-ui-muted);
   font-size: 16px;
@@ -45,7 +45,7 @@
 }
 /* Each row opens to its message's height, so arrivals push the log up smoothly. Rows clip while
    they open, so they reach 8px past the column on each side, where a message's tools overhang. */
-.x-govuk-ui-message-row {
+.x-govuk-ui-conversation-message-row {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -53,12 +53,12 @@
   padding-inline: 8px;
   overflow: hidden;
 }
-.x-govuk-ui-message-row[data-role="user"] {
+.x-govuk-ui-conversation-message-row[data-role="user"] {
   align-items: flex-end;
 }
 /* The assistant writes as plain text across the column. The user's own messages sit in a bubble
    on the other side. */
-.x-govuk-ui-message {
+.x-govuk-ui-conversation-message {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -66,15 +66,15 @@
   margin-bottom: 22px;
   color: var(--x-govuk-ui-text);
 }
-.x-govuk-ui-message[data-role="user"] {
+.x-govuk-ui-conversation-message[data-role="user"] {
   align-items: flex-end;
 }
 /* A message's tools take the space beneath it, so the gap to the next message closes up. They sit
    under the start of a reply and under the end of the user's bubble. */
-.x-govuk-ui-message:has(.x-govuk-ui-message-actions) {
+.x-govuk-ui-conversation-message:has(.x-govuk-ui-conversation-actions) {
   margin-bottom: 8px;
 }
-.x-govuk-ui-message-content {
+.x-govuk-ui-conversation-content {
   max-width: 100%;
   font-size: 17px;
   line-height: 1.6;
@@ -82,24 +82,25 @@
   overflow-wrap: anywhere;
 }
 /* The user's messages are secondary Bubbles, in the log's text size. */
-.x-govuk-ui-message[data-role="user"] .x-govuk-ui-message-content {
+.x-govuk-ui-conversation-message[data-role="user"] .x-govuk-ui-conversation-content {
   line-height: 1.6;
 }
 /* Consecutive bubbles from the user read as one run, as in a Bubble group. */
-.x-govuk-ui-message-row[data-role="user"]:has(+ .x-govuk-ui-message-row[data-role="user"])
-.x-govuk-ui-message {
+.x-govuk-ui-conversation-message-row[data-role="user"]:has(
+  + .x-govuk-ui-conversation-message-row[data-role="user"]
+) .x-govuk-ui-conversation-message {
   margin-bottom: 6px;
 }
-.x-govuk-ui-message-row[data-role="user"]
-  + .x-govuk-ui-message-row[data-role="user"]
-  .x-govuk-ui-message-content {
+.x-govuk-ui-conversation-message-row[data-role="user"]
+  + .x-govuk-ui-conversation-message-row[data-role="user"]
+  .x-govuk-ui-conversation-content {
   border-start-end-radius: var(--x-govuk-ui-bubble-tail);
 }
 /* The latest message always shows its tools, whoever wrote it. Other messages show theirs when the
    pointer is over them or a tool has focus. Touch screens have no hover, so tools always show
    there. The thinking row is not a message, so a message just sent keeps its tools until the
    reply. */
-.x-govuk-ui-message-actions {
+.x-govuk-ui-conversation-actions {
   display: flex;
   gap: 2px;
   margin-top: 2px;
@@ -107,26 +108,28 @@
   opacity: 0;
   transition: opacity var(--x-govuk-ui-duration-fast) ease;
 }
-.x-govuk-ui-message:hover .x-govuk-ui-message-actions,
-.x-govuk-ui-message-actions:focus-within,
-.x-govuk-ui-message-row[data-message]:not(:has(~ .x-govuk-ui-message-row[data-message]))
-  .x-govuk-ui-message-actions {
+.x-govuk-ui-conversation-message:hover .x-govuk-ui-conversation-actions,
+.x-govuk-ui-conversation-actions:focus-within,
+.x-govuk-ui-conversation-message-row[data-message]:not(
+    :has(~ .x-govuk-ui-conversation-message-row[data-message])
+  )
+  .x-govuk-ui-conversation-actions {
   opacity: 1;
 }
 @media (hover: none) {
-  .x-govuk-ui-message-actions {
+  .x-govuk-ui-conversation-actions {
     opacity: 1;
   }
 }
 /* While the assistant thinks, one status word shimmers, then gives way to the next. */
-.x-govuk-ui-thinking {
+.x-govuk-ui-conversation-thinking {
   position: relative;
   height: 24px;
   margin: 2px 0 16px 2px;
   font-size: 15px;
   line-height: 24px;
 }
-.x-govuk-ui-thinking-word {
+.x-govuk-ui-conversation-thinking-word {
   display: block;
   white-space: nowrap;
 }

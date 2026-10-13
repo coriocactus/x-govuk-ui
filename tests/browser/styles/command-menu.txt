@@ -1,4 +1,4 @@
-.x-govuk-ui-command-trigger
+.x-govuk-ui-command-menu-trigger
   display: grid
   font-size: 17px
   font-weight: 400

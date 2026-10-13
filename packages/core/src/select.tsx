@@ -12,7 +12,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
-  useReducer,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -72,10 +72,9 @@ const TickContext = createContext<string | null>(null);
 
 /** Where an item that a Select collects tells it the item's label. */
 type Registry = {
-  /** Keeps the item's latest label, without rendering the Select again. */
-  label: (value: string, label: ReactNode) => void;
-  /** Adds the item, which renders the Select again with its label, and returns its removal. */
-  add: (value: string) => () => void;
+  set: (value: string, label: ReactNode) => void;
+  /** Removes the item's label, unless another item has given its value a label since. */
+  delete: (value: string, label: ReactNode) => void;
 };
 
 const LabelRegistry = createContext<Registry | null>(null);
@@ -84,24 +83,37 @@ const LabelRegistry = createContext<Registry | null>(null);
  * The labels of items that the Select cannot read from its children, such as items in a wrapper
  * of your own. Once the page has loaded, `CollectLabels` renders the children again, in an element
  * outside the page. There, each item reports its label and renders nothing. The page's first HTML
- * therefore shows such an item's value, until the labels arrive before the next paint.
+ * therefore shows such an item's value, until the labels arrive before the next paint. A label
+ * that changes renders the Select again.
  */
 function useItemLabels() {
-  const found = useRef(new Map<string, ReactNode>());
-  const [, renderAgain] = useReducer((count: number) => count + 1, 0);
-  const [registry] = useState<Registry>(() => ({
-    label: (value, label) => {
-      found.current.set(value, label);
-    },
-    add: (value) => {
-      renderAgain();
-      return () => {
-        found.current.delete(value);
-        renderAgain();
-      };
-    },
-  }));
-  return { labels: Object.fromEntries(found.current), registry };
+  const [labels, setLabels] = useState<Readonly<Record<string, ReactNode>>>({});
+  const registry = useMemo<Registry>(
+    () => ({
+      set: (value, label) =>
+        setLabels((all) =>
+          value in all && all[value] === label ? all : { ...all, [value]: label },
+        ),
+      delete: (value, label) =>
+        setLabels((all) => {
+          if (!(value in all) || all[value] !== label) return all;
+          const { [value]: _gone, ...rest } = all;
+          return rest;
+        }),
+    }),
+    [],
+  );
+  return { labels, registry };
+}
+
+/**
+ * Whether any child might hold items that the Select cannot read, such as a wrapper of your own.
+ * Only then are the children rendered a second time to collect their labels.
+ */
+function hasWrappedItems(children: ReactNode) {
+  return Children.toArray(children).some(
+    (child) => isValidElement(child) && child.type !== SelectItem,
+  );
 }
 
 /** Renders a Select's items again, outside the page, so each reports its label. */
@@ -115,9 +127,11 @@ function CollectLabels({ registry, children }: { registry: Registry; children: R
 /** An item that a Select collects for its label. It renders nothing. */
 function CollectedItem({ value, label }: { value: string; label: ReactNode }) {
   const registry = useContext(LabelRegistry);
-  // The label is kept at every render, before the item is added, so the Select shows it at once.
-  useLayoutEffect(() => registry?.label(value, label));
-  useLayoutEffect(() => registry?.add(value), [registry, value]);
+  useLayoutEffect(() => {
+    if (!registry) return;
+    registry.set(value, label);
+    return () => registry.delete(value, label);
+  }, [registry, value, label]);
   return null;
 }
 
@@ -275,7 +289,9 @@ export function SelectControl(given: SelectControlProps) {
           <ChevronIcon size={16} />
         </Primitive.Icon>
       </Primitive.Trigger>
-      <CollectLabels registry={registered.registry}>{children}</CollectLabels>
+      {hasWrappedItems(children) && (
+        <CollectLabels registry={registered.registry}>{children}</CollectLabels>
+      )}
       <Primitive.Portal>
         <Primitive.Positioner
           className="x-govuk-ui-select-positioner"
@@ -321,7 +337,13 @@ export type SelectItemProps = ComponentPropsWithRef<"div"> & {
 
 /**
  * One option in a Select. The chosen option shows a tick. Screen readers hear the choice from the
- * option's selected state, so the tick is only decoration. It can sit in a wrapper of your own.
+ * option's selected state, so the tick is only decoration.
+ *
+ * It can sit in a wrapper of your own. The Select shows the chosen option's label while its list is
+ * closed, before Base UI has rendered the list. To find the label of an option in a wrapper, the
+ * Select renders its children once more, outside the page, once the page has loaded. A wrapper
+ * therefore renders twice, so it must only render. Fetch the options outside the Select, not in
+ * the wrapper.
  */
 export function SelectItem(props: SelectItemProps) {
   const registry = useContext(LabelRegistry);

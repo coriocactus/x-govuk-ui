@@ -1,10 +1,13 @@
 @use "sass:meta";
 // GDS Transport is licensed only for www.gov.uk, *.service.gov.uk and *.blog.gov.uk. The font
-// files are not bundled into this stylesheet, because bundlers would inline them. The components
-// therefore fall back to Arial, unless a GOV.UK service serves the files and declares @font-face.
-// Anything public on another domain must use another font. Set --x-govuk-ui-font on the page, as
-// the workbench's production build does with Roboto, or set $govuk-font-family here.
+// files are not bundled into this stylesheet, because bundlers would inline them. Unless a GOV.UK
+// service serves the files and declares @font-face, the components fall back to Noto Sans, the
+// typeface for a service outside GOV.UK, where the device has it or the page serves it. Android,
+// ChromeOS and most Linux desktops have it, and Windows, macOS and iOS do not, so Arial comes
+// after it, as in GOV.UK Frontend. Anything public on another domain must use another font. Serve
+// Noto Sans, as the workbench's production build does, or set --x-govuk-ui-font on the page.
 @use "pkg:govuk-frontend/base" as govuk with (
+  $govuk-font-family: ("GDS Transport", "Noto Sans", arial, sans-serif),
   $govuk-include-default-font-face: false
 );
 // GOV.UK's functional colours as custom properties, such as --govuk-text-colour. A service that

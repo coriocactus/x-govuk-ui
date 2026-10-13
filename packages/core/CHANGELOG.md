@@ -142,6 +142,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Visual
 
+- Changed the components' typeface, where GDS Transport is not served, to Noto Sans, the typeface for a service outside GOV.UK, in place of Arial. Arial now comes after it, for a device without Noto Sans, such as one with Windows, macOS or iOS, unless the page serves it. `--x-govuk-ui-font` is now `"GDS Transport", "Noto Sans", arial, sans-serif`.
 - Changed FileDiff's fold, the row that opens a run of unchanged lines, to be exactly as tall as a line. It loses its 2-pixel margins and its 2 pixels of padding above and below.
 
 ### Added

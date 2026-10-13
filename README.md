@@ -132,7 +132,7 @@ The tests check every page of the site. These are the front page, the workbench,
 
 - axe checks each page against the WCAG 2.0, 2.1 and 2.2 A and AA rules it runs by default, in Chromium and in WebKit.
 - In Chromium, axe checks each page again in the dark theme. It checks that text contrasts with its background, and that links can be told apart from the words around them.
-- On each component's page, no box may cut off its text, in Roboto or in a wide typeface. The wide typeface stands in for whatever typeface a service chooses.
+- On each component's page, no box may cut off its text, in Noto Sans or in a wide typeface. The wide typeface stands in for whatever typeface a service chooses.
 - In Chromium, Firefox and WebKit, behaviour tests use the components as users do, with the keyboard and the pointer. They check where focus goes.
 - In Chromium, a style snapshot records how each component's parts look, from their computed styles. A change to how a part looks fails it, until the snapshot and the changelog record the change.
 
@@ -142,6 +142,6 @@ Automated tests find some accessibility failures, but not all. Passing them does
 
 GOV.UK's crown, logotype, Royal Arms and GDS Transport are for official GOV.UK services only. As GOV.UK Frontend does, the library draws the crown and logotype, and leaves the Royal Arms and GDS Transport for a service to serve. A GOV.UK service gives Footer or ServicePage the Royal Arms as `crest`, and supplies the font.
 
-Without GDS Transport, the components fall back to Arial. Roboto is the pick for a service outside GOV.UK that follows GDS's principles, and this site is set in it.
+Noto Sans is the typeface for a service outside GOV.UK that follows GDS's principles, and this site is set in it. Without GDS Transport, the components fall back to Noto Sans where the device has it or the page serves it, and then to Arial. Android, ChromeOS and most Linux desktops have Noto Sans. Windows, macOS and iOS do not, so serve it, as this site does, from `@fontsource-variable/noto-sans`.
 
 The site's own mark is GOV/UK, drawn in `site/brand.tsx`.

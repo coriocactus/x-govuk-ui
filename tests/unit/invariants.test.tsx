@@ -88,6 +88,24 @@ test("an extension declares the cascade layers in core's order, whichever styles
 // giving each idea one name. `tests/types/conventions.ts` checks them against the exported types,
 // as part of `bun run typecheck`.
 
+test("each component lists each prop once, and each example setting once", () => {
+  // The playground keys each row by its name. A name listed twice, such as a prop left behind when
+  // it moved to another part, shows twice and makes React warn.
+  const twice: string[] = [];
+  for (const [key, entry] of Object.entries(catalogue))
+    for (const [list, docs] of [
+      ["props", entry.props],
+      ["example", ("example" in entry && entry.example) || []],
+    ] as const) {
+      const seen = new Set<string>();
+      for (const { name } of docs) {
+        if (seen.has(name)) twice.push(`${key} ${list}: ${name}`);
+        seen.add(name);
+      }
+    }
+  expect(twice).toEqual([]);
+});
+
 test("every playground setting that needs another names one of its component's settings", () => {
   const wrong: string[] = [];
   for (const [key, entry] of Object.entries(catalogue)) {

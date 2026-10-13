@@ -1147,12 +1147,11 @@ const entries = {
         { type: "boolean", default: "true with a trigger, false with an anchor" },
       ),
       toggle("closeButton", true, { note: "The × in the corner, as Popover's closeButton." }),
-      reference("labels", "Partial<OverlayLabels>", "Close"),
       reference("--x-govuk-ui-callout-width", "CSS length", "320px"),
       reference("CalloutTrigger", "Button props and { label, render }", "Part"),
       reference(
         "CalloutContent",
-        "{ title, actions, variant, side, align, timeout, countdown, closeButton, labels }",
+        "{ title, actions, variant, side, align, timeout, countdown, closeButton }",
         "Part",
       ),
     ],

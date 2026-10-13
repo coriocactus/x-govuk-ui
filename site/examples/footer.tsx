@@ -41,25 +41,29 @@ const anchor = (name: string) => `#${name.toLowerCase().replaceAll(/[^a-z]+/g, "
 /** GOV.UK's own footer, with its topics in two columns beside the government's sections. */
 export default function FooterExample({ crown = true, sections = true }: Props) {
   return (
-    <Footer crown={crown}>
-      {sections && (
-        <FooterSection title="Services and information" width="two-thirds" columns={2}>
-          {topics.map((name) => (
-            <FooterLink key={name} href={anchor(name)}>
-              {name}
-            </FooterLink>
-          ))}
-        </FooterSection>
-      )}
-      {sections && (
-        <FooterSection title="Departments and policy" width="one-third">
-          {government.map((name) => (
-            <FooterLink key={name} href={anchor(name)}>
-              {name}
-            </FooterLink>
-          ))}
-        </FooterSection>
-      )}
+    <Footer
+      crown={crown}
+      navigation={
+        sections && (
+          <>
+            <FooterSection title="Services and information" width="two-thirds" columns={2}>
+              {topics.map((name) => (
+                <FooterLink key={name} href={anchor(name)}>
+                  {name}
+                </FooterLink>
+              ))}
+            </FooterSection>
+            <FooterSection title="Departments and policy" width="one-third">
+              {government.map((name) => (
+                <FooterLink key={name} href={anchor(name)}>
+                  {name}
+                </FooterLink>
+              ))}
+            </FooterSection>
+          </>
+        )
+      }
+    >
       <FooterLinks>
         {support.map((name) => (
           <FooterLink key={name} href={anchor(name)}>

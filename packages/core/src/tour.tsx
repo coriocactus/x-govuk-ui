@@ -4,9 +4,13 @@ import { Popover as Primitive } from "@base-ui/react/popover";
 import {
   Children,
   type ComponentPropsWithRef,
+  createContext,
   isValidElement,
   type KeyboardEvent,
   type ReactNode,
+  type RefObject,
+  useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -43,9 +47,52 @@ export type TourStepProps = {
   className?: string;
 };
 
-/** One step of a Tour. It shows nothing itself, because the Tour shows each step in turn. */
-export function TourStep(_props: TourStepProps): ReactNode {
-  return null;
+/** A step as its Tour knows it, with the empty element that marks its place among the others. */
+type Step = { props: RefObject<TourStepProps>; place: RefObject<HTMLSpanElement | null> };
+
+/** Where each step tells its Tour what it shows. */
+type StepRegistry = (step: Step) => () => void;
+
+const StepsContext = createContext<StepRegistry | null>(null);
+
+/**
+ * One step of a Tour. The Tour shows each step in turn, in the card. In its own place, the step
+ * leaves only an empty, hidden element, which keeps its order among the others. It can sit inside a
+ * wrapper of your own.
+ */
+export function TourStep(props: TourStepProps): ReactNode {
+  const register = useContext(StepsContext);
+  const latest = useRef(props);
+  latest.current = props;
+  const place = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => register?.({ props: latest, place }), [register]);
+  return <span ref={place} hidden />;
+}
+
+/**
+ * The steps of a Tour. Each TourStep tells the Tour its props once it renders, so a step in a
+ * wrapper of your own counts. Until then, as the server renders, the Tour reads its direct
+ * children.
+ */
+function useSteps(children: ReactNode) {
+  const [registered, setRegistered] = useState<readonly Step[]>([]);
+  const register = useCallback<StepRegistry>((step) => {
+    // Steps take their places in the page's order, so one that appears later still comes first.
+    const order = (all: readonly Step[]) =>
+      [...all].sort((a, b) => {
+        const [first, second] = [a.place.current, b.place.current];
+        if (!first || !second) return 0;
+        return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+      });
+    setRegistered((all) => order([...all, step]));
+    return () => setRegistered((all) => all.filter((each) => each !== step));
+  }, []);
+  const direct = Children.toArray(children)
+    .filter(isValidElement)
+    .filter((child) => child.type === TourStep)
+    .map((child) => child.props as TourStepProps);
+  const steps = registered.length > 0 ? registered.map((step) => step.props.current) : direct;
+  return { steps, register };
 }
 
 // The card takes the other props, at every step.
@@ -173,9 +220,7 @@ export function Tour({
   onKeyDown,
   ...props
 }: TourProps) {
-  const steps = Children.toArray(children)
-    .filter(isValidElement)
-    .map((child) => child.props as TourStepProps);
+  const { steps, register } = useSteps(children);
   const stepsNow = useRef(steps);
   stepsNow.current = steps;
   // How far someone got, in local storage with a key, or else in memory.
@@ -346,6 +391,7 @@ export function Tour({
 
   return (
     <>
+      <StepsContext value={register}>{children}</StepsContext>
       {dim && (
         <Spotlight
           target={open ? (centred ? middle : element) : null}

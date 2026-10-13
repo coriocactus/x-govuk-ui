@@ -4,6 +4,11 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Added
+
+- Added the Editor's question and answer to FormSteps' Check your answers. The answer is the document's words, without its markup.
+- Added the ability to put an EditorSeparator inside a wrapper of your own, in an EditorToolbar. It is still a keyline, which the toolbar leaves out at either end of its row.
+
 ## [0.3.0] - 2026-10-10
 
 No changes of its own.

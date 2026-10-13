@@ -3277,6 +3277,7 @@ const entries = {
       reference("crest", "string", "/assets/images/govuk-crest.svg"),
       reference("licence", "ReactNode | null", "Open Government Licence"),
       reference("copyright", "ReactNode", "© Crown copyright"),
+      reference("navigation", "ReactNode", "FooterSection parts"),
       reference(
         "FooterSection",
         '{ title, width: "full" | "two-thirds" | "one-third" | …, columns: 1 | 2 | 3, children }',

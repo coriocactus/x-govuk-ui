@@ -1,13 +1,7 @@
 "use client";
 
 import { useRender } from "@base-ui/react/use-render";
-import {
-  Children,
-  type ComponentPropsWithRef,
-  type CSSProperties,
-  isValidElement,
-  type ReactNode,
-} from "react";
+import type { ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
 import { GovukCrown } from "./logo";
 import { WidthContainer } from "./width-container";
 
@@ -56,15 +50,16 @@ export type FooterProps = ComponentPropsWithRef<"footer"> & {
   licence?: ReactNode;
   /** The copyright line, which links to Crown copyright's terms. */
   copyright?: ReactNode;
+  /** Wider navigation, as `FooterSection` parts, above a rule at the top of the footer. */
+  navigation?: ReactNode;
 };
 
 /**
  * The foot of every page, as GOV.UK's is, under a band of brand blue. In order, it shows:
  *
  * - the crown
- * - any navigation, in `FooterSection` parts, above a rule
- * - the support links, in `FooterLinks`
- * - anything else given, such as who built the service
+ * - any `navigation`, in `FooterSection` parts, above a rule
+ * - its children, such as the support links in `FooterLinks`, and who built the service
  * - the licence, with Crown copyright under the Royal Arms at the end of the row
  */
 export function Footer({
@@ -72,15 +67,12 @@ export function Footer({
   crest = "/assets/images/govuk-crest.svg",
   licence = defaultLicence,
   copyright = "© Crown copyright",
+  navigation,
   className = "",
   style,
   children,
   ...props
 }: FooterProps) {
-  // Sections go in the navigation at the top. Everything else goes with the support links.
-  const parts = Children.toArray(children);
-  const sections = parts.filter((part) => isValidElement(part) && part.type === FooterSection);
-  const rest = parts.filter((part) => !sections.includes(part));
   return (
     <footer
       {...props}
@@ -93,15 +85,15 @@ export function Footer({
     >
       <WidthContainer className="x-govuk-ui-footer-container">
         {crown && <GovukCrown className="x-govuk-ui-footer-crown" />}
-        {sections.length > 0 && (
+        {navigation && (
           <>
-            <div className="x-govuk-ui-footer-navigation">{sections}</div>
+            <div className="x-govuk-ui-footer-navigation">{navigation}</div>
             <hr className="x-govuk-ui-footer-break" />
           </>
         )}
         <div className="x-govuk-ui-footer-meta">
           <div className="x-govuk-ui-footer-meta-main">
-            {rest}
+            {children}
             {licence !== null && (
               <p className="x-govuk-ui-footer-licence">
                 {licenceLogo}

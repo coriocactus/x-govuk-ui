@@ -24,11 +24,13 @@ import {
   Children,
   type ComponentPropsWithRef,
   type CSSProperties,
+  createContext,
   type FormEvent,
   Fragment,
   isValidElement,
   type MouseEvent,
   type ReactNode,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -247,10 +249,18 @@ export function EditorToolbar({
 }: EditorToolbarProps) {
   const { labels, pickFiles, options } = useEditorContext("EditorToolbar");
   const files = pickFiles !== null;
+  const separators = useSeparators();
   const items = useMemo(
     () =>
-      children === undefined ? controlItems(chosen, files, options.headings) : childItems(children),
-    [children, chosen, files, options.headings],
+      (children === undefined
+        ? controlItems(chosen, files, options.headings)
+        : childItems(children)
+      ).map((item) =>
+        item.role === "control" && separators.keys.has(item.key)
+          ? { ...item, role: "separator" as const }
+          : item,
+      ),
+    [children, chosen, files, options.headings, separators.keys],
   );
   const toolbar = useRef<HTMLDivElement>(null);
   const toolbarRef = useMergedRef(toolbar, ref);
@@ -320,7 +330,7 @@ export function EditorToolbar({
             />
           ) : (
             <div key={item.key} className="x-govuk-ui-editor-item" data-item={item.role}>
-              {item.node}
+              <SeparatorContext value={separators.markFor(item.key)}>{item.node}</SeparatorContext>
             </div>
           ),
         )}
@@ -375,13 +385,42 @@ function controlItems(
   });
 }
 
-/** Composed parts as items, with a separator among them recognised by its type. */
+/**
+ * Composed parts as items. A separator that is a direct child is known by its type, in the first
+ * HTML. One inside a wrapper of your own says so once it renders, through `SeparatorContext`.
+ */
 function childItems(children: ReactNode): Item[] {
   return Children.toArray(children).map((child, index) => ({
     key: isValidElement(child) && child.key !== null ? String(child.key) : String(index),
     role: isValidElement(child) && child.type === EditorSeparator ? "separator" : "control",
     node: child,
   }));
+}
+
+/** Lets a separator tell the item it is in that it is a keyline, not a control. */
+const SeparatorContext = createContext<(() => () => void) | null>(null);
+
+/** The items that hold a separator, by key, as the separators inside them say. */
+function useSeparators() {
+  const [keys, setKeys] = useState<ReadonlySet<string>>(new Set());
+  const marks = useRef(new Map<string, () => () => void>());
+  const markFor = (key: string) => {
+    let mark = marks.current.get(key);
+    if (!mark) {
+      mark = () => {
+        setKeys((all) => new Set(all).add(key));
+        return () =>
+          setKeys((all) => {
+            const rest = new Set(all);
+            rest.delete(key);
+            return rest;
+          });
+      };
+      marks.current.set(key, mark);
+    }
+    return mark;
+  };
+  return { keys, markFor };
 }
 
 /** An element's width inside its padding, which its items share. */
@@ -496,6 +535,8 @@ function MoreControl({ label, items }: { label: string; items: Item[] }) {
 
 /** A keyline between groups of controls. */
 export function EditorSeparator({ className = "", ...props }: ComponentPropsWithRef<"div">) {
+  const mark = useContext(SeparatorContext);
+  useLayoutEffect(() => mark?.(), [mark]);
   return (
     <Toolbar.Separator {...props} className={`x-govuk-ui-editor-separator ${className}`.trim()} />
   );

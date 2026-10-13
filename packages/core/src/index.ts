@@ -404,9 +404,13 @@ export {
 } from "./footer";
 export {
   Form,
+  type FormError,
+  FormErrorSummary,
+  type FormErrorSummaryProps,
   type FormErrors,
   type FormProps,
   type StandardSchema,
+  useFormErrors,
   type ValidateWithOptions,
   validateWith,
 } from "./form";

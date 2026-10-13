@@ -5,13 +5,20 @@ import {
   type FormEvent,
   type ReactNode,
   useCallback,
+  useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { AutoHeight } from "./auto-height";
-import { defaultErrorLabels, ErrorSummary, ErrorSummaryItem } from "./error-summary";
+import {
+  defaultErrorLabels,
+  ErrorSummary,
+  ErrorSummaryItem,
+  type ErrorSummaryProps,
+} from "./error-summary";
 import { both } from "./events";
 import { FormContext, type FormField, present } from "./field";
 import { useLabels } from "./labels";
@@ -149,7 +156,19 @@ export function fieldOf(name: string, fields: Iterable<string>) {
   return owners.sort((a, b) => b.length - a.length)[0] ?? name;
 }
 
-type Problem = { name: string; message: ReactNode; id: string };
+/** An error a Form shows. */
+export type FormError = {
+  /** The name it was given under, which is its field's, or another, such as "form". */
+  name: string;
+  message: ReactNode;
+  /**
+   * The id of the field the error summary links to, or null for an error about no one field, such
+   * as one about the whole form, which the summary shows without a link.
+   */
+  id: string | null;
+};
+
+type Problem = FormError;
 
 /** What a field submits, with any parts, such as a date's `{name}-day`, `-month` and `-year`. */
 function answer(data: FormData, name: string) {
@@ -210,13 +229,23 @@ export function Form({
       }),
     ),
   );
+  // How many FormErrorSummary parts of a service's own show the errors, in place of the Form's own.
+  const [summaries, setSummaries] = useState(0);
+  const addSummary = useCallback(() => {
+    setSummaries((count) => count + 1);
+    return () => setSummaries((count) => count - 1);
+  }, []);
   const context = useMemo(
     () => ({
       errors: Object.fromEntries(problems.map(({ name, message }) => [name, message])),
+      problems,
+      attempt,
+      errorTitle,
+      addSummary,
       register,
       defaults,
     }),
-    [problems, register, defaults],
+    [problems, attempt, errorTitle, addSummary, register, defaults],
   );
 
   /** Shows the errors, in the order of their fields, and says whether there were any. */
@@ -229,9 +258,9 @@ export function Form({
     const listed = [...owned].map(([name, message]) => ({
       name,
       message,
-      id: fields.current.get(name)?.id ?? name,
+      id: fields.current.get(name)?.id ?? null,
     }));
-    const place = (problem: Problem) => document.getElementById(problem.id);
+    const place = (problem: Problem) => (problem.id ? document.getElementById(problem.id) : null);
     listed.sort((a, b) => {
       const [first, second] = [place(a), place(b)];
       if (!first || !second) return 0;
@@ -241,9 +270,9 @@ export function Form({
     setProblems(listed);
     if (listed.length > 0) setAttempt((count) => count + 1);
     // Without a summary to take focus, the first field that needs fixing does.
-    const first = listed[0];
-    if (first && !errorSummary)
-      requestAnimationFrame(() => document.getElementById(first.id)?.focus());
+    const first = listed.find((problem) => problem.id);
+    if (first?.id && !errorSummary && summaries === 0)
+      requestAnimationFrame(() => document.getElementById(first.id ?? "")?.focus());
     return listed.length > 0;
   };
 
@@ -312,22 +341,85 @@ export function Form({
         onClick={both(onClick, recheck)}
         onKeyUp={both(onKeyUp, recheck)}
       >
-        {/* The summary opens above the fields, and the fields move down smoothly to make room. */}
+        {/* The summary opens above the fields, and the fields move down smoothly to make room. A
+            FormErrorSummary of a service's own shows the errors where it is placed instead. */}
         <AutoHeight className="x-govuk-ui-form-summary">
-          {failing && errorSummary && (
-            <div key={attempt} data-sound-enter="error">
-              <ErrorSummary title={errorTitle}>
-                {problems.map(({ name, message, id }) => (
-                  <ErrorSummaryItem key={name} href={`#${id}`}>
-                    {message}
-                  </ErrorSummaryItem>
-                ))}
-              </ErrorSummary>
-            </div>
-          )}
+          {errorSummary && summaries === 0 && <Summary />}
         </AutoHeight>
         <div className="x-govuk-ui-form-fields">{children}</div>
       </form>
     </FormContext>
+  );
+}
+
+/**
+ * The errors of the Form around it, and how many times it has been sent with errors, for a part of
+ * your own that shows them its own way. Null outside a Form.
+ */
+export function useFormErrors(): { errors: FormError[]; attempt: number } | null {
+  const form = useContext(FormContext);
+  return form ? { errors: form.problems ?? [], attempt: form.attempt ?? 0 } : null;
+}
+
+/** The Form's errors, in an Error summary, once there are any. @internal */
+function Summary({ title, description }: Pick<ErrorSummaryProps, "title" | "description">) {
+  const form = useContext(FormContext);
+  const problems = form?.problems ?? [];
+  if (problems.length === 0) return null;
+  const loose = problems.filter((problem) => !problem.id);
+  return (
+    // A new attempt opens a new summary, which takes focus again.
+    <div key={form?.attempt} data-sound-enter="error">
+      <ErrorSummary
+        title={title ?? form?.errorTitle}
+        description={
+          description || loose.length > 0 ? (
+            <>
+              {description}
+              {loose.map((problem) => (
+                <p key={problem.name}>{problem.message}</p>
+              ))}
+            </>
+          ) : undefined
+        }
+      >
+        {problems.map(
+          (problem) =>
+            problem.id && (
+              <ErrorSummaryItem key={problem.name} href={`#${problem.id}`}>
+                {problem.message}
+              </ErrorSummaryItem>
+            ),
+        )}
+      </ErrorSummary>
+    </div>
+  );
+}
+
+export type FormErrorSummaryProps = ComponentPropsWithRef<"div"> &
+  Pick<ErrorSummaryProps, "title" | "description">;
+
+/**
+ * The Form's Error summary, where you place it inside the Form, such as above the page's heading,
+ * as GOV.UK puts it. While one is on the page, the Form shows no summary of its own above its
+ * fields. It opens as the Form is sent with errors, takes focus, and folds away once nothing is
+ * wrong. An error about no one field, such as the whole form, shows beneath the title, without a
+ * link.
+ */
+export function FormErrorSummary({
+  title,
+  description,
+  className = "",
+  ...props
+}: FormErrorSummaryProps) {
+  const form = useContext(FormContext);
+  const addSummary = form?.addSummary;
+  useLayoutEffect(() => addSummary?.(), [addSummary]);
+  return (
+    <div {...props} className={`x-govuk-ui-form-error-summary ${className}`.trim()}>
+      <AutoHeight className="x-govuk-ui-form-summary">
+        <Summary title={title} description={description} />
+      </AutoHeight>
+    </div>
   );
 }

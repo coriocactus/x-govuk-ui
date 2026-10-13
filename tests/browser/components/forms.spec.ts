@@ -24,10 +24,17 @@ test("a form checks every answer when sent, and its date can come from the calen
   open,
 }) => {
   await open("form");
+  const heading = frame.getByRole("heading", { name: "Your details" });
+  const form = frame.locator(".x-govuk-ui-form");
+  // Where the heading sits in the form, which a summary that takes no space leaves alone.
+  const offset = async () => (await heading.boundingBox())!.y - (await form.boundingBox())!.y;
+  const before = await offset();
   await frame.getByRole("button", { name: "Continue" }).click();
-  // The summary opens above the fields, takes focus and lists the problems in the fields' order.
+  // The summary opens above the page's heading, where the example places its FormErrorSummary,
+  // takes focus and lists the problems in the fields' order.
   const summary = frame.locator(".x-govuk-ui-error-summary");
   await expect(summary).toBeFocused();
+  expect((await summary.boundingBox())!.y).toBeLessThan((await heading.boundingBox())!.y);
   await expect(page).toHaveTitle(/^Error: Form/);
   await expect(summary.getByRole("link")).toHaveText([
     "Enter an email address in the correct format, like name@example.com",
@@ -67,6 +74,29 @@ test("a form checks every answer when sent, and its date can come from the calen
   await frame.getByRole("button", { name: "Continue" }).click();
   await expect(summary).toBeHidden();
   await expect(page).toHaveTitle(/^Form/);
+  await expect(frame.getByRole("status")).toHaveText("Your answers are ready. Nothing was sent.");
+  // Once the summary has folded away, the heading is back where it started in the form.
+  await expect.poll(async () => Math.abs((await offset()) - before)).toBeLessThan(1);
+});
+
+test("a message about the whole form shows in the summary without a link", async ({
+  frame,
+  open,
+  playground,
+}) => {
+  await open("form");
+  await playground.set("fail", true);
+  await frame.getByRole("textbox", { name: "Email address" }).fill("someone@example.com");
+  await frame.getByRole("textbox", { name: "Day" }).fill("27");
+  await frame.getByRole("textbox", { name: "Month" }).fill("3");
+  await frame.getByRole("textbox", { name: "Year" }).fill("1985");
+  await frame.getByRole("radio", { name: "8 days" }).check();
+  await frame.getByRole("button", { name: "Continue" }).click();
+  const summary = frame.locator(".x-govuk-ui-error-summary");
+  await expect(summary).toBeFocused();
+  await expect(summary).toContainText("We could not save your details. Try again.");
+  await expect(summary.getByRole("link")).toHaveCount(0);
+  await frame.getByRole("button", { name: "Continue" }).click();
   await expect(frame.getByRole("status")).toHaveText("Your answers are ready. Nothing was sent.");
 });
 

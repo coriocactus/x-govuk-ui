@@ -4,6 +4,7 @@ import {
   DateInput,
   FooterLink,
   Form,
+  FormErrorSummary,
   type FormErrors,
   FormStep,
   FormSteps,
@@ -65,8 +66,9 @@ export default function FormExample({ example = "page", ...props }: Props) {
 }
 
 /** A page of questions in a service, as GOV.UK lays it out, read from the top left. */
-function OnePage({ errorTitle = "There is a problem", titlePrefix = true }: Props) {
+function OnePage({ errorTitle = "There is a problem", titlePrefix = true, fail = false }: Props) {
   const [ready, setReady] = useState("");
+  const failed = useRef(false);
   return (
     <ServicePage
       serviceName="Get a fishing licence"
@@ -85,13 +87,23 @@ function OnePage({ errorTitle = "There is a problem", titlePrefix = true }: Prop
         </>
       }
     >
-      <h1 className="preview-page-heading">Your details</h1>
       <Form
         validate={validate}
         errorTitle={errorTitle}
         titlePrefix={titlePrefix}
-        onSubmit={() => setReady("Your answers are ready. Nothing was sent.")}
+        onSubmit={async () => {
+          await wait(250);
+          // A message about the whole form, as a server sends one, shows without a link.
+          if (fail && !failed.current) {
+            failed.current = true;
+            return { form: "We could not save your details. Try again." };
+          }
+          setReady("Your answers are ready. Nothing was sent.");
+        }}
       >
+        {/* GOV.UK puts the error summary above the page's heading. */}
+        <FormErrorSummary />
+        <h1 className="preview-page-heading">Your details</h1>
         <Input
           id="email"
           name="email"

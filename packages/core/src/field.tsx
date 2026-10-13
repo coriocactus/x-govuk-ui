@@ -77,6 +77,14 @@ export type FormField = {
  */
 export const FormContext = createContext<{
   errors: Partial<Record<string, ReactNode>>;
+  /** The errors shown, in the fields' order, with where each links to. */
+  problems?: { name: string; message: ReactNode; id: string | null }[];
+  /** How many times the form has been sent with errors, so a summary takes focus again. */
+  attempt?: number;
+  /** The error summary's title, from the Form. */
+  errorTitle?: ReactNode;
+  /** Tells the Form that a FormErrorSummary of a service's own shows its errors. */
+  addSummary?: () => () => void;
   register: (name: string, field: FormField) => () => void;
   defaults?: Partial<Record<string, string[]>>;
   /**

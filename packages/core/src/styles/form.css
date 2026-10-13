@@ -12,14 +12,27 @@
 /* Fields stack with GOV.UK's spacing between them, and buttons keep their own width. The column is
    the form's width, so a field with something wide inside, such as a long line of code, scrolls
    that content instead of widening the field and every field with it. */
+/* The space between the fields, GOV.UK's 20 pixels on a phone and 30 on a wider screen. */
+.x-govuk-ui-form {
+  --x-govuk-ui-form-gap: 20px;
+}
 .x-govuk-ui-form-fields {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   justify-items: start;
-  gap: 20px;
+  gap: var(--x-govuk-ui-form-gap);
+}
+/* An error summary of a service's own takes the form's width wherever it sits. Among the fields, it
+   gives back the gap after it, so it takes no space until it opens, and the summary's own margin
+   is the space after it once it has. The margin never changes, so nothing jumps as it opens. */
+.x-govuk-ui-form-error-summary {
+  justify-self: stretch;
+}
+.x-govuk-ui-form-fields > .x-govuk-ui-form-error-summary {
+  margin-bottom: calc(-1 * var(--x-govuk-ui-form-gap));
 }
 @media (min-width: 40.0625em) {
-  .x-govuk-ui-form-fields {
-    gap: 30px;
+  .x-govuk-ui-form {
+    --x-govuk-ui-form-gap: 30px;
   }
 }

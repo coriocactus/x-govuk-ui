@@ -910,6 +910,10 @@
   line-height: 1.11;
   font-weight: 700;
 }
+/* Among a form's fields, the form's gap is part of the heading's space. */
+.x-govuk-ui-form-fields > .preview-page-heading {
+  margin-bottom: calc(30px - var(--x-govuk-ui-form-gap));
+}
 /* Grouped table. Status marks, priorities and the pills in each row. */
 .preview-grouped-title {
   margin: 0;

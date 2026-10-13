@@ -83,8 +83,10 @@
   max-width: var(--x-govuk-ui-feedback-measure, 40rem);
 }
 /* A short form in a band has its own spacing below, instead of a page's spacing between fields. */
+.x-govuk-ui-form.x-govuk-ui-feedback-form {
+  --x-govuk-ui-form-gap: 0px;
+}
 .x-govuk-ui-feedback-form > .x-govuk-ui-form-fields {
-  gap: 0;
   justify-items: stretch;
 }
 /* The fields and buttons stand apart, as on a form page. */

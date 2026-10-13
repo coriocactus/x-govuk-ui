@@ -952,6 +952,8 @@ const entries = {
         needs: [when("example", "page")],
       }),
       reference("errorSummary", "boolean", "true"),
+      reference("FormErrorSummary", "{ title, description } and div props", "Part"),
+      reference("useFormErrors", "() => { errors: { name, message, id }[], attempt }", "Hook"),
       reference("defaultValues", "Record<string, string | string[]>", "None"),
       reference("children", "Fields with a name, and a submit Button"),
       reference(
@@ -1008,8 +1010,7 @@ const entries = {
         restart: true,
       }),
       toggle("fail", false, {
-        note: "The rating fails to save the first time, as a server error would.",
-        needs: [when("example", "stages")],
+        note: "The answers fail to save the first time, as a server error would. In stages, the rating does.",
         restart: true,
       }),
       toggle("moreKinds", false, {

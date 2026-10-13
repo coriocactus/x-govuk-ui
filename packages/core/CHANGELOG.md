@@ -63,6 +63,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added FormErrorSummary, a Form's Error summary where a service places it inside the Form, such as above the page's heading, as GOV.UK puts it. While one is on the page, the Form shows no summary of its own. It takes no space until it opens. Added `useFormErrors`, which gives a part of your own the Form's errors, each with the id it links to, and how many times the form has been sent with errors. Added `--x-govuk-ui-form-gap`, the space between a Form's fields.
 - Added `empty` and `help` to CommandMenuContent, in place of its `empty` label and the help beneath the list. `help={null}` leaves the help out. Added `useCommandMenu`, which gives a part of the menu the search, a way to change it and a way to close the menu, such as for an empty state that offers to make what was searched for.
 - Added `filter`, `inputValue`, `defaultInputValue` and `onInputValueChange` to Combobox, MultiSelect and their controls. A service hears the text as users type, such as to ask a server for options, and gives `filter={null}` to show the options it found as they are, or a `filter` of its own. Added `description` to a ComboboxOption, a line beneath its label in the list.
 - Added `files` and `defaultFiles` to FileUpload and FileUploadControl, so a service can control the chosen files, show a file it already has, such as for a record being changed, or take one away. The input sends the files the field shows. Added `list`, which, given false, leaves the list of files beneath the zone to the service, such as to draw them with FileChips.
@@ -131,6 +132,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed a Form's error summary linking a message about no one field, such as one about the whole form from `validateWith` or `onSubmit`, to a place that does not exist. Such a message now shows beneath the summary's title, without a link.
 - Fixed an answer in a wrapper of your own, inside Radios or Checkboxes, taking the first answer's id. Its label then named the wrong answer. Such an answer now takes an id of its own, including in a group inside a follow-up question. A Form's error summary links to the first answer on the page.
 - Fixed FormSteps with a `storageKey` rendering different first HTML in the browser than on the server. Kept answers and the step now come back once the page has loaded, before it is drawn.
 - Fixed the browser's Back and Forward in FormSteps with `history` using the form as it was when the page loaded, such as which steps were skipped.

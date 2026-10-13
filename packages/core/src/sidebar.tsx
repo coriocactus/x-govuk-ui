@@ -312,6 +312,7 @@ export function Sidebar({
   animations = sidebarAnimations,
   initialFocus,
   className = "",
+  style,
   ...props
 }: SidebarProps) {
   const words = useLabels("sidebar", defaultSidebarLabels);
@@ -444,7 +445,7 @@ export function Sidebar({
     "data-side": side,
     "data-variant": variant,
     "data-animate": animationList,
-    style: { "--x-govuk-ui-sidebar-width": `${width}px` } as CSSProperties,
+    style: { ...style, "--x-govuk-ui-sidebar-width": `${width}px` } as CSSProperties,
   };
 
   // On a small screen the sidebar is a Sheet, so a swipe towards its edge closes it.

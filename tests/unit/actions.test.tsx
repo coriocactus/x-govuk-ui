@@ -59,6 +59,7 @@ test("pending buttons preserve their name and prevent repeated activation", () =
     </Button>,
   );
   expect(link).toContain('aria-disabled="true"');
+  expect(link).not.toContain(" disabled=");
   let stopped = false;
   linkClick?.({
     preventDefault() {

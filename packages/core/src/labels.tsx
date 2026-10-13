@@ -14,6 +14,7 @@ import type { MediaCreditLabels } from "./card";
 import type { CarouselLabels } from "./carousel";
 import type { CharacterCountLabels } from "./character-count";
 import type { ChatInputLabels } from "./chat-input";
+import type { ChoiceDividerLabels } from "./choice";
 import type { ComboboxLabels } from "./combobox";
 import type { CommandMenuLabels } from "./command-menu";
 import type { ConversationLabels } from "./conversation";
@@ -78,6 +79,7 @@ export interface ComponentLabels {
   carousel: CarouselLabels;
   characterCount: CharacterCountLabels;
   chatInput: ChatInputLabels;
+  choiceDivider: ChoiceDividerLabels;
   combobox: ComboboxLabels;
   commandMenu: CommandMenuLabels;
   conversation: ConversationLabels;

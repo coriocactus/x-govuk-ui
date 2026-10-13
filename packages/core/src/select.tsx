@@ -9,7 +9,6 @@ import {
   isValidElement,
   type ReactNode,
   useContext,
-  useEffect,
   useId,
   useLayoutEffect,
   useMemo,
@@ -83,8 +82,8 @@ const LabelRegistry = createContext<Registry | null>(null);
  * The labels of items that the Select cannot read from its children, such as items in a wrapper
  * of your own. Once the page has loaded, `CollectLabels` renders the children again, in an element
  * outside the page. There, each item reports its label and renders nothing. The page's first HTML
- * therefore shows such an item's value, until the labels arrive before the next paint. A label
- * that changes renders the Select again.
+ * therefore shows such an item's value, until the labels arrive before the browser first draws the
+ * page. A label that changes renders the Select again.
  */
 function useItemLabels() {
   const [labels, setLabels] = useState<Readonly<Record<string, ReactNode>>>({});
@@ -116,10 +115,13 @@ function hasWrappedItems(children: ReactNode) {
   );
 }
 
-/** Renders a Select's items again, outside the page, so each reports its label. */
+/**
+ * Renders a Select's items again, outside the page, so each reports its label. The element is made
+ * as the page first loads, before it is drawn, so the labels are there before the first paint.
+ */
 function CollectLabels({ registry, children }: { registry: Registry; children: ReactNode }) {
   const [host, setHost] = useState<HTMLElement | null>(null);
-  useEffect(() => setHost(document.createElement("div")), []);
+  useLayoutEffect(() => setHost(document.createElement("div")), []);
   if (!host) return null;
   return createPortal(<LabelRegistry value={registry}>{children}</LabelRegistry>, host);
 }

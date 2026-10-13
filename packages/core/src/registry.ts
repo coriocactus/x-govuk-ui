@@ -68,7 +68,8 @@ export function useRegistry<T>(): { items: readonly T[]; registry: Registry<T> }
             if (existing.data === data) return all;
             const next = [...all];
             next[at] = { ...existing, data };
-            return next;
+            // A part that changes may have moved too, such as one a wrapper put first.
+            return inOrder(next) ? next : sorted(next);
           }
           const entry = { token, data, place };
           const after = all.findIndex((other) => before(place.current, other.place.current));
@@ -83,7 +84,8 @@ export function useRegistry<T>(): { items: readonly T[]; registry: Registry<T> }
     }),
     [],
   );
-  // A part that moved, such as a keyed step that a wrapper put first, is placed again.
+  // A part that moved, such as a keyed step that a wrapper put first, is placed again. A part that
+  // moves without its group rendering is placed again as it next tells the group what it gives.
   useLayoutEffect(() => {
     if (!inOrder(entries)) setEntries((all) => (inOrder(all) ? all : sorted(all)));
   });

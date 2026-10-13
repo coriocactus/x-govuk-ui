@@ -28,6 +28,7 @@ import {
   useFormDefault,
 } from "./field";
 import { FieldsetLegend, type FieldsetProps, FieldsetRoot } from "./fieldset";
+import { useLabels } from "./labels";
 import { duration, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 import { type Registry, useRegister, useRegistry } from "./registry";
@@ -824,11 +825,20 @@ export function Radio(props: ChoiceProps) {
 
 export type ChoiceDividerProps = ComponentPropsWithRef<"div">;
 
+/** The words ChoiceDivider writes, which a LabelsProvider can change. */
+export type ChoiceDividerLabels = {
+  /** What the divider says, unless it is given words of its own. */
+  or: string;
+};
+
+export const defaultChoiceDividerLabels: ChoiceDividerLabels = { or: "or" };
+
 /** Sets an alternative answer apart, usually "or" before "None of these". */
-export function ChoiceDivider({ children = "or", className = "", ...props }: ChoiceDividerProps) {
+export function ChoiceDivider({ children, className = "", ...props }: ChoiceDividerProps) {
+  const words = useLabels("choiceDivider", defaultChoiceDividerLabels);
   return (
     <div {...props} className={`x-govuk-ui-choices-divider ${className}`.trim()}>
-      {children}
+      {children ?? words.or}
     </div>
   );
 }

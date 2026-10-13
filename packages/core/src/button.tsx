@@ -91,9 +91,12 @@ export function Button({
   const sound =
     (props as { "data-sound"?: string })["data-sound"] ??
     (variant === "warning" ? "destructive" : undefined);
+  // A link has no `disabled`, so another element takes `aria-disabled` in its place.
+  const { disabled, ...rest } = props;
   const button = (
     <button
-      {...props}
+      {...rest}
+      disabled={render ? undefined : disabled}
       // A button never sends its form by accident. Another element, such as a link, takes no type.
       type={render ? type : (type ?? "button")}
       className={`x-govuk-ui-button x-govuk-ui-button--${variant}${size === "medium" ? "" : ` x-govuk-ui-button--${size}`} ${className}`.trim()}

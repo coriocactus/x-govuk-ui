@@ -337,6 +337,9 @@ export function useFieldSummary(summary: FieldSummary) {
       if (given.linkTo?.owner === owner) given.linkTo = undefined;
     };
   });
+  // A part that leaves takes what it gave with it, so its Form hears of it, as it hears of a change.
+  const leaving = useLatest(changed);
+  useLayoutEffect(() => () => leaving.current?.(), []);
 }
 
 const FieldContext = createContext<Bound | null>(null);

@@ -280,3 +280,42 @@ test("a survey that starts on a step in a wrapper goes back to it from Check you
   await expect(visit).toBeVisible();
   await expect(frame.getByRole("radio", { name: "GOV.UK" })).toBeChecked();
 });
+
+test("a remembered survey keeps a slider's value as it shows, and an answer given just before the page reloads", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  await open("form");
+  const choose = async () => {
+    await playground.set("example", /In stages/);
+    for (const name of ["moreKinds", "remember"]) await playground.set(name, true);
+  };
+  await choose();
+  await frame.getByRole("radio", { name: "Satisfied", exact: true }).check();
+  await frame.getByRole("button", { name: "Submit and continue" }).click();
+  await expect(frame.getByRole("radio", { name: "Yes" })).toBeFocused();
+  await frame.getByRole("radio", { name: "No", exact: true }).check();
+  await frame.getByRole("button", { name: "Continue" }).click();
+  // The step's chosen answer takes focus as it comes, here the switch that starts on.
+  await expect(
+    frame.getByRole("switch", { name: "Take part in research about this service" }),
+  ).toBeFocused();
+  // The slider sends its value from an input that follows its state, so the value is kept once
+  // React has drawn it, not as the key is pressed.
+  const ease = frame.getByRole("slider", { name: "How easy was it, from 1 to 5?" });
+  await ease.focus();
+  await ease.press("ArrowRight");
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? ""))
+    .toContain('["ease","4"]');
+  // An answer given just before the page reloads is kept as the page goes.
+  await frame.getByRole("radio", { name: "GOV.UK" }).check();
+  await page.reload();
+  await choose();
+  await expect(
+    frame.getByRole("slider", { name: "How easy was it, from 1 to 5?" }),
+  ).toHaveAttribute("aria-valuenow", "4");
+  await expect(frame.getByRole("radio", { name: "GOV.UK" })).toBeChecked();
+});

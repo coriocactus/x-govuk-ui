@@ -335,9 +335,12 @@ function StepFields({
       return () => {
         unregister?.();
         if (own.get(name) === field) own.delete(name);
+        // A question that leaves, such as one a wrapper of your own stops rendering, leaves Check
+        // your answers too.
+        changed();
       };
     },
-    [parent, fields, step],
+    [parent, fields, step, changed],
   );
   const value = useMemo(() => form && { ...form, register, changed }, [form, register, changed]);
   return <FormContext value={value}>{children}</FormContext>;
@@ -384,6 +387,8 @@ export function FormSteps({
   onKeyDown: givenKeyDown,
   onInput: givenInput,
   onChange: givenChange,
+  onClick: givenClick,
+  onKeyUp: givenKeyUp,
   ref,
   ...formProps
 }: FormStepsProps) {
@@ -413,6 +418,7 @@ export function FormSteps({
   const [skipped, setSkipped] = useState(() => new Set<number>());
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
   const [rows, setRows] = useState<Row[]>([]);
+  const rememberSoon = useRef(0);
   // The fields each step asks, by the step's id and the field's name, as they register.
   const stepFields = useRef(new Map<string, Map<string, FormField>>());
   const [sent, setSent] = useState(false);
@@ -471,14 +477,31 @@ export function FormSteps({
     replan();
   }, [count, restored.round]);
 
-  /** Keeps the answers and the step, when there is a key. */
+  /**
+   * Keeps the answers and the step, when there is a key. Keeping them now cancels keeping them a
+   * moment after typing.
+   */
   const remember = (where = at, passing = passed, skipping = skipped) => {
+    window.clearTimeout(rememberSoon.current);
+    rememberSoon.current = 0;
     if (!storageKey || !form.current) return;
     const data = new FormData(form.current);
     const answers = [...data.entries()].flatMap(([name, value]) =>
       typeof value === "string" ? [[name, value] as [string, string]] : [],
     );
-    const names = new Set([...stepFields.current.values()].flatMap((fields) => [...fields.keys()]));
+    // A field that sends nothing is kept as empty, so it comes back empty. A field on a step that
+    // was skipped or does not apply sends nothing because its answers are left out, so it is not
+    // kept, and comes back at its own default.
+    const live = new Set(
+      planFor()
+        .filter((index) => !skipping.has(index))
+        .map((index) => registered[index]?.id),
+    );
+    const names = new Set(
+      [...stepFields.current]
+        .filter(([id]) => live.has(id))
+        .flatMap(([, fields]) => [...fields.keys()]),
+    );
     const empty = [...names].filter((name) => !data.has(name));
     writeSaved(storageKey, {
       at: where,
@@ -488,6 +511,29 @@ export function FormSteps({
       empty,
     });
   };
+
+  // Answers are kept a moment after the last change, once React has drawn it, such as in a hidden
+  // input that a control fills from its state. They are kept with the form as it is then, not as
+  // it was at the change. A page that closes or reloads within that moment, or a form that leaves
+  // it, keeps them at once.
+  const later = useLatest((andPlan: boolean) => {
+    if (andPlan) replan();
+    remember();
+  });
+  const keepSoon = () => {
+    window.clearTimeout(rememberSoon.current);
+    rememberSoon.current = window.setTimeout(() => later.current(true), 300);
+  };
+  useLayoutEffect(() => {
+    const flush = () => {
+      if (rememberSoon.current) later.current(false);
+    };
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, []);
 
   const go = (where: number, { push = true } = {}) => {
     replan();
@@ -940,13 +986,12 @@ export function FormSteps({
         onSubmit={(data) => onSubmit(data)}
         onKeyDown={chain(givenKeyDown, onKeyDown)}
         // Keeping the answers and working out the steps again follow every change, whatever a
-        // service's own handlers do. Each change is kept at once, with the step the form is on, so
-        // nothing kept later can name a step the form has left.
-        onInput={both(givenInput, () => {
-          replan();
-          remember();
-        })}
+        // service's own handlers do. A control that sends its value from a hidden input, such as a
+        // slider or a toggle group, changes it with a key or a press, not with typing.
+        onInput={both(givenInput, keepSoon)}
         onChange={both(givenChange, () => replan())}
+        onClick={both(givenClick, keepSoon)}
+        onKeyUp={both(givenKeyUp, keepSoon)}
       >
         {card ? <AutoHeight>{body}</AutoHeight> : body}
         {card ? (

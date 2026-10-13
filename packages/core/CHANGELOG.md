@@ -25,6 +25,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 ### Fixed
 
 - Fixed an answer in a wrapper of your own, inside Radios or Checkboxes, taking the first answer's id. Its label then named the wrong answer. Such an answer now takes an id of its own. When no answer has the group's id, a Form's error summary links to the first answer on the page.
+- Fixed a SelectItem in a wrapper of your own showing its value in the field, in place of its label, once chosen. Its label now shows once the page has loaded. A direct child's label is in the first HTML, as before.
 - Fixed Radios' dot landing on a follow-up question's chosen radio instead of the group's own.
 - Fixed Select dropping its own `aria-describedby` and `aria-invalid`. It now describes its control by them, before its hint and error, as Input and Textarea do.
 

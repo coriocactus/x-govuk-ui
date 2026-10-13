@@ -9,10 +9,14 @@ import {
   isValidElement,
   type ReactNode,
   useContext,
+  useEffect,
   useId,
+  useLayoutEffect,
+  useReducer,
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { useControllableState } from "./controllable-state";
 import {
   ErrorMessage,
@@ -65,7 +69,61 @@ export type SelectProps = Omit<
  */
 const TickContext = createContext<string | null>(null);
 
-/** The label of each item, so the chosen one shows in the field. */
+/** Where an item that a Select collects tells it the item's label. */
+type Registry = {
+  /** Keeps the item's latest label, without rendering the Select again. */
+  label: (value: string, label: ReactNode) => void;
+  /** Adds the item, which renders the Select again with its label, and returns its removal. */
+  add: (value: string) => () => void;
+};
+
+const LabelRegistry = createContext<Registry | null>(null);
+
+/**
+ * The labels of items that the Select cannot read from its children, such as items in a wrapper
+ * of your own. Once the page has loaded, `CollectLabels` renders the children again, in an element
+ * outside the page. There, each item reports its label and renders nothing. The page's first HTML
+ * therefore shows such an item's value, until the labels arrive before the next paint.
+ */
+function useItemLabels() {
+  const found = useRef(new Map<string, ReactNode>());
+  const [, renderAgain] = useReducer((count: number) => count + 1, 0);
+  const [registry] = useState<Registry>(() => ({
+    label: (value, label) => {
+      found.current.set(value, label);
+    },
+    add: (value) => {
+      renderAgain();
+      return () => {
+        found.current.delete(value);
+        renderAgain();
+      };
+    },
+  }));
+  return { labels: Object.fromEntries(found.current), registry };
+}
+
+/** Renders a Select's items again, outside the page, so each reports its label. */
+function CollectLabels({ registry, children }: { registry: Registry; children: ReactNode }) {
+  const [host, setHost] = useState<HTMLElement | null>(null);
+  useEffect(() => setHost(document.createElement("div")), []);
+  if (!host) return null;
+  return createPortal(<LabelRegistry value={registry}>{children}</LabelRegistry>, host);
+}
+
+/** An item that a Select collects for its label. It renders nothing. */
+function CollectedItem({ value, label }: { value: string; label: ReactNode }) {
+  const registry = useContext(LabelRegistry);
+  // The label is kept at every render, before the item is added, so the Select shows it at once.
+  useLayoutEffect(() => registry?.label(value, label));
+  useLayoutEffect(() => registry?.add(value), [registry, value]);
+  return null;
+}
+
+/**
+ * The label of each item that is a direct child, read as the Select renders, so it is in the first
+ * HTML.
+ */
 function labelsOf(children: ReactNode) {
   const labels: Record<string, ReactNode> = {};
   Children.forEach(children, (child) => {
@@ -162,7 +220,8 @@ export function SelectControl(given: SelectControlProps) {
   // A Form can give the field an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(name)?.[0];
   const defaultValue = givenDefault === undefined ? saved : givenDefault;
-  const labels = labelsOf(children);
+  const registered = useItemLabels();
+  const labels = { ...registered.labels, ...labelsOf(children) };
   const long = Object.keys(labels).length > SHORT_LIST;
   const list = <Primitive.List className="x-govuk-ui-select-list">{children}</Primitive.List>;
   // An uncontrolled select keeps its own value, so the tick can be read from it as the list opens.
@@ -208,6 +267,7 @@ export function SelectControl(given: SelectControlProps) {
           <ChevronIcon size={16} />
         </Primitive.Icon>
       </Primitive.Trigger>
+      <CollectLabels registry={registered.registry}>{children}</CollectLabels>
       <Primitive.Portal>
         <Primitive.Positioner
           className="x-govuk-ui-select-positioner"
@@ -253,15 +313,15 @@ export type SelectItemProps = ComponentPropsWithRef<"div"> & {
 
 /**
  * One option in a Select. The chosen option shows a tick. Screen readers hear the choice from the
- * option's selected state, so the tick is only decoration.
+ * option's selected state, so the tick is only decoration. It can sit in a wrapper of your own.
  */
-export function SelectItem({
-  value,
-  children,
-  disabled,
-  className = "",
-  ...props
-}: SelectItemProps) {
+export function SelectItem(props: SelectItemProps) {
+  const registry = useContext(LabelRegistry);
+  if (registry) return <CollectedItem value={props.value} label={props.children} />;
+  return <ListedItem {...props} />;
+}
+
+function ListedItem({ value, children, disabled, className = "", ...props }: SelectItemProps) {
   const ticked = useContext(TickContext) === value;
   return (
     <Primitive.Item

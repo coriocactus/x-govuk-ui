@@ -140,6 +140,6 @@ Automated tests find some accessibility failures, but not all. Passing them does
 
 ## Branding
 
-GOV.UK's crown, logotype, Royal Arms and GDS Transport are for official GOV.UK services only. The library deliberately leaves out the GDS Transport font. A GOV.UK service supplies the font itself, and elsewhere the components fall back to Arial.
+GOV.UK's crown, logotype, Royal Arms and GDS Transport are for official GOV.UK services only. The library draws the crown and logotype, which are a few lines of SVG, as GOV.UK Frontend's logo template does. It leaves out the Royal Arms and the GDS Transport font, which GOV.UK Frontend ships as files for a service to serve. A GOV.UK service serves them itself. It gives Footer the Royal Arms' address as `crest`, and supplies the font. Elsewhere, the footer shows no Royal Arms, and the components fall back to Arial.
 
 The site's own mark is GOV/UK, drawn in `site/brand.tsx`. In production, the site is set in Roboto.

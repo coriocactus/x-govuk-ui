@@ -1728,6 +1728,10 @@
   font-size: 17px;
 }
 
+/* The keylines of the editor example's own toolbar, a little taller than the editor's own. */
+.preview-keyline {
+  height: 24px;
+}
 /* The editor's Form, with its buttons, and Saved beside them, which takes no space of its own. */
 .preview-editor-actions {
   display: flex;

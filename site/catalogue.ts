@@ -553,6 +553,10 @@ const entries = {
       toggle("form", false, {
         note: "Puts the editor in a Form, which checks it is filled in and stops while files are on their way.",
       }),
+      toggle("ownToolbar", false, {
+        note: "A toolbar of the example's own, built from EditorControl and EditorSeparator parts, in place of `controls`. Its list controls come from a component of its own, which waits behind More whole.",
+        needs: [whenOn("richText")],
+      }),
       toggle("tip", true, {
         note: "A Callout, reading the editor through useEditor, points at Source until the source is shown or the tip is closed.",
         needs: [

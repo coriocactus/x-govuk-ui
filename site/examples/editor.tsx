@@ -10,9 +10,11 @@ import {
   EditorAIToolbar,
   EditorAITools,
   EditorContent,
+  EditorControl,
   type EditorControlKind,
   EditorPrompt,
   type EditorPromptItem,
+  EditorSeparator,
   EditorToolbar,
   type EditorUploadHelpers,
   type EditorValueFormat,
@@ -56,6 +58,8 @@ type Props = {
   form?: boolean;
   /** A Callout points at Source, until the source is shown or the tip is closed. */
   tip?: boolean;
+  /** A toolbar of the example's own, built from parts, in place of the editor's own controls. */
+  ownToolbar?: boolean;
 };
 
 // A caseworker's note, in the two formats the editor reads and writes.
@@ -239,6 +243,7 @@ export default function EditorExample({
   ai = false,
   form = false,
   tip = true,
+  ownToolbar = false,
 }: Props) {
   const [value, setValue] = useState(notes[format]);
   const [saved, setSaved] = useState(false);
@@ -267,7 +272,7 @@ export default function EditorExample({
       attachments={attachments}
       onUpload={upload}
     >
-      {richText && <EditorToolbar controls={controls} />}
+      {richText && (ownToolbar ? <NotesToolbar /> : <EditorToolbar controls={controls} />)}
       <EditorContent />
       {tip && richText && <SourceTip />}
       {mentions && <EditorPrompt trigger="@" name="person" label="Team members" items={team} />}
@@ -319,5 +324,50 @@ export default function EditorExample({
     </Form>
   ) : (
     editor
+  );
+}
+
+/**
+ * A toolbar of the example's own, built from EditorControl and EditorSeparator parts. The list
+ * controls come from a component of its own, which waits behind More whole when the row is short of
+ * space. Its keylines come from a component of its own too, which the toolbar treats as any
+ * keyline.
+ */
+function NotesToolbar() {
+  return (
+    <EditorToolbar>
+      <EditorControl kind="bold" />
+      <EditorControl kind="italic" />
+      <EditorControl kind="underline" />
+      <EditorControl kind="strikethrough" />
+      <EditorControl kind="link" />
+      <Keyline />
+      <ListControls />
+      <Keyline />
+      <EditorControl kind="quote" />
+      <EditorControl kind="code-block" />
+      <EditorControl kind="table" />
+      <EditorControl kind="divider" />
+      <Keyline />
+      <EditorControl kind="source" />
+      <EditorControl kind="undo" />
+      <EditorControl kind="redo" />
+    </EditorToolbar>
+  );
+}
+
+/** A keyline, drawn in one place, as a service keeps the look of its toolbars in one place. */
+function Keyline() {
+  return <EditorSeparator className="preview-keyline" />;
+}
+
+/** The list controls, kept together as a service keeps a group it uses in several toolbars. */
+function ListControls() {
+  return (
+    <>
+      <EditorControl kind="bullet-list" />
+      <EditorControl kind="numbered-list" />
+      <EditorControl kind="check-list" />
+    </>
   );
 }

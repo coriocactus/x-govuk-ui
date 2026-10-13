@@ -54,6 +54,42 @@ test("components use their own class names rather than GOV.UK Frontend's", () =>
   expect(html).not.toMatch(/class="[^"]*\bgovuk-(?!ui-)/);
 });
 
+test("every file that uses React's client-only API says it is client code", async () => {
+  // Each package's index re-exports from every file, and a service's server components import the
+  // index. A server build, such as Next.js's, refuses a file that imports a hook only the browser
+  // has, unless the file starts "use client". The build keeps each file's directive.
+  const clientOnly = new Set([
+    "Component",
+    "PureComponent",
+    "createContext",
+    "useActionState",
+    "useDeferredValue",
+    "useEffect",
+    "useImperativeHandle",
+    "useInsertionEffect",
+    "useLayoutEffect",
+    "useOptimistic",
+    "useReducer",
+    "useRef",
+    "useState",
+    "useSyncExternalStore",
+    "useTransition",
+  ]);
+  const unmarked: string[] = [];
+  for (const path of new Bun.Glob("packages/*/src/*.{ts,tsx}").scanSync(".")) {
+    const code = await Bun.file(path).text();
+    const used = [...code.matchAll(/import \{([^}]*)\} from "react"/g)].flatMap((match) =>
+      (match[1] ?? "")
+        .split(",")
+        .map((name) => name.trim())
+        .filter((name) => clientOnly.has(name)),
+    );
+    if (used.length > 0 && !code.trimStart().startsWith('"use client"'))
+      unmarked.push(`${path}: ${used.join(", ")}`);
+  }
+  expect(unmarked).toEqual([]);
+});
+
 test("every custom property the library declares starts x-govuk-ui-", async () => {
   // Reading another library's property, such as GOV.UK Frontend's palette or Base UI's
   // --anchor-width, is fine. Declaring one, in a stylesheet or from a component, names it ours.

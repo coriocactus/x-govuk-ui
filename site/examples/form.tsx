@@ -121,6 +121,31 @@ const ratings = [
   ["5", "Very dissatisfied"],
 ];
 
+/**
+ * A step of its own, as a service keeps a question it asks in several forms. FormSteps finds it
+ * inside the component, in its place among the others.
+ */
+function IssuesStep() {
+  return (
+    <FormStep
+      validate={(data): FormErrors => ({
+        issues: data.get("issues") ? undefined : "Select yes or no",
+      })}
+    >
+      <Radios name="issues" legend="Have you experienced any technical issues today?">
+        <Radio
+          value="yes"
+          conditional={<Textarea name="issue-details" label="Tell us about the technical issues" />}
+        >
+          Yes
+        </Radio>
+        <Radio value="no">No</Radio>
+      </Radios>
+      <Textarea name="improvement" label="How could we improve this service?" />
+    </FormStep>
+  );
+}
+
 /** Stands in for a service's API, which takes a moment to answer. */
 const wait = (milliseconds: number) => new Promise((done) => setTimeout(done, milliseconds));
 
@@ -181,24 +206,7 @@ function FeedbackInStages({
             ))}
           </Radios>
         </FormStep>
-        <FormStep
-          validate={(data): FormErrors => ({
-            issues: data.get("issues") ? undefined : "Select yes or no",
-          })}
-        >
-          <Radios name="issues" legend="Have you experienced any technical issues today?">
-            <Radio
-              value="yes"
-              conditional={
-                <Textarea name="issue-details" label="Tell us about the technical issues" />
-              }
-            >
-              Yes
-            </Radio>
-            <Radio value="no">No</Radio>
-          </Radios>
-          <Textarea name="improvement" label="How could we improve this service?" />
-        </FormStep>
+        <IssuesStep />
       </FormSteps>
       <Button
         variant="link"

@@ -86,13 +86,25 @@ export default function TourExample({
         <TourStep target="#tour-passport" title="Carry on where you left off">
           Applications you have not sent yet stay here for 30 days.
         </TourStep>
-        <TourStep target="#tour-start" title="Start something new">
-          Apply for another service. Your details are filled in for you.
-        </TourStep>
-        <TourStep target="#tour-help" title="Get help">
-          Talk to us by phone or webchat, Monday to Friday, 8am to 6pm.
-        </TourStep>
+        <ActionSteps />
       </Tour>
     </div>
+  );
+}
+
+/**
+ * The steps about the actions, kept with them in a component of their own, as a part of a page can
+ * keep its own steps. The Tour finds them inside it, in their place among the others.
+ */
+function ActionSteps() {
+  return (
+    <>
+      <TourStep target="#tour-start" title="Start something new">
+        Apply for another service. Your details are filled in for you.
+      </TourStep>
+      <TourStep target="#tour-help" title="Get help">
+        Talk to us by phone or webchat, Monday to Friday, 8am to 6pm.
+      </TourStep>
+    </>
   );
 }

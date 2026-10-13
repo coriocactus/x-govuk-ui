@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Added
+
+- Added `defaultMaximised` and `defaultActive` to Tiles and TilesProvider, for Tiles that keep track themselves from a start you choose.
+
 ## [0.3.0] - 2026-10-10
 
 ### Added

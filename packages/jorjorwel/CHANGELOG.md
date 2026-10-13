@@ -4,15 +4,19 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
-### Changed
+### Breaking Changes
 
-- Changed the Editor's `errorMessage` to take any React content, as every field's does.
+- Removed EditorAIPrompt's `submitLabel`, and EditorAISuggestion's `workingLabel`, `replaceLabel`, `discardLabel` and `closeLabel`. Their words are the Editor's labels `aiSend`, `aiWorking`, `aiReplace`, `aiDiscard` and `aiClose`, which the Editor's `labels` or a LabelsProvider's `editor` words give.
 
 ### Added
 
 - Added the Editor's words to LabelsProvider, from x-govuk-ui, as `editor`. The Editor's own `labels` come first, then the nearest provider's, then its English defaults.
 - Added the Editor's question and answer to FormSteps' Check your answers. The answer is the document's words, without its markup.
 - Added the ability to put an EditorSeparator inside a wrapper of your own, in an EditorToolbar. It is still a keyline, which the toolbar leaves out at either end of its row.
+
+### Changed
+
+- Changed the Editor's `errorMessage` to take any React content, as every field's does.
 
 ## [0.3.0] - 2026-10-10
 

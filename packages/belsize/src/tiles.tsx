@@ -389,6 +389,8 @@ export type TilesProviderProps = {
   createTile?: () => string | null | Promise<string | null>;
   /** The maximised tile, for Tiles you keep track of. Null means none. */
   maximised?: string | null;
+  /** The tile maximised at first, for Tiles that keep track themselves. */
+  defaultMaximised?: string | null;
   onMaximisedChange?: (id: string | null) => void;
   /**
    * The tile in use, for Tiles you keep track of. Null means none. Left out, the tile in use is the
@@ -397,6 +399,8 @@ export type TilesProviderProps = {
    * and the tile stays as it is until you give the new one.
    */
   active?: string | null;
+  /** The tile in use at first, for Tiles that keep track themselves. */
+  defaultActive?: string | null;
   /**
    * Called with the tile in use as it changes, from focus, the pointer or a tile's pager, and with
    * null when it closes.
@@ -424,8 +428,10 @@ export function TilesProvider({
   tiles: entries,
   createTile,
   maximised: maximisedValue,
+  defaultMaximised = null,
   onMaximisedChange,
   active: activeValue,
+  defaultActive = null,
   onActiveChange,
   mobileBreakpoint,
   children,
@@ -458,14 +464,14 @@ export function TilesProvider({
 
   const [wanted, setMaximised] = useControllableState<string | null>(
     maximisedValue,
-    null,
+    defaultMaximised,
     onMaximisedChange,
   );
   const maximised = wanted !== null && ids.includes(wanted) ? wanted : null;
 
   // The tile in use, while it is open. The service is told as a user changes it, and as it closes,
   // but not when the service gives a new one itself.
-  const [ownActive, setOwnActive] = useState<string | null>(null);
+  const [ownActive, setOwnActive] = useState<string | null>(defaultActive);
   const wantedActive = activeValue !== undefined ? activeValue : ownActive;
   const active = wantedActive !== null && ids.includes(wantedActive) ? wantedActive : null;
   const told = useRef<string | null>(null);
@@ -1123,8 +1129,10 @@ export function Tiles({
   tiles,
   createTile,
   maximised,
+  defaultMaximised,
   onMaximisedChange,
   active,
+  defaultActive,
   onActiveChange,
   mobileBreakpoint,
   renderTile,
@@ -1147,8 +1155,10 @@ export function Tiles({
       tiles={tiles}
       createTile={createTile}
       maximised={maximised}
+      defaultMaximised={defaultMaximised}
       onMaximisedChange={onMaximisedChange}
       active={active}
+      defaultActive={defaultActive}
       onActiveChange={onActiveChange}
       mobileBreakpoint={mobileBreakpoint}
     >

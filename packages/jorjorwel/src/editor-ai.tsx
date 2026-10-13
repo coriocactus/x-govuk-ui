@@ -1105,7 +1105,6 @@ export type EditorAIPromptProps = ComponentPropsWithRef<"div"> & {
   /** Names the field for screen readers. By default, the editor's `labels.aiPrompt`. */
   label?: string;
   placeholder?: string;
-  submitLabel?: string;
   /** Shown before the field. By default, the Orb. */
   icon?: ReactNode;
 };
@@ -1118,7 +1117,6 @@ export type EditorAIPromptProps = ComponentPropsWithRef<"div"> & {
 export function EditorAIPrompt({
   label,
   placeholder,
-  submitLabel,
   icon,
   className = "",
   ...props
@@ -1155,7 +1153,7 @@ export function EditorAIPrompt({
         type="button"
         size="small-icon"
         className="x-govuk-ui-editor-ai-send"
-        aria-label={submitLabel ?? labels.aiSend}
+        aria-label={labels.aiSend}
         data-sound="command"
         onClick={send}
       >
@@ -1167,27 +1165,15 @@ export function EditorAIPrompt({
   );
 }
 
-/** The suggestion's words. By default, each comes from the editor's `labels`. */
-export type EditorAISuggestionProps = MotionDivProps & {
-  workingLabel?: ReactNode;
-  replaceLabel?: ReactNode;
-  discardLabel?: ReactNode;
-  closeLabel?: ReactNode;
-};
+/** The suggestion's words come from the editor's `labels`. */
+export type EditorAISuggestionProps = MotionDivProps;
 
 /**
  * Shows progress, then the suggestion in Inset text with Replace and Discard buttons, or what went
  * wrong. A suggestion in Markdown is shown formatted, as it will go in. It grows to fit, so
  * nothing jumps into place.
  */
-export function EditorAISuggestion({
-  workingLabel,
-  replaceLabel,
-  discardLabel,
-  closeLabel,
-  className = "",
-  ...props
-}: EditorAISuggestionProps) {
+export function EditorAISuggestion({ className = "", ...props }: EditorAISuggestionProps) {
   const shared = useShared();
   const { labels } = useEditorContext("EditorAISuggestion");
   const { suggestion } = shared;
@@ -1204,7 +1190,7 @@ export function EditorAISuggestion({
         {shared.status === "working" && (
           <motion.p key="working" className="x-govuk-ui-editor-ai-status" role="status" {...settle}>
             <Orb state="working" size={14} />
-            <TextShimmer>{workingLabel ?? labels.aiWorking}</TextShimmer>
+            <TextShimmer>{labels.aiWorking}</TextShimmer>
           </motion.p>
         )}
         {suggestion !== null && (
@@ -1229,10 +1215,10 @@ export function EditorAISuggestion({
             </InsetText>
             <div className="x-govuk-ui-editor-ai-choices">
               <Button size="small" data-sound="success" onClick={shared.accept}>
-                {replaceLabel ?? labels.aiReplace}
+                {labels.aiReplace}
               </Button>
               <Button variant="link" data-sound="close" onClick={shared.discard}>
-                {discardLabel ?? labels.aiDiscard}
+                {labels.aiDiscard}
               </Button>
             </div>
           </motion.div>
@@ -1249,7 +1235,7 @@ export function EditorAISuggestion({
             </InsetText>
             <div className="x-govuk-ui-editor-ai-choices">
               <Button variant="link" data-sound="close" onClick={shared.discard}>
-                {closeLabel ?? labels.aiClose}
+                {labels.aiClose}
               </Button>
             </div>
           </motion.div>

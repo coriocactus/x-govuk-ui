@@ -144,8 +144,41 @@ export type UseFieldOptions = {
   answer?: (data: FormData) => ReactNode;
 };
 
+/** What `useField` gives a field wired by hand, and what a bound Field gives the parts inside it. */
+export type UseFieldResult = {
+  /** The control's id, which an error summary links to. */
+  id: string;
+  /**
+   * The label's id, for a control that its label cannot be for, such as a slider's thumb, which
+   * names itself with `aria-labelledby`. A Label with `htmlFor={null}` takes it.
+   */
+  labelId: string;
+  hintId: string;
+  errorId: string;
+  /** Whether the field has an error to show. */
+  invalid: boolean;
+  /** The message to show, which is the field's own or its Form's. */
+  errorMessage: ReactNode;
+  /** Spread onto the control, or onto the element that takes focus in a composite control. */
+  controlProps: {
+    id: string;
+    "aria-describedby"?: string;
+    "aria-invalid"?: true;
+  };
+};
+
 /** The ids that tie a control to its label, hint and error message, in GOV.UK's scheme. */
-export function useField({
+export function useField(options: UseFieldOptions): UseFieldResult {
+  const { field: _entry, ...result } = useFieldEntry(options);
+  return result;
+}
+
+/**
+ * `useField`, with the object the field keeps for its Form, which a bound Field gives its parts
+ * so they can tell the Form what they ask and answer. The object is the library's own, so it is
+ * not public.
+ */
+function useFieldEntry({
   id,
   name,
   linkTo,
@@ -207,17 +240,11 @@ export function useField({
     id: controlId,
     /** What the field tells its Form. Its parts and its control fill in what it was not given. */
     field,
-    /**
-     * The label's id, for a control that its label cannot be for, such as a slider's thumb, which
-     * names itself with `aria-labelledby`. A Label with `htmlFor={null}` takes it.
-     */
     labelId,
     hintId,
     errorId,
     invalid,
-    /** The message to show, which is the field's own or its Form's. */
     errorMessage,
-    /** Spread onto the control, or onto the element that takes focus in a composite control. */
     controlProps: {
       id: controlId,
       "aria-describedby":
@@ -250,7 +277,10 @@ type Entry = FormField & {
 };
 
 /** What a bound Field gives the parts inside it, which is `useField`'s result and its name. */
-export type BoundField = ReturnType<typeof useField> & { name?: string };
+export type BoundField = UseFieldResult & { name?: string };
+
+/** A bound Field as its own parts read it, with the object it keeps for its Form. */
+type Bound = BoundField & { field: Entry };
 
 /**
  * Gives the bound Field around it its answer, for Check your answers. It renders nothing.
@@ -309,7 +339,7 @@ export function useFieldSummary(summary: FieldSummary) {
   });
 }
 
-const FieldContext = createContext<BoundField | null>(null);
+const FieldContext = createContext<Bound | null>(null);
 
 /**
  * Keeps the parts inside from binding to the Field around them, such as the fields of a follow-up
@@ -472,7 +502,7 @@ export type FieldBindingProps = Pick<
  * `useControlProps`. Its props are a bound Field's.
  */
 export function FieldBinding({ children, controlId, ...binding }: FieldBindingProps) {
-  const field = useField({
+  const field = useFieldEntry({
     id: controlId,
     name: binding.name,
     linkTo: binding.linkTo,

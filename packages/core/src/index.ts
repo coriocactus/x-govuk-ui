@@ -327,6 +327,7 @@ export {
   ShownProvider,
   type ShownProviderProps,
   type UseFieldOptions,
+  type UseFieldResult,
   useBoundField,
   useControlProps,
   useField,

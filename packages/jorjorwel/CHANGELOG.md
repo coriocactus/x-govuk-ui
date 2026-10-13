@@ -12,7 +12,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Added the Editor's words to LabelsProvider, from x-govuk-ui, as `editor`. The Editor's own `labels` come first, then the nearest provider's, then its English defaults.
 - Added the Editor's question and answer to FormSteps' Check your answers. The answer is the document's words, without its markup.
-- Added the ability to put an EditorSeparator inside a wrapper of your own, in an EditorToolbar. It is still a keyline, which the toolbar leaves out at either end of its row. The toolbar knows it as a keyline for as long as its item is in the toolbar, so a wrapper that renders an EditorSeparator should always render one.
+- Added the ability to put an EditorSeparator inside a component of your own, in an EditorToolbar. Each child of the toolbar is one item of its row. One that draws only keylines is a keyline, which the row never starts or ends on. One that draws controls, such as a group of your own, waits behind More whole.
 
 ### Changed
 

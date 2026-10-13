@@ -12,9 +12,12 @@
     translate: 0 3px;
   }
 }
+/* Buttons of a step's own that do not fit beside Back and Next wrap onto another row, at its end. */
 .x-govuk-ui-tour-foot {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
   margin-top: 16px;
 }
@@ -25,13 +28,16 @@
 /* A step's own buttons, such as Skip the tour, sit before Back and Next. */
 .x-govuk-ui-tour-actions {
   display: inline-flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
+/* The count keeps to one line, so buttons that do not fit wrap instead. */
 .x-govuk-ui-tour-count {
   display: inline-flex;
   flex: 1;
   align-items: center;
   gap: 10px;
+  white-space: nowrap;
   font-size: 14px;
   font-variant-numeric: tabular-nums;
 }

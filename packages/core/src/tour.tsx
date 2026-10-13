@@ -139,7 +139,7 @@ export type TourProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   storage?: StorageLike;
   /**
    * Whether opening the tour again continues from the step where someone left it. Once they have
-   * finished, it starts again from the first step either way.
+   * finished, it starts again from `defaultStep` either way.
    */
   resume?: boolean;
   /**

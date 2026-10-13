@@ -1107,7 +1107,9 @@ test("a long list's highlight follows the keys and the wheel, never against them
   await page.keyboard.down("ArrowUp");
   await page.waitForTimeout(250);
   await phase("up, held");
-  for (let repeat = 0; repeat < 10; repeat++) {
+  // The list scrolls back only as the highlight reaches its first row. The key is held past it, so
+  // the frames it scrolls in fall while the key is held, however the repeats are timed.
+  for (let repeat = 0; repeat < 14; repeat++) {
     await page.keyboard.down("ArrowUp");
     await page.waitForTimeout(30);
   }

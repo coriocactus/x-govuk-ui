@@ -110,6 +110,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Fixed the browser's Back and Forward in FormSteps with `history` going to the wrong step after the form started on a step in a wrapper of your own, or came back to a step from a `storageKey`. The browser's current entry now always records the step the form is on.
 - Fixed FormSteps with a `storageKey` bringing back a field's own default after a reload, where users had cleared the answer, such as a switch turned off or a group with nothing ticked. A field that sends nothing is now kept as empty.
 - Fixed Check your answers showing a Select's value in place of its option's label after a reload, when its options are in a component of your own. Check your answers now lists the answers again when a field's question or answer changes while it shows.
+- Fixed FormSteps not keeping answers under its `storageKey` when a service's own `onInput` or `onChange` prevented the event's default.
 - Fixed Tour failing to render on the server.
 - Fixed File upload losing its files' Remove when given a `ref`, which took the place of its own.
 - Fixed Slider putting its own `aria-describedby` on its root, which nothing reads. It now describes the thumb, before the hint and the error, as every field's control is described.

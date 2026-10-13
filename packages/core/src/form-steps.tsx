@@ -20,7 +20,7 @@ import { AutoHeight } from "./auto-height";
 import { BackLink } from "./back-link";
 import { Button, ButtonGroup } from "./button";
 import { useControllableState } from "./controllable-state";
-import { chain } from "./events";
+import { both, chain } from "./events";
 import { FormContext, type FormField, present } from "./field";
 import { Form, type FormErrors, type FormProps } from "./form";
 import { Kbd } from "./kbd";
@@ -932,14 +932,16 @@ export function FormSteps({
         validate={(data) => (reviewing || !step?.validate ? {} : step.validate(data))}
         onSubmit={(data) => onSubmit(data)}
         onKeyDown={chain(givenKeyDown, onKeyDown)}
-        onInput={chain(givenInput, () => {
+        // Keeping the answers and working out the steps again follow every change, whatever a
+        // service's own handlers do.
+        onInput={both(givenInput, () => {
           window.clearTimeout(rememberSoon.current);
           rememberSoon.current = window.setTimeout(() => {
             replan();
             remember();
           }, 300);
         })}
-        onChange={chain(givenChange, () => replan())}
+        onChange={both(givenChange, () => replan())}
       >
         {card ? <AutoHeight>{body}</AutoHeight> : body}
         {card ? (

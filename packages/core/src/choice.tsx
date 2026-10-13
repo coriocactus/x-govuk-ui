@@ -23,7 +23,8 @@ import {
   type FieldProps,
   Hint,
   present,
-  ShownContext,
+  ShownProvider,
+  Unbound,
   useFormDefault,
 } from "./field";
 import { FieldsetLegend, type FieldsetProps, FieldsetRoot } from "./fieldset";
@@ -775,7 +776,8 @@ export type ChoiceConditionalProps = ComponentPropsWithRef<"div"> & {
 /**
  * An answer's follow-up question, after its `ChoiceRoot`. It opens and closes smoothly while its
  * answer is chosen. When closed, it is inert, so its fields cannot take focus, and it stays in the
- * page, so its answers are kept.
+ * page, so its answers are kept. Its fields are fields of their own, never parts of the group's
+ * Field, and Check your answers lists them only while it is open.
  */
 export function ChoiceConditional({
   value,
@@ -786,11 +788,6 @@ export function ChoiceConditional({
 }: ChoiceConditionalProps) {
   const group = useGroup();
   const checked = group.isChecked(value);
-  // The fields inside show while the answer is chosen and the question around it shows.
-  const around = useContext(ShownContext);
-  const open = useRef(checked);
-  open.current = checked;
-  const shown = useCallback(() => open.current && around(), [around]);
   return (
     <div
       {...props}
@@ -801,7 +798,9 @@ export function ChoiceConditional({
     >
       <div className="x-govuk-ui-conditional-inner">
         <div className="x-govuk-ui-conditional-content">
-          <ShownContext value={shown}>{children}</ShownContext>
+          <ShownProvider shown={checked}>
+            <Unbound>{children}</Unbound>
+          </ShownProvider>
         </div>
       </div>
     </div>

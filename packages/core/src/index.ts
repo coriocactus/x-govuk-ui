@@ -297,13 +297,17 @@ export {
   type ErrorMessageProps,
   Field,
   type FieldProps,
+  type FieldSummary,
   type FormField,
   Hint,
   Label,
   type LabelProps,
+  ShownProvider,
+  type ShownProviderProps,
   type UseFieldOptions,
   useControlProps,
   useField,
+  useFieldSummary,
   useFormDefault,
 } from "./field";
 export {

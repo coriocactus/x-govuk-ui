@@ -114,6 +114,11 @@ export type InlineCitationLabels = {
   next: string;
   /** Says which source shows, for screen readers, as in "Source 2 of 3". */
   position: (place: number, count: number) => string;
+  /**
+   * Names the pill for screen readers, by the first source's site and how many more there are, as
+   * in "Source: GOV.UK" or "Sources: GOV.UK and 2 more".
+   */
+  pill: (site: string, more: number) => string;
 };
 
 export const defaultInlineCitationLabels: InlineCitationLabels = {
@@ -122,6 +127,7 @@ export const defaultInlineCitationLabels: InlineCitationLabels = {
   previous: "Previous source",
   next: "Next source",
   position: (place, count) => `Source ${place} of ${count}`,
+  pill: (site, more) => (more > 0 ? `Sources: ${site} and ${more} more` : `Source: ${site}`),
 };
 
 /**
@@ -163,7 +169,7 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
         delay={200}
         className={`x-govuk-ui-inline-citation ${className}`.trim()}
         data-copy="skip"
-        aria-label={more ? `Sources: ${site} and ${more} more` : `Source: ${site}`}
+        aria-label={words.pill(site, more)}
       >
         <SiteMark source={first} />
         <span className="x-govuk-ui-inline-citation-site">{site}</span>

@@ -11,6 +11,7 @@ import {
 } from "x-govuk-ui";
 import { BrushControl, type BrushState } from "./chart-brush";
 import { type FigureRow, Figures, type FigureTable } from "./chart-frame";
+import { useChartLabels } from "./chart-labels";
 import { defaultChartLabels } from "./chart-words";
 
 /** One entry of a chart's key, with what it names, and its mark. */
@@ -157,10 +158,12 @@ export type ChartTableProps = Omit<FigureDataProps, "children" | "summary"> & {
  */
 export function ChartTable({ summary, tables, ...props }: ChartTableProps) {
   const parts = useContext(ChartPartsContext);
+  // Outside a chart, the words come from a LabelsProvider's chart words, as a chart's do.
+  const words = useChartLabels();
   const shown = tables ?? parts?.tables;
   if (!shown?.length) return null;
   return (
-    <FigureData {...props} summary={summary ?? parts?.summary ?? defaultChartLabels.showTable}>
+    <FigureData {...props} summary={summary ?? parts?.summary ?? words.showTable}>
       {shown.map((table, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: A table has only its place among them.
         <Figures key={index} {...table} />

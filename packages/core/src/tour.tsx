@@ -374,6 +374,10 @@ export function Tour({
 
   const go = async (index: number) => {
     if (moving || index < 0 || index >= steps.length) return;
+    // Focus on a button among the step's words, which leave with the step, moves on to Next first.
+    // Otherwise Base UI puts it on the card as the words go.
+    if (card?.querySelector(".x-govuk-ui-tour-step")?.contains(document.activeElement))
+      next.current?.focus();
     direction.current = index > step ? 1 : -1;
     const wanted = steps[index]?.target;
     const coming = wanted === undefined ? null : resolveAnchor(wanted);
@@ -389,9 +393,11 @@ export function Tour({
     setStep(index);
     setMoving(false);
     setProgress({ step: index, ended: null });
-    // There is no Back at the first step, so focus moves on to Next.
+    // There is no Back at the first step, so focus moves on to Next. So does focus on the card
+    // itself, where Safari puts it as a button among the step's words is pressed.
     requestAnimationFrame(() => {
-      if (!card?.contains(document.activeElement)) next.current?.focus();
+      const focused = document.activeElement;
+      if (!card?.contains(focused) || focused === card) next.current?.focus();
     });
   };
   const end = (how: "finished" | "closed") => {

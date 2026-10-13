@@ -196,6 +196,13 @@ test("a tour steps through its targets, and a service chooses its dimming, memor
   await expect(next).toBeFocused();
   for (let step = 0; step < 3; step++) await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("dialog", { name: "Get help" })).toBeVisible();
+  // A button among a step's words moves the tour too, back to its first step. It leaves with its
+  // step, so focus moves on to Next.
+  await card.getByRole("button", { name: "See the tour from the start" }).click();
+  await expect(card).toContainText("1 of 4");
+  await expect(next).toBeFocused();
+  for (let step = 0; step < 3; step++) await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("dialog", { name: "Get help" })).toBeVisible();
   // Done ends it, and focus goes back to where the tour began.
   await card.getByRole("button", { name: "Done" }).click();
   await expect(card).toHaveCount(0);
@@ -247,14 +254,8 @@ test("a tour steps through its targets, and a service chooses its dimming, memor
   await start.click();
   await expect(page.getByRole("dialog", { name: "Find an application" })).toBeVisible();
   await page.keyboard.press("Escape");
-  // A button among a step's words moves the tour too, back to its first step.
-  await start.click();
-  for (let step = 1; step < 4; step++)
-    await card.getByRole("button", { name: "Next", exact: true }).click();
-  await expect(card).toContainText("4 of 4");
-  await card.getByRole("button", { name: "See the tour from the start" }).click();
-  await expect(card).toContainText("1 of 4");
   // A step's own button, Skip, ends the tour as Done does.
+  await start.click();
   await card.getByRole("button", { name: "Skip" }).click();
   await expect(card).toHaveCount(0);
   expect(await stored()).toBe('{"step":0,"ended":"finished"}');

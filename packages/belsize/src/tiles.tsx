@@ -33,6 +33,7 @@ import {
   MenuSubmenu,
   ResizableHandle,
   ScrollArea,
+  type StorageLike,
   Tooltip,
   useControllableState,
   useLabels,
@@ -404,6 +405,8 @@ export type TilesLayoutOptions = {
    * as long as the page.
    */
   storageKey?: string;
+  /** Where `storageKey` keeps the arrangement. By default, local storage. */
+  storage?: StorageLike;
   /** The arrangement to start with, and to go back to when the kept one cannot be used. */
   defaultValue: TilesLayout | null;
   /** The tiles that still exist. Any kept under the key that are not among them are left out. */
@@ -418,11 +421,12 @@ export type TilesLayoutOptions = {
  */
 export function useTilesLayout({
   storageKey,
+  storage,
   defaultValue,
   ids,
 }: TilesLayoutOptions): [TilesLayout | null, (layout: TilesLayout | null) => void] {
   const [own, setOwn] = useState(defaultValue);
-  const [saved, setSaved] = useStoredState<Saved | null>(storageKey, null);
+  const [saved, setSaved] = useStoredState<Saved | null>(storageKey, null, storage);
   let usable: TilesLayout | null | undefined;
   if (saved?.version === 1 && (saved.layout === null || isTilesLayout(saved.layout))) {
     usable = ids === undefined ? saved.layout : keepTiles(saved.layout, ids);
@@ -462,6 +466,8 @@ export type TilesProviderProps = {
    * Controlled Tiles keep theirs with `useTilesLayout`, which checks it the same way.
    */
   storageKey?: string;
+  /** Where `storageKey` keeps the arrangement. By default, local storage. */
+  storage?: StorageLike;
   /**
    * Every tile the Tiles can show, with its title. Closed tiles wait in a `TilesDock`, and in each
    * tile's Show here. The entries name a tile before its Tile does, so a Tile needs no title of its
@@ -514,6 +520,7 @@ export function TilesProvider({
   defaultValue = null,
   onValueChange,
   storageKey,
+  storage,
   tiles: entries,
   createTile,
   maximised: maximisedValue,
@@ -536,6 +543,7 @@ export function TilesProvider({
   const known = useMemo(() => JSON.parse(entriesText) as TileEntry[], [entriesText]);
   const [own, setOwn] = useTilesLayout({
     storageKey: value === undefined ? storageKey : undefined,
+    storage,
     defaultValue,
     ids: entries ? known.map((entry) => entry.id) : undefined,
   });
@@ -1219,6 +1227,7 @@ export function Tiles({
   defaultValue,
   onValueChange,
   storageKey,
+  storage,
   tiles,
   createTile,
   maximised,
@@ -1246,6 +1255,7 @@ export function Tiles({
       defaultValue={defaultValue}
       onValueChange={onValueChange}
       storageKey={storageKey}
+      storage={storage}
       tiles={tiles}
       createTile={createTile}
       maximised={maximised}

@@ -3,7 +3,7 @@
 import { type ComponentPropsWithRef, type RefObject, useLayoutEffect, useRef } from "react";
 import { Button } from "./button";
 import { useLabels } from "./labels";
-import { useStoredState } from "./stored-state";
+import { type StorageLike, useStoredState } from "./stored-state";
 import { Tooltip } from "./tooltip";
 
 /** The page's theme, which is light, as GOV.UK is, or dark. */
@@ -31,8 +31,10 @@ function applyTheme(target: HTMLElement, theme: Theme, change: boolean) {
 }
 
 export type UseThemeOptions = {
-  /** Keeps the theme in local storage under this key, for every page of the site. */
+  /** Keeps the theme in `storage` under this key, for every page of the site. */
   storageKey?: string;
+  /** Where `storageKey` keeps the theme. By default, local storage. */
+  storage?: StorageLike;
   /** The theme before users choose one. By default, light, as GOV.UK is. */
   defaultTheme?: Theme;
   /**
@@ -46,8 +48,13 @@ export type UseThemeOptions = {
  * The page's theme, light or dark, and a way to change it, kept in local storage if you give it a
  * key. A change is instant, everywhere on the page in the same frame.
  */
-export function useTheme({ storageKey, defaultTheme = "light", element }: UseThemeOptions = {}) {
-  const [stored, setTheme] = useStoredState<Theme>(storageKey, defaultTheme);
+export function useTheme({
+  storageKey,
+  storage,
+  defaultTheme = "light",
+  element,
+}: UseThemeOptions = {}) {
+  const [stored, setTheme] = useStoredState<Theme>(storageKey, defaultTheme, storage);
   // Anything else kept, such as an older choice of System, falls back to the default.
   const theme: Theme = stored === "light" || stored === "dark" ? stored : defaultTheme;
   const applied = useRef<Theme | null>(null);
@@ -88,6 +95,8 @@ export type ThemePickerProps = Omit<
    * picker sets the page's theme itself, with useTheme.
    */
   storageKey?: string;
+  /** Where `storageKey` keeps the theme. By default, local storage. */
+  storage?: StorageLike;
   labels?: Partial<ThemePickerLabels>;
 };
 
@@ -109,6 +118,7 @@ export function ThemePicker({
   defaultValue = "light",
   onValueChange,
   storageKey,
+  storage,
   labels,
   className = "",
   onClick,
@@ -118,6 +128,7 @@ export function ThemePicker({
   const controlled = value !== undefined;
   const own = useTheme({
     storageKey: controlled ? undefined : storageKey,
+    storage,
     defaultTheme: defaultValue,
     element: controlled ? null : undefined,
   });

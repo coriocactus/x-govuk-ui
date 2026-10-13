@@ -34,7 +34,7 @@ import { Sheet, SheetContent, type SheetContentProps } from "./sheet";
 import { shortcutKeys } from "./shortcut";
 import { Skeleton } from "./skeleton";
 import { useScopeSound } from "./sound-scope";
-import { useStoredState } from "./stored-state";
+import { type StorageLike, useStoredState } from "./stored-state";
 import { Tooltip, TooltipGroup } from "./tooltip";
 
 /** Every movement a Sidebar can make, for `animations` to choose from. */
@@ -63,6 +63,8 @@ export type SidebarProviderProps = {
    * `defaultOpen`, then the remembered state.
    */
   storageKey?: string;
+  /** Where `storageKey` keeps whether it is open, and its width. By default, local storage. */
+  storage?: StorageLike;
 };
 
 export type SidebarProps = ComponentPropsWithRef<"nav"> & {
@@ -141,6 +143,7 @@ export type SidebarItemProps = Omit<ComponentPropsWithRef<"button">, "children">
 type SidebarState = {
   id: string;
   storageKey: string | undefined;
+  storage: StorageLike | undefined;
   state: "expanded" | "collapsed";
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -209,11 +212,12 @@ export function SidebarProvider({
   mobileBreakpoint = 768,
   shortcut = "b",
   storageKey,
+  storage,
 }: SidebarProviderProps) {
   const id = useId();
   const play = useScopeSound();
   const isMobile = useMediaQuery(`(max-width: ${mobileBreakpoint}px)`);
-  const [own, setOwn] = useStoredState(storageKey && `${storageKey}-open`, defaultOpen);
+  const [own, setOwn] = useStoredState(storageKey && `${storageKey}-open`, defaultOpen, storage);
   const [openMobile, setOpenMobile] = useState(false);
   const open = controlled ?? own;
   const expanded = isMobile ? openMobile : open;
@@ -252,6 +256,7 @@ export function SidebarProvider({
     () => ({
       id,
       storageKey,
+      storage,
       state: open ? "expanded" : "collapsed",
       open,
       setOpen,
@@ -261,7 +266,7 @@ export function SidebarProvider({
       toggleSidebar,
       shortcut: shortcut ? shortcutKeys(shortcut) : undefined,
     }),
-    [id, storageKey, open, setOpen, isMobile, openMobile, toggleSidebar, shortcut],
+    [id, storageKey, storage, open, setOpen, isMobile, openMobile, toggleSidebar, shortcut],
   );
   return <SidebarContext value={value}>{children}</SidebarContext>;
 }
@@ -331,6 +336,7 @@ export function Sidebar({
   const [storedWidth, setWidth] = useStoredState(
     sidebar.storageKey && `${sidebar.storageKey}-width`,
     defaultWidth,
+    sidebar.storage,
   );
   // A remembered width still keeps within the current limits.
   const width = Math.min(maxWidth, Math.max(minWidth, storedWidth));

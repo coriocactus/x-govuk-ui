@@ -794,6 +794,7 @@ export {
   Stats,
   type StatsProps,
 } from "./stat";
+export type { StorageLike } from "./stored-state";
 export { StreamingText, type StreamingTextProps } from "./streaming-text";
 export {
   defaultSummaryListLabels,

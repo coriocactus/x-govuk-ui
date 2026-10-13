@@ -61,6 +61,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added `storage` to every part that keeps something under a `storageKey`, which are FormSteps, QuestionCard, Tour, SidebarProvider and ThemePicker, and to `useTheme` and `useSidebarArrangement`. Give `sessionStorage`, to keep answers only while the tab is open, or a store of your own with `getItem`, `setItem` and `removeItem`, typed as `StorageLike`. By default, it is local storage, as before.
 - Added a fieldset's props to FormStep, such as `id`, `style`, `ref` and data attributes, which go on the step's fieldset beside its `className`, and `titleLevel`, the level of its title's heading, 1 on a page and 3 in a card by default.
 - Added `closeOnPressOutside` to Dialog and Sheet, as Callout and Tour have. Give false for a decision that must be made in the dialog or the sheet, such as confirming a deletion. Escape and its own close still close it.
 - Added `copyrightUrl` to Footer, where its copyright line links to. By default, Crown copyright's terms, as before. Give your own terms, or null for a line with no link, for a service outside GOV.UK.

@@ -30,7 +30,7 @@ import { glideEasing, useMotionTiming } from "./motion";
 import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
 import { useMergedRef } from "./refs";
 import { type Registry, useRegister, useRegistry } from "./registry";
-import { useStoredState } from "./stored-state";
+import { type StorageLike, useStoredState } from "./stored-state";
 
 export type TourStepProps = {
   /**
@@ -95,10 +95,12 @@ export type TourProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   /** The space the dimming leaves around each target, in pixels. */
   dimPadding?: number;
   /**
-   * Keeps how far someone got in local storage under this key, so it lasts between visits.
-   * Without it, the tour keeps it only while the page is open.
+   * Keeps how far someone got in `storage` under this key, so it lasts between visits. Without
+   * it, the tour keeps it only while the page is open.
    */
   storageKey?: string;
+  /** Where `storageKey` keeps how far someone got. By default, local storage. */
+  storage?: StorageLike;
   /**
    * Whether opening the tour again continues from the step where someone left it. Once they have
    * finished, it starts again from the first step either way.
@@ -201,6 +203,7 @@ export function Tour({
   dim = false,
   dimPadding = 6,
   storageKey,
+  storage,
   resume = true,
   closing = "ends",
   closeOnPressOutside = false,
@@ -216,7 +219,11 @@ export function Tour({
   const stepLabel = labels.step;
   const { steps, registry } = useSteps(children);
   // How far someone got, in local storage with a key, or else in memory.
-  const [progress, setProgress] = useStoredState<Progress>(storageKey, { step: 0, ended: null });
+  const [progress, setProgress] = useStoredState<Progress>(
+    storageKey,
+    { step: 0, ended: null },
+    storage,
+  );
   // The step is kept as asked for, and kept within the steps as it is read. Steps in a wrapper of
   // your own register after the tour first renders, so the steps are not all known before then.
   const firstStep = () => (!resume || progress.ended === "finished" ? 0 : progress.step);

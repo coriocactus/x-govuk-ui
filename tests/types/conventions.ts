@@ -242,6 +242,17 @@ export type StyleTakenAndLost = None<
   { [Name in Unstyled]: "style" extends keyof PropsOf<Name> ? Name : never }[Unstyled]
 >;
 
+/** A part that keeps something under a `storageKey` takes `storage`, where it keeps it. */
+export type StorageKeyWithoutStorage = None<
+  {
+    [Name in keyof Components]: "storageKey" extends keyof PropsOf<Name>
+      ? "storage" extends keyof PropsOf<Name>
+        ? never
+        : Name
+      : never;
+  }[keyof Components]
+>;
+
 /** A part that renders a link takes an `href`. An SVG's `href` is no link, and an SVG has a `viewBox`. */
 export type LinkWithoutRender = None<
   {

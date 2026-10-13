@@ -31,6 +31,7 @@ import { Panel } from "./panel";
 import { useLatest, useMergedRef } from "./refs";
 import { type Registry, useRegister, useRegistry } from "./registry";
 import { stepAnswers } from "./step-answers";
+import { browserStorage, type StorageLike } from "./stored-state";
 import { SummaryList, SummaryListAction, SummaryListRow } from "./summary-list";
 import { Tag } from "./tag";
 
@@ -168,15 +169,17 @@ export type FormStepsProps = Omit<
   /** Each step is a place in the browser's history, so Back in the browser goes back a step. */
   history?: boolean;
   /**
-   * Keeps the answers and the step in local storage under this key, so users continue where they
-   * left off. They come back once the page has loaded, and `onStepChange` is told the step. They
-   * are cleared once the form is sent. Answers stay in the browser, so leave out anything
-   * sensitive.
+   * Keeps the answers and the step in `storage` under this key, so users continue where they left
+   * off. They come back once the page has loaded, and `onStepChange` is told the step. They are
+   * cleared once the form is sent. Answers stay in the browser, so leave out anything sensitive, or
+   * keep them only while the tab is open, in `sessionStorage`.
    *
    * Each field comes back through `useFormDefault`, so a field that is controlled keeps its own
    * `value`. A controlled field of your own can read `useFormDefault` to start from its answer.
    */
   storageKey?: string;
+  /** Where `storageKey` keeps the answers. By default, local storage. */
+  storage?: StorageLike;
   /**
    * Called with every answer once the last step, or Check your answers, is sent. Answers to steps
    * skipped or not asked are left out. If it returns messages, such as the server's, the form goes
@@ -281,10 +284,10 @@ type Row = {
 };
 
 /** What was kept under the key, or null when there is nothing, or nothing this form wrote. */
-function readSaved(key: string | undefined): Saved | null {
-  if (!key || typeof localStorage === "undefined") return null;
+function readSaved(key: string | undefined, storage: StorageLike | null): Saved | null {
+  if (!key || !storage) return null;
   try {
-    const saved: unknown = JSON.parse(localStorage.getItem(key) ?? "null");
+    const saved: unknown = JSON.parse(storage.getItem(key) ?? "null");
     if (typeof saved !== "object" || saved === null) return null;
     const { at, passed, skipped, answers, empty = [] } = saved as Record<string, unknown>;
     if (typeof at !== "number" || !Number.isInteger(at) || at < 0) return null;
@@ -295,11 +298,11 @@ function readSaved(key: string | undefined): Saved | null {
     return null;
   }
 }
-function writeSaved(key: string | undefined, saved: Saved | null) {
-  if (!key) return;
+function writeSaved(key: string | undefined, storage: StorageLike | null, saved: Saved | null) {
+  if (!key || !storage) return;
   try {
-    if (saved) localStorage.setItem(key, JSON.stringify(saved));
-    else localStorage.removeItem(key);
+    if (saved) storage.setItem(key, JSON.stringify(saved));
+    else storage.removeItem(key);
   } catch {
     // Storage can be full or blocked. The form still works for this visit.
   }
@@ -391,6 +394,7 @@ export function FormSteps({
   keyboardShortcut = true,
   history: historyOn = false,
   storageKey,
+  storage: ownStorage,
   onComplete,
   step: controlledStep,
   defaultStep = 0,
@@ -462,7 +466,7 @@ export function FormSteps({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: answers are restored once, as the form first mounts.
   useLayoutEffect(() => {
-    const saved = readSaved(storageKey);
+    const saved = readSaved(storageKey, ownStorage ?? browserStorage());
     if (!saved) return;
     const answers: Record<string, string[]> = {};
     for (const name of saved.empty) answers[name] = [];
@@ -523,7 +527,7 @@ export function FormSteps({
     );
     const given = new Set(sent.map(([name]) => name));
     const empty = [...names].filter((name) => !given.has(name));
-    writeSaved(storageKey, {
+    writeSaved(storageKey, ownStorage ?? browserStorage(), {
       at: where,
       passed: [...passing],
       skipped: [...skipping],
@@ -694,7 +698,7 @@ export function FormSteps({
     rememberSoon.current = 0;
     keeping.current = false;
     if (!onComplete) {
-      writeSaved(storageKey, null);
+      writeSaved(storageKey, ownStorage ?? browserStorage(), null);
       element?.submit();
       return;
     }
@@ -728,7 +732,7 @@ export function FormSteps({
     window.clearTimeout(rememberSoon.current);
     rememberSoon.current = 0;
     keeping.current = false;
-    writeSaved(storageKey, null);
+    writeSaved(storageKey, ownStorage ?? browserStorage(), null);
     // The answers stay on show once sent, unless something else takes their place.
     setRows(planFor().flatMap((index) => summaryRows(index, skipping)));
     setSent(true);

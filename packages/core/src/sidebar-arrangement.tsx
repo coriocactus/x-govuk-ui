@@ -15,7 +15,7 @@ import {
   SheetDescription,
   SheetTitle,
 } from "./sheet";
-import { useStoredState } from "./stored-state";
+import { type StorageLike, useStoredState } from "./stored-state";
 import { Switch } from "./switch";
 import { Tooltip } from "./tooltip";
 
@@ -52,6 +52,8 @@ export type UseSidebarArrangementOptions = {
    * the arrangement lasts only while the page is open.
    */
   storageKey?: string;
+  /** Where `storageKey` keeps the arrangement. By default, local storage. */
+  storage?: StorageLike;
 };
 
 export type SidebarArranger = ReturnType<typeof useSidebarArrangement>;
@@ -104,12 +106,17 @@ export function useSidebarArrangement({
   entries,
   groups: ownGroups,
   storageKey,
+  storage,
 }: UseSidebarArrangementOptions) {
   const groups = useMemo(
     () => ownGroups ?? [...new Set(entries.map((entry) => entry.group))],
     [ownGroups, entries],
   );
-  const [kept, keep] = useStoredState<Partial<SidebarArrangement> | null>(storageKey, null);
+  const [kept, keep] = useStoredState<Partial<SidebarArrangement> | null>(
+    storageKey,
+    null,
+    storage,
+  );
   const signature = JSON.stringify(kept);
   // biome-ignore lint/correctness/useExhaustiveDependencies: the arrangement follows what is kept.
   const arrangement = useMemo(() => fit(kept, entries, groups), [signature, entries, groups]);

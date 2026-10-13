@@ -167,7 +167,7 @@ export type QuestionCardProps = Omit<
   labels?: Partial<QuestionCardLabels>;
   /** What marks each answer to a choice, which is a letter, a number or nothing. */
   markers?: "letters" | "numbers" | "none";
-  /** Keeps the answers in local storage under this key until they are sent. */
+  /** Keeps the answers in `storage` under this key until they are sent. */
   storageKey?: string;
 };
 

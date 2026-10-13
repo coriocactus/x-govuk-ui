@@ -5,11 +5,25 @@ import { useCallback, useState, useSyncExternalStore } from "react";
 const STORED = "x-govuk-ui-stored";
 
 /**
- * State kept in local storage when there is a key, or else in memory. Every part that uses the key,
- * in this tab or another, follows changes.
+ * Where a part keeps what it keeps between visits, such as `localStorage`, `sessionStorage`, or a
+ * store of your own with the same three methods. Each answers at once, as the browser's do.
+ */
+export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+/** Local storage, where there is one, as the server has none. @internal */
+export const browserStorage = (): StorageLike | null =>
+  typeof localStorage === "undefined" ? null : localStorage;
+
+/**
+ * State kept in storage when there is a key, or else in memory. Every part that uses the key, in
+ * this tab or, with local storage, another, follows changes.
  * @internal
  */
-export function useStoredState<T>(key: string | undefined, fallback: T): [T, (next: T) => void] {
+export function useStoredState<T>(
+  key: string | undefined,
+  fallback: T,
+  storage?: StorageLike,
+): [T, (next: T) => void] {
   const [own, setOwn] = useState(fallback);
   const subscribe = useCallback(
     (onChange: () => void) => {
@@ -28,7 +42,7 @@ export function useStoredState<T>(key: string | undefined, fallback: T): [T, (ne
   );
   const stored = useSyncExternalStore(
     subscribe,
-    () => (key ? readStorage(key) : null),
+    () => (key ? readStorage(key, storage ?? browserStorage()) : null),
     () => null,
   );
   const set = useCallback(
@@ -36,13 +50,13 @@ export function useStoredState<T>(key: string | undefined, fallback: T): [T, (ne
       setOwn(next);
       if (!key) return;
       try {
-        localStorage.setItem(key, JSON.stringify(next));
+        (storage ?? browserStorage())?.setItem(key, JSON.stringify(next));
       } catch {
         // Storage can be full or blocked. The part still works for this visit.
       }
       window.dispatchEvent(new Event(STORED));
     },
-    [key],
+    [key, storage],
   );
   if (stored === null) return [own, set];
   try {
@@ -52,9 +66,9 @@ export function useStoredState<T>(key: string | undefined, fallback: T): [T, (ne
   }
 }
 
-function readStorage(key: string) {
+function readStorage(key: string, storage: StorageLike | null) {
   try {
-    return localStorage.getItem(key);
+    return storage?.getItem(key) ?? null;
   } catch {
     return null;
   }

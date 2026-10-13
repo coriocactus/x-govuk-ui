@@ -104,7 +104,8 @@ export type FileUploadControlProps = Omit<
  * File upload's control on its own, for a field composed from Field's parts. It is the drop zone,
  * with the native input over it, and the list of chosen files beneath. In a bound Field, the input
  * takes its id, name and descriptions from the field. The input is described by the list too, so
- * screen readers hear which files are chosen. Its `className` goes on the zone.
+ * screen readers hear which files are chosen. Its `className` and `style` go on the zone, which
+ * is what users see. Every other prop, including `ref`, goes on the input, which takes focus.
  *
  * Your own drag and drop handlers run before the zone's own, which run whatever yours do, because
  * preventing a drop's default is how a page takes files.
@@ -115,6 +116,7 @@ export function FileUploadControl(given: FileUploadControlProps) {
     multiple = false,
     labels: ownLabels,
     className = "",
+    style,
     disabled,
     ref,
     onDragEnter,
@@ -172,6 +174,7 @@ export function FileUploadControl(given: FileUploadControlProps) {
         data-invalid={invalid || undefined}
         style={
           {
+            ...style,
             "--x-govuk-ui-pull-x": `${pull.x}px`,
             "--x-govuk-ui-pull-y": `${pull.y}px`,
           } as CSSProperties

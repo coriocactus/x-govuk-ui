@@ -336,6 +336,8 @@ const icon = (
  * not be answered. The card eases to each question's height while its words change at once. A ring
  * in the header fills as the questions are answered. When all are done, the card shows the answers
  * in a Summary list, each with Change.
+ *
+ * As in FormSteps, its `className` and `style` go on the card, and every other prop on its form.
  */
 export function QuestionCard({
   questions,

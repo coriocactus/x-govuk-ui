@@ -550,7 +550,7 @@ export function Hint({ className = "", children, ...props }: ComponentPropsWithR
   );
 }
 
-/** The message is a paragraph with the role and the id, and the paragraph takes the other props. */
+/** The message is a paragraph, with the role and the id, which takes every prop. */
 export type ErrorMessageProps = ComponentPropsWithRef<"p">;
 
 /**
@@ -576,13 +576,13 @@ export function ErrorMessage({
       {present(children) && (
         <motion.div
           key="error"
-          className={`x-govuk-ui-error-container ${className}`.trim()}
+          className="x-govuk-ui-error-container"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={timing.ease(duration.medium)}
         >
-          <p {...props} className="x-govuk-ui-error" id={id} role="alert">
+          <p {...props} className={`x-govuk-ui-error ${className}`.trim()} id={id} role="alert">
             <span className="x-govuk-ui-visually-hidden">{labels.prefix}: </span>
             {children}
           </p>

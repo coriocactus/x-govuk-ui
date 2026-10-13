@@ -167,7 +167,7 @@ export function DateInput({
   max,
   autoCompleteBirthday = false,
   disabled = false,
-  className,
+  className = "",
   "aria-describedby": describedBy,
   ...props
 }: DateInputProps) {
@@ -181,14 +181,17 @@ export function DateInput({
       errorMessage={errorMessage}
       describedBy={describedBy}
     >
-      <FieldsetRoot {...props} id={groupId} className="x-govuk-ui-date-input-fieldset">
+      <FieldsetRoot
+        {...props}
+        id={groupId}
+        className={`x-govuk-ui-date-input-fieldset ${className}`.trim()}
+      >
         <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
           {legend}
         </FieldsetLegend>
         <Hint>{hint}</Hint>
         <ErrorMessage />
         <DateInputControl
-          className={className}
           value={value}
           defaultValue={defaultValue}
           onValueChange={onValueChange}

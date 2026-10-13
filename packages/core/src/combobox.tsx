@@ -215,7 +215,9 @@ export type ComboboxControlProps = Omit<ComboboxProps, keyof FieldWords> & { id?
 /**
  * Combobox's control on its own, for a field composed from Field's parts. It is the field that
  * takes typing, with its buttons and its list. In a bound Field, it takes its id, name and
- * descriptions from the field, and Check your answers shows its option's label.
+ * descriptions from the field, and Check your answers shows its option's label. Its `className`
+ * and `style` go on the box around the input and its buttons. Every other prop, including `ref`,
+ * goes on the input, which takes focus.
  */
 export function ComboboxControl(given: ComboboxControlProps) {
   const {
@@ -228,6 +230,7 @@ export function ComboboxControl(given: ComboboxControlProps) {
     name,
     disabled,
     className = "",
+    style,
     ...props
   } = useControlProps(given);
   const options = useMemo(() => items.map(optionOf), [items]);
@@ -255,6 +258,7 @@ export function ComboboxControl(given: ComboboxControlProps) {
       <div
         ref={group}
         className={`x-govuk-ui-input-group x-govuk-ui-combobox-field ${className}`.trim()}
+        style={style}
       >
         <Primitive.Input {...props} className="x-govuk-ui-input" placeholder={placeholder} />
         <Primitive.Clear className="x-govuk-ui-combobox-button" aria-label={labels.clear}>
@@ -314,7 +318,9 @@ export type MultiSelectControlProps = Omit<MultiSelectProps, keyof FieldWords> &
 /**
  * MultiSelect's control on its own, for a field composed from Field's parts. It is the field of
  * chips that takes typing, with its list. In a bound Field, it takes its id, name and descriptions
- * from the field, and Check your answers lists the chosen options' labels.
+ * from the field, and Check your answers lists the chosen options' labels. Its `className` and
+ * `style` go on the box of chips. Every other prop, including `ref`, goes on the input, which
+ * takes focus.
  */
 export function MultiSelectControl(given: MultiSelectControlProps) {
   const {
@@ -327,6 +333,7 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
     name,
     disabled,
     className = "",
+    style,
     ...props
   } = useControlProps(given);
   const options = useMemo(() => items.map(optionOf), [items]);
@@ -356,6 +363,7 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
       <Primitive.Chips
         ref={chips}
         className={`x-govuk-ui-input-group x-govuk-ui-multi-select-field ${className}`.trim()}
+        style={style}
       >
         <Primitive.Value>
           {(chosen: ComboboxOption[]) => (

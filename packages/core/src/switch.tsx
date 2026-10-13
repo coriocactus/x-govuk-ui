@@ -37,7 +37,8 @@ export type SwitchProps = Omit<ComponentPropsWithRef<"input">, "type" | "role" |
  *
  * Its row holds its label, a `Hint`, an `ErrorMessage` and a `SwitchControl`, bound to the control
  * as a Field binds its parts. Compose a Field of your own around a SwitchControl for another
- * layout.
+ * layout. Its props, `className` among them, go on the control, as an Input's go on its input. The
+ * row is `.x-govuk-ui-switch`.
  */
 export function Switch({
   label,
@@ -46,7 +47,6 @@ export function Switch({
   errorMessage,
   size = "medium",
   id,
-  className = "",
   "aria-describedby": describedBy,
   ...props
 }: SwitchProps) {
@@ -60,7 +60,7 @@ export function Switch({
       describedBy={describedBy}
       label={label}
     >
-      <SwitchRow label={label} hint={hint} hideLabel={hideLabel} size={size} className={className}>
+      <SwitchRow label={label} hint={hint} hideLabel={hideLabel} size={size}>
         <SwitchControl {...props} size={size} />
       </SwitchRow>
     </FieldBinding>
@@ -73,15 +73,14 @@ function SwitchRow({
   hint,
   hideLabel,
   size,
-  className,
   children,
-}: Pick<SwitchProps, "label" | "hint" | "hideLabel" | "size" | "className"> & {
+}: Pick<SwitchProps, "label" | "hint" | "hideLabel" | "size"> & {
   children: ReactNode;
 }) {
   const field = useBoundField();
   return (
     <div
-      className={`x-govuk-ui-switch ${className}`.trim()}
+      className="x-govuk-ui-switch"
       data-size={size === "small" ? "small" : undefined}
       data-invalid={field?.invalid || undefined}
     >

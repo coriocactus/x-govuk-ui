@@ -128,7 +128,7 @@ export function TimeInput({
   defaultValue,
   onValueChange,
   disabled = false,
-  className,
+  className = "",
   "aria-describedby": describedBy,
   ...props
 }: TimeInputProps) {
@@ -142,14 +142,17 @@ export function TimeInput({
       errorMessage={errorMessage}
       describedBy={describedBy}
     >
-      <FieldsetRoot {...props} id={groupId} className="x-govuk-ui-date-input-fieldset">
+      <FieldsetRoot
+        {...props}
+        id={groupId}
+        className={`x-govuk-ui-date-input-fieldset ${className}`.trim()}
+      >
         <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
           {legend}
         </FieldsetLegend>
         <Hint>{hint}</Hint>
         <ErrorMessage />
         <TimeInputControl
-          className={className}
           value={value}
           defaultValue={defaultValue}
           onValueChange={onValueChange}

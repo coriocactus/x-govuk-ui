@@ -357,6 +357,9 @@ function StepFields({
  * Its progress, its Back, its errors, its keys and its history can each be turned on or off. With
  * a `storageKey`, it remembers how far users got. Focus moves to each step as it comes, and a card
  * eases to each step's height.
+ *
+ * Its `className` and `style` go on the section that users see, around the title, the progress
+ * and the form. Every other prop, including `ref`, goes on the form, as a Form's do.
  */
 export function FormSteps({
   children,
@@ -377,6 +380,7 @@ export function FormSteps({
   done: doneContent,
   labels: ownLabels,
   className = "",
+  style,
   onKeyDown: givenKeyDown,
   onInput: givenInput,
   onChange: givenChange,
@@ -905,6 +909,7 @@ export function FormSteps({
   return (
     <section
       className={`x-govuk-ui-form-steps ${className}`.trim()}
+      style={style}
       data-layout={layout}
       data-done={sent || undefined}
       // SoundScope plays the success sound as the answers are taken.

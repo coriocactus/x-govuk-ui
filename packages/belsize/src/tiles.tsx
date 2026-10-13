@@ -1484,6 +1484,7 @@ export function TileClose({ className = "", ...props }: ControlProps) {
     <Control
       {...props}
       label="Close"
+      data-sound="close"
       icon={icons.close}
       aria-label={`Close ${tile.title}`}
       className={`x-govuk-ui-tile-close ${className}`.trim()}

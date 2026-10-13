@@ -14,8 +14,7 @@ const CONTROL =
   'button, a[href], summary, [role="button"], [role="option"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="tab"], [role="switch"], input[type="checkbox"], input[type="radio"]';
 const TOGGLE =
   'input[type="checkbox"], input[type="radio"], [role="switch"], [aria-pressed], [role="menuitemcheckbox"], [role="menuitemradio"]';
-const LIST_ITEM =
-  '[role="option"], [role="menuitem"], [role="tab"], nav a[href], .x-govuk-ui-sidebar-item';
+const LIST_ITEM = '[role="option"], [role="menuitem"], [role="tab"], nav a[href], [data-sound-row]';
 
 function isOn(element: Element) {
   if (element instanceof HTMLInputElement) return element.checked;
@@ -44,7 +43,7 @@ function toastCue(type: string | null): SoundCue {
  * a warning button, something that opens or closes, a row in a list, or a plain button.
  */
 export function cueFor(target: Element): Cue | null {
-  if (target.closest(".x-govuk-ui-command-popup")) {
+  if (target.closest('[data-sound-list="command"]')) {
     return target.closest('[role="option"]') ? ["command"] : null;
   }
   const labelled = target.closest("label")?.control ?? target;
@@ -54,14 +53,12 @@ export function cueFor(target: Element): Cue | null {
   const named = control.closest<HTMLElement>("[data-sound]")?.dataset.sound;
   if (isSoundCue(named)) return [named];
   if (control.matches(TOGGLE)) return [isOn(control) ? "toggleOff" : "toggleOn"];
-  if (control.matches(".x-govuk-ui-button--warning")) return ["destructive"];
   if (control.hasAttribute("popovertarget"))
     return [control.getAttribute("popovertargetaction") === "hide" ? "close" : "open"];
-  if (control.matches('.x-govuk-ui-toast-close, [aria-label^="Close"]')) return ["close"];
   if (control.hasAttribute("aria-expanded"))
     return [control.getAttribute("aria-expanded") === "true" ? "close" : "open"];
   if (control.matches(LIST_ITEM)) return ["select", { detune: rowPitch(control) }];
-  return ["tap", { velocity: control.matches(".x-govuk-ui-button--quiet") ? 0.78 : 1 }];
+  return ["tap", { velocity: control.matches("[data-sound-soft]") ? 0.78 : 1 }];
 }
 
 const ScopeSound = createContext<(cue: SoundCue, options?: PlayOptions) => void>(() => {});
@@ -114,7 +111,7 @@ export function SoundScope({ children, play }: SoundScopeProps) {
           // A promise toast turning from a spinner into its result.
           if (
             record.attributeName === "data-type" &&
-            target.matches(".x-govuk-ui-toast") &&
+            target.matches("[data-sound-toast]") &&
             value !== record.oldValue
           )
             return emit([toastCue(value)], 0);
@@ -125,7 +122,7 @@ export function SoundScope({ children, play }: SoundScopeProps) {
           // data-sound-enter.
           const entering = node.getAttribute("data-sound-enter");
           if (isSoundCue(entering)) return emit([entering], 0);
-          if (node.matches(".x-govuk-ui-toast"))
+          if (node.matches("[data-sound-toast]"))
             return emit([toastCue(node.getAttribute("data-type"))], 0);
         }
       }
@@ -158,7 +155,7 @@ export function SoundScope({ children, play }: SoundScopeProps) {
           const target = event.target;
           if (event.repeat || !(target instanceof HTMLElement)) return;
           if (event.key === "Enter" && target.getAttribute("aria-activedescendant"))
-            return emit([target.closest(".x-govuk-ui-command-popup") ? "command" : "select"]);
+            return emit([target.closest('[data-sound-list="command"]') ? "command" : "select"]);
           const checkable = target.matches('input[type="checkbox"], input[type="radio"]');
           if (event.key === " " || (event.key === "Enter" && !checkable)) {
             const cue = cueFor(target);
@@ -180,7 +177,7 @@ export function SoundScope({ children, play }: SoundScopeProps) {
             const span = Number(target.max || 100) - Number(target.min || 0);
             const position = span ? (Number(target.value) - Number(target.min || 0)) / span : 0;
             void playRef.current("sliderTick", { detune: position * 900 }).catch(() => {});
-          } else if (target.closest(".x-govuk-ui-otp")) {
+          } else if (target.matches("[data-sound-typing]")) {
             const deleting = target.value.length < previous.length;
             emit(["key", { detune: target.value.length * 45 - (deleting ? 260 : 0) }], 0);
           }

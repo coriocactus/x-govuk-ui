@@ -82,6 +82,10 @@ export function Button({
 }: ButtonProps) {
   const unavailable =
     loading || props["aria-disabled"] === true || props["aria-disabled"] === "true";
+  // A warning button sounds destructive, unless it names its own sound, as Exit this page does.
+  const sound =
+    (props as { "data-sound"?: string })["data-sound"] ??
+    (variant === "warning" ? "destructive" : undefined);
   const button = (
     <button
       {...props}
@@ -91,6 +95,9 @@ export function Button({
       aria-busy={loading || undefined}
       aria-disabled={unavailable || undefined}
       data-loading={loading || undefined}
+      data-sound={sound}
+      // SoundScope plays a quiet button's press more softly.
+      data-sound-soft={variant === "quiet" || undefined}
       onClick={(event) => {
         if (unavailable) {
           event.preventDefault();

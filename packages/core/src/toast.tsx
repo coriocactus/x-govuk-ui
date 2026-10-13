@@ -409,6 +409,8 @@ function ToastRegion({
                   ref={toast.id === front?.id ? measureFront : undefined}
                   toast={toast}
                   className="x-govuk-ui-toast"
+                  // SoundScope plays each toast's cue as it arrives, and as its type changes.
+                  data-sound-toast=""
                   // A toast can name its own cue with data.sound. Otherwise its type chooses one.
                   data-sound-enter={
                     typeof toast.data?.sound === "string" ? toast.data.sound : undefined
@@ -443,6 +445,7 @@ function ToastRegion({
                     {(closeButton || toast.timeout === 0) && toast.type !== "loading" && (
                       <Primitive.Close
                         className="x-govuk-ui-toast-close"
+                        data-sound="close"
                         aria-label={labels.dismiss}
                       >
                         <CrossIcon />

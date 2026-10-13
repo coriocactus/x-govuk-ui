@@ -289,6 +289,8 @@ export function CommandMenu({
             <Dialog.Popup
               ref={popup}
               className="x-govuk-ui-command-popup"
+              // SoundScope plays the command cue for its options.
+              data-sound-list="command"
               initialFocus={input}
               finalFocus={finalFocus}
             >
@@ -306,7 +308,11 @@ export function CommandMenu({
                     }
                   }}
                 />
-                <Dialog.Close className="x-govuk-ui-command-close" aria-label={labels.close}>
+                <Dialog.Close
+                  className="x-govuk-ui-command-close"
+                  aria-label={labels.close}
+                  data-sound="close"
+                >
                   Esc
                 </Dialog.Close>
               </div>

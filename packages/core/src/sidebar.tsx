@@ -855,6 +855,8 @@ export function SidebarItem({
       className: `x-govuk-ui-sidebar-item ${className}`.trim(),
       "aria-current": current ? "page" : undefined,
       "data-active": current || undefined,
+      // SoundScope plays a row's press a step higher down the list.
+      "data-sound-row": "",
       onPointerEnter,
       onClick: (event: MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);

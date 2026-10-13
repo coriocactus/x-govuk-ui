@@ -76,6 +76,8 @@ export function InputOTP({
         {...field.controlProps}
         aria-invalid={field.controlProps["aria-invalid"] ?? props["aria-invalid"]}
         maxLength={maxLength}
+        // SoundScope plays a key's sound as each digit is typed.
+        data-sound-typing=""
         containerClassName={`x-govuk-ui-otp ${containerClassName}`.trim()}
         aria-busy={verifying || undefined}
         render={({ slots, isFocused }) => {

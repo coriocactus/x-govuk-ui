@@ -1,0 +1,4 @@
+/* A box easing to the height of its content clips the content while it eases. */
+.x-govuk-ui-auto-height[data-moving] {
+  overflow: hidden;
+}

@@ -1,0 +1,92 @@
+/* Avatar. A circle with a photo, or initials on one of GOV.UK's colours. */
+.x-govuk-ui-avatar {
+  --x-govuk-ui-avatar-size: 40px;
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--x-govuk-ui-avatar-size);
+  height: var(--x-govuk-ui-avatar-size);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-white);
+  font-family: var(--x-govuk-ui-font);
+  font-size: calc(var(--x-govuk-ui-avatar-size) * 0.4);
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+  vertical-align: middle;
+}
+.x-govuk-ui-avatar[data-size="small"] {
+  --x-govuk-ui-avatar-size: 28px;
+}
+.x-govuk-ui-avatar[data-size="large"] {
+  --x-govuk-ui-avatar-size: 56px;
+}
+.x-govuk-ui-avatar[data-tint="blue"] {
+  background: var(--x-govuk-ui-blue);
+}
+.x-govuk-ui-avatar[data-tint="teal"] {
+  background: var(--x-govuk-ui-teal);
+}
+.x-govuk-ui-avatar[data-tint="purple"] {
+  background: var(--x-govuk-ui-purple);
+}
+.x-govuk-ui-avatar[data-tint="green"] {
+  background: var(--x-govuk-ui-green);
+}
+.x-govuk-ui-avatar[data-tint="magenta"] {
+  background: var(--x-govuk-ui-magenta);
+}
+.x-govuk-ui-avatar[data-tint="red"] {
+  background: var(--x-govuk-ui-red);
+}
+.x-govuk-ui-avatar-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: x-govuk-ui-avatar-in var(--x-govuk-ui-duration-medium) ease;
+}
+@keyframes x-govuk-ui-avatar-in {
+  from {
+    opacity: 0;
+  }
+}
+.x-govuk-ui-avatar-group {
+  display: inline-flex;
+}
+/* Under the pointer, the avatar there rises and grows a little, over its neighbours, which rise
+   less the further away they are. They rise smoothly, and spring back into line with a bounce as
+   the pointer leaves. The rise comes before the growth, so the growth does not stretch it. */
+.x-govuk-ui-avatar-group > .x-govuk-ui-avatar {
+  box-shadow: 0 0 0 2px var(--x-govuk-ui-paper);
+  transform: translateY(var(--x-govuk-ui-avatar-lift, 0px)) scale(var(--x-govuk-ui-avatar-grow, 1));
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.x-govuk-ui-avatar-group[data-settling] > .x-govuk-ui-avatar {
+  transition-timing-function: cubic-bezier(0.34, 3.85, 0.64, 1);
+}
+.x-govuk-ui-avatar-group > .x-govuk-ui-avatar[data-active] {
+  z-index: 1;
+}
+.x-govuk-ui-avatar-group > .x-govuk-ui-avatar + .x-govuk-ui-avatar {
+  margin-left: calc(var(--x-govuk-ui-avatar-size) * -0.18);
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-avatar-group > .x-govuk-ui-avatar {
+    transform: none;
+  }
+}
+.x-govuk-ui-avatar-more {
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+  font-size: 13px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-avatar {
+    border: 1px solid CanvasText;
+  }
+}

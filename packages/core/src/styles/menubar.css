@@ -1,0 +1,35 @@
+/* Menubar. A row of quiet menu names, each shaded while its menu is open. */
+.x-govuk-ui-menubar {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+  background: var(--x-govuk-ui-paper);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-menubar-trigger {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--x-govuk-ui-text);
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background var(--x-govuk-ui-duration-instant) ease;
+}
+.x-govuk-ui-menubar-trigger:hover,
+.x-govuk-ui-menubar-trigger[data-popup-open] {
+  background: var(--x-govuk-ui-secondary);
+}
+/* The dark edge sits beneath the trigger, as GOV.UK's does, so its name stays in the middle of
+   the yellow. */
+.x-govuk-ui-menubar-trigger:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 3px var(--x-govuk-ui-focus-text);
+}

@@ -1,0 +1,100 @@
+/* Attachment. A thumbnail of the document beside its title, details and any accessibility
+   notice. */
+.x-govuk-ui-attachment {
+  display: flex;
+  gap: 24px;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+/* The thumbnail lifts as one piece, its format label printed on the page, as the pointer reaches
+   the title. Its shadow falls from the whole page. */
+.x-govuk-ui-attachment-thumbnail {
+  position: relative;
+  flex: none;
+  align-self: flex-start;
+  width: 84px;
+  height: 120px;
+  filter: drop-shadow(0 2px 3px rgb(11 12 12 / 18%));
+  transition:
+    translate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    filter var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-attachment-thumbnail > :is(img, svg) {
+  display: block;
+  width: 84px;
+  height: 120px;
+}
+.x-govuk-ui-attachment:has(.x-govuk-ui-attachment-title a:hover) .x-govuk-ui-attachment-thumbnail {
+  translate: 0 -2px;
+  filter: drop-shadow(0 6px 7px rgb(11 12 12 / 22%));
+}
+.x-govuk-ui-attachment-page {
+  fill: var(--x-govuk-ui-paper);
+  stroke: var(--x-govuk-ui-line);
+  stroke-width: 2;
+}
+.x-govuk-ui-attachment-fold {
+  fill: var(--x-govuk-ui-secondary);
+  stroke: var(--x-govuk-ui-line);
+  stroke-width: 2;
+}
+.x-govuk-ui-attachment-line {
+  stroke: var(--x-govuk-ui-line);
+  stroke-width: 4;
+}
+.x-govuk-ui-attachment-format {
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-white);
+  font-size: 12px;
+  font-weight: 700;
+}
+/* Formats take the colours users know them by, such as red for PDF and green for spreadsheets. */
+.x-govuk-ui-attachment-format[data-format="pdf"] {
+  background: var(--x-govuk-ui-red);
+}
+.x-govuk-ui-attachment-format:is(
+  [data-format="csv"],
+  [data-format="xls"],
+  [data-format="xlsx"],
+  [data-format="ods"]
+) {
+  background: var(--x-govuk-ui-green);
+}
+/* Brand blue is lighter in the dark theme, so the label on it turns dark. */
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-attachment-format {
+    color: var(--x-govuk-ui-paper);
+  }
+  /* On dark paper, labels are light, with dark text, so PDF and spreadsheets take lighter tints. */
+  :scope .x-govuk-ui-attachment-format[data-format="pdf"] {
+    background: var(--x-govuk-ui-red-tint-50);
+  }
+  :scope
+    .x-govuk-ui-attachment-format:is(
+      [data-format="csv"],
+      [data-format="xls"],
+      [data-format="xlsx"],
+      [data-format="ods"]
+    ) {
+    background: var(--x-govuk-ui-green-tint-50);
+  }
+}
+.x-govuk-ui-attachment-details {
+  min-width: 0;
+}
+.x-govuk-ui-attachment-title {
+  margin: 0 0 8px;
+  font-size: 19px;
+  line-height: 1.32;
+}
+.x-govuk-ui-attachment-facts {
+  margin: 0 0 8px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+  line-height: 1.45;
+}

@@ -1,0 +1,58 @@
+/* Item. Media, a title and a description, and actions at the end, in one row. */
+.x-govuk-ui-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-item[data-variant="outline"] {
+  padding: 14px 16px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: 8px;
+}
+.x-govuk-ui-item-group {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-item-group > li + li {
+  border-top: 1px solid var(--x-govuk-ui-line);
+}
+.x-govuk-ui-item-media {
+  display: grid;
+  flex: none;
+  place-items: center;
+  color: var(--x-govuk-ui-muted);
+}
+/* An icon in a tile of the brand's tint, as in Question card's header. */
+.x-govuk-ui-item-media[data-variant="tile"] {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 12%, var(--x-govuk-ui-paper));
+  color: var(--x-govuk-ui-brand);
+}
+.x-govuk-ui-item-content {
+  flex: 1;
+  min-width: 0;
+}
+.x-govuk-ui-item-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.x-govuk-ui-item-description {
+  margin: 2px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+  line-height: 1.4;
+}
+.x-govuk-ui-item-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}

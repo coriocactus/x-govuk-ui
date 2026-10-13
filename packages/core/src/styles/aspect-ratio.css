@@ -1,0 +1,13 @@
+/* Aspect ratio. Content fills the shape. */
+.x-govuk-ui-aspect-ratio {
+  position: relative;
+  overflow: hidden;
+}
+.x-govuk-ui-aspect-ratio > :is(img, video, iframe) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}

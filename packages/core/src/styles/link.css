@@ -1,0 +1,43 @@
+/* Link. GOV.UK's link is underlined, and the underline thickens under the pointer. It turns purple
+   once visited, and has GOV.UK's yellow focus. */
+.x-govuk-ui-link {
+  color: var(--x-govuk-ui-link);
+  font-family: var(--x-govuk-ui-font);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+  transition: text-decoration-thickness var(--x-govuk-ui-duration-instant) ease;
+}
+.x-govuk-ui-link:visited {
+  color: var(--x-govuk-ui-link-visited);
+}
+.x-govuk-ui-link:hover {
+  color: var(--x-govuk-ui-link-hover);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+.x-govuk-ui-link[data-no-visited]:visited {
+  color: var(--x-govuk-ui-link);
+}
+.x-govuk-ui-link[data-colour="text"],
+.x-govuk-ui-link[data-colour="text"]:visited,
+.x-govuk-ui-link[data-colour="text"]:hover {
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-link[data-colour="inverse"],
+.x-govuk-ui-link[data-colour="inverse"]:visited,
+.x-govuk-ui-link[data-colour="inverse"]:hover {
+  color: var(--x-govuk-ui-white);
+}
+.x-govuk-ui-link[data-no-underline]:not(:hover) {
+  text-decoration: none;
+}
+.x-govuk-ui-link:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  text-decoration: none;
+  box-shadow:
+    0 -2px var(--x-govuk-ui-focus),
+    0 4px var(--x-govuk-ui-focus-text);
+  box-decoration-break: clone;
+}

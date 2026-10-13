@@ -1,0 +1,130 @@
+/* Filter chips. Rounded toggles with a plus that turns into a tick in place, so a chip keeps its
+   width as it turns on. Chosen chips side by side share one brand-blue shape behind them, which
+   grows out of a chip just chosen and draws back into a chip just turned off. */
+.x-govuk-ui-filter-chips {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.x-govuk-ui-filter-chips-track {
+  position: absolute;
+  z-index: 0;
+  border-radius: 17px;
+  background: var(--x-govuk-ui-brand);
+  pointer-events: none;
+}
+.x-govuk-ui-filter-chip {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px 0 10px;
+  border: 1px solid var(--x-govuk-ui-border);
+  border-radius: 17px;
+  background: transparent;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background var(--x-govuk-ui-duration-fast) ease,
+    border-color var(--x-govuk-ui-duration-fast) ease,
+    color var(--x-govuk-ui-duration-medium) ease,
+    scale var(--x-govuk-ui-duration-fast) var(--x-govuk-ui-ease-out);
+}
+/* Small chips sit in a panel of settings. */
+.x-govuk-ui-filter-chips[data-size="small"] {
+  gap: 6px;
+}
+.x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chips-track,
+.x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chip {
+  border-radius: 14px;
+}
+.x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chip {
+  gap: 4px;
+  height: 28px;
+  padding: 0 11px 0 8px;
+  font-size: 14px;
+}
+.x-govuk-ui-filter-chips[data-size="small"] .x-govuk-ui-filter-chip svg {
+  width: 12px;
+  height: 12px;
+}
+/* The hover tint is opaque and sits above the shape. A chip turned off under the pointer fades from
+   the shape's blue straight to the tint, and a chip chosen under it fades from the tint to blue,
+   never through the page's colour. */
+.x-govuk-ui-filter-chip:hover:not([data-pressed]) {
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-filter-chip:not([data-pressed]):active {
+  scale: 0.97;
+}
+/* A chosen chip shows the shape behind it. */
+.x-govuk-ui-filter-chip[data-pressed] {
+  border-color: transparent;
+  color: var(--x-govuk-ui-white);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-filter-chip[data-pressed] {
+    color: var(--x-govuk-ui-paper);
+  }
+}
+.x-govuk-ui-filter-chip svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  transition:
+    opacity var(--x-govuk-ui-duration-fast) ease,
+    stroke-dashoffset var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    rotate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+  transform-origin: center;
+}
+.x-govuk-ui-filter-chip-tick {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.x-govuk-ui-filter-chip[data-pressed] .x-govuk-ui-filter-chip-tick {
+  stroke-dashoffset: 0;
+}
+.x-govuk-ui-filter-chip[data-pressed] .x-govuk-ui-filter-chip-plus {
+  opacity: 0;
+  rotate: 45deg;
+}
+.x-govuk-ui-filter-chip-count {
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 9px;
+  background: var(--x-govuk-ui-secondary);
+  color: var(--x-govuk-ui-text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition:
+    background var(--x-govuk-ui-duration-medium) ease,
+    color var(--x-govuk-ui-duration-medium) ease;
+}
+.x-govuk-ui-filter-chip[data-pressed] .x-govuk-ui-filter-chip-count {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  color: inherit;
+}
+.x-govuk-ui-filter-chip:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  box-shadow: 0 0 0 5px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-filter-chip[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-filter-chips-track {
+    background: Highlight;
+  }
+  .x-govuk-ui-filter-chip[data-pressed] {
+    forced-color-adjust: none;
+    color: HighlightText;
+  }
+}

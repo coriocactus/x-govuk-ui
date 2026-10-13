@@ -23,7 +23,21 @@ export {
   type QuestionCardProps,
   type QuestionOption,
 } from "./agent-cards";
+export {
+  Aside,
+  type AsideProps,
+} from "./aside";
+export {
+  AspectRatio,
+  type AspectRatioProps,
+} from "./aspect-ratio";
 export { Attachment, type AttachmentProps } from "./attachment";
+export {
+  Avatar,
+  AvatarGroup,
+  type AvatarGroupProps,
+  type AvatarProps,
+} from "./avatar";
 export { BackLink, type BackLinkProps } from "./back-link";
 export {
   Breadcrumbs,
@@ -67,14 +81,6 @@ export {
   type CalloutVariant,
 } from "./callout";
 export {
-  Aside,
-  type AsideProps,
-  AspectRatio,
-  type AspectRatioProps,
-  Avatar,
-  AvatarGroup,
-  type AvatarGroupProps,
-  type AvatarProps,
   Card,
   CardDescription,
   CardFooter,
@@ -82,17 +88,6 @@ export {
   type CardProps,
   CardTitle,
   type CardTitleProps,
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemMedia,
-  type ItemMediaProps,
-  type ItemProps,
-  ItemTitle,
-  Marker,
-  type MarkerProps,
   MediaCredit,
   type MediaCreditProps,
 } from "./card";
@@ -391,6 +386,17 @@ export {
 } from "./input";
 export { InputOTP, type InputOTPProps } from "./input-otp";
 export { InsetText, type InsetTextProps } from "./inset-text";
+export {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  type ItemMediaProps,
+  type ItemProps,
+  ItemTitle,
+} from "./item";
 export { Kbd, type KbdProps } from "./kbd";
 export {
   type ComponentLabels,
@@ -411,9 +417,16 @@ export {
   type LightboxLabels,
   type LightboxProps,
 } from "./lightbox";
-export { Link, type LinkProps, VisuallyHidden, type VisuallyHiddenProps } from "./link";
+export {
+  Link,
+  type LinkProps,
+} from "./link";
 export { GovukCrown, GovukLockup, type GovukMarkProps, GovukWordmark } from "./logo";
 export { LogoCarousel, type LogoCarouselItem, type LogoCarouselProps } from "./logo-carousel";
+export {
+  Marker,
+  type MarkerProps,
+} from "./marker";
 export { useMediaQuery } from "./media-query";
 export {
   ContextMenu,
@@ -754,6 +767,10 @@ export {
   TourStep,
   type TourStepProps,
 } from "./tour";
+export {
+  VisuallyHidden,
+  type VisuallyHiddenProps,
+} from "./visually-hidden";
 export { WarningText, type WarningTextProps } from "./warning-text";
 export {
   GridColumn,

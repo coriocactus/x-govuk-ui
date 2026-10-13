@@ -1,0 +1,49 @@
+/* Marker. A highlight that sweeps across the words, from the start of each line, once seen. */
+.x-govuk-ui-marker {
+  --x-govuk-ui-marker: var(--x-govuk-ui-yellow-tint-50);
+  padding: 0 2px;
+  border-radius: 3px;
+  background:
+    linear-gradient(var(--x-govuk-ui-marker), var(--x-govuk-ui-marker)) no-repeat 0 0 / 0% 100%;
+  color: inherit;
+  box-decoration-break: clone;
+  transition: background-size 700ms var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-marker[data-drawn] {
+  background-size: 100% 100%;
+}
+.x-govuk-ui-marker[data-colour="blue"] {
+  --x-govuk-ui-marker: var(--x-govuk-ui-blue-tint-80);
+}
+.x-govuk-ui-marker[data-colour="green"] {
+  --x-govuk-ui-marker: var(--x-govuk-ui-green-tint-80);
+}
+.x-govuk-ui-marker[data-colour="pink"] {
+  --x-govuk-ui-marker: var(--x-govuk-ui-magenta-tint-80);
+}
+@scope ([data-theme="dark"], [data-theme="inverse"]) to ([data-theme="light"]) {
+  :scope .x-govuk-ui-marker {
+    --x-govuk-ui-marker: color-mix(in srgb, var(--x-govuk-ui-yellow) 30%, var(--x-govuk-ui-paper));
+  }
+  :scope .x-govuk-ui-marker[data-colour="blue"] {
+    --x-govuk-ui-marker: color-mix(in srgb, var(--x-govuk-ui-blue) 45%, var(--x-govuk-ui-paper));
+  }
+  :scope .x-govuk-ui-marker[data-colour="green"] {
+    --x-govuk-ui-marker: color-mix(in srgb, var(--x-govuk-ui-green) 45%, var(--x-govuk-ui-paper));
+  }
+  :scope .x-govuk-ui-marker[data-colour="pink"] {
+    --x-govuk-ui-marker: color-mix(in srgb, var(--x-govuk-ui-magenta) 40%, var(--x-govuk-ui-paper));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-marker {
+    background-size: 100% 100%;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-marker {
+    forced-color-adjust: none;
+    background: Mark;
+    color: MarkText;
+  }
+}

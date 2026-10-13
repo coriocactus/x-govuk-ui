@@ -1,0 +1,22 @@
+/* Aside. Related content under a brand-blue rule, like GOV.UK's related links. */
+.x-govuk-ui-aside {
+  padding-top: 12px;
+  border-top: 2px solid var(--x-govuk-ui-brand);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  line-height: 1.45;
+}
+.x-govuk-ui-aside-title {
+  margin: 0 0 12px;
+  font-size: 19px;
+  line-height: 1.3;
+}
+.x-govuk-ui-aside ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-aside li + li {
+  margin-top: 10px;
+}

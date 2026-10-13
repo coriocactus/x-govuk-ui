@@ -1,0 +1,22 @@
+/* Cookie banner. GOV.UK's grey band, with the question or the confirmation in it. */
+.x-govuk-ui-cookie-banner {
+  overflow: hidden;
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-cookie-banner-message {
+  padding-block: 20px 24px;
+  overflow: hidden;
+  font-size: 19px;
+  line-height: 1.32;
+  outline: none;
+}
+.x-govuk-ui-cookie-banner-message p {
+  margin: 0 0 16px;
+}
+.x-govuk-ui-cookie-banner-heading {
+  margin: 0 0 16px;
+  font-size: 24px;
+  line-height: 1.25;
+}

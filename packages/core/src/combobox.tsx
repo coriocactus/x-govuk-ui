@@ -66,11 +66,14 @@ type ControlShared = {
    */
   filter?: ((search: string, option: ComboboxOption) => boolean) | null;
   /**
-   * The text in the input. Leave it out to let the field keep track, and it starts with the chosen
-   * option's label.
+   * The text in the input. Leave it out to let the field keep track. Combobox's then starts with
+   * the chosen option's label, and MultiSelect's empty.
    */
   inputValue?: string;
-  /** The text an uncontrolled field starts with. By default, the chosen option's label. */
+  /**
+   * The text an uncontrolled field starts with. By default, Combobox's chosen option's label, or
+   * nothing in MultiSelect.
+   */
   defaultInputValue?: string;
   /** Called as the text changes, such as to ask a server for options that match it. */
   onInputValueChange?: (inputValue: string) => void;

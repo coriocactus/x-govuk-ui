@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Button, Callout, CalloutTrigger, Field, Hint, Label } from "x-govuk-ui";
+import { Button, Callout, CalloutContent, CalloutTrigger, Field, Hint, Label } from "x-govuk-ui";
 
 type Props = {
   variant?: "brand" | "plain";
@@ -29,16 +29,17 @@ export default function CalloutExample({
       <Field>
         <div className="preview-callout-label">
           <Label htmlFor="callout-reference">Reference number</Label>
-          <Callout
-            trigger={<CalloutTrigger label="Help with your reference number" />}
-            variant={variant}
-            side={side}
-            closeOnPressOutside={outside}
-            closeButton={closeButton}
-            title="Your reference number"
-          >
-            It’s 12 characters long and starts with LIC. It’s at the top of the letter or email we
-            sent you.
+          <Callout closeOnPressOutside={outside}>
+            <CalloutTrigger label="Help with your reference number" />
+            <CalloutContent
+              variant={variant}
+              side={side}
+              closeButton={closeButton}
+              title="Your reference number"
+            >
+              It’s 12 characters long and starts with LIC. It’s at the top of the letter or email we
+              sent you.
+            </CalloutContent>
           </Callout>
         </div>
         <Hint id="callout-reference-hint">For example, LIC 4821 7730 21</Hint>
@@ -61,20 +62,23 @@ export default function CalloutExample({
         anchor={download}
         open={notice}
         onOpenChange={setNotice}
-        variant={variant}
-        side={side}
-        timeout={timeout}
-        countdown={countdown}
         closeOnPressOutside={outside}
-        closeButton={closeButton}
-        title="New: download your answers"
-        actions={
-          <Button size="small" onClick={() => setNotice(false)}>
-            Got it
-          </Button>
-        }
       >
-        Keep a copy of everything you’ve told us, as a PDF.
+        <CalloutContent
+          variant={variant}
+          side={side}
+          timeout={timeout}
+          countdown={countdown}
+          closeButton={closeButton}
+          title="New: download your answers"
+          actions={
+            <Button size="small" onClick={() => setNotice(false)}>
+              Got it
+            </Button>
+          }
+        >
+          Keep a copy of everything you’ve told us, as a PDF.
+        </CalloutContent>
       </Callout>
       <p className="preview-callout-again" data-hidden={notice || undefined}>
         <Button variant="link" onClick={() => setNotice(true)} disabled={notice}>

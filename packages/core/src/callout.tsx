@@ -3,16 +3,18 @@
 import { Popover as Primitive } from "@base-ui/react/popover";
 import {
   type ComponentPropsWithRef,
-  type ReactElement,
+  createContext,
   type ReactNode,
   type RefObject,
+  useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { flushSync } from "react-dom";
-import { Button, type ButtonProps } from "./button";
+import { Button, type ButtonProps, withoutButtonLook } from "./button";
 import { useControllableState } from "./controllable-state";
 import { Countdown } from "./countdown";
 import { ArrowShape, CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
@@ -215,21 +217,92 @@ export function useCalloutSide(
   return chosen;
 }
 
-// The card takes the rest of the props.
-export type CalloutProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
+/** What a callout's parts share, from its root. */
+type CalloutState = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  anchor?: CalloutAnchor;
+  /** Whether a CalloutTrigger opens it, so it is help that users asked for. */
+  asked: boolean;
+  trigger: RefObject<HTMLButtonElement | null>;
+  registerTrigger: () => () => void;
+};
+
+const CalloutContext = createContext<CalloutState | null>(null);
+
+function useCallout(part: string) {
+  const callout = useContext(CalloutContext);
+  if (!callout) throw new Error(`${part} must be inside Callout.`);
+  return callout;
+}
+
+export type CalloutProps = {
+  /** Its parts, which are a `CalloutContent`, and a `CalloutTrigger` for help users ask for. */
+  children: ReactNode;
   /**
    * What it points at, which is an element, a ref to an element, or a CSS selector. Leave it out
-   * when you give a `trigger`, and the callout points at the trigger.
+   * when it has a CalloutTrigger, and the callout points at the trigger.
    */
   anchor?: CalloutAnchor;
-  /**
-   * A button that opens and closes it, such as a CalloutTrigger beside a question, for help that
-   * users ask for.
-   */
-  trigger?: ReactElement;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Closes it when someone presses outside it. By default, help that users asked for closes, and
+   * a notice stays while they use the page.
+   */
+  closeOnPressOutside?: boolean;
+};
+
+/**
+ * A card with an arrow that points at something on the page, for help, a notice or a step in a
+ * Tour. Compose it from a `CalloutContent`, the card, and a `CalloutTrigger`, as Popover is
+ * composed.
+ *
+ * With a CalloutTrigger, it is help that users ask for. The trigger opens it, focus moves into it,
+ * and a press outside or Escape closes it.
+ *
+ * Given an `anchor`, it is a notice that appears by itself, with the notification sound. Screen
+ * readers read it out without it taking focus. It stays while users work in the page, until they
+ * close it or its `timeout` passes.
+ */
+export function Callout({
+  children,
+  anchor,
+  open: controlled,
+  defaultOpen = false,
+  onOpenChange,
+  closeOnPressOutside,
+}: CalloutProps) {
+  const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
+  const sound = useOverlaySound();
+  const trigger = useRef<HTMLButtonElement>(null);
+  const [triggers, setTriggers] = useState(0);
+  const asked = triggers > 0;
+  const registerTrigger = useCallback(() => {
+    setTriggers((count) => count + 1);
+    return () => setTriggers((count) => count - 1);
+  }, []);
+  return (
+    <CalloutContext value={{ open, setOpen, anchor, asked, trigger, registerTrigger }}>
+      <Primitive.Root
+        open={open}
+        onOpenChange={(next, details) => {
+          // A notice stays while users work in the page around it, unless told otherwise.
+          const outside = details.reason === "outside-press" || details.reason === "focus-out";
+          if (!next && outside && !(closeOnPressOutside ?? asked)) return;
+          sound(next, details.reason);
+          setOpen(next);
+        }}
+      >
+        {children}
+      </Primitive.Root>
+    </CalloutContext>
+  );
+}
+
+// The card takes the rest of the props.
+export type CalloutContentProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
   title?: ReactNode;
   children?: ReactNode;
   /** Buttons at its foot, such as "Got it". */
@@ -239,11 +312,6 @@ export type CalloutProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
   /** The side of its anchor it sits on. With `auto`, the side where it finds the best space. */
   side?: CalloutSide;
   align?: "start" | "center" | "end";
-  /**
-   * Closes it when someone presses outside it. By default, help that users asked for closes, and
-   * a notice stays while they use the page.
-   */
-  closeOnPressOutside?: boolean;
   /**
    * Closes it after this many milliseconds, as Toast's `timeout` does, for a notice that can go by
    * itself. The default, 0, keeps it open until someone closes it, because a notice that vanishes
@@ -263,36 +331,20 @@ export type CalloutProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
   closeButton?: boolean;
   /** Its words, in place of a LabelsProvider's or the defaults. */
   labels?: Partial<OverlayLabels>;
-  className?: string;
 };
 
 /**
- * A card with an arrow that points at something on the page, for help, a notice or a step in a
- * Tour. It is brand blue unless you choose plain.
- *
- * Given a `trigger`, it is help that users ask for. The button opens it, focus moves into it, and
- * a press outside or Escape closes it.
- *
- * Given an `anchor`, it is a notice that appears by itself, with the notification sound. Screen
- * readers read it out without it taking focus. It stays while users work in the page, until they
- * close it or its `timeout` passes.
- *
- * Unless told otherwise, it takes the side where it finds the best space. It keeps clear of other
- * open callouts and of controls, and moves to another side if it no longer fits.
+ * The callout's card. Unless told otherwise, it takes the side where it finds the best space. It
+ * keeps clear of other open callouts and of controls, and moves to another side if it no longer
+ * fits.
  */
-export function Callout({
-  anchor,
-  trigger,
-  open: controlled,
-  defaultOpen = false,
-  onOpenChange,
+export function CalloutContent({
   title,
   children,
   actions,
   variant = "brand",
   side = "auto",
   align = "center",
-  closeOnPressOutside,
   timeout = 0,
   countdown = true,
   closeButton = true,
@@ -304,10 +356,8 @@ export function Callout({
   onFocus,
   onBlur,
   ...props
-}: CalloutProps) {
-  const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
-  const asked = Boolean(trigger);
-  const sound = useOverlaySound();
+}: CalloutContentProps) {
+  const { open, setOpen, anchor, asked, trigger } = useCallout("CalloutContent");
   const play = useScopeSound();
   const [target, setTarget] = useState<Element | null>(null);
   const [card, setCard] = useState<HTMLDivElement | null>(null);
@@ -316,10 +366,9 @@ export function Callout({
   const [heard, setHeard] = useState("");
 
   // A selector is looked up as the callout opens, once the page has what it names.
-  const triggerElement = useRef<HTMLButtonElement>(null);
   // biome-ignore lint/correctness/useExhaustiveDependencies: a selector is looked up at each opening.
   useLayoutEffect(() => {
-    setTarget(asked ? triggerElement.current : resolveAnchor(anchor));
+    setTarget(asked ? trigger.current : resolveAnchor(anchor));
   }, [anchor, asked, open]);
   // While the callout is open, an anchor that leaves the page is looked up again as the page
   // changes. A toolbar's control, for example, goes behind More when the window narrows, and comes
@@ -405,17 +454,7 @@ export function Callout({
   }, [open, timeout, held]);
 
   return (
-    <Primitive.Root
-      open={open}
-      onOpenChange={(next, details) => {
-        // A notice stays while users work in the page around it, unless told otherwise.
-        const outside = details.reason === "outside-press" || details.reason === "focus-out";
-        if (!next && outside && !(closeOnPressOutside ?? asked)) return;
-        sound(next, details.reason);
-        setOpen(next);
-      }}
-    >
-      {trigger && <Primitive.Trigger ref={triggerElement} render={trigger} />}
+    <>
       {!asked && (
         <span className="x-govuk-ui-visually-hidden" role="status">
           {heard}
@@ -481,38 +520,58 @@ export function Callout({
           </Primitive.Popup>
         </Primitive.Positioner>
       </Primitive.Portal>
-    </Primitive.Root>
+    </>
   );
 }
 
+export type CalloutTriggerProps = Omit<ButtonProps, "render"> & {
+  /** Names the button for what it helps with, such as "Help with your reference number". */
+  label?: string;
+  /**
+   * Another element to open the callout in the button's place. It takes the trigger's props and
+   * none of the button's look.
+   */
+  render?: Primitive.Trigger.Props["render"];
+};
+
 /**
- * The small round button that opens help beside a question or a heading, marked with a question
- * mark. Name it for what it helps with, such as "Help with your reference number".
+ * The button that opens help beside a question or a heading, a small round button marked with a
+ * question mark. The callout points at it. Name it for what it helps with.
  */
 export function CalloutTrigger({
   label = "Help",
+  render,
   className = "",
   ...props
-}: ButtonProps & { label?: string }) {
+}: CalloutTriggerProps) {
+  const { trigger, registerTrigger } = useCallout("CalloutTrigger");
+  useLayoutEffect(() => registerTrigger(), [registerTrigger]);
+  if (render)
+    return <Primitive.Trigger ref={trigger} {...withoutButtonLook(props)} render={render} />;
   return (
-    <Button
-      variant="quiet"
-      size="small-icon"
-      aria-label={label}
-      className={`x-govuk-ui-callout-trigger ${className}`.trim()}
-      {...props}
-    >
-      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
-        <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <path
-          d="M7.9 7.7a2.2 2.2 0 1 1 3 2.05c-.6.24-.9.7-.9 1.3v.45"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        />
-        <circle cx="10" cy="14.2" r="1" fill="currentColor" />
-      </svg>
-    </Button>
+    <Primitive.Trigger
+      ref={trigger}
+      render={
+        <Button
+          variant="quiet"
+          size="small-icon"
+          aria-label={label}
+          className={`x-govuk-ui-callout-trigger ${className}`.trim()}
+          {...props}
+        >
+          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+            <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
+            <path
+              d="M7.9 7.7a2.2 2.2 0 1 1 3 2.05c-.6.24-.9.7-.9 1.3v.45"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+            <circle cx="10" cy="14.2" r="1" fill="currentColor" />
+          </svg>
+        </Button>
+      }
+    />
   );
 }

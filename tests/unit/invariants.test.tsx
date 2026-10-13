@@ -89,6 +89,7 @@ test("every part that renders an element takes a className", async () => {
   const elementless = new Set([
     "SoundScope",
     "LabelsProvider",
+    "Callout",
     "Popover",
     "HoverCard",
     "Sheet",

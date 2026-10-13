@@ -58,9 +58,12 @@ export {
 export {
   Callout,
   type CalloutAnchor,
+  CalloutContent,
+  type CalloutContentProps,
   type CalloutProps,
   type CalloutSide,
   CalloutTrigger,
+  type CalloutTriggerProps,
   type CalloutVariant,
 } from "./callout";
 export {

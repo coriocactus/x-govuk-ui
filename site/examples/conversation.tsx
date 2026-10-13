@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   Callout,
+  CalloutContent,
   ChatInput,
   ChatInputAttach,
   ChatInputDictation,
@@ -418,10 +419,10 @@ export default function ConversationExample({
         anchor=".preview-chat .x-govuk-ui-chat-input"
         open={tip && !tipClosed && messages.length === 0}
         onOpenChange={(open) => setTipClosed(!open)}
-        side="top"
-        title="Try it"
       >
-        Ask anything and send it.
+        <CalloutContent side="top" title="Try it">
+          Ask anything and send it.
+        </CalloutContent>
       </Callout>
     </div>
   );

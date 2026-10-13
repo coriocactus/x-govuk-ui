@@ -20,7 +20,7 @@ import {
   useEditorAI,
 } from "@x-govuk-ui/jorjorwel";
 import { useEffect, useState } from "react";
-import { Button, Callout, Form } from "x-govuk-ui";
+import { Button, Callout, CalloutContent, Form } from "x-govuk-ui";
 
 type Props = {
   label?: string;
@@ -199,9 +199,10 @@ function SourceTip() {
         anchor='.x-govuk-ui-editor-toolbar :is([aria-label="Source"], [aria-label="More formatting"])'
         open={!done}
         onOpenChange={(open) => setDone(!open)}
-        title="See what it submits"
       >
-        Source shows what the field sends, and you can change it there.
+        <CalloutContent title="See what it submits">
+          Source shows what the field sends, and you can change it there.
+        </CalloutContent>
       </Callout>
     )
   );

@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Changed Callout to be built from parts, as Popover is. Callout keeps its state, its `anchor` and `closeOnPressOutside`. Its card is now CalloutContent, which takes `title`, `actions`, `variant`, `side`, `align`, `timeout`, `countdown`, `closeButton`, `labels` and the card's other props. CalloutTrigger goes inside Callout, in place of its `trigger` prop, and takes `render` for another element, as the other triggers do. Write `<Callout><CalloutTrigger label="…" /><CalloutContent title="…">…</CalloutContent></Callout>`.
 - Changed ServicePage's `footerLinks` to take FooterLink parts, in place of a list of labels and addresses, so a router's link can be one. It no longer shows GOV.UK's support links at placeholder addresses, such as `#help`, when it is given none. Give your service's own. `ServicePageLink` is removed.
 - Changed the props that turn keys on, so `shortcut` always means the keys a part shows or handles. CommandMenu's `hotkey` is now `keyboardShortcut`, FormSteps' `shortcut` is now `keyboardShortcut`, and Choices' `shortcuts` is now `shortcutScope`.
 - Changed MainWrapper's `size` from `"default" | "large"` to `"medium" | "large"`, as other parts name their sizes.

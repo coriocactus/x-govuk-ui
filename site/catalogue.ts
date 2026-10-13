@@ -1087,7 +1087,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "A card with an arrow, built on Base UI's Popover. It is brand blue with GOV.UK's inverse buttons in white, or plain, on the page's paper as Popover is. Given a trigger, such as the question mark beside a label, it is help that users ask for. Focus moves into it, and a press outside or Escape closes it. Given an anchor, an element, a ref or a selector, it is a notice that appears by itself with the notification sound, is read out without taking focus, and stays while users work in the page, until they close it or its timeout passes, which stops while the pointer or focus is on it. The timeout works as Toast's does. 0, the default, keeps the notice until it is closed. The time stops while the notice is held and continues after, and a line along the foot shows the time left, which can be turned off. The × in the corner can be turned off too, as Popover's is. Whether a press outside closes it is yours to choose. It finds its own space. It measures the space on all four sides of what it points at, within the window and anything the anchor scrolls inside. Of the sides where it fits, it takes the one where it covers least, first of other open callouts, then of things users press, and then the one with the most space. It keeps that side while it still fits and covers nothing, and Base UI moves it to another if the page scrolls it out of space. Its width is --x-govuk-ui-callout-width.",
+      "A card with an arrow, built on Base UI's Popover. It is brand blue with GOV.UK's inverse buttons in white, or plain, on the page's paper as Popover is. Built from parts, as Popover is. With a CalloutTrigger, such as the question mark beside a label, it is help that users ask for. Focus moves into it, and a press outside or Escape closes it. Given an anchor, an element, a ref or a selector, it is a notice that appears by itself with the notification sound, is read out without taking focus, and stays while users work in the page, until they close it or its timeout passes, which stops while the pointer or focus is on it. The timeout works as Toast's does. 0, the default, keeps the notice until it is closed. The time stops while the notice is held and continues after, and a line along the foot shows the time left, which can be turned off. The × in the corner can be turned off too, as Popover's is. Whether a press outside closes it is yours to choose. It finds its own space. It measures the space on all four sides of what it points at, within the window and anything the anchor scrolls inside. Of the sides where it fits, it takes the one where it covers least, first of other open callouts, then of things users press, and then the one with the most space. It keeps that side while it still fits and covers nothing, and Base UI moves it to another if the page scrolls it out of space. Its width is --x-govuk-ui-callout-width.",
     props: [
       choice(
         "variant",
@@ -1109,7 +1109,6 @@ const entries = {
         "auto",
       ),
       reference("anchor", "Element | ref | selector", "None"),
-      reference("trigger", "ReactElement, such as a CalloutTrigger", "None"),
       reference("open / defaultOpen / onOpenChange", "boolean", "false"),
       reference("title / children / actions", "ReactNode", "None"),
       reference("align", '"start" | "center" | "end"', "center"),
@@ -1134,7 +1133,12 @@ const entries = {
       toggle("closeButton", true, { note: "The × in the corner, as Popover's closeButton." }),
       reference("labels", "Partial<OverlayLabels>", "Close"),
       reference("--x-govuk-ui-callout-width", "CSS length", "320px"),
-      reference("CalloutTrigger", "Button props and { label }", "Part"),
+      reference("CalloutTrigger", "Button props and { label, render }", "Part"),
+      reference(
+        "CalloutContent",
+        "{ title, actions, variant, side, align, timeout, countdown, closeButton, labels }",
+        "Part",
+      ),
     ],
     presets: [
       { name: "Plain, above", args: { variant: "plain", side: "top" } },

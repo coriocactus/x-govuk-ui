@@ -6,6 +6,7 @@ import {
   BubbleGroup,
   Button,
   Callout,
+  CalloutContent,
   ChatInput,
   CopyButton,
   MessageActions,
@@ -417,10 +418,10 @@ export default function MessageScrollerExample({
         anchor=".preview-help-chat"
         open={tip && !tipClosed && !opened}
         onOpenChange={(next) => setTipClosed(!next)}
-        side="top"
-        title="Try it"
       >
-        Ask the Passport Office about your application.
+        <CalloutContent side="top" title="Try it">
+          Ask the Passport Office about your application.
+        </CalloutContent>
       </Callout>
     </div>
   );

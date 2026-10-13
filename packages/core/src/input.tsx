@@ -15,6 +15,7 @@ import {
   Label,
   present,
   useControlProps,
+  useFieldSummary,
   useFormDefault,
 } from "./field";
 import { passwordStrength } from "./helpers";
@@ -58,6 +59,8 @@ export type InputLabels = {
   strength: string;
   /** The strength meter's word for each score, from too short to strong. */
   strengths: readonly [string, string, string, string, string];
+  /** Stands for a password in FormSteps' Check your answers, which never shows it. */
+  passwordAnswer: string;
 };
 
 export const defaultInputLabels: InputLabels = {
@@ -69,6 +72,7 @@ export const defaultInputLabels: InputLabels = {
   passwordHidden: "Your password is hidden",
   strength: "Password strength",
   strengths: ["Too short", "Weak", "Fair", "Good", "Strong"],
+  passwordAnswer: "••••••••",
 };
 
 /**
@@ -130,6 +134,9 @@ export function InputControl(given: InputControlProps) {
   const controlId = props.id ?? `input-${generated}`;
   const password = type === "password";
   const [shown, setShown] = useState(false);
+  // Check your answers lists a password as covered, whether or not it shows in its box.
+  const covered = labels.passwordAnswer;
+  useFieldSummary({ answer: password ? () => covered : undefined });
   const [announcement, setAnnouncement] = useState("");
   // A Form can give the field an answer to start with, such as one kept from an earlier visit.
   const saved = useFormDefault(props.name)?.[0];

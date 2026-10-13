@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Combobox, type ComboboxOption } from "x-govuk-ui";
 
 type Props = {
@@ -53,15 +53,19 @@ export default function ComboboxExample({
   const [country, setCountry] = useState<string | null>(null);
   const [typed, setTyped] = useState("");
   // A search of the service's own, as a server would answer it. It finds the countries whose names
-  // start with the text, and says so beneath each. Each answer is a new object, sent under a code,
-  // as a server's would be.
-  const found: ComboboxOption[] = countries
-    .filter((name) => typed.trim() && name.toLowerCase().startsWith(typed.trim().toLowerCase()))
-    .map((name) => ({
-      value: codeOf(name),
-      label: name,
-      description: "Starts with what you typed",
-    }));
+  // start with the text, and says so beneath each. Each answer is sent under a code, as a server's
+  // would be, and the results stay the same array until the text changes.
+  const found = useMemo<ComboboxOption[]>(
+    () =>
+      countries
+        .filter((name) => typed.trim() && name.toLowerCase().startsWith(typed.trim().toLowerCase()))
+        .map((name) => ({
+          value: codeOf(name),
+          label: name,
+          description: "Starts with what you typed",
+        })),
+    [typed],
+  );
   const chosen = countries.find((name) => country === name || country === codeOf(name));
   return (
     <>

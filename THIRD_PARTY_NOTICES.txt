@@ -4,7 +4,7 @@ https://github.com/alphagov/govuk-frontend
 The stylesheet takes colour and typography settings from GOV.UK Frontend's Sass. Its licence follows.
 The library names the GDS Transport typeface, whose font files GOV.UK Frontend ships and licenses
 for www.gov.uk, *.service.gov.uk and *.blog.gov.uk only. The library includes no GDS Transport
-files, and the workbench's production build is set in Roboto and includes none either.
+files, and the workbench's production build is set in Noto Sans and includes none either.
 The GOV.UK crown and logotype in src/logo.tsx come from GOV.UK Frontend's logo template, and the
 Royal Arms image the workbench serves comes from its assets. They are Crown copyright, and GOV.UK's
 brand rules allow them only on official GOV.UK services.

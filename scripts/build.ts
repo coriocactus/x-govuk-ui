@@ -79,7 +79,7 @@ for (const root of [...dependencyRoots].sort()) {
   if (!licences.length) throw new Error(`Add a licence notice for ${root}`);
   notices += `\n\n${root.replace(/^.*node_modules\//, "")}\n\n${await Bun.file(`${root}/${licences[0]}`).text()}`;
 }
-// Roboto's files are served as assets instead of bundled, so its licence is added here.
-notices += `\n\nRoboto, from @fontsource-variable/roboto\n\n${await Bun.file("node_modules/@fontsource-variable/roboto/LICENSE").text()}`;
+// Noto Sans's files are served as assets instead of bundled, so its licence is added here.
+notices += `\n\nNoto Sans, from @fontsource-variable/noto-sans\n\n${await Bun.file("node_modules/@fontsource-variable/noto-sans/LICENSE").text()}`;
 await Bun.write("dist/THIRD_PARTY_NOTICES.txt", notices);
 console.log(`Built ${result.outputs.length} assets in dist/`);

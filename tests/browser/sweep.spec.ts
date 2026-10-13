@@ -274,11 +274,11 @@ for (const [name, path] of pages) {
     // The fit check fills the dials, so it comes after axe has seen the page as it opens, in both
     // themes. It is the layout's arithmetic, which the theme does not change.
     if (example)
-      await test.step("text fits in Roboto", async () => {
+      await test.step("text fits in Noto Sans", async () => {
         expect(await clipped(page)).toEqual([]);
       });
-    // The build's Roboto has narrow figures. A wide typeface stands in for whichever a service
-    // chooses, so no box is sized to one font. It is set before the page loads, as a service's
+    // The build is set in Noto Sans. A wide typeface stands in for whichever a service chooses, so
+    // no box is sized to one font. It is set before the page loads, as a service's
     // stylesheet would be, so anything that measures text at mount measures it in that face.
     if (example)
       await test.step("text fits in a wide typeface", async () => {

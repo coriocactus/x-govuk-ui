@@ -13,7 +13,7 @@
       and otherwise light, as GOV.UK is. -->
     <script>{ let theme = null; try { theme = JSON.parse(localStorage.getItem("x-govuk-ui-theme")); } catch {} document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light"; }</script>
     <!-- The fonts are linked by script so the bundler does not inline the font files. Local
-      development is set in GDS Transport, and the production build in Roboto. -->
+      development is set in GDS Transport, and the production build in Noto Sans. -->
     <script>document.head.append(Object.assign(document.createElement("link"), { rel: "stylesheet", href: "/assets/fonts.css" }));</script>
     <link rel="stylesheet" href="../packages/core/src/styles.css" />
     <link rel="stylesheet" href="../packages/belsize/src/styles.css" />

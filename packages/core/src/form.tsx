@@ -191,8 +191,9 @@ function answer(data: FormData, name: string) {
 /**
  * GOV.UK's pattern for a question page, as one component. Each field inside takes part by its
  * `name`. When the form is sent, `validate` checks every answer. If any need fixing, the form stays
- * on the page. An Error summary opens above the fields and takes focus, and each field shows its
- * own message. The summary lists the messages in the fields' order, and each links to its field.
+ * on the page. An Error summary opens above everything inside the form and takes focus, and each
+ * field shows its own message. Put the page's heading inside the Form, so the summary opens above
+ * it, as GOV.UK puts it. The summary lists the messages in the fields' order, and each links to its field.
  * Fixing an answer clears its message and its line in the summary at once. The summary folds away
  * once nothing is wrong. The fields stack with GOV.UK's spacing between them. The browser's own
  * validation is off, as GOV.UK advises.
@@ -237,9 +238,8 @@ export function Form({
       }),
     ),
   );
-  // How many parts of a service's own show the errors, in place of the Form's own summary, such as
-  // a FormErrorSummary. The count is read again as focus moves, so a part that comes with the
-  // errors counts too.
+  // How many parts of a service's own show the errors, in place of the Form's own summary. The
+  // count is read again as focus moves, so a part that comes with the errors counts too.
   const [summaries, setSummaries] = useState(0);
   const shown = useRef(0);
   const addSummary = useCallback(() => {
@@ -360,10 +360,10 @@ export function Form({
         onClick={both(onClick, recheck)}
         onKeyUp={both(onKeyUp, recheck)}
       >
-        {/* The summary opens above the fields, and the fields move down smoothly to make room. A
-            FormErrorSummary of a service's own shows the errors where it is placed instead. */}
+        {/* The summary opens above everything inside the form, such as a page's heading, and what
+            is beneath moves down smoothly to make room. */}
         <AutoHeight className="x-govuk-ui-form-summary">
-          {errorSummary && summaries === 0 && <Summary own />}
+          {errorSummary && summaries === 0 && <Summary />}
         </AutoHeight>
         <div className="x-govuk-ui-form-fields">{children}</div>
       </form>
@@ -394,23 +394,16 @@ export function useFormErrors({
 }
 
 /** The Form's errors, in an Error summary, once there are any. @internal */
-function Summary({
-  title,
-  description,
-  own = false,
-}: Pick<ErrorSummaryProps, "title" | "description"> & {
-  /** Whether it is the Form's own summary, which a part of a service's own can take the place of. */
-  own?: boolean;
-}) {
+function Summary() {
   const form = useContext(FormContext);
   const box = useRef<HTMLDivElement>(null);
   const attempt = form?.attempt ?? 0;
   const claimed = form?.claimed;
-  // The Form's own summary is drawn with the errors before a part of a service's own that comes
-  // with them can take its place. It takes focus only if none has, so it takes none from that part.
+  // The summary is drawn with the errors before a part of a service's own that comes with them can
+  // take its place. It takes focus only if none has, so it takes none from that part.
   useEffect(() => {
-    if (own && attempt > 0 && !claimed?.()) box.current?.focus();
-  }, [own, attempt, claimed]);
+    if (attempt > 0 && !claimed?.()) box.current?.focus();
+  }, [attempt, claimed]);
   const problems = form?.problems ?? [];
   if (problems.length === 0) return null;
   const loose = problems.filter((problem) => !problem.id);
@@ -419,17 +412,12 @@ function Summary({
     <div key={form?.attempt} data-sound-enter="error">
       <ErrorSummary
         ref={box}
-        autoFocus={!own}
-        title={title ?? form?.errorTitle}
+        autoFocus={false}
+        title={form?.errorTitle}
         description={
-          description || loose.length > 0 ? (
-            <>
-              {description}
-              {loose.map((problem) => (
-                <p key={problem.name}>{problem.message}</p>
-              ))}
-            </>
-          ) : undefined
+          loose.length > 0
+            ? loose.map((problem) => <p key={problem.name}>{problem.message}</p>)
+            : undefined
         }
       >
         {problems.map(
@@ -441,32 +429,6 @@ function Summary({
             ),
         )}
       </ErrorSummary>
-    </div>
-  );
-}
-
-export type FormErrorSummaryProps = Omit<ComponentPropsWithRef<"div">, "title" | "children"> &
-  Pick<ErrorSummaryProps, "title" | "description">;
-
-/**
- * The Form's Error summary, where you place it inside the Form, such as above the page's heading,
- * as GOV.UK puts it. While one is on the page, the Form shows no summary of its own above its
- * fields. It opens as the Form is sent with errors, takes focus, and folds away once nothing is
- * wrong. An error about no one field, such as the whole form, shows beneath the title, without a
- * link.
- */
-export function FormErrorSummary({
-  title,
-  description,
-  className = "",
-  ...props
-}: FormErrorSummaryProps) {
-  useFormErrors({ summary: true });
-  return (
-    <div {...props} className={`x-govuk-ui-form-error-summary ${className}`.trim()}>
-      <AutoHeight className="x-govuk-ui-form-summary">
-        <Summary title={title} description={description} />
-      </AutoHeight>
     </div>
   );
 }

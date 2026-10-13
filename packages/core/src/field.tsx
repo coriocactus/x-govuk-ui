@@ -83,7 +83,7 @@ export const FormContext = createContext<{
   attempt?: number;
   /** The error summary's title, from the Form. */
   errorTitle?: ReactNode;
-  /** Tells the Form that a FormErrorSummary of a service's own shows its errors. */
+  /** Tells the Form that a part of a service's own shows its errors, in place of its summary. */
   addSummary?: () => () => void;
   /** Whether a part of a service's own shows the errors now, read as focus moves. */
   claimed?: () => boolean;

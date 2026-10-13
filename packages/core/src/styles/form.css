@@ -1,5 +1,5 @@
-/* Form. The error summary opens above the fields in a box that eases to its height, so the fields
-   move down smoothly. The box reaches a little past the summary on every side, so the summary's
+/* Form. The error summary opens above everything inside the form in a box that eases to its height,
+   so what is beneath moves down smoothly. The box reaches a little past the summary on every side, so the summary's
    focus ring shows in full, and the box takes no extra space for it. */
 .x-govuk-ui-form-summary.x-govuk-ui-auto-height {
   margin: -4px;
@@ -9,27 +9,18 @@
 .x-govuk-ui-form-summary > div {
   display: flow-root;
 }
-/* Fields stack with GOV.UK's spacing between them, and buttons keep their own width. The column is
-   the form's width, so a field with something wide inside, such as a long line of code, scrolls
-   that content instead of widening the field and every field with it. */
 /* The space between the fields, GOV.UK's 20 pixels on a phone and 30 on a wider screen. */
 .x-govuk-ui-form {
   --x-govuk-ui-form-gap: 20px;
 }
+/* Fields stack with GOV.UK's spacing between them, and buttons keep their own width. The column is
+   the form's width, so a field with something wide inside, such as a long line of code, scrolls
+   that content instead of widening the field and every field with it. */
 .x-govuk-ui-form-fields {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   justify-items: start;
   gap: var(--x-govuk-ui-form-gap);
-}
-/* An error summary of a service's own takes the form's width wherever it sits. Among the fields, it
-   gives back the gap after it, so it takes no space until it opens, and the summary's own margin
-   is the space after it once it has. The margin never changes, so nothing jumps as it opens. */
-.x-govuk-ui-form-error-summary {
-  justify-self: stretch;
-}
-.x-govuk-ui-form-fields > .x-govuk-ui-form-error-summary {
-  margin-bottom: calc(-1 * var(--x-govuk-ui-form-gap));
 }
 @media (min-width: 40.0625em) {
   .x-govuk-ui-form {

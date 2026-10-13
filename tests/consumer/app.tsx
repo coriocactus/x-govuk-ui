@@ -12,7 +12,6 @@ import {
   Aside,
   defaultPaginationLabels,
   FieldBinding,
-  FormErrorSummary,
   FormStepsSummary,
   Hint,
   Label,
@@ -101,7 +100,6 @@ export function DialField() {
 export const titles = (
   <>
     <Aside title={<span lang="cy">Cysylltiedig</span>}>Links</Aside>
-    <FormErrorSummary title={<span lang="cy">Mae problem</span>} />
     <FormStepsSummary title={null} steps={[0]} />
   </>
 );

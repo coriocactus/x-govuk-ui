@@ -26,12 +26,12 @@ test("a form checks every answer when sent, and its date can come from the calen
   await open("form");
   const heading = frame.getByRole("heading", { name: "Your details" });
   const form = frame.locator(".x-govuk-ui-form");
-  // Where the heading sits in the form, which a summary that takes no space leaves alone.
+  // Where the heading sits in the form, which the summary leaves alone until it opens.
   const offset = async () => (await heading.boundingBox())!.y - (await form.boundingBox())!.y;
   const before = await offset();
   await frame.getByRole("button", { name: "Continue" }).click();
-  // The summary opens above the page's heading, where the example places its FormErrorSummary,
-  // takes focus and lists the problems in the fields' order.
+  // The summary opens above the page's heading, which is inside the Form, takes focus and lists
+  // the problems in the fields' order.
   const summary = frame.locator(".x-govuk-ui-error-summary");
   await expect(summary).toBeFocused();
   expect((await summary.boundingBox())!.y).toBeLessThan((await heading.boundingBox())!.y);
@@ -75,7 +75,7 @@ test("a form checks every answer when sent, and its date can come from the calen
   await expect(summary).toBeHidden();
   await expect(page).toHaveTitle(/^Form/);
   await expect(frame.getByRole("status")).toHaveText("Your answers are ready. Nothing was sent.");
-  // Once the summary has folded away, the heading is back where it started in the form.
+  // Once the summary has folded away, the heading is back where it started.
   await expect.poll(async () => Math.abs((await offset()) - before)).toBeLessThan(1);
 });
 
@@ -545,5 +545,4 @@ test("an application in pages takes its Back link, buttons and answers where it 
     "Your licence",
   ]);
   await expect(back).toHaveCount(0);
-  await page.screenshot({ path: "/tmp/pages-sent.png" });
 });

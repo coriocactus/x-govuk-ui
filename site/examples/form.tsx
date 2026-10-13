@@ -4,7 +4,6 @@ import {
   DateInput,
   FooterLink,
   Form,
-  FormErrorSummary,
   type FormErrors,
   FormStep,
   FormSteps,
@@ -119,8 +118,9 @@ function OnePage({
           setReady("Your answers are ready. Nothing was sent.");
         }}
       >
-        {/* GOV.UK puts the error summary above the page's heading. */}
-        {ownSummary ? <OwnErrors /> : <FormErrorSummary />}
+        {/* The page's heading is inside the Form, so the Form's summary opens above it, as GOV.UK
+            puts it. A list of the example's own can take the summary's place. */}
+        {ownSummary && <OwnErrors />}
         <h1 className="preview-page-heading">Your details</h1>
         <Input
           id="email"

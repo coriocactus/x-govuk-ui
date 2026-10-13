@@ -404,8 +404,6 @@ export {
 } from "./footer";
 export {
   Form,
-  FormErrorSummary,
-  type FormErrorSummaryProps,
   type FormErrors,
   type FormProblem,
   type FormProps,

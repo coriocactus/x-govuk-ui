@@ -2,8 +2,14 @@
 
 import { OTPInput, REGEXP_ONLY_DIGITS } from "input-otp";
 import { AnimatePresence, motion } from "motion/react";
-import { type ComponentPropsWithRef, type CSSProperties, Fragment, type ReactNode } from "react";
-import { ErrorMessage, Field, Hint, Label, useField } from "./field";
+import {
+  type ComponentPropsWithRef,
+  type CSSProperties,
+  Fragment,
+  type ReactNode,
+  useId,
+} from "react";
+import { ErrorMessage, Field, Hint, Label, present, useControlProps } from "./field";
 import { duration, easeOut, springs, useMotionTiming } from "./motion";
 
 export type InputOTPProps = Omit<
@@ -30,139 +36,159 @@ export type InputOTPProps = Omit<
  * the slots. Each digit plays a key sound, and a pasted code fills the slots. While the service
  * checks the code, a wave passes along the digits. Once the code is accepted, they hop in turn and
  * settle green. It is built on input-otp, so screen readers and password managers see one field.
+ *
+ * It is a bound Field with a Label, a Hint, an ErrorMessage and an InputOTPControl. Compose those
+ * parts yourself to put something between them.
  */
 export function InputOTP({
   label,
   hint,
   hideLabel = false,
   errorMessage,
-  maxLength = 6,
-  placeholder = "",
-  verifying = false,
-  success = false,
   id,
-  containerClassName = "",
-  readOnly,
   "aria-describedby": describedBy,
   ...props
 }: InputOTPProps) {
+  const generated = useId();
+  return (
+    <Field
+      controlId={id ?? `field-${generated}`}
+      name={props.name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Hint>{hint}</Hint>
+      <ErrorMessage />
+      <InputOTPControl {...props} />
+    </Field>
+  );
+}
+
+export type InputOTPControlProps = Omit<
+  InputOTPProps,
+  "label" | "hint" | "hideLabel" | "errorMessage"
+>;
+
+/**
+ * InputOTP's control on its own, the row of slots, for a field composed from Field's parts. In a
+ * bound Field, it takes its id, name and descriptions from the field.
+ */
+export function InputOTPControl(given: InputOTPControlProps) {
+  const {
+    maxLength = 6,
+    placeholder = "",
+    verifying = false,
+    success = false,
+    containerClassName = "",
+    readOnly,
+    ...props
+  } = useControlProps(given);
   const timing = useMotionTiming();
-  const field = useField({
-    id,
-    name: props.name,
-    hint,
-    errorMessage,
-    "aria-describedby": describedBy,
-    label,
-  });
+  const generated = useId();
+  const controlId = props.id ?? `otp-${generated}`;
+  const invalid = props["aria-invalid"] === true || props["aria-invalid"] === "true";
   // Split even-length codes into two groups, as they are often printed.
   const groupAt = maxLength >= 4 && maxLength % 2 === 0 ? maxLength / 2 : -1;
 
   return (
-    <Field invalid={field.invalid}>
-      <Label htmlFor={field.id} visuallyHidden={hideLabel}>
-        {label}
-      </Label>
-      <Hint id={field.hintId}>{hint}</Hint>
-      <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
-      <OTPInput
-        autoComplete="one-time-code"
-        inputMode="numeric"
-        pattern={REGEXP_ONLY_DIGITS}
-        pasteTransformer={(value) => value.replace(/[\s-]/g, "")}
-        {...props}
-        // The digits cannot change while the code is checked or once it is accepted.
-        readOnly={readOnly || verifying || success}
-        {...field.controlProps}
-        aria-invalid={field.controlProps["aria-invalid"] ?? props["aria-invalid"]}
-        maxLength={maxLength}
-        // SoundScope plays a key's sound as each digit is typed.
-        data-sound-typing=""
-        containerClassName={`x-govuk-ui-input-otp ${containerClassName}`.trim()}
-        aria-busy={verifying || undefined}
-        render={({ slots, isFocused }) => {
-          const complete = slots.every((slot) => slot.char !== null);
-          const active = slots.filter((slot) => slot.isActive).length;
-          // One ring marks the caret and glides between slots. Once every slot is filled, the caret
-          // rests after the last digit, so the ring shows again only when the user selects
-          // digits.
-          const caret = isFocused && active === 1 && !complete && !verifying && !success;
-          return (
-            <div
-              className="x-govuk-ui-input-otp-slots"
-              aria-hidden="true"
-              dir="ltr"
-              data-invalid={field.invalid || undefined}
-              data-verifying={verifying || undefined}
-              data-success={success || undefined}
-              data-disabled={props.disabled || undefined}
-              data-readonly={readOnly || undefined}
-            >
-              {slots.map((slot, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: Each OTP slot is identified by its fixed digit position.
-                <Fragment key={index}>
-                  {index === groupAt && <span className="x-govuk-ui-input-otp-separator" />}
-                  <span
-                    className="x-govuk-ui-input-otp-slot"
-                    data-selected={(active > 1 && slot.isActive) || undefined}
-                    data-filled={slot.char !== null || undefined}
-                    style={{ "--x-govuk-ui-input-otp-index": index } as CSSProperties}
-                  >
-                    {caret && slot.isActive && (
+    <OTPInput
+      autoComplete="one-time-code"
+      inputMode="numeric"
+      pattern={REGEXP_ONLY_DIGITS}
+      pasteTransformer={(value) => value.replace(/[\s-]/g, "")}
+      {...props}
+      id={controlId}
+      // The digits cannot change while the code is checked or once it is accepted.
+      readOnly={readOnly || verifying || success}
+      maxLength={maxLength}
+      // SoundScope plays a key's sound as each digit is typed.
+      data-sound-typing=""
+      containerClassName={`x-govuk-ui-input-otp ${containerClassName}`.trim()}
+      aria-busy={verifying || undefined}
+      render={({ slots, isFocused }) => {
+        const complete = slots.every((slot) => slot.char !== null);
+        const active = slots.filter((slot) => slot.isActive).length;
+        // One ring marks the caret and glides between slots. Once every slot is filled, the caret
+        // rests after the last digit, so the ring shows again only when the user selects
+        // digits.
+        const caret = isFocused && active === 1 && !complete && !verifying && !success;
+        return (
+          <div
+            className="x-govuk-ui-input-otp-slots"
+            aria-hidden="true"
+            dir="ltr"
+            data-invalid={invalid || undefined}
+            data-verifying={verifying || undefined}
+            data-success={success || undefined}
+            data-disabled={props.disabled || undefined}
+            data-readonly={readOnly || undefined}
+          >
+            {slots.map((slot, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: Each OTP slot is identified by its fixed digit position.
+              <Fragment key={index}>
+                {index === groupAt && <span className="x-govuk-ui-input-otp-separator" />}
+                <span
+                  className="x-govuk-ui-input-otp-slot"
+                  data-selected={(active > 1 && slot.isActive) || undefined}
+                  data-filled={slot.char !== null || undefined}
+                  style={{ "--x-govuk-ui-input-otp-index": index } as CSSProperties}
+                >
+                  {caret && slot.isActive && (
+                    <motion.span
+                      layoutId={`${controlId}-ring`}
+                      className="x-govuk-ui-input-otp-ring"
+                      transition={timing.spring(springs.hop)}
+                    />
+                  )}
+                  <AnimatePresence initial={false}>
+                    {slot.char !== null ? (
                       <motion.span
-                        layoutId={`${field.id}-ring`}
-                        className="x-govuk-ui-input-otp-ring"
-                        transition={timing.spring(springs.hop)}
-                      />
-                    )}
-                    <AnimatePresence initial={false}>
-                      {slot.char !== null ? (
+                        key={`char-${slot.char}`}
+                        className="x-govuk-ui-input-otp-char"
+                        initial={{ opacity: 0, y: 10, scale: 0.8, filter: "blur(3px)" }}
+                        animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                        // Cleared together, the digits leave from the last back to the first,
+                        // following the caret back to the start.
+                        exit={{
+                          opacity: 0,
+                          y: -8,
+                          scale: 0.9,
+                          filter: "blur(2px)",
+                          transition: timing.reduced
+                            ? { duration: 0 }
+                            : {
+                                duration: duration.fast,
+                                ease: easeOut,
+                                delay: (maxLength - index) * 0.025,
+                              },
+                        }}
+                        transition={timing.ease(duration.medium)}
+                      >
+                        {slot.char}
+                      </motion.span>
+                    ) : (
+                      placeholder[index] && (
                         <motion.span
-                          key={`char-${slot.char}`}
-                          className="x-govuk-ui-input-otp-char"
-                          initial={{ opacity: 0, y: 10, scale: 0.8, filter: "blur(3px)" }}
-                          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                          // Cleared together, the digits leave from the last back to the first,
-                          // following the caret back to the start.
-                          exit={{
-                            opacity: 0,
-                            y: -8,
-                            scale: 0.9,
-                            filter: "blur(2px)",
-                            transition: timing.reduced
-                              ? { duration: 0 }
-                              : {
-                                  duration: duration.fast,
-                                  ease: easeOut,
-                                  delay: (maxLength - index) * 0.025,
-                                },
-                          }}
-                          transition={timing.ease(duration.medium)}
+                          key="placeholder"
+                          className="x-govuk-ui-input-otp-placeholder"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={timing.ease(duration.fast)}
                         >
-                          {slot.char}
+                          {placeholder[index]}
                         </motion.span>
-                      ) : (
-                        placeholder[index] && (
-                          <motion.span
-                            key="placeholder"
-                            className="x-govuk-ui-input-otp-placeholder"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={timing.ease(duration.fast)}
-                          >
-                            {placeholder[index]}
-                          </motion.span>
-                        )
-                      )}
-                    </AnimatePresence>
-                  </span>
-                </Fragment>
-              ))}
-            </div>
-          );
-        }}
-      />
-    </Field>
+                      )
+                    )}
+                  </AnimatePresence>
+                </span>
+              </Fragment>
+            ))}
+          </div>
+        );
+      }}
+    />
   );
 }

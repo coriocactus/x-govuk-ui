@@ -461,7 +461,12 @@ export {
   type InputLabels,
   type InputProps,
 } from "./input";
-export { InputOTP, type InputOTPProps } from "./input-otp";
+export {
+  InputOTP,
+  InputOTPControl,
+  type InputOTPControlProps,
+  type InputOTPProps,
+} from "./input-otp";
 export { InsetText, type InsetTextProps } from "./inset-text";
 export {
   Item,

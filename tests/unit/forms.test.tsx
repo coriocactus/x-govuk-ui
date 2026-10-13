@@ -49,6 +49,7 @@ import {
   Input,
   InputControl,
   InputOTP,
+  InputOTPControl,
   Label,
   LabelsProvider,
   MultiSelect,
@@ -328,7 +329,7 @@ test("date and time inputs are their parts in a bound field, so a composed one m
   expect(composedTime).toContain('name="start-period"');
 });
 
-test("comboboxes, file uploads, sliders and the editor are their parts in a bound field, so a composed one matches", () => {
+test("comboboxes, file uploads, one-time codes, sliders and the editor are their parts in a bound field, so a composed one matches", () => {
   // Base UI numbers its parts by their place in the tree, which composing changes.
   const same = (html: string) =>
     normalised(html).replace(/ (?:id|aria-controls|aria-labelledby)="base-ui-[^"]*"/g, "");
@@ -368,6 +369,9 @@ test("comboboxes, file uploads, sliders and the editor are their parts in a boun
   expect(
     same(renderToStaticMarkup(<FileUpload id="country" name="country" multiple {...shorthand} />)),
   ).toBe(same(renderToStaticMarkup(words(<FileUploadControl multiple />))));
+  expect(same(renderToStaticMarkup(<InputOTP id="country" name="country" {...shorthand} />))).toBe(
+    same(renderToStaticMarkup(words(<InputOTPControl />))),
+  );
   // A slider's label names its thumb, so it is the slider's own label, beside its value.
   const slider = renderToStaticMarkup(
     <Slider id="volume" name="volume" label="Volume" hint="How loud" defaultValue={40} />,

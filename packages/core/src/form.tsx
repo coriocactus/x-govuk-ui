@@ -390,8 +390,14 @@ export function useFormErrors({
   const form = useContext(FormContext);
   const addSummary = summary ? form?.addSummary : undefined;
   useLayoutEffect(() => addSummary?.(), [addSummary]);
-  return form ? { errors: form.problems ?? [], attempt: form.attempt ?? 0 } : null;
+  const [inForm, errors, attempt] = [Boolean(form), form?.problems, form?.attempt];
+  return useMemo(
+    () => (inForm ? { errors: errors ?? noProblems, attempt: attempt ?? 0 } : null),
+    [inForm, errors, attempt],
+  );
 }
+
+const noProblems: FormProblem[] = [];
 
 /** The Form's errors, in an Error summary, once there are any. @internal */
 function Summary() {

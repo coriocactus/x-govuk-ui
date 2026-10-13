@@ -55,7 +55,7 @@ export type TourStepProps = {
 };
 
 /** What `useTour` gives a part of the tour's card, such as a step's own action. */
-export type TourControls = {
+export type UseTourResult = {
   /** The step on show, from 0. */
   step: number;
   /** How many steps there are. */
@@ -68,10 +68,10 @@ export type TourControls = {
   close: () => void;
 };
 
-const TourContext = createContext<TourControls | null>(null);
+const TourContext = createContext<UseTourResult | null>(null);
 
 /** The tour around a part of its card, such as a step's own action. Null outside a tour's card. */
-export function useTour(): TourControls | null {
+export function useTour(): UseTourResult | null {
   return useContext(TourContext);
 }
 
@@ -428,7 +428,7 @@ export function Tour({
   // What a part of the card gives `useTour`, such as a button in a step's words or its actions.
   // Its ways to move call the latest go and end, so it changes only as the step does.
   const latest = useLatest({ go, end });
-  const controls = useMemo<TourControls>(
+  const controls = useMemo<UseTourResult>(
     () => ({
       step,
       count,

@@ -210,7 +210,6 @@ export {
   type CommandMenuCommand,
   CommandMenuContent,
   type CommandMenuContentProps,
-  type CommandMenuControls,
   CommandMenuGroup,
   type CommandMenuGroupProps,
   CommandMenuItem,
@@ -224,6 +223,7 @@ export {
   defaultCommandMenuLabels,
   matchesCommand,
   rankCommandByName,
+  type UseCommandMenuResult,
   useCommandMenu,
 } from "./command-menu";
 export { useControllableState } from "./controllable-state";
@@ -422,7 +422,6 @@ export {
   type FormStepsAnswer,
   FormStepsBack,
   type FormStepsBackProps,
-  type FormStepsControls,
   type FormStepsLabels,
   FormStepsProgress,
   type FormStepsProgressProps,
@@ -433,6 +432,7 @@ export {
   type FormStepsSummaryProps,
   type UseFormStepsAnswersOptions,
   type UseFormStepsAnswersResult,
+  type UseFormStepsResult,
   useFormSteps,
   useFormStepsAnswers,
 } from "./form-steps";
@@ -934,11 +934,11 @@ export {
 export {
   defaultTourLabels,
   Tour,
-  type TourControls,
   type TourLabels,
   type TourProps,
   TourStep,
   type TourStepProps,
+  type UseTourResult,
   useTour,
 } from "./tour";
 export {

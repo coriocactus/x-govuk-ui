@@ -249,6 +249,7 @@ export function CommandMenu({
   const play = useScopeSound();
   const { reduced } = useMotionTiming();
   const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
+  const close = useCallback(() => setOpen(false), [setOpen]);
   const isOpen = useLatest(open);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -386,7 +387,7 @@ export function CommandMenu({
               back,
               rankWith,
               setQuery,
-              close: () => setOpen(false),
+              close,
               setSlots,
             }}
           >
@@ -480,7 +481,7 @@ export type CommandMenuContentProps = ComponentPropsWithRef<"div"> & {
 };
 
 /** What `useCommandMenu` gives a part of the menu, such as an empty state of your own. */
-export type CommandMenuControls = {
+export type UseCommandMenuResult = {
   /** What users have typed. */
   search: string;
   /** Changes the search, as typing does. */
@@ -490,9 +491,13 @@ export type CommandMenuControls = {
 };
 
 /** The command menu around a part of it, such as an empty state of your own. Null outside one. */
-export function useCommandMenu(): CommandMenuControls | null {
+export function useCommandMenu(): UseCommandMenuResult | null {
   const shared = useContext(SharedContext);
-  return shared && { search: shared.query, setSearch: shared.setQuery, close: shared.close };
+  const [search, setSearch, close] = [shared?.query, shared?.setQuery, shared?.close];
+  return useMemo(
+    () => (setSearch && close ? { search: search ?? "", setSearch, close } : null),
+    [search, setSearch, close],
+  );
 }
 
 /** The menu's dialog, with its search, its trail of pages and its list of commands. */

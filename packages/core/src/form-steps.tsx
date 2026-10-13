@@ -106,7 +106,7 @@ type Claim = (part: Part) => () => void;
 
 /** What FormSteps shares with its parts, inside it or in a FormStepsProvider around it. */
 type StepsShared = {
-  controls: FormStepsControls;
+  controls: UseFormStepsResult;
   labels: FormStepsLabels;
   layout: "page" | "card";
   /** Whether `done` has taken the place of the steps and their answers. */
@@ -117,7 +117,7 @@ const SharedContext = createContext<StepsShared | null>(null);
  * The controls alone, for `useFormSteps`. A page that reads them and draws the form is drawn again
  * only as the form changes, not as its words are given again, such as a function given inline.
  */
-const ControlsContext = createContext<FormStepsControls | null>(null);
+const ControlsContext = createContext<UseFormStepsResult | null>(null);
 /**
  * The answers, inside the form alone. They change each time they are listed, so they reach only
  * the parts that show them, never a page that draws the form.
@@ -351,7 +351,7 @@ export type FormStepsAnswer = {
 };
 
 /** What `useFormSteps` gives a part of your own, such as a button beside Continue. */
-export type FormStepsControls = {
+export type UseFormStepsResult = {
   /** The step on show, by its place among the steps, from 0. `count` is Check your answers. */
   step: number;
   /** How many steps there are, whether they apply or not. */
@@ -980,7 +980,7 @@ export function FormSteps({
   const canGoBack = !sent && previous !== undefined;
   const canSkip = Boolean(step?.optional) && !reviewing && !sent;
   const listed = reviewing || sent ? rows : noAnswers;
-  const controls = useMemo<FormStepsControls>(
+  const controls = useMemo<UseFormStepsResult>(
     () => ({
       step: at,
       count,
@@ -1284,7 +1284,7 @@ export function FormStepsProvider({ children }: FormStepsProviderProps) {
  * button beside Continue or a heading above the answers. It reads a FormStepsProvider too. Null
  * outside both.
  */
-export function useFormSteps(): FormStepsControls | null {
+export function useFormSteps(): UseFormStepsResult | null {
   return useContext(ControlsContext);
 }
 

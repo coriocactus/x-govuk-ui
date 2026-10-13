@@ -141,10 +141,10 @@ function useClaims() {
   return [placed, claim] as const;
 }
 
-/** Says that a part of a service's own is on the page, while it is. */
-function useClaim(part: Part) {
+/** Says that a part of a service's own is on the page, while it is. Null says nothing. */
+function useClaim(part: Part | null) {
   const claim = useContext(ClaimContext);
-  useLayoutEffect(() => claim?.(part), [claim, part]);
+  useLayoutEffect(() => (part ? claim?.(part) : undefined), [claim, part]);
 }
 /** A step's place among its FormSteps' direct children, read as the server renders. */
 const StepIndex = createContext<number | null>(null);
@@ -377,6 +377,14 @@ export type FormStepsControls = {
    * apply, such as for Save and come back later. Null before the form is drawn.
    */
   data: () => FormData | null;
+};
+
+export type UseFormStepsAnswersOptions = {
+  /**
+   * Says that the part lists the answers in place of the form's own list. While it is on the page,
+   * FormSteps lists no answers of its own, as it does beside a FormStepsSummary.
+   */
+  summary?: boolean;
 };
 
 /** What `useFormStepsAnswers` gives a list of the answers of your own. */
@@ -1246,8 +1254,9 @@ export type FormStepsProviderProps = {
 };
 
 /**
- * Lets the parts of the FormSteps inside it sit outside the FormSteps, such as a FormStepsBack in a
- * ServicePage's `back`, above the page's main content, where GOV.UK puts a Back link.
+ * Lets FormStepsBack and FormStepsProgress sit outside the FormSteps inside it, such as a
+ * FormStepsBack in a ServicePage's `back`, above the page's main content, where GOV.UK puts a Back
+ * link.
  * `useFormSteps` reads the form there too. Put it around one FormSteps and its parts. It renders no
  * element.
  *
@@ -1281,10 +1290,17 @@ export function useFormSteps(): FormStepsControls | null {
 
 /**
  * The answers Check your answers lists, and Change, for a list of your own, as FormStepsSummary
- * lists them. Null outside the form, as a FormStepsProvider does not carry them.
+ * lists them. Null outside the form, as a FormStepsProvider does not carry them. Read it in the
+ * part that lists them, not in one that draws the steps, which would list them again each time.
  */
-export function useFormStepsAnswers(): UseFormStepsAnswersResult | null {
-  return useContext(AnswersContext);
+export function useFormStepsAnswers({
+  summary = false,
+}: UseFormStepsAnswersOptions = {}): UseFormStepsAnswersResult | null {
+  const answers = useContext(AnswersContext);
+  // A list that has no answers to show, outside the form, takes the form's own list's place from
+  // nothing.
+  useClaim(summary && answers ? "summary" : null);
+  return answers;
 }
 
 export type FormStepsBackProps = Omit<BackLinkProps, "href" | "render" | "children">;
@@ -1363,15 +1379,19 @@ export type FormStepsSummaryProps = Omit<ComponentPropsWithRef<"div">, "title"> 
 
 /** The answers, as FormSteps lists them. @internal */
 function StepsSummary({
+  claims = false,
   title,
   titleLevel,
   steps: only,
   children,
   className = "",
   ...props
-}: FormStepsSummaryProps) {
+}: FormStepsSummaryProps & {
+  /** Whether it takes the form's own list's place, as a FormStepsSummary does. */
+  claims?: boolean;
+}) {
   const shared = useContext(SharedContext);
-  const listed = useFormStepsAnswers();
+  const listed = useFormStepsAnswers({ summary: claims });
   if (!shared || !listed) return null;
   const { controls, labels, layout, replaced } = shared;
   const { reviewing, sent } = controls;
@@ -1439,9 +1459,9 @@ function StepsSummary({
  * The answers as Check your answers lists them, each with Change, where you place it among the
  * form's steps. It shows on Check your answers, and stays once the answers are sent. Give each of
  * several a `title` and the `steps` of a section, as GOV.UK lists a long form's answers. While one
- * is in the form, FormSteps lists no answers of its own.
+ * is in the form, FormSteps lists no answers of its own. Put it inside the form, because a
+ * FormStepsProvider does not carry the answers.
  */
 export function FormStepsSummary(props: FormStepsSummaryProps) {
-  useClaim("summary");
-  return <StepsSummary {...props} />;
+  return <StepsSummary {...props} claims />;
 }

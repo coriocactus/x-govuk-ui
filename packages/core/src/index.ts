@@ -433,6 +433,7 @@ export {
   type FormStepsProviderProps,
   FormStepsSummary,
   type FormStepsSummaryProps,
+  type UseFormStepsAnswersOptions,
   type UseFormStepsAnswersResult,
   useFormSteps,
   useFormStepsAnswers,

@@ -24,6 +24,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
   useFormSteps,
+  useFormStepsAnswers,
 } from "x-govuk-ui";
 
 type Props = {
@@ -165,6 +166,30 @@ function SaveForLater({ saved }: { saved: (data: FormData) => void }) {
   );
 }
 
+/**
+ * The licence asked for, said as a sentence of the service's own in place of a list, with Change.
+ * It takes a list's place, so the form lists no answers of its own beside it.
+ */
+function LicenceAnswer() {
+  const listed = useFormStepsAnswers({ summary: true });
+  const steps = useFormSteps();
+  const licence = listed?.answers.find((answer) => answer.step === 2);
+  if (!listed || !licence) return null;
+  return (
+    <div className="x-govuk-ui-form-steps-review">
+      <h2 className="x-govuk-ui-form-steps-review-title">Your licence</h2>
+      <p className="preview-licence">
+        You asked for a licence for {licence.values}.{" "}
+        {!steps?.sent && (
+          <Button variant="link" onClick={() => listed.change(licence)}>
+            Change<span className="x-govuk-ui-visually-hidden"> how long your licence lasts</span>
+          </Button>
+        )}
+      </p>
+    </div>
+  );
+}
+
 /** Heads Check your answers, above the answers listed in sections. */
 function CheckHeading() {
   const steps = useFormSteps();
@@ -175,7 +200,7 @@ function CheckHeading() {
 /**
  * An application in a service, asked a page at a time, as GOV.UK lays it out. The form's Back link
  * sits in the page's own place for one, above the main content, so a FormStepsProvider holds both.
- * Check your answers lists the answers in two sections.
+ * Check your answers lists the answers in two sections, the second in words of the example's own.
  */
 function ApplyInPages() {
   return (
@@ -263,7 +288,7 @@ function Application() {
         </FormStep>
         <CheckHeading />
         <FormStepsSummary title="Your details" titleLevel={2} steps={[0, 1]} />
-        <FormStepsSummary title="Your licence" titleLevel={2} steps={[2]} />
+        <LicenceAnswer />
       </FormSteps>
       <p className="preview-message" role="status" data-success={saved ? "" : undefined}>
         {saved}

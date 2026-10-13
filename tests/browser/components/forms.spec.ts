@@ -503,6 +503,17 @@ test("an application in pages takes its Back link, buttons and answers where it 
     "Jo Bloggs",
     "jo@example.org",
   ]);
+  // The licence is a sentence of the example's own, in place of a list, so the form lists no
+  // answers of its own. Its Change asks again, and the sentence follows the new answer.
+  await expect(frame.locator(".x-govuk-ui-summary-list")).toHaveCount(1);
+  const licence = frame.locator(".preview-licence");
+  await expect(licence).toContainText("You asked for a licence for 8 days.");
+  await licence.getByRole("button", { name: "Change how long your licence lasts" }).click();
+  await expect(frame.getByRole("radio", { name: "8 days" })).toBeFocused();
+  await frame.getByRole("radio", { name: "12 months" }).check();
+  await frame.getByRole("button", { name: "Continue" }).click();
+  await expect(heading).toBeFocused();
+  await expect(licence).toContainText("You asked for a licence for 12 months.");
   await frame.getByRole("button", { name: "Accept and send" }).click();
   // Once sent, the Panel heads the page and takes focus, and the sections stay.
   await expect(

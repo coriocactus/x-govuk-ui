@@ -3,7 +3,7 @@
 import { Popover as Primitive } from "@base-ui/react/popover";
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Button, type ButtonProps, withoutButtonLook } from "./button";
-import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
+import { ArrowShape, CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
 
 export type PopoverProps = {
   children: ReactNode;
@@ -58,7 +58,8 @@ export type PopoverContentProps = ComponentPropsWithRef<"div"> & {
   arrow?: boolean;
   /** Shows a × button in the corner. */
   closeButton?: boolean;
-  closeLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<OverlayLabels>;
 };
 
 /** The panel. It grows out of its trigger and shrinks back into it. */
@@ -67,7 +68,7 @@ export function PopoverContent({
   align = "center",
   arrow = true,
   closeButton = false,
-  closeLabel = "Close",
+  labels,
   className = "",
   children,
   ...props
@@ -93,7 +94,9 @@ export function PopoverContent({
           {children}
           {closeButton && (
             <Primitive.Close
-              render={<CloseIconButton label={closeLabel} className="x-govuk-ui-popover-close" />}
+              render={
+                <CloseIconButton label={labels?.close} className="x-govuk-ui-popover-close" />
+              }
             />
           )}
         </Primitive.Popup>

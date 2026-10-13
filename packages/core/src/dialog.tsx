@@ -3,7 +3,7 @@
 import { Dialog as Primitive } from "@base-ui/react/dialog";
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Button, type ButtonProps, withoutButtonLook } from "./button";
-import { CloseIconButton, useOverlaySound } from "./overlay";
+import { CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
 
 export type DialogProps = {
   children: ReactNode;
@@ -55,7 +55,8 @@ export function DialogTrigger({ variant = "secondary", render, ...props }: Dialo
 export type DialogContentProps = ComponentPropsWithRef<"div"> & {
   /** Shows a × button in the corner. Escape and a press outside close the dialog either way. */
   closeButton?: boolean;
-  closeLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<OverlayLabels>;
   /** Where focus goes as it opens. By default, the first control inside. */
   initialFocus?: Primitive.Popup.Props["initialFocus"];
   /** Where focus goes as it closes. By default, the trigger. */
@@ -68,7 +69,7 @@ export type DialogContentProps = ComponentPropsWithRef<"div"> & {
  */
 export function DialogContent({
   closeButton = true,
-  closeLabel = "Close",
+  labels,
   initialFocus,
   finalFocus,
   className = "",
@@ -88,7 +89,7 @@ export function DialogContent({
           {children}
           {closeButton && (
             <Primitive.Close
-              render={<CloseIconButton label={closeLabel} className="x-govuk-ui-dialog-close" />}
+              render={<CloseIconButton label={labels?.close} className="x-govuk-ui-dialog-close" />}
             />
           )}
         </Primitive.Popup>

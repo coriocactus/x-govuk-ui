@@ -11,6 +11,7 @@ import {
   useId,
 } from "react";
 import { ChevronIcon } from "./icons";
+import { useLabels } from "./labels";
 import { useMediaQuery } from "./media-query";
 import { springs, useMotionTiming } from "./motion";
 import { WidthContainer } from "./width-container";
@@ -21,11 +22,25 @@ export type ServiceNavigationProps = ComponentPropsWithRef<"section"> & {
   /** The service's name, which leads its navigation. */
   serviceName?: ReactNode;
   serviceUrl?: string;
-  /** The button that shows the links on a small screen. */
-  menuLabel?: string;
-  /** Names the links for screen readers. */
-  navigationLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<ServiceNavigationLabels>;
   children?: ReactNode;
+};
+
+/** The words Service navigation writes, which a LabelsProvider or its `labels` can change. */
+export type ServiceNavigationLabels = {
+  /** The button that shows the links on a small screen. */
+  menu: string;
+  /** Names the links for screen readers. */
+  navigation: string;
+  /** Names the band for screen readers. */
+  serviceInformation: string;
+};
+
+export const defaultServiceNavigationLabels: ServiceNavigationLabels = {
+  menu: "Menu",
+  navigation: "Menu",
+  serviceInformation: "Service information",
 };
 
 /**
@@ -36,12 +51,12 @@ export type ServiceNavigationProps = ComponentPropsWithRef<"section"> & {
 export function ServiceNavigation({
   serviceName,
   serviceUrl,
-  menuLabel = "Menu",
-  navigationLabel = "Menu",
+  labels: ownLabels,
   className = "",
   children,
   ...props
 }: ServiceNavigationProps) {
+  const labels = useLabels("serviceNavigation", defaultServiceNavigationLabels, ownLabels);
   const id = useId();
   const small = useMediaQuery("(max-width: 40em)");
   const list = (
@@ -52,7 +67,7 @@ export function ServiceNavigation({
   return (
     <NavigationContext value={id}>
       <section
-        aria-label="Service information"
+        aria-label={labels.serviceInformation}
         {...props}
         className={`x-govuk-ui-service-navigation ${className}`.trim()}
       >
@@ -66,15 +81,15 @@ export function ServiceNavigation({
             (small ? (
               <Collapsible.Root className="x-govuk-ui-service-navigation-menu">
                 <Collapsible.Trigger className="x-govuk-ui-service-navigation-toggle">
-                  {menuLabel}
+                  {labels.menu}
                   <ChevronIcon size={12} strokeWidth={2} />
                 </Collapsible.Trigger>
                 <Collapsible.Panel className="x-govuk-ui-service-navigation-panel">
-                  <nav aria-label={navigationLabel}>{list}</nav>
+                  <nav aria-label={labels.navigation}>{list}</nav>
                 </Collapsible.Panel>
               </Collapsible.Root>
             ) : (
-              <nav aria-label={navigationLabel}>{list}</nav>
+              <nav aria-label={labels.navigation}>{list}</nav>
             ))}
         </WidthContainer>
       </section>

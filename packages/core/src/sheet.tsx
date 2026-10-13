@@ -3,7 +3,7 @@
 import { Drawer as Primitive } from "@base-ui/react/drawer";
 import { type ComponentPropsWithRef, createContext, type ReactNode, useContext } from "react";
 import { Button, type ButtonProps, withoutButtonLook } from "./button";
-import { CloseIconButton, useOverlaySound } from "./overlay";
+import { CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
 
 export type SheetSide = "left" | "right" | "top" | "bottom";
 const SideContext = createContext<SheetSide>("right");
@@ -64,7 +64,8 @@ export type SheetContentProps = ComponentPropsWithRef<"div"> & {
   label?: string;
   /** Shows a × button in the corner. */
   closeButton?: boolean;
-  closeLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<OverlayLabels>;
   initialFocus?: Primitive.Popup.Props["initialFocus"];
   finalFocus?: Primitive.Popup.Props["finalFocus"];
 };
@@ -73,7 +74,7 @@ export type SheetContentProps = ComponentPropsWithRef<"div"> & {
 export function SheetContent({
   label,
   closeButton = false,
-  closeLabel = "Close",
+  labels,
   initialFocus,
   finalFocus,
   className = "",
@@ -96,7 +97,7 @@ export function SheetContent({
           {children}
           {closeButton && (
             <Primitive.Close
-              render={<CloseIconButton label={closeLabel} className="x-govuk-ui-sheet-close" />}
+              render={<CloseIconButton label={labels?.close} className="x-govuk-ui-sheet-close" />}
             />
           )}
         </Primitive.Popup>

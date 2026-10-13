@@ -15,6 +15,7 @@ import { Button } from "./button";
 import { useControllableState } from "./controllable-state";
 import { useField } from "./field";
 import { FileChip, type FileChipProps, FileChips, type FileChipsProps } from "./file-chips";
+import { useLabels } from "./labels";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -24,6 +25,29 @@ import {
 } from "./menu";
 import { ScrollAreaBars } from "./scroll-area";
 import { Tooltip } from "./tooltip";
+
+/** The words Chat input writes, which a LabelsProvider can change. */
+export type ChatInputLabels = {
+  /** Names the button that sends the message. */
+  send: string;
+  /** Names the button that stops the reply. */
+  stop: string;
+  dictate: string;
+  stopDictating: string;
+  /** Says that the browser's own recogniser cannot listen. */
+  dictationNotInBrowser: string;
+  /** Says that a service's own recogniser cannot listen. */
+  dictationNotAvailable: string;
+};
+
+export const defaultChatInputLabels: ChatInputLabels = {
+  send: "Send",
+  stop: "Stop the reply",
+  dictate: "Dictate",
+  stopDictating: "Stop dictating",
+  dictationNotInBrowser: "Dictation is not available in this browser",
+  dictationNotAvailable: "Dictation is not available",
+};
 
 type ChatInputContextValue = {
   /** Adds files to the message, as ChatInputAttach does. */
@@ -152,6 +176,7 @@ export function ChatInput({
   className = "",
   ...props
 }: ChatInputProps) {
+  const labels = useLabels("chatInput", defaultChatInputLabels);
   const field = useField({ id });
   const [text, setText] = useControllableState(value, defaultValue, onValueChange);
   const area = useRef<HTMLTextAreaElement>(null);
@@ -283,7 +308,7 @@ export function ChatInput({
               size="small-icon"
               variant="outline"
               className="x-govuk-ui-chat-input-send"
-              aria-label="Stop the reply"
+              aria-label={labels.stop}
               onClick={onStop}
             >
               {stopIcon}
@@ -294,7 +319,7 @@ export function ChatInput({
               size="small-icon"
               variant="outline"
               className="x-govuk-ui-chat-input-send"
-              aria-label="Send"
+              aria-label={labels.send}
               aria-disabled={!ready || disabled || undefined}
             >
               {sendIcon}
@@ -515,6 +540,7 @@ export function ChatInputDictation({
   ...props
 }: ChatInputDictationProps) {
   const { insert, disabled } = useChatInput("ChatInputDictation");
+  const labels = useLabels("chatInput", defaultChatInputLabels);
   const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const stop = useRef<(() => void) | null>(null);
@@ -523,12 +549,12 @@ export function ChatInputDictation({
   // Whether it can listen is known only in the browser, so the server renders it unavailable.
   useEffect(() => setSupported(recogniser.available?.() ?? true), [recogniser]);
   useEffect(() => () => stop.current?.(), []);
-  let label = listening ? "Stop dictating" : "Dictate";
+  let label = listening ? labels.stopDictating : labels.dictate;
   if (!supported)
     label =
       recogniser === browserRecogniser
-        ? "Dictation is not available in this browser"
-        : "Dictation is not available";
+        ? labels.dictationNotInBrowser
+        : labels.dictationNotAvailable;
   const toggle = () => {
     if (listening) {
       stop.current?.();

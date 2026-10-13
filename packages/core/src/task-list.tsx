@@ -2,6 +2,7 @@
 
 import { type ComponentPropsWithRef, type ReactNode, useId } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
+import { useLabels } from "./labels";
 import { Spinner } from "./spinner";
 import { Tag, type TagColour } from "./tag";
 
@@ -41,18 +42,28 @@ export type TaskListItemProps = ComponentPropsWithRef<"li"> & {
   render?: AnchorProps["render"];
   hint?: ReactNode;
   status: TaskStatus;
-  /** Replaces the status's words, such as "Saved" for completed. */
-  statusLabel?: string;
+  /** Replaces the status's words for this task, such as "Saved" for completed. */
+  statusText?: string;
 };
 
-const statuses: Record<TaskStatus, { label: string; colour?: TagColour }> = {
-  completed: { label: "Completed" },
-  incomplete: { label: "Incomplete", colour: "blue" },
-  "not-started": { label: "Not yet started", colour: "blue" },
-  "in-progress": { label: "In progress", colour: "teal" },
-  "cannot-start": { label: "Cannot start yet" },
-  error: { label: "There is a problem", colour: "red" },
-  working: { label: "Working on it" },
+/** The words for each status, which a LabelsProvider can change. */
+export type TaskListLabels = Record<TaskStatus, string>;
+
+export const defaultTaskListLabels: TaskListLabels = {
+  completed: "Completed",
+  incomplete: "Incomplete",
+  "not-started": "Not yet started",
+  "in-progress": "In progress",
+  "cannot-start": "Cannot start yet",
+  error: "There is a problem",
+  working: "Working on it",
+};
+
+const colours: Partial<Record<TaskStatus, TagColour>> = {
+  incomplete: "blue",
+  "not-started": "blue",
+  "in-progress": "teal",
+  error: "red",
 };
 
 /**
@@ -65,13 +76,14 @@ export function TaskListItem({
   render,
   hint,
   status,
-  statusLabel,
+  statusText,
   className = "",
   ...props
 }: TaskListItemProps) {
   const id = useId();
-  const { label: fallback, colour } = statuses[status];
-  const label = statusLabel ?? fallback;
+  const labels = useLabels("taskList", defaultTaskListLabels);
+  const colour = colours[status];
+  const label = statusText ?? labels[status];
   const linked = (href !== undefined || render !== undefined) && status !== "cannot-start";
   const described = [hint && `${id}-hint`, `${id}-status`].filter(Boolean).join(" ");
   return (

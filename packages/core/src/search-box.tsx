@@ -3,17 +3,29 @@
 import type { ComponentPropsWithRef, FormEvent, ReactNode } from "react";
 import { useControllableState } from "./controllable-state";
 import { Label, useField } from "./field";
+import { useLabels } from "./labels";
+
+/** The words Search box writes, which a LabelsProvider or its `labels` can change. */
+export type SearchBoxLabels = {
+  /** What the field searches, for screen readers, unless it is given its own `label`. */
+  label: string;
+  /** Names the search button for screen readers. */
+  button: string;
+};
+
+export const defaultSearchBoxLabels: SearchBoxLabels = { label: "Search", button: "Search" };
 
 export type SearchBoxProps = Omit<
   ComponentPropsWithRef<"form">,
   "defaultValue" | "onValueChange" | "onSearch" | "action" | "name" | "id"
 > & {
-  /** What the field searches, for screen readers. */
+  /** What the field searches, for screen readers. By default, its `label` label, "Search". */
   label?: ReactNode;
   /**
-   * Shows the label above the field. It is hidden by default, because the button names the search.
+   * Hides the label visually, as it is by default, because the button names the search. Screen
+   * readers still announce it.
    */
-  showLabel?: boolean;
+  hideLabel?: boolean;
   placeholder?: string;
   value?: string;
   defaultValue?: string;
@@ -25,8 +37,8 @@ export type SearchBoxProps = Omit<
   /** Where the form goes, with the query as `name`. */
   action?: string;
   name?: string;
-  /** Names the search button for screen readers. */
-  buttonLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<SearchBoxLabels>;
   id?: string;
 };
 
@@ -36,8 +48,8 @@ export type SearchBoxProps = Omit<
  * straight to it.
  */
 export function SearchBox({
-  label = "Search",
-  showLabel = false,
+  label,
+  hideLabel = true,
   placeholder,
   value,
   defaultValue = "",
@@ -45,11 +57,12 @@ export function SearchBox({
   onSearch,
   action,
   name = "q",
-  buttonLabel = "Search",
+  labels: ownLabels,
   id,
   className = "",
   ...props
 }: SearchBoxProps) {
+  const labels = useLabels("searchBox", defaultSearchBoxLabels, ownLabels);
   const field = useField({ id });
   const [query, setQuery] = useControllableState(value, defaultValue, onValueChange);
   return (
@@ -65,8 +78,8 @@ export function SearchBox({
         onSearch(query.trim());
       }}
     >
-      <Label htmlFor={field.id} visuallyHidden={!showLabel}>
-        {label}
+      <Label htmlFor={field.id} visuallyHidden={hideLabel}>
+        {label ?? labels.label}
       </Label>
       <div className="x-govuk-ui-search-box-field">
         <input
@@ -78,7 +91,7 @@ export function SearchBox({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
-        <button type="submit" className="x-govuk-ui-search-box-button" aria-label={buttonLabel}>
+        <button type="submit" className="x-govuk-ui-search-box-button" aria-label={labels.button}>
           <svg
             viewBox="0 0 24 24"
             width="22"

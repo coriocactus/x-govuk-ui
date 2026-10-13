@@ -15,7 +15,7 @@ import { flushSync } from "react-dom";
 import { Button, type ButtonProps } from "./button";
 import { useControllableState } from "./controllable-state";
 import { Countdown } from "./countdown";
-import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
+import { ArrowShape, CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
 import { useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
@@ -261,7 +261,8 @@ export type CalloutProps = Omit<ComponentPropsWithRef<"div">, "title"> & {
    * another way to close it, such as an action, a timeout or a press outside.
    */
   closeButton?: boolean;
-  closeLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<OverlayLabels>;
   className?: string;
 };
 
@@ -295,7 +296,7 @@ export function Callout({
   timeout = 0,
   countdown = true,
   closeButton = true,
-  closeLabel = "Close",
+  labels,
   className = "",
   ref,
   onPointerEnter,
@@ -470,7 +471,9 @@ export function Callout({
             {actions && <div className="x-govuk-ui-callout-actions">{actions}</div>}
             {closeButton && (
               <Primitive.Close
-                render={<CloseIconButton label={closeLabel} className="x-govuk-ui-callout-close" />}
+                render={
+                  <CloseIconButton label={labels?.close} className="x-govuk-ui-callout-close" />
+                }
               />
             )}
             {/* A new timeout starts the line again. */}

@@ -12,6 +12,7 @@ import {
   useState,
 } from "react";
 import { MediaCredit } from "./card";
+import { useLabels } from "./labels";
 import { useMotionTiming } from "./motion";
 import { useOverlaySound } from "./overlay";
 import { useScopeSound } from "./sound-scope";
@@ -82,6 +83,19 @@ function fly(photo: HTMLElement, thumbnail: Rect, toThumbnail: boolean) {
   });
 }
 
+/** The words Lightbox writes, which a LabelsProvider can change. */
+export type LightboxLabels = {
+  close: string;
+  previous: string;
+  next: string;
+};
+
+export const defaultLightboxLabels: LightboxLabels = {
+  close: "Close",
+  previous: "Previous photo",
+  next: "Next photo",
+};
+
 /**
  * Photos in justified rows, each row filling the width at the photos' own proportions, laid out by
  * CSS alone. Pressing a photo dips it a little. It then moves to the centre and grows, while the
@@ -100,6 +114,7 @@ export function Lightbox({
   className = "",
   ...props
 }: LightboxProps) {
+  const words = useLabels("lightbox", defaultLightboxLabels);
   const [index, setIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState(0);
   const [closing, setClosing] = useState(false);
@@ -306,7 +321,7 @@ export function Lightbox({
               <Primitive.Close
                 ref={focusClose}
                 className="x-govuk-ui-lightbox-button"
-                aria-label="Close"
+                aria-label={words.close}
               >
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                   <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" />
@@ -318,7 +333,7 @@ export function Lightbox({
                 <button
                   type="button"
                   className="x-govuk-ui-lightbox-button"
-                  aria-label="Previous photo"
+                  aria-label={words.previous}
                   onClick={() => move(-1)}
                 >
                   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -377,7 +392,7 @@ export function Lightbox({
                 <button
                   type="button"
                   className="x-govuk-ui-lightbox-button"
-                  aria-label="Next photo"
+                  aria-label={words.next}
                   onClick={() => move(1)}
                 >
                   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">

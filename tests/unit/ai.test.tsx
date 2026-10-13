@@ -24,7 +24,7 @@ import {
   ConversationMessage,
   ConversationNote,
   ConversationThinking,
-  defaultThinkingLabels,
+  defaultThinkingStatuses,
   FileChip,
   FileChips,
   InlineCitation,
@@ -32,7 +32,7 @@ import {
   ItemMedia,
   MessageSuggestion,
   MessageSuggestions,
-  playfulThinkingLabels,
+  playfulThinkingStatuses,
   ReasoningStep,
   ReasoningSteps,
   StreamingText,
@@ -116,7 +116,7 @@ test("conversation parts name each speaker, and the thinking status is plain for
           <ConversationCopy />
         </ConversationActions>
       </ConversationMessage>
-      <ConversationThinking labels={["Pondering"]} />
+      <ConversationThinking statuses={["Pondering"]} />
     </Conversation>,
   );
   expect(html).toContain('role="log" aria-label="Help"');
@@ -145,9 +145,9 @@ test("the assistant thinks in plain words unless a service chooses livelier ones
       <ConversationThinking />
     </Conversation>,
   );
-  expect(plain).toContain(`${defaultThinkingLabels[0]}…`);
-  expect(defaultThinkingLabels).not.toContain("Vibing");
-  expect(playfulThinkingLabels).toContain("Vibing");
+  expect(plain).toContain(`${defaultThinkingStatuses[0]}…`);
+  expect(defaultThinkingStatuses).not.toContain("Vibing");
+  expect(playfulThinkingStatuses).toContain("Vibing");
 });
 
 test("the Editor's suggestions are composed from parts, and wait for a selection", () => {

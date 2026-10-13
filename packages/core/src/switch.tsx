@@ -2,6 +2,12 @@
 
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { ErrorMessage, Field, Hint, useField } from "./field";
+import { useLabels } from "./labels";
+
+/** The words Switch writes in Check your answers, which a LabelsProvider can change. */
+export type SwitchLabels = { on: string; off: string };
+
+export const defaultSwitchLabels: SwitchLabels = { on: "On", off: "Off" };
 
 export type SwitchProps = Omit<ComponentPropsWithRef<"input">, "type" | "role" | "size"> & {
   label: ReactNode;
@@ -33,6 +39,7 @@ export function Switch({
   "aria-describedby": describedBy,
   ...props
 }: SwitchProps) {
+  const labels = useLabels("switch", defaultSwitchLabels);
   const field = useField({
     id,
     name: props.name,
@@ -41,7 +48,7 @@ export function Switch({
     "aria-describedby": describedBy,
     label,
     // Check your answers says whether the setting is on.
-    answer: (data) => (props.name && data.has(props.name) ? "On" : "Off"),
+    answer: (data) => (props.name && data.has(props.name) ? labels.on : labels.off),
   });
   return (
     <Field

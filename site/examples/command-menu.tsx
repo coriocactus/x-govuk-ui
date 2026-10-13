@@ -28,7 +28,7 @@ export default function CommandMenuExample({
     <>
       <CommandMenu
         placeholder={placeholder}
-        triggerLabel={triggerLabel}
+        labels={{ trigger: triggerLabel }}
         hotkey={hotkey}
         disabled={disabled}
       >

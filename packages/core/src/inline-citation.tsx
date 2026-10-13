@@ -5,6 +5,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { type ComponentPropsWithRef, type ReactNode, useState } from "react";
 import { Button } from "./button";
 import { directionOf } from "./helpers";
+import { useLabels } from "./labels";
 import { GovukCrown } from "./logo";
 import { useOverlaySound } from "./overlay";
 
@@ -103,6 +104,23 @@ const arrow = (path: string) => (
   </svg>
 );
 
+/** The words Inline citation writes, which a LabelsProvider can change. */
+export type InlineCitationLabels = {
+  /** Names the card of one source. */
+  source: string;
+  /** Names the card of several sources. */
+  sources: string;
+  previous: string;
+  next: string;
+};
+
+export const defaultInlineCitationLabels: InlineCitationLabels = {
+  source: "Source",
+  sources: "Sources",
+  previous: "Previous source",
+  next: "Next source",
+};
+
 /**
  * A small pill after a claim, naming the site it comes from, such as an assistant's answer citing
  * a GOV.UK page. Several sources stack in one pill, as "GOV.UK +2". Resting on the pill, or
@@ -111,6 +129,7 @@ const arrow = (path: string) => (
  * from the keyboard, and focus moves into it. In the card, each title is a link to its source.
  */
 export function InlineCitation({ sources, className = "", ...props }: InlineCitationProps) {
+  const words = useLabels("inlineCitation", defaultInlineCitationLabels);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const sound = useOverlaySound();
@@ -157,7 +176,7 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
         >
           <Primitive.Popup
             className="x-govuk-ui-floating x-govuk-ui-citation-card"
-            aria-label={more ? "Sources" : "Source"}
+            aria-label={more ? words.sources : words.source}
             // Focus moves in when the card opens from the keyboard or a touch, not from hovering.
             initialFocus={(type) => type !== "mouse"}
           >
@@ -166,7 +185,7 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
                 <Button
                   variant="quiet"
                   size="small-icon"
-                  aria-label="Previous source"
+                  aria-label={words.previous}
                   onClick={() => step(-1)}
                 >
                   {arrow("m10 3-5 5 5 5")}
@@ -174,7 +193,7 @@ export function InlineCitation({ sources, className = "", ...props }: InlineCita
                 <Button
                   variant="quiet"
                   size="small-icon"
-                  aria-label="Next source"
+                  aria-label={words.next}
                   onClick={() => step(1)}
                 >
                   {arrow("m6 3 5 5-5 5")}

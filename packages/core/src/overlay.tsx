@@ -1,7 +1,16 @@
 "use client";
 
 import { Button, type ButtonProps } from "./button";
+import { useLabels } from "./labels";
 import { useScopeSound } from "./sound-scope";
+
+/** The words of the overlays, which a LabelsProvider or an overlay's `labels` can change. */
+export type OverlayLabels = {
+  /** Names the × in an overlay's corner. */
+  close: string;
+};
+
+export const defaultOverlayLabels: OverlayLabels = { close: "Close" };
 
 /** Ways an overlay closes without a press of its own, so it plays its own sound. */
 const UNPRESSED = new Set(["escape-key", "outside-press", "swipe", "focus-out"]);
@@ -34,13 +43,20 @@ const closeIcon = (
 );
 
 /**
- * The quiet × button in an overlay's corner. Its name starts with Close, so it plays the close
- * sound.
+ * The quiet × button in an overlay's corner, which plays the close sound. Its name is the
+ * overlay's `close` label, unless it is given one.
  * @internal
  */
-export function CloseIconButton({ label = "Close", ...props }: ButtonProps & { label?: string }) {
+export function CloseIconButton({ label, ...props }: ButtonProps & { label?: string }) {
+  const labels = useLabels("overlay", defaultOverlayLabels);
   return (
-    <Button variant="quiet" size="small-icon" aria-label={label} {...props}>
+    <Button
+      variant="quiet"
+      size="small-icon"
+      aria-label={label ?? labels.close}
+      data-sound="close"
+      {...props}
+    >
       {closeIcon}
     </Button>
   );

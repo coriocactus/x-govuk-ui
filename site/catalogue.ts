@@ -315,7 +315,7 @@ const entries = {
       toggle("disabled"),
       reference("items", "(string | { value, label })[]", "Required"),
       reference("value / onValueChange", "string | null / (value) => void"),
-      reference("emptyText", "string", "No results found"),
+      reference("labels", "Partial<ComboboxLabels>", "No results found"),
       reference("name / errorMessage", "string"),
     ],
   },
@@ -335,7 +335,7 @@ const entries = {
       toggle("disabled"),
       reference("items", "(string | { value, label })[]", "Required"),
       reference("value / onValueChange", "string[] / (value: string[]) => void"),
-      reference("emptyText", "string", "No results found"),
+      reference("labels", "Partial<ComboboxLabels>", "No results found"),
       reference("name / errorMessage", "string"),
     ],
   },
@@ -350,13 +350,13 @@ const entries = {
     props: [
       text("label", "Search GOV.UK", { type: "ReactNode", default: "Search" }),
       text("placeholder", ""),
-      toggle("showLabel", false, {
+      toggle("hideLabel", true, {
         note: "The label is hidden by default, as the button names the search.",
       }),
       reference("onSearch", "(query: string) => void"),
       reference("action / name", "string", "q"),
       reference("value / onValueChange", "string / (value: string) => void"),
-      reference("buttonLabel", "string", "Search"),
+      reference("labels", "Partial<SearchBoxLabels>", "Search"),
     ],
   },
   textarea: {
@@ -1021,7 +1021,7 @@ const entries = {
       reference("DialogTrigger", "Button props and { render }", "Part"),
       reference("DialogClose", "Button props", "Part"),
       reference("--x-govuk-ui-dialog-width", "CSS length", "560px"),
-      reference("DialogContent", "{ closeButton, closeLabel, initialFocus, finalFocus }", "Part"),
+      reference("DialogContent", "{ closeButton, labels, initialFocus, finalFocus }", "Part"),
       reference("DialogTitle / DialogDescription", "ReactNode", "Part"),
     ],
   },
@@ -1132,7 +1132,7 @@ const entries = {
         { type: "boolean", default: "true with a trigger, false with an anchor" },
       ),
       toggle("closeButton", true, { note: "The × in the corner, as Popover's closeButton." }),
-      reference("closeLabel", "string", "Close"),
+      reference("labels", "Partial<OverlayLabels>", "Close"),
       reference("--x-govuk-ui-callout-width", "CSS length", "320px"),
       reference("CalloutTrigger", "Button props and { label }", "Part"),
     ],
@@ -1350,7 +1350,7 @@ const entries = {
       reference("filename", "string"),
       reference("label", "string"),
       reference("children", "ReactNode", "Actions"),
-      reference("CodeBlockCopy", "{ label, copiedLabel, failedLabel }", "Part"),
+      reference("CodeBlockCopy", "{ labels: { copy, copied, failed } }", "Part"),
     ],
     example: [
       toggle("header", true, { note: "Names the file in a header. Without it, Copy floats." }),
@@ -1636,7 +1636,7 @@ const entries = {
       reference("AccordionItem", "{ value, disabled }", "Part"),
       reference("AccordionTrigger", "{ summary, children }", "Part"),
       reference("AccordionPanel", "{ hiddenUntilFound, children }", "Part"),
-      reference("AccordionShowAll", "{ showLabel, hideLabel }", "Part"),
+      reference("AccordionShowAll", "{ labels: { showAll, hideAll } }", "Part"),
     ],
     example: [
       toggle("showAll", true, { note: "Shows AccordionShowAll.", needs: [whenOn("multiple")] }),
@@ -1792,9 +1792,8 @@ const entries = {
       reference("open / onOpenChange", "boolean / (open) => void", "Uncontrolled"),
       text("placeholder", "Search commands…", { default: "Search commands…" }),
       reference("trigger", "boolean | ReactElement", "true"),
-      text("triggerLabel", "Open command menu", { default: "Open command menu" }),
       toggle("hotkey", true),
-      reference("emptyLabel", "string", "No commands found."),
+      reference("labels", "Partial<CommandMenuLabels>", "Open command menu, No commands found."),
       toggle("disabled"),
       reference("CommandMenuGroup", "{ label, children }", "Part"),
       reference(
@@ -1804,7 +1803,12 @@ const entries = {
       ),
       reference("CommandMenuPage", "{ id, label, placeholder, children }", "Part"),
     ],
-    example: [toggle("shortcuts", true, { note: "Shows a shortcut on Save your progress." })],
+    example: [
+      text("triggerLabel", "Open command menu", {
+        note: "The built-in button's words, its trigger label.",
+      }),
+      toggle("shortcuts", true, { note: "Shows a shortcut on Save your progress." }),
+    ],
   },
   bubble: {
     name: "Bubble",
@@ -1868,7 +1872,7 @@ const entries = {
       reference("ConversationContent", "The message's text", "Part"),
       reference("ConversationNote", "A quiet note, such as a reply stopped", "Part"),
       reference("ConversationActions", "Tools for one message", "Part"),
-      reference("ConversationCopy", "{ label, copiedLabel }", "Part"),
+      reference("ConversationCopy", "{ labels: { copy, copied, failed } }", "Part"),
       reference(
         "MessageRating / MessageRetry / MessageAction",
         "{ value, onValueChange } / { onRetry } / { label, icon, onClick }",
@@ -1881,7 +1885,7 @@ const entries = {
       ),
       reference(
         "ConversationThinking",
-        "{ labels = defaultThinkingLabels, or playfulThinkingLabels }",
+        "{ statuses = defaultThinkingStatuses, or playfulThinkingStatuses }",
         "Part",
       ),
     ],
@@ -2535,7 +2539,7 @@ const entries = {
     changes:
       "GOV.UK's task list, built from parts. Each task's link covers its row, which tints under the pointer, and screen readers hear the hint and status with the name. Statuses are GOV.UK's, as Tags or plain text, and each new status rises into place. It is also an agent's task list. The task an agent is on shows a spinner, and each task it completes ticks softly.",
     props: [
-      reference("TaskListItem", "{ href, hint, status, statusLabel, children }", "Part"),
+      reference("TaskListItem", "{ href, hint, status, statusText, children }", "Part"),
       reference(
         "status",
         '"completed" | "incomplete" | "not-started" | "in-progress" | "cannot-start" | "error" | "working"',
@@ -3134,7 +3138,7 @@ const entries = {
     props: [
       text("label", "Documents with this question", { default: "Files" }),
       reference("children", "FileChip parts", "Required"),
-      reference("FileChip", "{ name, kind, icon, onRemove, removeLabel, render }", "Part"),
+      reference("FileChip", "{ name, kind, icon, onRemove, labels, render }", "Part"),
     ],
     example: [
       toggle("removable", false, { note: "Gives each chip onRemove, so it has a × button." }),
@@ -3258,7 +3262,7 @@ const entries = {
     props: [
       text("serviceName", "Apply for a licence", { type: "ReactNode" }),
       reference("serviceUrl", "string"),
-      reference("menuLabel / navigationLabel", "string", "Menu"),
+      reference("labels", "Partial<ServiceNavigationLabels>", "Menu"),
       reference("ServiceNavigationItem", "{ href, current, render }", "Part"),
     ],
   },

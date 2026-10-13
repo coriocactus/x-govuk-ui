@@ -20,6 +20,7 @@ import { Button } from "./button";
 import { useControllableState } from "./controllable-state";
 import { trackHighlight } from "./highlight";
 import { Kbd } from "./kbd";
+import { useLabels } from "./labels";
 import { duration, easeOut, useMotionTiming } from "./motion";
 import { ScrollArea } from "./scroll-area";
 import { shortcutKeys } from "./shortcut";
@@ -96,6 +97,34 @@ function followScroller(viewport: HTMLDivElement | null) {
   };
 }
 
+/** The words Command menu writes, which a LabelsProvider or its `labels` can change. */
+export type CommandMenuLabels = {
+  /** The built-in button that opens the menu. */
+  trigger: string;
+  /** The search's placeholder. A page's own placeholder comes first. */
+  search: string;
+  /** Shown when nothing matches the search. */
+  empty: string;
+  /**
+   * Names the menu and its list of commands. The list is a Tab stop once it scrolls, so keyboard
+   * users can scroll it. A page of further commands takes its own label instead.
+   */
+  commands: string;
+  /** Names the Esc button that closes the menu. */
+  close: string;
+  /** The first page in the trail of pages opened. */
+  home: string;
+};
+
+export const defaultCommandMenuLabels: CommandMenuLabels = {
+  trigger: "Open command menu",
+  search: "Search commands…",
+  empty: "No commands found.",
+  commands: "Commands",
+  close: "Close command menu",
+  home: "Home",
+};
+
 export type CommandMenuProps = {
   children: ReactNode;
   /** Controls whether the menu is open. Leave unset for the menu to manage its own state. */
@@ -107,18 +136,13 @@ export type CommandMenuProps = {
    * keys. Give false when something outside opens the menu through `open`.
    */
   trigger?: boolean | ReactElement;
-  triggerLabel?: string;
   /** Toggles the menu with Command-K or Control-K anywhere on the page. */
   hotkey?: boolean;
+  /** The search's placeholder, in place of its `search` label. A page's own comes first. */
   placeholder?: string;
-  /** Shown when nothing matches the search. */
-  emptyLabel?: string;
-  /**
-   * Names the list of commands once it scrolls. The list is then also a Tab stop, so keyboard users
-   * can scroll it. A page of further commands takes its name from its own label instead.
-   */
-  listLabel?: string;
   disabled?: boolean;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<CommandMenuLabels>;
   /**
    * Where focus goes as the menu closes, such as the page a command opened. By default, the
    * control that had focus before it opened.
@@ -136,14 +160,14 @@ export function CommandMenu({
   open: controlled,
   onOpenChange,
   trigger = true,
-  triggerLabel = "Open command menu",
   hotkey = true,
-  placeholder = "Search commands…",
-  emptyLabel = "No commands found.",
-  listLabel = "Commands",
+  placeholder: ownPlaceholder,
   disabled = false,
+  labels: ownLabels,
   finalFocus,
 }: CommandMenuProps) {
+  const labels = useLabels("commandMenu", defaultCommandMenuLabels, ownLabels);
+  const placeholder = ownPlaceholder ?? labels.search;
   const play = useScopeSound();
   const { reduced } = useMotionTiming();
   const [open, setOpen] = useControllableState(controlled, false, onOpenChange);
@@ -253,7 +277,7 @@ export function CommandMenu({
                 disabled={disabled}
                 aria-keyshortcuts={shortcuts}
               >
-                {triggerLabel}
+                {labels.trigger}
                 {hotkey && <Kbd aria-hidden="true">{shortcutKeys("k")}</Kbd>}
               </Dialog.Trigger>
             )
@@ -266,7 +290,7 @@ export function CommandMenu({
               initialFocus={input}
               finalFocus={finalFocus}
             >
-              <Dialog.Title className="x-govuk-ui-visually-hidden">Commands</Dialog.Title>
+              <Dialog.Title className="x-govuk-ui-visually-hidden">{labels.commands}</Dialog.Title>
               <div className="x-govuk-ui-command-search">
                 <Autocomplete.Input
                   ref={input}
@@ -280,14 +304,14 @@ export function CommandMenu({
                     }
                   }}
                 />
-                <Dialog.Close className="x-govuk-ui-command-close" aria-label="Close command menu">
+                <Dialog.Close className="x-govuk-ui-command-close" aria-label={labels.close}>
                   Esc
                 </Dialog.Close>
               </div>
               {stack.length > 0 && (
                 <div className="x-govuk-ui-command-crumbs">
                   <button type="button" onClick={() => back(0)}>
-                    Home
+                    {labels.home}
                   </button>
                   {stack.map((id, index) =>
                     index === stack.length - 1 ? (
@@ -306,11 +330,11 @@ export function CommandMenu({
                 {current?.label ?? ""}
               </span>
               {open && visible.length === 0 && order.length > 0 && (
-                <p className="x-govuk-ui-command-empty">{emptyLabel}</p>
+                <p className="x-govuk-ui-command-empty">{labels.empty}</p>
               )}
               <ScrollArea
                 viewportRef={followScroller}
-                label={current?.label ?? listLabel}
+                label={current?.label ?? labels.commands}
                 className="x-govuk-ui-command-scroll"
                 fade
               >

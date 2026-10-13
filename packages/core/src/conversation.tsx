@@ -18,6 +18,7 @@ import {
 } from "react";
 import { Bubble, BubbleContent } from "./bubble";
 import { CopyButton, type CopyButtonProps, readableText } from "./copy";
+import { useLabels } from "./labels";
 import { MessageActions } from "./message-actions";
 import { MessageScroller } from "./message-scroller";
 import { duration, motionElementProps, useMotionTiming } from "./motion";
@@ -28,7 +29,7 @@ import { TextShimmer } from "./text-shimmer";
  * The status words that Conversation thinking takes turns with, unless it is given others. They are
  * plain, as a service's words are.
  */
-export const defaultThinkingLabels = [
+export const defaultThinkingStatuses = [
   "Thinking",
   "Working on a reply",
   "Considering your question",
@@ -36,7 +37,7 @@ export const defaultThinkingLabels = [
 ] as const;
 
 /** Livelier words for Conversation thinking, for a service whose voice suits them. */
-export const playfulThinkingLabels = [
+export const playfulThinkingStatuses = [
   "Thinking",
   "Pondering",
   "Mulling it over",
@@ -48,6 +49,22 @@ export const playfulThinkingLabels = [
   "Untangling",
   "Vibing",
 ] as const;
+
+/** The words Conversation writes, which a LabelsProvider can change. */
+export type ConversationLabels = {
+  /** Names the user's messages for screen readers. */
+  you: string;
+  /** Tells screen readers that the assistant is writing a reply. */
+  writing: (assistantName: string) => string;
+  /** The status words that Conversation thinking takes turns with. */
+  thinking: readonly string[];
+};
+
+export const defaultConversationLabels: ConversationLabels = {
+  you: "You",
+  writing: (assistantName) => `${assistantName} is writing a reply`,
+  thinking: defaultThinkingStatuses,
+};
 
 type Speaker = "user" | "assistant";
 
@@ -221,6 +238,7 @@ export function ConversationMessage({
   ...props
 }: ConversationMessageProps) {
   const { assistantName, headingLevel, stream } = useContext(ConversationContext);
+  const words = useLabels("conversation", defaultConversationLabels);
   const Heading = `h${headingLevel}` as const;
   const timing = useMotionTiming();
   const arrival = useArrival();
@@ -252,11 +270,11 @@ export function ConversationMessage({
         >
           {/* The layout shows who spoke, and screen readers hear the speaker's name. */}
           <Heading className="x-govuk-ui-visually-hidden">
-            {from === "user" ? "You" : assistantName}
+            {from === "user" ? words.you : assistantName}
           </Heading>
           {streaming && (
             <span className="x-govuk-ui-visually-hidden" role="status">
-              {assistantName} is writing a reply
+              {words.writing(assistantName)}
             </span>
           )}
           {children}
@@ -327,17 +345,22 @@ export function ConversationCopy(props: ConversationCopyProps) {
 }
 
 export type ConversationThinkingProps = ComponentPropsWithRef<"div"> & {
-  /** Status words that take turns. Screen readers hear one plain status instead. */
-  labels?: readonly string[];
+  /**
+   * Status words that take turns, in place of its `thinking` labels. Screen readers hear one plain
+   * status instead.
+   */
+  statuses?: readonly string[];
 };
 
 /** Shows the assistant working on a reply, with one shimmering status word after another. */
 export function ConversationThinking({
-  labels = defaultThinkingLabels,
+  statuses,
   className = "",
   ...props
 }: ConversationThinkingProps) {
   const { assistantName } = useContext(ConversationContext);
+  const words = useLabels("conversation", defaultConversationLabels);
+  const labels = statuses ?? words.thinking;
   const arrival = useArrival();
   const timing = useMotionTiming();
   const [index, setIndex] = useState(0);
@@ -377,7 +400,7 @@ export function ConversationThinking({
         </AnimatePresence>
       </p>
       <span className="x-govuk-ui-visually-hidden" role="status">
-        {assistantName} is writing a reply
+        {words.writing(assistantName)}
       </span>
     </motion.div>
   );

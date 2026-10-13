@@ -12,6 +12,7 @@ import {
   useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
+import { useLabels } from "./labels";
 
 type HeadingLevel = 2 | 3 | 4 | 5 | 6;
 
@@ -160,8 +161,19 @@ export type AccordionShowAllProps = Omit<
   ComponentPropsWithRef<"button">,
   "children" | "onClick" | "type"
 > & {
-  showLabel?: string;
-  hideLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<AccordionLabels>;
+};
+
+/** The words Accordion writes, which a LabelsProvider or `AccordionShowAll`'s `labels` can change. */
+export type AccordionLabels = {
+  showAll: string;
+  hideAll: string;
+};
+
+export const defaultAccordionLabels: AccordionLabels = {
+  showAll: "Show all sections",
+  hideAll: "Hide all sections",
 };
 
 /**
@@ -169,11 +181,11 @@ export type AccordionShowAllProps = Omit<
  * Use it with `multiple`, so more than one section can be open.
  */
 export function AccordionShowAll({
-  showLabel = "Show all sections",
-  hideLabel = "Hide all sections",
+  labels: ownLabels,
   className = "",
   ...props
 }: AccordionShowAllProps) {
+  const labels = useLabels("accordion", defaultAccordionLabels, ownLabels);
   const { value, values, setValue } = useAccordion("AccordionShowAll");
   const allOpen = values.length > 0 && values.every((each) => value.includes(each));
   return (
@@ -187,7 +199,7 @@ export function AccordionShowAll({
       <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
         <path d="m5 8 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" />
       </svg>
-      {allOpen ? hideLabel : showLabel}
+      {allOpen ? labels.hideAll : labels.showAll}
     </button>
   );
 }

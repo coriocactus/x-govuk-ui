@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { CrossIcon, FileIcon } from "./icons";
+import { useLabels } from "./labels";
 
 // File chips. A long name is cut short in its middle, so its end and extension show, as
 // "Catch return…2025.xlsx". The ellipsis is written into the start's own text, so the font sets it
@@ -357,6 +358,14 @@ function watch(name: HTMLElement, targets: Element[]) {
   };
 }
 
+/** The words File chip writes, which a LabelsProvider or its `labels` can change. */
+export type FileChipLabels = {
+  /** Names the × button that removes the file. */
+  remove: (name: string) => string;
+};
+
+export const defaultFileChipLabels: FileChipLabels = { remove: (name) => `Remove ${name}` };
+
 export type FileChipProps = Omit<ComponentPropsWithRef<"li">, "children"> & {
   /**
    * What it is, such as a file's or a document's name. A long name is cut short in its middle, so
@@ -372,8 +381,8 @@ export type FileChipProps = Omit<ComponentPropsWithRef<"li">, "children"> & {
    * one before, unless onRemove moves focus itself. Without onRemove, the chip has no button.
    */
   onRemove?: () => void;
-  /** Names the × button. By default, Remove and the name. */
-  removeLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<FileChipLabels>;
   /** Another element for the name, such as a link to the document. */
   render?: useRender.RenderProp;
 };
@@ -415,11 +424,12 @@ export function FileChip({
   kind,
   icon = <FileIcon />,
   onRemove,
-  removeLabel,
+  labels: ownLabels,
   render,
   className = "",
   ...props
 }: FileChipProps) {
+  const labels = useLabels("fileChip", defaultFileChipLabels, ownLabels);
   // The name's element is kept in state, so a new one, as when `render` makes the name a link, is
   // also cut and watched.
   const [element, setElement] = useState<Element | null>(null);
@@ -474,7 +484,7 @@ export function FileChip({
         <button
           type="button"
           className="x-govuk-ui-file-chip-remove"
-          aria-label={removeLabel ?? `Remove ${name}`}
+          aria-label={labels.remove(name)}
           onClick={(event) => {
             const button = event.currentTarget;
             const chip = button.closest("li");

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { Button } from "./button";
 import { useControllableState } from "./controllable-state";
+import { useLabels } from "./labels";
 import { ResizableHandle } from "./resizable";
 import { ScrollArea } from "./scroll-area";
 import { TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "./table";
@@ -67,6 +68,14 @@ type Sort = { id: string; direction: "ascending" | "descending" } | null;
 /** The width of the checkboxes' column, in pixels. */
 const CHECKS = 44;
 
+/** The words Data table writes, which a LabelsProvider can change. */
+export type DataTableLabels = {
+  /** Names the checkbox that chooses every row. */
+  selectAll: string;
+};
+
+export const defaultDataTableLabels: DataTableLabels = { selectAll: "Select every row" };
+
 /**
  * A dense table for working through many records, as in a CRM. It is built from Table's parts in a
  * Scroll area. As it scrolls, the headings stay at the top and the first columns stay at the side.
@@ -94,6 +103,7 @@ export function DataTable<Row>({
   style,
   ...props
 }: DataTableProps<Row>) {
+  const labels = useLabels("dataTable", defaultDataTableLabels);
   const [widths, setWidths] = useState(() =>
     Object.fromEntries(columns.map((column) => [column.id, column.width])),
   );
@@ -279,7 +289,7 @@ export function DataTable<Row>({
                   <input
                     type="checkbox"
                     className="x-govuk-ui-data-table-checkbox"
-                    aria-label="Select every row"
+                    aria-label={labels.selectAll}
                     checked={all}
                     ref={(element) => {
                       if (element) element.indeterminate = some;

@@ -6,6 +6,18 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Changed every component's words to labels, which a LabelsProvider or the component's `labels` prop can change, in place of a prop for each word:
+  - AccordionShowAll's `showLabel` and `hideLabel` are its labels `showAll` and `hideAll`.
+  - CommandMenu's `triggerLabel`, `emptyLabel` and `listLabel` are its labels `trigger`, `empty` and `commands`. Its `placeholder` stays, in place of its `search` label.
+  - Combobox's and MultiSelect's `emptyText` is their label `empty`.
+  - The `closeLabel` of DialogContent, SheetContent, PopoverContent and Callout is their label `close`.
+  - SearchBox's `buttonLabel` is its label `button`, and `showLabel` is now `hideLabel`, which is true by default, as other fields name it.
+  - ServiceNavigation's `menuLabel` and `navigationLabel` are its labels `menu` and `navigation`.
+  - MessageRating's `upLabel` and `downLabel` are its labels `up` and `down`.
+  - The `label`, `copiedLabel` and `failedLabel` of CodeBlockCopy and ConversationCopy are their labels `copy`, `copied` and `failed`.
+  - FileChip's `removeLabel` is its label `remove`, a function of the file's name.
+  - TaskListItem's `statusLabel` is now `statusText`, and the statuses' words are the `taskList` labels.
+  - ConversationThinking's `labels`, a list of status words, is now `statuses`. `defaultThinkingLabels` and `playfulThinkingLabels` are now `defaultThinkingStatuses` and `playfulThinkingStatuses`.
 - Changed FormSteps, FormStep, Tour and QuestionCard to take their words in `labels`, in place of a prop for each word. FormSteps' `continueLabel`, `backLabel`, `skipLabel`, `submitLabel`, `doneLabel`, `skippedLabel`, `notAnsweredLabel`, `progressLabel` and `checkAnswersTitle` are now its labels `continue`, `back`, `skip`, `submit`, `sent` or `answered`, `skipped`, `notAnswered`, `progress` and `checkAnswers`. FormStep's `continueLabel` is `labels={{ continue }}`. Tour's `stepLabel`, `nextLabel`, `backLabel`, `doneLabel` and `closeLabel` are its labels `step`, `next`, `back`, `done` and `close`. QuestionCard's `submitLabel` is its label `submit`.
 - Changed Pagination's `previousLabel` and `nextLabel` to `previousTitle` and `nextTitle`, the titles of the pages in block mode. Its `aria-label` is now its `navigation` label.
 - Removed MessageCopy. Use CopyButton, which takes the same props, and copies any text, not only a message's.
@@ -26,6 +38,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added CopyButton, an icon button that copies any text, such as a reference number. CodeBlockCopy and ConversationCopy are built on it.
 - Added LabelsProvider, which gives every component inside it a service's words, such as Welsh, with the `locale` for dates and numbers. Each component's words are a map, and its `labels` prop takes the words it should use in place of the provider's. Pagination, Calendar, Date input, Time input and Input's password words take `labels`, and every word they wrote in English is now a label. The error summary's title and the "Error" before each error message are the `errors` labels. Each map's English defaults are exported, such as `defaultPaginationLabels`.
 - Added the words of FormSteps, Tour and QuestionCard to LabelsProvider, including Check your answers, Change and QuestionCard's messages in GOV.UK's words.
+- Added the words of the rest of the components that write words to LabelsProvider, including Toast's Dismiss notification, Lightbox's and Inline citation's buttons, Chat input's Send, Stop and dictation, Data table's Select every row, Conversation's You and is writing a reply, and Switch's On and Off in Check your answers.
 - Added `useLocale`, which gives the nearest LabelsProvider's language. Calendar and Date input write their dates in it.
 - Added `useControlProps`, which gives a control of your own the id, name and descriptions of the bound Field around it.
 - Added InputControl, TextareaControl and SelectControl, the controls of Input, Textarea and Select on their own. In a bound Field, each takes its id, name and descriptions from the field. A service can then put something between a field's hint and its control, or beside the control, as GOV.UK's search puts a button. InputControl keeps the prefix, suffix, Show button and strength meter, TextareaControl the character or word count, and SelectControl the list. Input, Textarea and Select are now built from these parts, and their markup does not change.

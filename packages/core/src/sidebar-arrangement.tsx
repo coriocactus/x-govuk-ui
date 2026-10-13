@@ -379,7 +379,7 @@ const customiseWords: SidebarCustomiseLabels = {
 };
 
 // The sheet's panel takes the other props, as a `SheetContent` does.
-export type SidebarCustomiseProps = Omit<SheetContentProps, "children" | "label"> & {
+export type SidebarCustomiseProps = Omit<SheetContentProps, "children" | "label" | "labels"> & {
   arranger: SidebarArranger;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -520,7 +520,7 @@ export function SidebarCustomise({
         {...props}
         className={`x-govuk-ui-sidebar-customise ${className}`.trim()}
         closeButton
-        closeLabel={words.close}
+        labels={{ close: words.close }}
       >
         <SheetTitle>{words.title}</SheetTitle>
         <SheetDescription>{words.description}</SheetDescription>

@@ -2,6 +2,7 @@ export {
   Accordion,
   AccordionItem,
   type AccordionItemProps,
+  type AccordionLabels,
   AccordionPanel,
   type AccordionPanelProps,
   type AccordionProps,
@@ -9,6 +10,7 @@ export {
   type AccordionShowAllProps,
   AccordionTrigger,
   type AccordionTriggerProps,
+  defaultAccordionLabels,
 } from "./accordion";
 export {
   defaultQuestionCardLabels,
@@ -115,11 +117,13 @@ export {
   type ChatInputAttachProps,
   ChatInputDictation,
   type ChatInputDictationProps,
+  type ChatInputLabels,
   ChatInputModel,
   type ChatInputModelOption,
   type ChatInputModelProps,
   type ChatInputProps,
   type DictationRecogniser,
+  defaultChatInputLabels,
 } from "./chat-input";
 export {
   Checkbox,
@@ -163,8 +167,10 @@ export {
 export {
   Combobox,
   type ComboboxItem,
+  type ComboboxLabels,
   type ComboboxOption,
   type ComboboxProps,
+  defaultComboboxLabels,
   MultiSelect,
   type MultiSelectProps,
 } from "./combobox";
@@ -174,9 +180,11 @@ export {
   type CommandMenuGroupProps,
   CommandMenuItem,
   type CommandMenuItemProps,
+  type CommandMenuLabels,
   CommandMenuPage,
   type CommandMenuPageProps,
   type CommandMenuProps,
+  defaultCommandMenuLabels,
 } from "./command-menu";
 export {
   Conversation,
@@ -184,18 +192,26 @@ export {
   ConversationContent,
   ConversationCopy,
   type ConversationCopyProps,
+  type ConversationLabels,
   ConversationMessage,
   type ConversationMessageProps,
   ConversationNote,
   type ConversationProps,
   ConversationThinking,
   type ConversationThinkingProps,
-  defaultThinkingLabels,
-  playfulThinkingLabels,
+  defaultConversationLabels,
+  defaultThinkingStatuses,
+  playfulThinkingStatuses,
 } from "./conversation";
 export { CookieBanner, type CookieBannerProps, type CookieChoice } from "./cookie-banner";
-export { CopyButton, type CopyButtonProps, type CopyLabels } from "./copy";
-export { DataTable, type DataTableColumn, type DataTableProps } from "./data-table";
+export { CopyButton, type CopyButtonProps, type CopyLabels, defaultCopyLabels } from "./copy";
+export {
+  DataTable,
+  type DataTableColumn,
+  type DataTableLabels,
+  type DataTableProps,
+  defaultDataTableLabels,
+} from "./data-table";
 export {
   DateInput,
   type DateInputLabels,
@@ -274,7 +290,9 @@ export {
   type FigureSourceProps,
 } from "./figure";
 export {
+  defaultFileChipLabels,
   FileChip,
+  type FileChipLabels,
   type FileChipProps,
   FileChips,
   type FileChipsProps,
@@ -349,7 +367,13 @@ export {
   TickIcon,
 } from "./icons";
 export { ImageGeneration, type ImageGenerationProps } from "./image-generation";
-export { type CitationSource, InlineCitation, type InlineCitationProps } from "./inline-citation";
+export {
+  type CitationSource,
+  defaultInlineCitationLabels,
+  InlineCitation,
+  type InlineCitationLabels,
+  type InlineCitationProps,
+} from "./inline-citation";
 export {
   defaultInputLabels,
   Input,
@@ -373,7 +397,13 @@ export {
   LanguageNavigationItem,
   type LanguageNavigationItemProps,
 } from "./language-navigation";
-export { Lightbox, type LightboxImage, type LightboxProps } from "./lightbox";
+export {
+  defaultLightboxLabels,
+  Lightbox,
+  type LightboxImage,
+  type LightboxLabels,
+  type LightboxProps,
+} from "./lightbox";
 export { Link, type LinkProps, VisuallyHidden, type VisuallyHiddenProps } from "./link";
 export { GovukCrown, GovukLockup, type GovukMarkProps, GovukWordmark } from "./logo";
 export { LogoCarousel, type LogoCarouselItem, type LogoCarouselProps } from "./logo-carousel";
@@ -406,11 +436,13 @@ export {
 } from "./menu";
 export { Menubar, type MenubarProps, MenubarTrigger, type MenubarTriggerProps } from "./menubar";
 export {
+  defaultMessageRatingLabels,
   MessageAction,
   type MessageActionProps,
   MessageActions,
   type MessageActionsProps,
   MessageRating,
+  type MessageRatingLabels,
   type MessageRatingProps,
   type MessageRatingValue,
   MessageRetry,
@@ -452,6 +484,7 @@ export {
   type NotificationBannerTitleProps,
 } from "./notification-banner";
 export { OrganisationName, type OrganisationNameProps } from "./organisation-name";
+export { defaultOverlayLabels, type OverlayLabels } from "./overlay";
 export {
   Page,
   type PageProps,
@@ -496,7 +529,12 @@ export {
   type RichTextProps,
 } from "./rich-text";
 export { ScrollArea, type ScrollAreaProps } from "./scroll-area";
-export { SearchBox, type SearchBoxProps } from "./search-box";
+export {
+  defaultSearchBoxLabels,
+  SearchBox,
+  type SearchBoxLabels,
+  type SearchBoxProps,
+} from "./search-box";
 export {
   Select,
   SelectControl,
@@ -507,9 +545,11 @@ export {
 } from "./select";
 export { Separator, type SeparatorProps } from "./separator";
 export {
+  defaultServiceNavigationLabels,
   ServiceNavigation,
   ServiceNavigationItem,
   type ServiceNavigationItemProps,
+  type ServiceNavigationLabels,
   type ServiceNavigationProps,
 } from "./service-navigation";
 export {
@@ -606,7 +646,12 @@ export {
   SummaryListRowRoot,
   SummaryListValue,
 } from "./summary-list";
-export { Switch, type SwitchProps } from "./switch";
+export {
+  defaultSwitchLabels,
+  Switch,
+  type SwitchLabels,
+  type SwitchProps,
+} from "./switch";
 export {
   Table,
   TableBody,
@@ -633,9 +678,11 @@ export {
 } from "./tabs";
 export { Tag, type TagColour, type TagProps } from "./tag";
 export {
+  defaultTaskListLabels,
   TaskList,
   TaskListItem,
   type TaskListItemProps,
+  type TaskListLabels,
   type TaskListProps,
   type TaskStatus,
 } from "./task-list";
@@ -668,6 +715,8 @@ export {
   type TimelineProps,
 } from "./timeline";
 export {
+  defaultToastLabels,
+  type ToastLabels,
   type ToastPosition,
   ToastProvider,
   type ToastProviderProps,

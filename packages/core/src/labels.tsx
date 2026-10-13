@@ -1,14 +1,31 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
+import type { AccordionLabels } from "./accordion";
 import type { QuestionCardLabels } from "./agent-cards";
 import type { CalendarLabels } from "./calendar";
+import type { ChatInputLabels } from "./chat-input";
+import type { ComboboxLabels } from "./combobox";
+import type { CommandMenuLabels } from "./command-menu";
+import type { ConversationLabels } from "./conversation";
+import type { CopyLabels } from "./copy";
+import type { DataTableLabels } from "./data-table";
 import type { DateInputLabels } from "./date-input";
 import type { ErrorLabels } from "./error-summary";
+import type { FileChipLabels } from "./file-chips";
 import type { FormStepsLabels } from "./form-steps";
+import type { InlineCitationLabels } from "./inline-citation";
 import type { InputLabels } from "./input";
+import type { LightboxLabels } from "./lightbox";
+import type { MessageRatingLabels } from "./message-actions";
+import type { OverlayLabels } from "./overlay";
 import type { PaginationLabels } from "./pagination";
+import type { SearchBoxLabels } from "./search-box";
+import type { ServiceNavigationLabels } from "./service-navigation";
+import type { SwitchLabels } from "./switch";
+import type { TaskListLabels } from "./task-list";
 import type { TimeInputLabels } from "./time-input";
+import type { ToastLabels } from "./toast";
 import type { TourLabels } from "./tour";
 
 /**
@@ -17,14 +34,31 @@ import type { TourLabels } from "./tour";
  * An extension adds its components' maps to this interface, by augmenting the `x-govuk-ui` module.
  */
 export interface ComponentLabels {
+  accordion: AccordionLabels;
   calendar: CalendarLabels;
+  chatInput: ChatInputLabels;
+  combobox: ComboboxLabels;
+  commandMenu: CommandMenuLabels;
+  conversation: ConversationLabels;
+  copy: CopyLabels;
+  dataTable: DataTableLabels;
   dateInput: DateInputLabels;
   errors: ErrorLabels;
+  fileChip: FileChipLabels;
   formSteps: FormStepsLabels;
+  inlineCitation: InlineCitationLabels;
   input: InputLabels;
+  lightbox: LightboxLabels;
+  messageRating: MessageRatingLabels;
+  overlay: OverlayLabels;
   pagination: PaginationLabels;
   questionCard: QuestionCardLabels;
+  searchBox: SearchBoxLabels;
+  serviceNavigation: ServiceNavigationLabels;
+  switch: SwitchLabels;
+  taskList: TaskListLabels;
   timeInput: TimeInputLabels;
+  toast: ToastLabels;
   tour: TourLabels;
 }
 

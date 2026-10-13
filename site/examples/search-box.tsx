@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { SearchBox } from "x-govuk-ui";
 
-type Props = { label?: string; placeholder?: string; showLabel?: boolean };
+type Props = { label?: string; placeholder?: string; hideLabel?: boolean };
 
 export default function SearchBoxExample({
   label = "Search GOV.UK",
   placeholder = "",
-  showLabel = false,
+  hideLabel = true,
 }: Props) {
   const [searched, setSearched] = useState<string | null>(null);
   // Nothing until a search, then what was searched for, or a prompt after an empty one.
@@ -18,7 +18,7 @@ export default function SearchBoxExample({
       <SearchBox
         id="site-search"
         label={label}
-        showLabel={showLabel}
+        hideLabel={hideLabel}
         placeholder={placeholder || undefined}
         // The example searches in place. A site search goes to its action instead.
         onSearch={setSearched}

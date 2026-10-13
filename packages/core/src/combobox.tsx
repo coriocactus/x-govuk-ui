@@ -12,6 +12,7 @@ import {
 import { ErrorMessage, Field, Hint, Label, useField, useFormDefault } from "./field";
 import { trackHighlight } from "./highlight";
 import { ChevronIcon, CrossIcon, TickIcon } from "./icons";
+import { useLabels } from "./labels";
 import { ScrollArea } from "./scroll-area";
 
 export type ComboboxOption = { value: string; label: string };
@@ -34,14 +35,30 @@ type Shared = Omit<
   /** The options to search. */
   items: readonly ComboboxItem[];
   placeholder?: string;
-  /** Shown when nothing matches what has been typed. */
-  emptyText?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<ComboboxLabels>;
   /** The name the value submits under in a form. */
   name?: string;
   disabled?: boolean;
   id?: string;
   /** Classes for the field. */
   className?: string;
+};
+
+/** The words Combobox and Multi-select write, which a LabelsProvider or `labels` can change. */
+export type ComboboxLabels = {
+  /** Shown when nothing matches what has been typed. */
+  empty: string;
+  /** Names the button that clears the field. */
+  clear: string;
+  /** Names the button that shows every option. */
+  showAll: string;
+};
+
+export const defaultComboboxLabels: ComboboxLabels = {
+  empty: "No results found",
+  clear: "Clear",
+  showAll: "Show all options",
 };
 
 /** The labels of the options sent, for Check your answers. */
@@ -152,7 +169,7 @@ export function Combobox({
   defaultValue,
   onValueChange,
   placeholder,
-  emptyText = "No results found",
+  labels: ownLabels,
   name,
   disabled,
   id,
@@ -160,6 +177,7 @@ export function Combobox({
   ...props
 }: ComboboxProps) {
   const options = useMemo(() => items.map(optionOf), [items]);
+  const labels = useLabels("combobox", defaultComboboxLabels, ownLabels);
   const field = useField({
     id,
     name,
@@ -202,14 +220,14 @@ export function Combobox({
             className="x-govuk-ui-input"
             placeholder={placeholder}
           />
-          <Primitive.Clear className="x-govuk-ui-combobox-button" aria-label="Clear">
+          <Primitive.Clear className="x-govuk-ui-combobox-button" aria-label={labels.clear}>
             <CrossIcon />
           </Primitive.Clear>
-          <Primitive.Trigger className="x-govuk-ui-combobox-button" aria-label="Show all options">
+          <Primitive.Trigger className="x-govuk-ui-combobox-button" aria-label={labels.showAll}>
             <ChevronIcon size={16} />
           </Primitive.Trigger>
         </div>
-        <Options query={query} emptyText={emptyText} field={group} />
+        <Options query={query} emptyText={labels.empty} field={group} />
       </Primitive.Root>
     </Field>
   );
@@ -236,7 +254,7 @@ export function MultiSelect({
   defaultValue,
   onValueChange,
   placeholder,
-  emptyText = "No results found",
+  labels: ownLabels,
   name,
   disabled,
   id,
@@ -244,6 +262,7 @@ export function MultiSelect({
   ...props
 }: MultiSelectProps) {
   const options = useMemo(() => items.map(optionOf), [items]);
+  const labels = useLabels("combobox", defaultComboboxLabels, ownLabels);
   const field = useField({
     id,
     name,
@@ -307,7 +326,7 @@ export function MultiSelect({
             )}
           </Primitive.Value>
         </Primitive.Chips>
-        <Options query={query} emptyText={emptyText} field={chips} />
+        <Options query={query} emptyText={labels.empty} field={chips} />
       </Primitive.Root>
     </Field>
   );

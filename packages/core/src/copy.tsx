@@ -2,20 +2,26 @@
 
 import { type ComponentPropsWithRef, useEffect, useRef, useState } from "react";
 import { Button } from "./button";
+import { useLabels } from "./labels";
 import { Tooltip } from "./tooltip";
 
 const copyIcon = "M8 8h12v12H8zM16 8V4H4v12h4";
 const checkIcon = "m5 12 4 4L19 6";
 
+/** The words a copy button writes, which a LabelsProvider or its `labels` can change. */
 export type CopyLabels = {
   /** Names the button, and shows in its tooltip. */
-  label?: string;
-  /** Replaces the label for a moment once the text is copied. */
-  copiedLabel?: string;
-  /** Replaces the label for a moment when the browser refuses to copy. */
-  failedLabel?: string;
-  /** Classes for the button. */
-  className?: string;
+  copy: string;
+  /** Replaces its name for a moment once the text is copied. */
+  copied: string;
+  /** Replaces its name for a moment when the browser refuses to copy. */
+  failed: string;
+};
+
+export const defaultCopyLabels: CopyLabels = {
+  copy: "Copy",
+  copied: "Copied",
+  failed: "Could not copy",
 };
 
 /**
@@ -61,14 +67,15 @@ async function writeText(text: string, from: HTMLElement) {
   if (!copied) throw new Error("The browser did not copy the text.");
 }
 
-export type CopyButtonProps = Omit<ComponentPropsWithRef<"button">, "children"> &
-  CopyLabels & {
-    /**
-     * The text to copy, or a function that reads it at the press, so it is always current, such
-     * as a message's text as it streams in.
-     */
-    text: string | (() => string);
-  };
+export type CopyButtonProps = Omit<ComponentPropsWithRef<"button">, "children"> & {
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<CopyLabels>;
+  /**
+   * The text to copy, or a function that reads it at the press, so it is always current, such
+   * as a message's text as it streams in.
+   */
+  text: string | (() => string);
+};
 
 /**
  * An icon button that copies text, such as a reference number. Its icon turns to a tick for a
@@ -76,18 +83,12 @@ export type CopyButtonProps = Omit<ComponentPropsWithRef<"button">, "children"> 
  * offer no Clipboard API. CodeBlockCopy and ConversationCopy are this button, given the text they
  * copy.
  */
-export function CopyButton({
-  text,
-  label = "Copy",
-  copiedLabel = "Copied",
-  failedLabel = "Could not copy",
-  className = "",
-  ...props
-}: CopyButtonProps) {
+export function CopyButton({ text, labels: ownLabels, className = "", ...props }: CopyButtonProps) {
+  const labels = useLabels("copy", defaultCopyLabels, ownLabels);
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const name = { idle: label, copied: copiedLabel, failed: failedLabel }[status];
+  const name = { idle: labels.copy, copied: labels.copied, failed: labels.failed }[status];
   return (
     <Tooltip content={name}>
       <Button

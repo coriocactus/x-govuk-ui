@@ -18,6 +18,7 @@ import {
 } from "react";
 import { Countdown } from "./countdown";
 import { CrossIcon } from "./icons";
+import { useLabels } from "./labels";
 import { duration, easeOut, springs, useMotionTiming } from "./motion";
 import { useScopeSound } from "./sound-scope";
 import { Spinner } from "./spinner";
@@ -177,7 +178,21 @@ type SwipeDirection = "up" | "down" | "left" | "right";
 /** Pixels per millisecond. Faster than this, a short drag counts as a flick. */
 const FLICK_SPEED = 0.3;
 
-const spoken: Partial<Record<string, string>> = { error: "Error: ", warning: "Warning: " };
+/** The words toasts write, which a LabelsProvider can change. */
+export type ToastLabels = {
+  /** Names the button that dismisses a toast. */
+  dismiss: string;
+  /** Starts an error toast's title for screen readers, followed by a colon. */
+  error: string;
+  /** Starts a warning toast's title for screen readers, followed by a colon. */
+  warning: string;
+};
+
+export const defaultToastLabels: ToastLabels = {
+  dismiss: "Dismiss notification",
+  error: "Error",
+  warning: "Warning",
+};
 
 function Glyph({ type }: { type?: string }) {
   const timing = useMotionTiming();
@@ -206,6 +221,8 @@ function Glyph({ type }: { type?: string }) {
  * the old text to the new, so the toast morphs instead of snapping, and the old text stays inside.
  */
 function ToastTitle({ title, type }: { title: ReactNode; type?: string }) {
+  const labels = useLabels("toast", defaultToastLabels);
+  const spoken = type === "error" || type === "warning" ? `${labels[type]}: ` : null;
   const timing = useMotionTiming();
   const frame = useRef<HTMLHeadingElement>(null);
   const width = useRef<number | null>(null);
@@ -234,7 +251,7 @@ function ToastTitle({ title, type }: { title: ReactNode; type?: string }) {
 
   return (
     <Primitive.Title ref={frame} className="x-govuk-ui-toast-title">
-      {type && spoken[type] && <span className="x-govuk-ui-visually-hidden">{spoken[type]}</span>}
+      {spoken && <span className="x-govuk-ui-visually-hidden">{spoken}</span>}
       <AnimatePresence initial={false} mode="popLayout">
         <motion.span
           key={key}
@@ -270,6 +287,7 @@ function ToastRegion({
   // empty then.
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const { toasts, close } = useToastManager();
+  const labels = useLabels("toast", defaultToastLabels);
   const play = useScopeSound();
   // Tapping the toast, or pressing Enter while it has focus, dismisses it. Its own controls, such
   // as the action, keep their usual behaviour.
@@ -425,7 +443,7 @@ function ToastRegion({
                     {(closeButton || toast.timeout === 0) && toast.type !== "loading" && (
                       <Primitive.Close
                         className="x-govuk-ui-toast-close"
-                        aria-label="Dismiss notification"
+                        aria-label={labels.dismiss}
                       >
                         <CrossIcon />
                       </Primitive.Close>

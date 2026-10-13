@@ -4,6 +4,7 @@ import { type ComponentPropsWithRef, type ReactNode, useState } from "react";
 import { Button, type ButtonProps } from "./button";
 import { useControllableState } from "./controllable-state";
 import { CopyButton, type CopyButtonProps } from "./copy";
+import { useLabels } from "./labels";
 import { Tooltip } from "./tooltip";
 
 export type MessageActionsProps = ComponentPropsWithRef<"div">;
@@ -70,8 +71,21 @@ export type MessageRatingProps = Omit<
   value?: MessageRatingValue | null;
   defaultValue?: MessageRatingValue | null;
   onValueChange?: (value: MessageRatingValue | null) => void;
-  upLabel?: string;
-  downLabel?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<MessageRatingLabels>;
+};
+
+/** The words Message rating writes, which a LabelsProvider or its `labels` can change. */
+export type MessageRatingLabels = {
+  /** Names the thumb up. */
+  up: string;
+  /** Names the thumb down. */
+  down: string;
+};
+
+export const defaultMessageRatingLabels: MessageRatingLabels = {
+  up: "Helpful",
+  down: "Not helpful",
 };
 
 /**
@@ -82,24 +96,24 @@ export function MessageRating({
   value,
   defaultValue = null,
   onValueChange,
-  upLabel = "Helpful",
-  downLabel = "Not helpful",
+  labels: ownLabels,
   className = "",
   ...props
 }: MessageRatingProps) {
+  const labels = useLabels("messageRating", defaultMessageRatingLabels, ownLabels);
   const [rating, setRating] = useControllableState(value, defaultValue, onValueChange);
   const rate = (next: MessageRatingValue) => setRating(rating === next ? null : next);
   return (
     <span {...props} className={`x-govuk-ui-message-rating ${className}`.trim()}>
       <MessageAction
-        label={upLabel}
+        label={labels.up}
         icon={icon(thumb)}
         aria-pressed={rating === "up"}
         className="x-govuk-ui-message-rate"
         onClick={() => rate("up")}
       />
       <MessageAction
-        label={downLabel}
+        label={labels.down}
         icon={icon(<g transform="rotate(180 12 12)">{thumb}</g>)}
         aria-pressed={rating === "down"}
         className="x-govuk-ui-message-rate"

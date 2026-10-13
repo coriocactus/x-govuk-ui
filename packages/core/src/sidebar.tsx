@@ -21,6 +21,7 @@ import {
   useState,
 } from "react";
 import { Button, type ButtonProps } from "./button";
+import { chain } from "./events";
 import { isOneGlyph } from "./glyph";
 import { MoreIcon, SearchIcon } from "./icons";
 import { Input, type InputProps } from "./input";
@@ -585,7 +586,12 @@ export type SidebarContentProps = Omit<ComponentPropsWithRef<"div">, "children">
  * The scrolling middle of the sidebar, between its header and footer, containing its groups. The
  * hover highlight glides between the rows in it.
  */
-export function SidebarContent({ children, className = "", ...props }: SidebarContentProps) {
+export function SidebarContent({
+  children,
+  className = "",
+  onPointerLeave,
+  ...props
+}: SidebarContentProps) {
   const frame = useFrame();
   return (
     <ScrollArea
@@ -593,7 +599,7 @@ export function SidebarContent({ children, className = "", ...props }: SidebarCo
       viewportRef={frame.content}
       className={`x-govuk-ui-sidebar-content ${className}`.trim()}
       fade
-      onPointerLeave={() => frame.hover(null)}
+      onPointerLeave={chain(onPointerLeave, () => frame.hover(null))}
     >
       {/* The highlight moves inside a layer clipped to the rows. Wherever it was left, such as
           below rows that a search has removed, it never makes the list taller or scrollable. */}

@@ -14,8 +14,10 @@ import {
   useState,
 } from "react";
 import { Button, type ButtonProps } from "./button";
+import { chain } from "./events";
 import { useLabels } from "./labels";
 import { useMotionTiming } from "./motion";
+import { useMergedRef } from "./refs";
 
 type CarouselContextValue = {
   viewport: RefObject<HTMLDivElement | null>;
@@ -89,23 +91,30 @@ export function Carousel({ label, children, className = "", ...props }: Carousel
 export type CarouselViewportProps = ComponentPropsWithRef<"div"> & { children: ReactNode };
 
 /** The slides, side by side. Native scrolling moves them with touch, a trackpad or the keyboard. */
-export function CarouselViewport({ children, className = "", ...props }: CarouselViewportProps) {
+export function CarouselViewport({
+  children,
+  className = "",
+  onScroll,
+  ref,
+  ...props
+}: CarouselViewportProps) {
   const carousel = useCarousel("CarouselViewport");
+  const viewportRef = useMergedRef(carousel.viewport, ref);
   const slides = Children.toArray(children);
   const { setCount } = carousel;
   useLayoutEffect(() => setCount(slides.length), [setCount, slides.length]);
   return (
     <div
       {...props}
-      ref={carousel.viewport}
+      ref={viewportRef}
       className={`x-govuk-ui-carousel-viewport ${className}`.trim()}
       // biome-ignore lint/a11y/noNoninteractiveTabindex: Native horizontal scrolling needs keyboard focus.
       tabIndex={0}
-      onScroll={(event) => {
+      onScroll={chain(onScroll, (event) => {
         const element = event.currentTarget;
         if (element.clientWidth)
           carousel.setIndex(Math.round(Math.abs(element.scrollLeft) / element.clientWidth));
-      }}
+      })}
     >
       {slides.map((slide, index) => (
         // Each slide learns its position, so it can be announced as "2 of 3".
@@ -177,7 +186,7 @@ export const defaultCarouselLabels: CarouselLabels = {
 };
 
 /** Moves to the previous slide. It is unavailable on the first. */
-export function CarouselPrevious({ label: ownLabel, ...props }: CarouselButtonProps) {
+export function CarouselPrevious({ label: ownLabel, onClick, ...props }: CarouselButtonProps) {
   const words = useLabels("carousel", defaultCarouselLabels);
   const label = ownLabel ?? words.previous;
   const carousel = useCarousel("CarouselPrevious");
@@ -189,7 +198,7 @@ export function CarouselPrevious({ label: ownLabel, ...props }: CarouselButtonPr
       {...props}
       data-sound="tick"
       disabled={carousel.index === 0}
-      onClick={() => carousel.go(carousel.index - 1)}
+      onClick={chain(onClick, () => carousel.go(carousel.index - 1))}
     >
       {arrow("M19 12H5m6-6-6 6 6 6")}
     </Button>
@@ -197,7 +206,7 @@ export function CarouselPrevious({ label: ownLabel, ...props }: CarouselButtonPr
 }
 
 /** Moves to the next slide. It is unavailable on the last. */
-export function CarouselNext({ label: ownLabel, ...props }: CarouselButtonProps) {
+export function CarouselNext({ label: ownLabel, onClick, ...props }: CarouselButtonProps) {
   const words = useLabels("carousel", defaultCarouselLabels);
   const label = ownLabel ?? words.next;
   const carousel = useCarousel("CarouselNext");
@@ -209,7 +218,7 @@ export function CarouselNext({ label: ownLabel, ...props }: CarouselButtonProps)
       {...props}
       data-sound="tick"
       disabled={carousel.index >= carousel.count - 1}
-      onClick={() => carousel.go(carousel.index + 1)}
+      onClick={chain(onClick, () => carousel.go(carousel.index + 1))}
     >
       {arrow("M5 12h14m-6-6 6 6-6 6")}
     </Button>

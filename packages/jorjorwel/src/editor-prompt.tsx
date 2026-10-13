@@ -45,7 +45,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { ScrollArea } from "x-govuk-ui";
-import { trackHighlight, useMergedRef } from "x-govuk-ui/internal";
+import { chain, trackHighlight, useMergedRef } from "x-govuk-ui/internal";
 import { $createNodeSelectionWith, $textBefore } from "./editor-commands";
 import { useEditorContext, useStore } from "./editor-context";
 import { parseHtml } from "./editor-html";
@@ -350,6 +350,7 @@ export function EditorPrompt({
   className = "",
   style,
   ref,
+  onMouseDown,
   ...props
 }: EditorPromptProps) {
   const { editor, labels, mentions, options } = useEditorContext("EditorPrompt");
@@ -650,7 +651,7 @@ export function EditorPrompt({
           visibility: place ? undefined : "hidden",
         } as CSSProperties
       }
-      onMouseDown={(event) => event.preventDefault()}
+      onMouseDown={chain(onMouseDown, (event) => event.preventDefault())}
     >
       {/* The suggestions scroll in a Scroll area, which fades the edge with more beyond it. */}
       <ScrollArea viewportRef={viewportRef} className="x-govuk-ui-editor-prompt-scroll" fade>

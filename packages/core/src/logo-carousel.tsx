@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { Button } from "./button";
+import { chain } from "./events";
 import { duration, useMotionTiming } from "./motion";
 import { OrganisationName } from "./organisation-name";
 import { useMergedRef } from "./refs";
@@ -57,6 +58,10 @@ export function LogoCarousel({
   interval = 2600,
   className = "",
   ref,
+  onPointerEnter,
+  onPointerLeave,
+  onFocus,
+  onBlur,
   ...props
 }: LogoCarouselProps) {
   const timing = useMotionTiming();
@@ -146,12 +151,12 @@ export function LogoCarousel({
       ref={merged}
       className={`x-govuk-ui-logo-carousel ${className}`.trim()}
       aria-label={label}
-      onPointerEnter={() => setHeld(true)}
-      onPointerLeave={() => setHeld(false)}
-      onFocus={() => setHeld(true)}
-      onBlur={(event) => {
+      onPointerEnter={chain(onPointerEnter, () => setHeld(true))}
+      onPointerLeave={chain(onPointerLeave, () => setHeld(false))}
+      onFocus={chain(onFocus, () => setHeld(true))}
+      onBlur={chain(onBlur, (event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setHeld(false);
-      }}
+      })}
     >
       <div className="x-govuk-ui-logo-carousel-header">
         <p className="x-govuk-ui-logo-carousel-label">{label}</p>

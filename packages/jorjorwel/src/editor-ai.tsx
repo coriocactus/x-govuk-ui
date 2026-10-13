@@ -50,7 +50,7 @@ import {
   useMotionTiming,
   useScopeSound,
 } from "x-govuk-ui";
-import { AutoHeight, duration, Orb, useMergedRef } from "x-govuk-ui/internal";
+import { AutoHeight, chain, duration, Orb, useMergedRef } from "x-govuk-ui/internal";
 import { type EditorShared, focusDocument, useEditorContext } from "./editor-context";
 import { $getValue, parseHtml, pastedMarkdownToHtml } from "./editor-html";
 
@@ -909,6 +909,8 @@ export function EditorAIToolbar({
   className = "",
   style,
   ref,
+  onMouseDown,
+  onKeyDown,
   ...props
 }: EditorAIToolbarProps) {
   const shared = useShared();
@@ -988,17 +990,17 @@ export function EditorAIToolbar({
             width: size?.first ? { duration: 0 } : timing.ease(duration.medium),
           }}
           // Keep the document selection when pressing a tool. Fields still take focus.
-          onMouseDown={(event) => {
+          onMouseDown={chain(onMouseDown, (event) => {
             if (!(event.target instanceof Element && event.target.closest("input, select")))
               event.preventDefault();
-          }}
-          onKeyDown={(event) => {
+          })}
+          onKeyDown={chain(onKeyDown, (event) => {
             if (event.key !== "Escape") return;
             event.preventDefault();
             // Escape closes the toolbar without a press, so the editor plays its own sound.
             play("close");
             shared.discard();
-          }}
+          })}
         >
           {children}
         </motion.div>

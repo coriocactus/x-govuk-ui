@@ -2,6 +2,7 @@
 
 import type { ComponentPropsWithRef, FormEvent, ReactNode } from "react";
 import { useControllableState } from "./controllable-state";
+import { chain } from "./events";
 import { Label, useField } from "./field";
 import { useLabels } from "./labels";
 
@@ -60,6 +61,7 @@ export function SearchBox({
   labels: ownLabels,
   id,
   className = "",
+  onSubmit,
   ...props
 }: SearchBoxProps) {
   const labels = useLabels("searchBox", defaultSearchBoxLabels, ownLabels);
@@ -72,11 +74,11 @@ export function SearchBox({
       role="search"
       className={`x-govuk-ui-search-box ${className}`.trim()}
       action={action}
-      onSubmit={(event: FormEvent<HTMLFormElement>) => {
+      onSubmit={chain(onSubmit, (event: FormEvent<HTMLFormElement>) => {
         if (!onSearch) return;
         event.preventDefault();
         onSearch(query.trim());
-      }}
+      })}
     >
       <Label htmlFor={field.id} visuallyHidden={hideLabel}>
         {label ?? labels.label}

@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { chain } from "./events";
 import { ErrorMessage, Field, Hint, Label, useField } from "./field";
 import { useScopeSound } from "./sound-scope";
 
@@ -56,6 +57,10 @@ export function FileUpload({
   className = "",
   disabled,
   "aria-describedby": describedBy,
+  onDragEnter,
+  onDragOver,
+  onDragLeave,
+  onDrop,
   ...props
 }: FileUploadProps) {
   const field = useField({
@@ -131,19 +136,19 @@ export function FileUpload({
             update(next);
             if (next.length) play("select");
           }}
-          onDragEnter={(event) => {
+          onDragEnter={chain(onDragEnter, (event) => {
             setDragging(true);
             lean(event);
-          }}
-          onDragOver={lean}
-          onDragLeave={() => {
+          })}
+          onDragOver={chain(onDragOver, lean)}
+          onDragLeave={chain(onDragLeave, () => {
             setDragging(false);
             setPull({ x: 0, y: 0 });
-          }}
-          onDrop={() => {
+          })}
+          onDrop={chain(onDrop, () => {
             setDragging(false);
             setPull({ x: 0, y: 0 });
-          }}
+          })}
         />
         <span className="x-govuk-ui-file-upload-body" aria-hidden="true">
           <svg

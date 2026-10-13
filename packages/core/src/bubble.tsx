@@ -18,6 +18,7 @@ import {
 import { useControllableState } from "./controllable-state";
 import { useLabels } from "./labels";
 import { duration, useMotionTiming } from "./motion";
+import { useMergedRef } from "./refs";
 import { useShrinkWrap } from "./shrink-wrap";
 import { useScopeSound } from "./sound-scope";
 
@@ -77,9 +78,11 @@ export function Bubble({
   align = "start",
   className = "",
   children,
+  ref,
   ...props
 }: BubbleProps) {
   const root = useRef<HTMLDivElement>(null);
+  const rootRef = useMergedRef(root, ref);
   const frame = useRef<HTMLDivElement>(null);
   const mounted = useRef(false);
   useEffect(() => {
@@ -89,7 +92,7 @@ export function Bubble({
     <BubbleContext value={{ variant, align, root, frame, mounted }}>
       <div
         {...props}
-        ref={root}
+        ref={rootRef}
         className={`x-govuk-ui-bubble ${className}`.trim()}
         data-variant={variant}
         data-align={align}

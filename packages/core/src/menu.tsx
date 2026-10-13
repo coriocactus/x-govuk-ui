@@ -10,6 +10,7 @@ import {
   useContext,
 } from "react";
 import { Button, type ButtonProps, withoutButtonLook } from "./button";
+import { chain } from "./events";
 import { trackHighlight } from "./highlight";
 import { ChevronIcon, TickIcon } from "./icons";
 import { Kbd } from "./kbd";
@@ -274,6 +275,7 @@ export function MenuItem({
   disabled,
   keepOpen = false,
   className = "",
+  onClick,
   ...props
 }: MenuItemProps) {
   return (
@@ -284,7 +286,7 @@ export function MenuItem({
       data-sound={destructive ? "destructive" : undefined}
       disabled={disabled}
       closeOnClick={!keepOpen}
-      onClick={() => onSelect?.()}
+      onClick={chain(onClick, () => onSelect?.())}
     >
       <ItemBody icon={icon} shortcut={shortcut}>
         {children}

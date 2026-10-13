@@ -16,6 +16,7 @@ import {
 } from "react";
 import { Button, type ButtonProps, withoutButtonLook } from "./button";
 import { useControllableState } from "./controllable-state";
+import { chain } from "./events";
 import { trackHighlight } from "./highlight";
 import { Kbd } from "./kbd";
 import { useLabels } from "./labels";
@@ -560,6 +561,7 @@ export function CommandMenuItem({
   textValue,
   disabled = false,
   className = "",
+  onClick,
   ...props
 }: CommandMenuItemProps) {
   const menu = useMenu("CommandMenuItem");
@@ -586,7 +588,7 @@ export function CommandMenuItem({
       disabled={disabled}
       className={`x-govuk-ui-command-menu-item ${className}`.trim()}
       data-command={id}
-      onClick={() => menu.choose(opens, onSelect)}
+      onClick={chain(onClick, () => menu.choose(opens, onSelect))}
     >
       {icon && (
         <span className="x-govuk-ui-command-menu-icon" aria-hidden="true">

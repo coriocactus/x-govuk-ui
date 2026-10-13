@@ -20,12 +20,13 @@ import { AutoHeight } from "./auto-height";
 import { BackLink } from "./back-link";
 import { Button, ButtonGroup } from "./button";
 import { useControllableState } from "./controllable-state";
+import { chain } from "./events";
 import { FormContext, type FormField, present } from "./field";
 import { Form, type FormErrors, type FormProps } from "./form";
 import { Kbd } from "./kbd";
 import { useLabels } from "./labels";
 import { Panel } from "./panel";
-import { useLatest } from "./refs";
+import { useLatest, useMergedRef } from "./refs";
 import { type Registry, useRegister, useRegistry } from "./registry";
 import { SummaryList, SummaryListAction, SummaryListRow } from "./summary-list";
 import { Tag } from "./tag";
@@ -358,6 +359,10 @@ export function FormSteps({
   done: doneContent,
   labels: ownLabels,
   className = "",
+  onKeyDown: givenKeyDown,
+  onInput: givenInput,
+  onChange: givenChange,
+  ref,
   ...formProps
 }: FormStepsProps) {
   const labels = useLabels("formSteps", defaultFormStepsLabels, ownLabels);
@@ -392,6 +397,7 @@ export function FormSteps({
   const [busy, setBusy] = useState(false);
   const returning = useRef(false);
   const form = useRef<HTMLFormElement | null>(null);
+  const formRef = useMergedRef(form, ref);
   const focusNext = useRef<string | null>(null);
   const titleId = useId();
   const historyKey = `x-govuk-ui-form-steps:${storageKey ?? titleId}`;
@@ -876,7 +882,7 @@ export function FormSteps({
         {...formProps}
         // Restored answers start the form again, because each field reads its answer once.
         key={restored.round}
-        ref={form}
+        ref={formRef}
         className="x-govuk-ui-form-steps-form"
         // Pressing anywhere in it that is not a control puts focus in the form, so keys that work
         // across it, such as Choices' letters, reach it.
@@ -885,15 +891,15 @@ export function FormSteps({
         defaultValues={restored.answers}
         validate={(data) => (reviewing || !step?.validate ? {} : step.validate(data))}
         onSubmit={(data) => onSubmit(data)}
-        onKeyDown={onKeyDown}
-        onInput={() => {
+        onKeyDown={chain(givenKeyDown, onKeyDown)}
+        onInput={chain(givenInput, () => {
           window.clearTimeout(rememberSoon.current);
           rememberSoon.current = window.setTimeout(() => {
             replan();
             remember();
           }, 300);
-        }}
-        onChange={() => replan()}
+        })}
+        onChange={chain(givenChange, () => replan())}
       >
         {card ? <AutoHeight>{body}</AutoHeight> : body}
         {card ? (

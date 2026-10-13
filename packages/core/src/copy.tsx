@@ -83,7 +83,13 @@ export type CopyButtonProps = Omit<ComponentPropsWithRef<"button">, "children"> 
  * offer no Clipboard API. CodeBlockCopy and ConversationCopy are this button, given the text they
  * copy.
  */
-export function CopyButton({ text, labels: ownLabels, className = "", ...props }: CopyButtonProps) {
+export function CopyButton({
+  text,
+  labels: ownLabels,
+  className = "",
+  onClick,
+  ...props
+}: CopyButtonProps) {
   const labels = useLabels("copy", defaultCopyLabels, ownLabels);
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -99,6 +105,9 @@ export function CopyButton({ text, labels: ownLabels, className = "", ...props }
         aria-label={name}
         data-sound="copy"
         onClick={async (event) => {
+          // A service's own handler runs first, and can stop the copy by preventing the default.
+          onClick?.(event);
+          if (event.defaultPrevented) return;
           let next: typeof status = "copied";
           try {
             await writeText(typeof text === "string" ? text : text(), event.currentTarget);

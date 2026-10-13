@@ -3,6 +3,7 @@
 import { type ComponentPropsWithRef, type ReactNode, useState } from "react";
 import { Button, type ButtonProps } from "./button";
 import { useControllableState } from "./controllable-state";
+import { chain } from "./events";
 import { useLabels } from "./labels";
 import { Tooltip } from "./tooltip";
 
@@ -160,6 +161,8 @@ export function MessageRetry({
   disabled,
   unavailable = false,
   className = "",
+  onPointerDown,
+  onKeyDown,
   ...props
 }: MessageRetryProps) {
   const words = useLabels("messageActions", defaultMessageActionsLabels);
@@ -186,14 +189,15 @@ export function MessageRetry({
         </span>
       }
       // An unavailable button is never pressed, so its refusal responds to the pointer and keys.
-      onPointerDown={unavailable ? refuse : undefined}
-      onKeyDown={
+      onPointerDown={chain(onPointerDown, unavailable ? refuse : undefined)}
+      onKeyDown={chain(
+        onKeyDown,
         unavailable
           ? (event) => {
               if (event.key === "Enter" || event.key === " ") refuse();
             }
-          : undefined
-      }
+          : undefined,
+      )}
       onClick={() => {
         setPresses((count) => count + 1);
         onRetry?.();

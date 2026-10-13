@@ -18,6 +18,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Changed the Editor's `errorMessage` to take any React content, as every field's does.
 
+### Fixed
+
+- Fixed EditorAIToolbar and EditorPrompt dropping a service's own `onMouseDown`, and EditorAIToolbar its `onKeyDown`. A service's handler now runs first, and calling `preventDefault` in it stops what the part would do.
+
 ## [0.3.0] - 2026-10-10
 
 No changes of its own.

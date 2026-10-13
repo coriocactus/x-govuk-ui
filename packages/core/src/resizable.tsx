@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { chain } from "./events";
 import { useLabels } from "./labels";
 import { useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
@@ -92,6 +93,13 @@ export function ResizableHandle({
   disabled = false,
   className = "",
   ref,
+  onPointerDown: givenPointerDown,
+  onPointerMove: givenPointerMove,
+  onPointerUp: givenPointerUp,
+  onPointerCancel: givenPointerCancel,
+  onLostPointerCapture: givenLostPointerCapture,
+  onDoubleClick: givenDoubleClick,
+  onKeyDown: givenKeyDown,
   ...props
 }: ResizableHandleProps) {
   const words = useLabels("resizable", defaultResizableLabels);
@@ -226,21 +234,21 @@ export function ResizableHandle({
       className={`x-govuk-ui-resizable-handle ${className}`.trim()}
       data-dragging={dragging || undefined}
       data-grip={grip || undefined}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={(event) => {
+      onPointerDown={chain(givenPointerDown, onPointerDown)}
+      onPointerMove={chain(givenPointerMove, onPointerMove)}
+      onPointerUp={chain(givenPointerUp, (event) => {
         if (event.currentTarget.hasPointerCapture(event.pointerId))
           event.currentTarget.releasePointerCapture(event.pointerId);
         finish();
-      }}
-      onPointerCancel={finish}
-      onLostPointerCapture={finish}
-      onDoubleClick={() => {
+      })}
+      onPointerCancel={chain(givenPointerCancel, finish)}
+      onLostPointerCapture={chain(givenLostPointerCapture, finish)}
+      onDoubleClick={chain(givenDoubleClick, () => {
         if (disabled || defaultValue === undefined) return;
         choose(defaultValue);
         play("tap", { velocity: 0.7 });
-      }}
-      onKeyDown={onKeyDown}
+      })}
+      onKeyDown={chain(givenKeyDown, onKeyDown)}
     >
       {grip && <span className="x-govuk-ui-resizable-grip" />}
     </div>

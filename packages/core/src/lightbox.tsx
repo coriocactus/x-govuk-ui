@@ -115,6 +115,7 @@ export function Lightbox({
   gap = 8,
   label: ownLabel,
   className = "",
+  style,
   ...props
 }: LightboxProps) {
   const words = useLabels("lightbox", defaultLightboxLabels);
@@ -240,7 +241,7 @@ export function Lightbox({
         {...props}
         className={`x-govuk-ui-lightbox ${className}`.trim()}
         aria-label={label}
-        style={{ gap } as CSSProperties}
+        style={{ ...style, gap } as CSSProperties}
         data-viewing={(index !== null && !closing) || undefined}
       >
         {images.map((image, at) => (

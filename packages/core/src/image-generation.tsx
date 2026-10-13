@@ -92,6 +92,7 @@ export function ImageGeneration({
   progress,
   label: ownLabel,
   className = "",
+  style,
   ...props
 }: ImageGenerationProps) {
   const words = useLabels("imageGeneration", defaultImageGenerationLabels);
@@ -182,7 +183,7 @@ export function ImageGeneration({
     <figure
       {...props}
       className={`x-govuk-ui-image-generation ${className}`.trim()}
-      style={{ aspectRatio: `${width} / ${height}` } as CSSProperties}
+      style={{ ...style, aspectRatio: `${width} / ${height}` } as CSSProperties}
       data-phase={phase}
       // SoundScope plays the success sound as an image forms whole.
       data-success={made || undefined}

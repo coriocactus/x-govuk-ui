@@ -13,6 +13,7 @@ import {
 } from "react";
 import { Button } from "./button";
 import { useControllableState } from "./controllable-state";
+import { chain } from "./events";
 import { useField } from "./field";
 import { FileChip, type FileChipProps, FileChips, type FileChipsProps } from "./file-chips";
 import { useLabels } from "./labels";
@@ -190,6 +191,7 @@ export function ChatInput({
   disabled = false,
   id,
   className = "",
+  onPointerDown,
   ...props
 }: ChatInputProps) {
   const words = useLabels("chatInput", defaultChatInputLabels);
@@ -254,13 +256,13 @@ export function ChatInput({
         // pressing a plain field would. The press's default is prevented, so focus does not go to
         // the box first. That would also stop a selection starting, so a file chip's name is left
         // to the browser.
-        onPointerDown={(event) => {
+        onPointerDown={chain(onPointerDown, (event) => {
           const target = event.target as Element;
           if (disabled || event.button !== 0 || target === area.current) return;
           if (target.closest(PRESSABLE)) return;
           event.preventDefault();
           area.current?.focus();
-        }}
+        })}
       >
         <label htmlFor={field.id} className="x-govuk-ui-visually-hidden">
           {label}
@@ -415,6 +417,7 @@ export function ChatInputAttach({
   multiple = true,
   label: ownLabel,
   className = "",
+  onClick,
   ...props
 }: ChatInputAttachProps) {
   const words = useLabels("chatInput", defaultChatInputLabels);
@@ -445,7 +448,7 @@ export function ChatInputAttach({
           size="small-icon"
           aria-label={label}
           disabled={disabled}
-          onClick={() => input.current?.click()}
+          onClick={chain(onClick, () => input.current?.click())}
         >
           <svg
             viewBox="0 0 24 24"
@@ -557,6 +560,7 @@ export function ChatInputDictation({
   lang,
   recogniser = browserRecogniser,
   className = "",
+  onClick,
   ...props
 }: ChatInputDictationProps) {
   const { insert, disabled } = useChatInput("ChatInputDictation");
@@ -604,7 +608,7 @@ export function ChatInputDictation({
         aria-pressed={supported ? listening : undefined}
         aria-disabled={!supported || disabled || undefined}
         data-listening={listening || undefined}
-        onClick={() => supported && !disabled && toggle()}
+        onClick={chain(onClick, () => supported && !disabled && toggle())}
       >
         <svg
           viewBox="0 0 24 24"

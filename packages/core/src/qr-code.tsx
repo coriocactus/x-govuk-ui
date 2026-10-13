@@ -35,6 +35,7 @@ export function QrCode({
   errorCorrection = "M",
   ripple = 500,
   className = "",
+  style,
   ...props
 }: QrCodeProps) {
   const qr = useMemo(
@@ -65,7 +66,10 @@ export function QrCode({
       aria-label={`QR code for ${label ?? value}`}
       data-still={ripple <= 0 || undefined}
       style={
-        { "--x-govuk-ui-qr-grow": `${Math.round(Math.max(0, ripple) * 0.38)}ms` } as CSSProperties
+        {
+          ...style,
+          "--x-govuk-ui-qr-grow": `${Math.round(Math.max(0, ripple) * 0.38)}ms`,
+        } as CSSProperties
       }
     >
       <rect

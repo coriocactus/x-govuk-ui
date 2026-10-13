@@ -112,6 +112,7 @@ export function GroupedTable({
   children,
   className = "",
   ref,
+  style,
   ...props
 }: GroupedTableProps) {
   const frame = useRef<HTMLDivElement>(null);
@@ -443,7 +444,7 @@ export function GroupedTable({
       ref={mergedRef}
       className={`x-govuk-ui-grouped-table ${className}`.trim()}
       data-step={step}
-      style={{ width: chosen === null ? undefined : `${chosen}px` } as CSSProperties}
+      style={{ ...style, width: chosen === null ? style?.width : `${chosen}px` } as CSSProperties}
     >
       {toolbar && <div className="x-govuk-ui-grouped-table-toolbar">{toolbar}</div>}
       {/* Past the last step, the groups scroll sideways rather than cut any text short. */}

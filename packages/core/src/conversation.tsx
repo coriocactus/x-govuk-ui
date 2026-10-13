@@ -303,13 +303,18 @@ export function ConversationMessage({
  * not text that only stops being hidden. Anything opened inside the text while it streamed, such
  * as a citation's card, therefore closes at that point.
  */
-export function ConversationContent({ className = "", ...props }: ComponentPropsWithRef<"div">) {
+export function ConversationContent({
+  className = "",
+  ref,
+  ...props
+}: ComponentPropsWithRef<"div">) {
   const message = useMessage("ConversationContent");
+  const contentRef = useMergedRef(message.content, ref);
   const classes = `x-govuk-ui-conversation-content ${className}`.trim();
   if (message.from === "user")
     return (
       <Bubble variant="secondary" align="end">
-        <BubbleContent {...props} ref={message.content} className={classes} />
+        <BubbleContent {...props} ref={contentRef} className={classes} />
       </Bubble>
     );
   return (
@@ -317,7 +322,7 @@ export function ConversationContent({ className = "", ...props }: ComponentProps
       {...props}
       // A new element once streaming ends, so screen readers are given the whole reply at once.
       key={message.streaming ? "streaming" : "written"}
-      ref={message.content}
+      ref={contentRef}
       className={classes}
       aria-hidden={message.streaming || undefined}
     />

@@ -1292,6 +1292,9 @@ export function useFormSteps(): FormStepsControls | null {
  * The answers Check your answers lists, and Change, for a list of your own, as FormStepsSummary
  * lists them. Null outside the form, as a FormStepsProvider does not carry them. Read it in the
  * part that lists them, not in one that draws the steps, which would list them again each time.
+ *
+ * As the answers come, focus moves to the first `h1` on a page, or else to a heading with the class
+ * `x-govuk-ui-form-steps-review-title`. Give your list one, or move focus to it yourself.
  */
 export function useFormStepsAnswers({
   summary = false,

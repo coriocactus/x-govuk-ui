@@ -127,8 +127,9 @@ export const defaultCommandMenuLabels: CommandMenuLabels = {
 
 export type CommandMenuProps = {
   children: ReactNode;
-  /** Controls whether the menu is open. Leave unset for the menu to manage its own state. */
+  /** Whether the menu is open. Leave it out to let the menu keep track. */
   open?: boolean;
+  defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   /**
    * The control that opens the menu. By default, it is the built-in outline Button with its
@@ -137,7 +138,7 @@ export type CommandMenuProps = {
    */
   trigger?: boolean | ReactElement;
   /** Toggles the menu with Command-K or Control-K anywhere on the page. */
-  hotkey?: boolean;
+  keyboardShortcut?: boolean;
   /** The search's placeholder, in place of its `search` label. A page's own comes first. */
   placeholder?: string;
   disabled?: boolean;
@@ -158,9 +159,10 @@ export type CommandMenuProps = {
 export function CommandMenu({
   children,
   open: controlled,
+  defaultOpen = false,
   onOpenChange,
   trigger = true,
-  hotkey = true,
+  keyboardShortcut = true,
   placeholder: ownPlaceholder,
   disabled = false,
   labels: ownLabels,
@@ -170,7 +172,7 @@ export function CommandMenu({
   const placeholder = ownPlaceholder ?? labels.search;
   const play = useScopeSound();
   const { reduced } = useMotionTiming();
-  const [open, setOpen] = useControllableState(controlled, false, onOpenChange);
+  const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
   const isOpen = useRef(open);
   isOpen.current = open;
   const input = useRef<HTMLInputElement>(null);
@@ -211,7 +213,7 @@ export function CommandMenu({
   };
 
   useEffect(() => {
-    if (!hotkey || disabled) return;
+    if (!keyboardShortcut || disabled) return;
     const keydown = (event: KeyboardEvent) => {
       // A control that has taken the keys, such as the Editor's link on Mod K, keeps them.
       if (event.defaultPrevented) return;
@@ -227,9 +229,9 @@ export function CommandMenu({
     };
     window.addEventListener("keydown", keydown);
     return () => window.removeEventListener("keydown", keydown);
-  }, [hotkey, disabled, setOpen]);
+  }, [keyboardShortcut, disabled, setOpen]);
   // The shortcut is announced as a shortcut, not as part of the trigger's name.
-  const shortcuts = hotkey ? "Meta+K Control+K" : undefined;
+  const shortcuts = keyboardShortcut ? "Meta+K Control+K" : undefined;
 
   return (
     <MenuContext
@@ -278,7 +280,7 @@ export function CommandMenu({
                 aria-keyshortcuts={shortcuts}
               >
                 {labels.trigger}
-                {hotkey && <Kbd aria-hidden="true">{shortcutKeys("k")}</Kbd>}
+                {keyboardShortcut && <Kbd aria-hidden="true">{shortcutKeys("k")}</Kbd>}
               </Dialog.Trigger>
             )
           )}

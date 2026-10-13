@@ -114,7 +114,7 @@ export type EditorProps = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   /**
    * The name the document submits under in a form, in its `format`. In a Form, the editor finds its
    * error by this name.

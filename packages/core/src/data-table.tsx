@@ -51,6 +51,8 @@ export type DataTableProps<Row> = ComponentPropsWithRef<"div"> & {
   selectable?: boolean;
   /** The chosen rows' keys. Leave it out to let the table keep track. */
   selected?: readonly string[];
+  /** The rows' keys chosen at first, for a table that keeps track itself. */
+  defaultSelected?: readonly string[];
   onSelectedChange?: (selected: string[]) => void;
   /** Says how many rows there are, at the foot of the first column. */
   count?: (rows: number) => ReactNode;
@@ -95,6 +97,7 @@ export function DataTable<Row>({
   pinned = 1,
   selectable = false,
   selected: controlled,
+  defaultSelected = [],
   onSelectedChange,
   count,
   minRows,
@@ -111,8 +114,10 @@ export function DataTable<Row>({
   const [summed, setSummed] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
-  const [chosen, choose] = useControllableState<readonly string[]>(controlled, [], (next) =>
-    onSelectedChange?.([...next]),
+  const [chosen, choose] = useControllableState<readonly string[]>(
+    controlled,
+    defaultSelected,
+    (next) => onSelectedChange?.([...next]),
   );
 
   // The pinned columns cast a shadow once the rest has scrolled under them.

@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Changed
+
+- Changed the Editor's `errorMessage` to take any React content, as every field's does.
+
 ### Added
 
 - Added the Editor's words to LabelsProvider, from x-govuk-ui, as `editor`. The Editor's own `labels` come first, then the nearest provider's, then its English defaults.

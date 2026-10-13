@@ -19,7 +19,7 @@ export type FileUploadProps = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   /** Called with the chosen files, after choosing, dropping or removing one. */
   onFilesChange?: (files: File[]) => void;
   /** What the zone's button says. By default, "Choose file", or "Choose files" for several. */

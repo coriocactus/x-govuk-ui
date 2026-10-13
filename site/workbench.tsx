@@ -499,7 +499,7 @@ export function Workbench() {
             return false;
           }}
           // On its own page, the command menu example takes Command-K.
-          hotkey={name !== "command-menu"}
+          keyboardShortcut={name !== "command-menu"}
           placeholder="Search components and actions…"
         >
           <CommandMenuGroup label="Preview">

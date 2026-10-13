@@ -18,6 +18,7 @@ import {
 import { AutoHeight } from "./auto-height";
 import { BackLink } from "./back-link";
 import { Button, ButtonGroup } from "./button";
+import { useControllableState } from "./controllable-state";
 import { FormContext, type FormField, present } from "./field";
 import { Form, type FormErrors, type FormProps } from "./form";
 import { Kbd } from "./kbd";
@@ -99,7 +100,7 @@ export type FormStepsProps = Omit<
    */
   errorSummary?: boolean;
   /** Command or Control with Enter sends the step from anywhere in it. The card shows the keys. */
-  shortcut?: boolean;
+  keyboardShortcut?: boolean;
   /** Each step is a place in the browser's history, so Back in the browser goes back a step. */
   history?: boolean;
   /**
@@ -114,6 +115,13 @@ export type FormStepsProps = Omit<
    * back to the first step that has one. Without it, the form is sent as any form is.
    */
   onComplete?: (data: FormData) => Outcome;
+  /**
+   * The step on show, from 0. The number of steps shows Check your answers. Leave it out to let the
+   * form keep track.
+   */
+  step?: number;
+  /** The step it starts on, unless it remembers another under `storageKey`. */
+  defaultStep?: number;
   onStepChange?: (step: number) => void;
   /**
    * Shows in place of the steps once the answers are sent. Without it, the answers stay on show,
@@ -273,10 +281,12 @@ export function FormSteps({
   back = true,
   progress = true,
   errorSummary = layout !== "card",
-  shortcut = true,
+  keyboardShortcut = true,
   history: historyOn = false,
   storageKey,
   onComplete,
+  step: controlledStep,
+  defaultStep = 0,
   onStepChange,
   done: doneContent,
   labels: ownLabels,
@@ -297,7 +307,11 @@ export function FormSteps({
     return answers;
   });
   // Where the form is, as a step's index, or `count` for Check your answers.
-  const [at, setAt] = useState(() => Math.min(saved?.at ?? 0, count));
+  const [at, setAt] = useControllableState(
+    controlledStep,
+    () => Math.min(saved?.at ?? defaultStep, count),
+    onStepChange,
+  );
   const [passed, setPassed] = useState(() => new Set(saved?.passed ?? []));
   const [skipped, setSkipped] = useState(() => new Set(saved?.skipped ?? []));
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
@@ -349,7 +363,6 @@ export function FormSteps({
   const go = (where: number, { push = true, route = replan(), skipping = skipped } = {}) => {
     if (where >= count) setRows(route.flatMap((index) => summaryRows(index, skipping)));
     setAt(where);
-    onStepChange?.(where);
     focusNext.current = where >= count ? "summary" : "step";
     if (historyOn && push)
       window.history.pushState({ ...window.history.state, [historyKey]: where }, "");
@@ -551,7 +564,7 @@ export function FormSteps({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
-    if (!shortcut || event.key !== "Enter" || !(event.metaKey || event.ctrlKey)) return;
+    if (!keyboardShortcut || event.key !== "Enter" || !(event.metaKey || event.ctrlKey)) return;
     event.preventDefault();
     event.currentTarget.requestSubmit();
   };
@@ -616,10 +629,10 @@ export function FormSteps({
       type="submit"
       size={card ? "small" : undefined}
       loading={busy}
-      aria-keyshortcuts={shortcut ? "Meta+Enter Control+Enter" : undefined}
+      aria-keyshortcuts={keyboardShortcut ? "Meta+Enter Control+Enter" : undefined}
     >
       {label}
-      {card && shortcut && (
+      {card && keyboardShortcut && (
         <Kbd aria-hidden="true" className="x-govuk-ui-form-steps-shortcut" shortcut="↵" />
       )}
     </Button>

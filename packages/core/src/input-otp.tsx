@@ -14,7 +14,7 @@ export type InputOTPProps = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   maxLength?: number;
   /** Characters shown faintly in empty slots, one per slot. */
   placeholder?: string;

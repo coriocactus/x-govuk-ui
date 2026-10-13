@@ -6,6 +6,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
+- Changed the props that turn keys on, so `shortcut` always means the keys a part shows or handles. CommandMenu's `hotkey` is now `keyboardShortcut`, FormSteps' `shortcut` is now `keyboardShortcut`, and Choices' `shortcuts` is now `shortcutScope`.
+- Changed MainWrapper's `size` from `"default" | "large"` to `"medium" | "large"`, as other parts name their sizes.
 - Changed every component's words to labels, which a LabelsProvider or the component's `labels` prop can change, in place of a prop for each word:
   - AccordionShowAll's `showLabel` and `hideLabel` are its labels `showAll` and `hideAll`.
   - CommandMenu's `triggerLabel`, `emptyLabel` and `listLabel` are its labels `trigger`, `empty` and `commands`. Its `placeholder` stays, in place of its `search` label.
@@ -40,6 +42,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added the words of FormSteps, Tour and QuestionCard to LabelsProvider, including Check your answers, Change and QuestionCard's messages in GOV.UK's words.
 - Added the words of the rest of the components that write words to LabelsProvider, including Toast's Dismiss notification, Lightbox's and Inline citation's buttons, Chat input's Send, Stop and dictation, Data table's Select every row, Conversation's You and is writing a reply, and Switch's On and Off in Check your answers.
 - Added `useLocale`, which gives the nearest LabelsProvider's language. Calendar and Date input write their dates in it.
+- Added `step` and `defaultStep` to FormSteps, which can now be controlled, as its `onStepChange` suggested.
+- Added `defaultOpen` to CommandMenu and `defaultSelected` to DataTable, so each can keep track of its own state from a start you choose.
 - Added `useControlProps`, which gives a control of your own the id, name and descriptions of the bound Field around it.
 - Added InputControl, TextareaControl and SelectControl, the controls of Input, Textarea and Select on their own. In a bound Field, each takes its id, name and descriptions from the field. A service can then put something between a field's hint and its control, or beside the control, as GOV.UK's search puts a button. InputControl keeps the prefix, suffix, Show button and strength meter, TextareaControl the character or word count, and SelectControl the list. Input, Textarea and Select are now built from these parts, and their markup does not change.
 - Added the parts of Radios and Checkboxes, for a group of your own. RadiosRoot and CheckboxesRoot keep the group's state and bind its Field to the group's id. ChoiceList holds the answers, and Radios' dot travels between them. An answer is a ChoiceRoot, with a ChoiceControl, a ChoiceLabel and a ChoiceHint, and a ChoiceConditional after it for its follow-up question. A part can then go between a group's hint and its answers. ChoiceControl takes an input's props, such as `required` and `ref`. Radios and Checkboxes are now built from these parts, and their markup does not change.
@@ -56,7 +60,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Changed ErrorSummaryItem to focus the first control inside the element it links to, when that element cannot take focus itself, such as a Slider or a group.
 - Changed SummaryListAction's `hiddenText` to take any React content.
-- Changed `errorMessage` on Input, Textarea and Select to take any React content, as Fieldset's does.
+- Changed `errorMessage` on every field to take any React content, as Fieldset's does.
 
 ### Fixed
 

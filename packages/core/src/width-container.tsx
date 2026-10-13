@@ -49,7 +49,7 @@ export type MainWrapperProps = ComponentPropsWithRef<"main"> & {
    * `large` leaves more space above. Use it for a page that has nothing above its content, such as
    * a back link or breadcrumbs. In a Page, it is chosen for you.
    */
-  size?: "default" | "large";
+  size?: "medium" | "large";
   /** Renders another element in place of `main`, such as a `div` inside a page that has one. */
   render?: useRender.RenderProp;
 };

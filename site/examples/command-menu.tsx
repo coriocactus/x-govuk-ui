@@ -10,7 +10,7 @@ import {
 type Props = {
   placeholder?: string;
   triggerLabel?: string;
-  hotkey?: boolean;
+  keyboardShortcut?: boolean;
   disabled?: boolean;
   /** Shows a shortcut beside the save command. */
   shortcuts?: boolean;
@@ -19,7 +19,7 @@ type Props = {
 export default function CommandMenuExample({
   placeholder = "Search commands…",
   triggerLabel = "Open command menu",
-  hotkey = true,
+  keyboardShortcut = true,
   disabled = false,
   shortcuts = true,
 }: Props) {
@@ -29,7 +29,7 @@ export default function CommandMenuExample({
       <CommandMenu
         placeholder={placeholder}
         labels={{ trigger: triggerLabel }}
-        hotkey={hotkey}
+        keyboardShortcut={keyboardShortcut}
         disabled={disabled}
       >
         <CommandMenuGroup label="Your application">

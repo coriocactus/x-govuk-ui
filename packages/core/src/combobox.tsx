@@ -31,7 +31,7 @@ type Shared = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   /** The options to search. */
   items: readonly ComboboxItem[];
   placeholder?: string;

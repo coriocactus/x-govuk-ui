@@ -780,7 +780,7 @@ const entries = {
       ),
       toggle("multiple", false, { note: "Checkboxes, for more than one answer." }),
       choice(
-        "shortcuts",
+        "shortcutScope",
         [
           ["page", "Anywhere on the page"],
           ["form", "Within its form"],
@@ -1792,7 +1792,7 @@ const entries = {
       reference("open / onOpenChange", "boolean / (open) => void", "Uncontrolled"),
       text("placeholder", "Search commands…", { default: "Search commands…" }),
       reference("trigger", "boolean | ReactElement", "true"),
-      toggle("hotkey", true),
+      toggle("keyboardShortcut", true),
       reference("labels", "Partial<CommandMenuLabels>", "Open command menu, No commands found."),
       toggle("disabled"),
       reference("CommandMenuGroup", "{ label, children }", "Part"),
@@ -3312,7 +3312,7 @@ const entries = {
       reference("footer", "ReactNode"),
       reference("skipLink", "ReactNode | null", "<SkipLink />"),
       reference("width", "number | string", "960"),
-      reference("MainWrapper", '{ size: "default" | "large", id, render }', "Part"),
+      reference("MainWrapper", '{ size: "medium" | "large", id, render }', "Part"),
     ],
     example: [
       toggle("phaseBanner", true, { note: "Puts a Phase banner above the content." }),

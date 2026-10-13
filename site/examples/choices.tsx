@@ -3,7 +3,7 @@ import { Choices } from "x-govuk-ui";
 type Props = {
   markers?: "letters" | "numbers" | "none";
   multiple?: boolean;
-  shortcuts?: "page" | "form" | "none";
+  shortcutScope?: "page" | "form" | "none";
   /** Adds a last answer to type any other into. */
   other?: boolean;
 };
@@ -11,7 +11,7 @@ type Props = {
 export default function ChoicesExample({
   markers = "letters",
   multiple = false,
-  shortcuts = "page",
+  shortcutScope = "page",
   other = true,
 }: Props) {
   return (
@@ -19,13 +19,13 @@ export default function ChoicesExample({
       name="contact"
       legend="How should we contact you about your application?"
       hint={
-        markers === "none" || shortcuts === "none"
+        markers === "none" || shortcutScope === "none"
           ? undefined
           : `Press ${markers === "letters" ? "a letter" : "a number"} to choose.`
       }
       multiple={multiple}
       markers={markers}
-      shortcuts={shortcuts}
+      shortcutScope={shortcutScope}
       other={other ? "Another way…" : undefined}
       options={[
         { value: "email", label: "Email" },

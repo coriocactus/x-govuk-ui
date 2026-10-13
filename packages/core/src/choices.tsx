@@ -28,7 +28,7 @@ export type ChoicesProps = Omit<
    * anywhere on the page while these are the only choices on show and nobody is typing, as in a
    * survey. With `form`, they work only within the choices' form. With `none`, they do not work.
    */
-  shortcuts?: "page" | "form" | "none";
+  shortcutScope?: "page" | "form" | "none";
   /** The chosen values. Leave it out to let the answers keep track. */
   value?: string[];
   defaultValue?: string[];
@@ -74,7 +74,7 @@ export function Choices({
   multiple = false,
   other,
   markers = "letters",
-  shortcuts = "page",
+  shortcutScope = "page",
   value,
   defaultValue,
   onValueChange,
@@ -135,7 +135,7 @@ export function Choices({
       form.requestSubmit();
       return;
     }
-    if (shortcuts === "none" || disabled || target.matches("input[type=text]")) return;
+    if (shortcutScope === "none" || disabled || target.matches("input[type=text]")) return;
     if (event.metaKey || event.ctrlKey || event.altKey || event.key.length !== 1) return;
     const pressed = event.key.toUpperCase();
     const index = options.findIndex((_, place) => keyOf(place) === pressed);
@@ -161,9 +161,9 @@ export function Choices({
   handler.current = onKeyDown;
   useEffect(() => {
     const own = list.current;
-    if (!own || shortcuts === "none") return;
+    if (!own || shortcutScope === "none") return;
     const scope: HTMLElement | Document =
-      shortcuts === "page" ? document : (own.closest("form") ?? own);
+      shortcutScope === "page" ? document : (own.closest("form") ?? own);
     const listen = (event: globalThis.KeyboardEvent) => {
       if (event.defaultPrevented || !(event.target instanceof Element)) return;
       const inside = own.contains(event.target);
@@ -172,7 +172,7 @@ export function Choices({
     };
     scope.addEventListener("keydown", listen as EventListener);
     return () => scope.removeEventListener("keydown", listen as EventListener);
-  }, [shortcuts]);
+  }, [shortcutScope]);
 
   const otherKey = other ? keyOf(options.length) : null;
   return (
@@ -208,7 +208,7 @@ export function Choices({
                 value={option.value}
                 checked={on}
                 disabled={disabled}
-                aria-keyshortcuts={(shortcuts !== "none" && key) || undefined}
+                aria-keyshortcuts={(shortcutScope !== "none" && key) || undefined}
                 onChange={(event) => choose(option.value, event.target.checked)}
               />
               {markers !== "none" && (
@@ -241,7 +241,7 @@ export function Choices({
               className="x-govuk-ui-choice-list-other"
               name={otherChosen ? `${name}-other` : undefined}
               aria-label={other}
-              aria-keyshortcuts={(shortcuts !== "none" && otherKey) || undefined}
+              aria-keyshortcuts={(shortcutScope !== "none" && otherKey) || undefined}
               placeholder={other}
               autoComplete="off"
               disabled={disabled}

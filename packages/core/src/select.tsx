@@ -59,6 +59,12 @@ export type SelectProps = Omit<
   id?: string;
   /** The choices, as `SelectItem` parts. */
   children: ReactNode;
+  /**
+   * Each choice's label, by its value. Give it when the choices are in a component of your own, so
+   * the field shows the chosen label in the first HTML, and the choices render once. Without it,
+   * the Select renders such choices a second time, outside the page, to read their labels.
+   */
+  items?: Readonly<Record<string, ReactNode>>;
   /** Classes for the button that opens the list. */
   className?: string;
 };
@@ -230,6 +236,7 @@ export function SelectControl(given: SelectControlProps) {
     disabled = false,
     size = "medium",
     children,
+    items,
     className = "",
     ref,
     ...props
@@ -239,7 +246,7 @@ export function SelectControl(given: SelectControlProps) {
   const saved = useFormDefault(name);
   const defaultValue = saved ? (saved[0] ?? null) : givenDefault;
   const registered = useItemLabels();
-  const labels = { ...registered.labels, ...labelsOf(children) };
+  const labels = { ...registered.labels, ...items, ...labelsOf(children) };
   // Check your answers shows the chosen option's label, not its value.
   useFieldSummary({
     answer: (data) => {
@@ -292,7 +299,7 @@ export function SelectControl(given: SelectControlProps) {
           <ChevronIcon size={16} />
         </Primitive.Icon>
       </Primitive.Trigger>
-      {hasWrappedItems(children) && (
+      {!items && hasWrappedItems(children) && (
         <CollectLabels registry={registered.registry}>{children}</CollectLabels>
       )}
       <Primitive.Portal>

@@ -506,6 +506,27 @@ test("a label that its control cannot be for takes the field's label id instead"
   expect(html).not.toContain(" for=");
 });
 
+test("a select given its items' labels shows the chosen label in the first HTML", () => {
+  // The options are in a component of the service's own, so the Select cannot read their labels
+  // as it renders. Given them, it shows the chosen one's label at once.
+  function Orders() {
+    return <SelectItem value="views">Most views</SelectItem>;
+  }
+  const value = (html: string) => html.match(/x-govuk-ui-select-value[^>]*>([^<]*)</)?.[1];
+  const read = renderToStaticMarkup(
+    <Select label="Sort by" defaultValue="views">
+      <Orders />
+    </Select>,
+  );
+  const given = renderToStaticMarkup(
+    <Select label="Sort by" defaultValue="views" items={{ views: "Most views" }}>
+      <Orders />
+    </Select>,
+  );
+  expect(value(read)).toBe("views");
+  expect(value(given)).toBe("Most views");
+});
+
 test("a value of your own is controlled or uncontrolled as the library's are", () => {
   const heard: (string | null)[] = [];
   let state: [string | null, (next: string | null) => void] | undefined;

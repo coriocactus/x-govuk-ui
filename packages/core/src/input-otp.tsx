@@ -12,9 +12,14 @@ import {
 import { ErrorMessage, Field, Hint, Label, present, useControlProps } from "./field";
 import { duration, easeOut, springs, useMotionTiming } from "./motion";
 
+/**
+ * InputOTP's props. It takes no `style`, because input-otp sets the style of its
+ * input and of the row of slots itself, so a style given here would never show. Style the row
+ * through `containerClassName`.
+ */
 export type InputOTPProps = Omit<
   ComponentPropsWithRef<typeof OTPInput>,
-  "render" | "children" | "maxLength" | "placeholder"
+  "render" | "children" | "maxLength" | "placeholder" | "style"
 > & {
   label: ReactNode;
   hint?: ReactNode;

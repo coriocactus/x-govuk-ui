@@ -31,6 +31,7 @@ import {
   seriesRows,
 } from "./chart-context";
 import { CellFigure, type FigureTable, useDrawIn, useWidest } from "./chart-frame";
+import { useChartLabels } from "./chart-labels";
 import { extentOf, figureOf, fingerprint, niceScale } from "./chart-maths";
 import { ChartFrame, type ChartKeyEntry, type ChartLayout } from "./chart-parts";
 import { RadarPlot, RadialPlot, radar, radial } from "./chart-polar";
@@ -392,7 +393,7 @@ export function Chart(props: ChartProps) {
     diverging,
     orientation,
     direct,
-    labels,
+    labels: ownLabels,
     curve,
     highlight,
     bins,
@@ -408,6 +409,7 @@ export function Chart(props: ChartProps) {
     className = "",
     ...rest
   } = props;
+  const labels = useChartLabels(ownLabels);
   const kind = KINDS[type];
 
   // With a range, the plot draws the categories between its ends, and the table keeps them all.
@@ -421,7 +423,7 @@ export function Chart(props: ChartProps) {
     onRangeChange?.(next);
   };
   // The options are read from the props themselves, and the rest go to the frame.
-  const figures = figuresOf(props, undefined, span);
+  const figures = figuresOf({ ...props, labels }, undefined, span);
   // Two categories are the fewest shown, so a brush over two would have nothing to choose.
   const brushState: BrushState | null =
     brush && rangeable && rows.length > 2
@@ -683,11 +685,12 @@ export function ChartSet({
   columns = 3,
   height = 160,
   description,
-  labels,
+  labels: ownLabels,
   className = "",
   style,
   ...props
 }: ChartSetProps) {
+  const labels = useChartLabels(ownLabels);
   const syncId = useId();
   const words = wordsOf(labels);
   // A panel's words are the set's, overridden by its own.

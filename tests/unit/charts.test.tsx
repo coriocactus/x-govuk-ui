@@ -17,7 +17,7 @@ import {
   Waffle,
 } from "@x-govuk-ui/memetics";
 import { renderToStaticMarkup } from "react-dom/server";
-import { FigureCaption, FigureSource } from "x-govuk-ui";
+import { FigureCaption, FigureSource, LabelsProvider } from "x-govuk-ui";
 import { waffleCells } from "../../packages/memetics/src/waffle";
 
 test("charts keep their figures in a table, and a set shares one key", () => {
@@ -668,3 +668,27 @@ test("a gauge keeps the figure it reports within its range, and a waffle writes 
 });
 
 type ChartDatumRow = Record<string, string | number | null>;
+
+test("a chart takes its words and its language from a labels provider, and its own labels first", () => {
+  const props = {
+    type: "bar" as const,
+    description: "Sales rose.",
+    data: [
+      { month: "Jan", sold: 1234.5 },
+      { month: "Feb", sold: 5 },
+    ],
+    category: "month",
+    series: [{ key: "sold", label: "Sold" }],
+    title: "Sales",
+  };
+  const welsh = renderToStaticMarkup(
+    <LabelsProvider labels={{ locale: "de", chart: { showTable: "Dangos y ffigurau fel tabl" } }}>
+      <Chart {...props} />
+      <Chart {...props} labels={{ showTable: "Tabl" }} />
+    </LabelsProvider>,
+  );
+  expect(welsh).toContain("Dangos y ffigurau fel tabl");
+  expect(welsh).toContain("Tabl");
+  // The provider's language writes the figures, as German writes 1.234,5.
+  expect(welsh).toContain("1.234,5");
+});

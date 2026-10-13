@@ -3,6 +3,7 @@
 import { type PointerEvent, useCallback, useId, useMemo, useRef } from "react";
 import type { FigureProps } from "x-govuk-ui";
 import { CellFigure, FigureCard, heatKey, useHoverCard } from "./chart-frame";
+import { useChartLabels } from "./chart-labels";
 import { extentOf, heatScale, niceScale } from "./chart-maths";
 import { ChartFrame, type ChartLayout } from "./chart-parts";
 import { type ChartLabels, plainIn, wordsOf } from "./chart-words";
@@ -73,10 +74,11 @@ export function ChoroplethMap({
   domain,
   height = 440,
   description,
-  labels,
+  labels: ownLabels,
   className = "",
   ...props
 }: ChoroplethMapProps) {
+  const labels = useChartLabels(ownLabels);
   const words = wordsOf(labels);
   const format = ownFormat ?? plainIn(words.locale);
   const [low, high] =

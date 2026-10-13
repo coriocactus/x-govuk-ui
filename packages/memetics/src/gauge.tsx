@@ -1,6 +1,7 @@
 "use client";
 
 import { type ComponentPropsWithRef, type CSSProperties, type ReactNode, useId } from "react";
+import { useChartLabels } from "./chart-labels";
 import { type ChartLabels, plainIn, wordsOf } from "./chart-words";
 
 export type GaugeProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
@@ -58,11 +59,12 @@ export function Gauge({
   description,
   sentiment = "neutral",
   size = 180,
-  labels,
+  labels: ownLabels,
   className = "",
   style,
   ...props
 }: GaugeProps) {
+  const labels = useChartLabels(ownLabels);
   const labelId = useId();
   // A meter needs a range that runs upwards, so bounds that do not are read as zero to a hundred.
   // The figure screen readers are given is kept within them. The meter's words, and the figure in

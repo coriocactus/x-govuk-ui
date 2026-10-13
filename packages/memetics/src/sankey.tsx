@@ -4,6 +4,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Sankey as RechartsSankey, ResponsiveContainer, Tooltip } from "recharts";
 import type { FigureProps } from "x-govuk-ui";
 import { ChartCard, useRuler } from "./chart-frame";
+import { useChartLabels } from "./chart-labels";
 import { acyclic } from "./chart-maths";
 import { colour } from "./chart-palette";
 import { ChartFrame, type ChartLayout } from "./chart-parts";
@@ -80,10 +81,11 @@ export function Sankey({
   format: ownFormat,
   height = 320,
   description,
-  labels,
+  labels: ownLabels,
   className = "",
   ...props
 }: SankeyProps) {
+  const labels = useChartLabels(ownLabels);
   const words = wordsOf(labels);
   const format = ownFormat ?? plainIn(words.locale);
   // Recharts lays the stages out in columns, and a loop has no column to go in, so it would never

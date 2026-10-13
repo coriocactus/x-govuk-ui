@@ -3,6 +3,7 @@
 import { ResponsiveContainer, SunburstChart, Tooltip } from "recharts";
 import type { FigureProps } from "x-govuk-ui";
 import { ChartCard, treeTable } from "./chart-frame";
+import { useChartLabels } from "./chart-labels";
 import { type ChartNode, type LaidNode, layTree, nodeValue } from "./chart-maths";
 import { colour } from "./chart-palette";
 import { ChartFrame, type ChartLayout } from "./chart-parts";
@@ -67,10 +68,11 @@ export function Sunburst({
   format: ownFormat,
   height = 320,
   description,
-  labels,
+  labels: ownLabels,
   className = "",
   ...props
 }: SunburstProps) {
+  const labels = useChartLabels(ownLabels);
   const words = wordsOf(labels);
   const format = ownFormat ?? plainIn(words.locale);
   const share = percentIn(words.locale);

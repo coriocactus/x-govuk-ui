@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Treemap as RechartsTreemap, ResponsiveContainer, Tooltip } from "recharts";
 import type { FigureProps } from "x-govuk-ui";
 import { ChartCard, treeTable, useDrawIn, useRuler } from "./chart-frame";
+import { useChartLabels } from "./chart-labels";
 import { type ChartNode, layTree, nodeValue } from "./chart-maths";
 import { colour, onColour } from "./chart-palette";
 import { ChartFrame, type ChartLayout } from "./chart-parts";
@@ -62,10 +63,11 @@ export function Treemap({
   format: ownFormat,
   height = 320,
   description,
-  labels,
+  labels: ownLabels,
   className = "",
   ...props
 }: TreemapProps) {
+  const labels = useChartLabels(ownLabels);
   const words = wordsOf(labels);
   const format = ownFormat ?? plainIn(words.locale);
   const share = percentIn(words.locale);

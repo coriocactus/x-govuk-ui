@@ -3,6 +3,7 @@
 import { type CSSProperties, type PointerEvent, useCallback, useMemo, useRef } from "react";
 import { type FigureProps, ScrollArea } from "x-govuk-ui";
 import { CellFigure, FigureCard, heatKey, useHoverCard } from "./chart-frame";
+import { useChartLabels } from "./chart-labels";
 import { extentOf, heatScale, niceScale } from "./chart-maths";
 import { ChartFrame, type ChartLayout } from "./chart-parts";
 import { type ChartLabels, plainIn, wordsOf } from "./chart-words";
@@ -101,10 +102,11 @@ export function CalendarHeatmap({
   format: ownFormat,
   domain,
   description,
-  labels,
+  labels: ownLabels,
   className = "",
   ...props
 }: CalendarHeatmapProps) {
+  const labels = useChartLabels(ownLabels);
   const words = wordsOf(labels);
   const format = ownFormat ?? plainIn(words.locale);
   const names = calendarFor(words.locale);

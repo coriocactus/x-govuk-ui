@@ -7,6 +7,7 @@ import { Calendar } from "./calendar";
 import { useControllableState } from "./controllable-state";
 import { Dial } from "./dial";
 import { ErrorMessage, Field, Hint, useField, useFormDefault } from "./field";
+import { FieldsetLegend } from "./fieldset";
 import { type DateParts, dateFromParts } from "./helpers";
 import { useOverlaySound } from "./overlay";
 
@@ -156,9 +157,9 @@ export function DateInput({
         id={groupId}
         aria-describedby={field.controlProps["aria-describedby"]}
       >
-        <legend className={`x-govuk-ui-legend x-govuk-ui-legend--${legendSize}`}>
-          {pageHeading ? <h1 className="x-govuk-ui-legend-heading">{legend}</h1> : legend}
-        </legend>
+        <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
+          {legend}
+        </FieldsetLegend>
         <Hint id={field.hintId}>{hint}</Hint>
         <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
         <div className={`x-govuk-ui-date-input ${className}`.trim()}>

@@ -23,6 +23,8 @@ import {
   ErrorSummaryItem,
   Field,
   Fieldset,
+  FieldsetLegend,
+  FieldsetRoot,
   FileUpload,
   Hint,
   Input,
@@ -206,6 +208,46 @@ test("input, textarea and select are their parts in a bound field, so a composed
       </Select>,
     ),
   ).toContain('aria-describedby="own pick-hint"');
+});
+
+test("a fieldset is its parts in a bound field, so a composed one matches", () => {
+  const shorthand = renderToStaticMarkup(
+    <Fieldset
+      id="address"
+      name="address"
+      legend="What is your address?"
+      legendSize="large"
+      pageHeading
+      hint="Where you live now."
+      errorMessage="Enter your address."
+      aria-describedby="own"
+    >
+      <Input id="street" label="Street" name="street" />
+    </Fieldset>,
+  );
+  const composed = renderToStaticMarkup(
+    <Field
+      controlId="address"
+      name="address"
+      hasHint
+      errorMessage="Enter your address."
+      describedBy="own"
+    >
+      <FieldsetRoot>
+        <FieldsetLegend size="large" pageHeading>
+          What is your address?
+        </FieldsetLegend>
+        <Hint>Where you live now.</Hint>
+        <ErrorMessage />
+        <Input id="street" label="Street" name="street" />
+      </FieldsetRoot>
+    </Field>,
+  );
+  expect(normalised(shorthand)).toBe(normalised(composed));
+  expect(shorthand).toContain('aria-describedby="own address-hint address-error"');
+  expect(shorthand).toContain('<h1 class="x-govuk-ui-legend-heading">What is your address?</h1>');
+  // A field inside the fieldset is bound to itself, not to the fieldset.
+  expect(shorthand).not.toContain('for="address"');
 });
 
 test("inputs generate distinct IDs and escape content during server rendering", () => {

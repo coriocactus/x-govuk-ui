@@ -4,6 +4,7 @@ import { type ComponentPropsWithRef, type ReactNode, useId } from "react";
 import { useControllableState } from "./controllable-state";
 import { Dial } from "./dial";
 import { ErrorMessage, Field, Hint, useField, useFormDefault } from "./field";
+import { FieldsetLegend } from "./fieldset";
 import { ToggleGroup, ToggleGroupItem } from "./toggle-group";
 
 export type TimeParts = { hour: string; minute: string; period?: string };
@@ -115,9 +116,9 @@ export function TimeInput({
         id={groupId}
         aria-describedby={field.controlProps["aria-describedby"]}
       >
-        <legend className={`x-govuk-ui-legend x-govuk-ui-legend--${legendSize}`}>
-          {pageHeading ? <h1 className="x-govuk-ui-legend-heading">{legend}</h1> : legend}
-        </legend>
+        <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
+          {legend}
+        </FieldsetLegend>
         <Hint id={field.hintId}>{hint}</Hint>
         <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
         <div className={`x-govuk-ui-date-input x-govuk-ui-time-input ${className}`.trim()}>

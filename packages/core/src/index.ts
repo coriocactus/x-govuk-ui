@@ -217,7 +217,13 @@ export {
   useField,
   useFormDefault,
 } from "./field";
-export { Fieldset, type FieldsetProps } from "./fieldset";
+export {
+  Fieldset,
+  FieldsetLegend,
+  type FieldsetLegendProps,
+  type FieldsetProps,
+  FieldsetRoot,
+} from "./fieldset";
 export {
   Figure,
   FigureCaption,

@@ -3,8 +3,16 @@
 import { type ComponentPropsWithRef, type ReactNode, useId } from "react";
 import { useControllableState } from "./controllable-state";
 import { Dial } from "./dial";
-import { ErrorMessage, Field, Hint, useField, useFormDefault } from "./field";
-import { FieldsetLegend } from "./fieldset";
+import {
+  ErrorMessage,
+  Field,
+  Hint,
+  present,
+  useBoundField,
+  useFieldSummary,
+  useFormDefault,
+} from "./field";
+import { FieldsetLegend, FieldsetRoot } from "./fieldset";
 import { useLabels } from "./labels";
 import { ToggleGroup, ToggleGroupItem } from "./toggle-group";
 
@@ -66,6 +74,29 @@ export type TimeInputProps = Omit<
   className?: string;
 };
 
+export type TimeInputControlProps = Omit<
+  ComponentPropsWithRef<"div">,
+  "id" | "defaultValue" | "onChange"
+> &
+  Pick<
+    TimeInputProps,
+    | "name"
+    | "value"
+    | "defaultValue"
+    | "onValueChange"
+    | "errorFields"
+    | "hourCycle"
+    | "minuteStep"
+    | "labels"
+    | "disabled"
+  > & {
+    /**
+     * The group's id, from which the fields take theirs, `{id}-hour`, `{id}-minute` and
+     * `{id}-period`. In a bound Field, the field's.
+     */
+    id?: string;
+  };
+
 const pad = (value: number) => String(value).padStart(2, "0");
 const range = (from: number, to: number, step = 1) =>
   Array.from({ length: Math.floor((to - from) / step) + 1 }, (_, index) => from + index * step);
@@ -76,6 +107,10 @@ const range = (from: number, to: number, step = 1) =>
  * field like a dial. Drag it up or down, scroll over it, or press the arrow keys. A drum rises out
  * of the field, and the values click past one step at a time, ticking as each passes. The values go
  * round, so 59 minutes turns to 00. The fields are Dials, as Date input's are.
+ *
+ * It is a bound Field holding a `FieldsetRoot`, with a `FieldsetLegend`, a `Hint`, an
+ * `ErrorMessage` and a `TimeInputControl`. Compose those parts yourself to put something between
+ * them.
  */
 export function TimeInput({
   legend,
@@ -86,34 +121,85 @@ export function TimeInput({
   errorFields,
   id,
   name,
-  hourCycle = 24,
-  minuteStep = 1,
-  labels: ownLabels,
+  hourCycle,
+  minuteStep,
+  labels,
   value,
   defaultValue,
   onValueChange,
   disabled = false,
-  className = "",
+  className,
+  "aria-describedby": describedBy,
   ...props
 }: TimeInputProps) {
   const generated = useId();
-  const labels = useLabels("timeInput", defaultTimeInputLabels, ownLabels);
   const groupId = id ?? `time-${generated}`;
-  const field = useField({
-    id: groupId,
-    name,
+  return (
+    <Field
+      controlId={groupId}
+      name={name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <FieldsetRoot {...props} id={groupId} className="x-govuk-ui-date-input-fieldset">
+        <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
+          {legend}
+        </FieldsetLegend>
+        <Hint>{hint}</Hint>
+        <ErrorMessage />
+        <TimeInputControl
+          className={className}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={onValueChange}
+          errorFields={errorFields}
+          hourCycle={hourCycle}
+          minuteStep={minuteStep}
+          labels={labels}
+          disabled={disabled}
+        />
+      </FieldsetRoot>
+    </Field>
+  );
+}
+
+/**
+ * Time input's fields on their own, Hour and Minute, with am or pm on a 12-hour clock, for a time
+ * composed from Field's parts. In a bound Field, the fields take their ids and names from the
+ * field's, such as `{controlId}-hour` and `{name}-hour`. They show the field's error, and a Form's
+ * error summary links to the hour.
+ */
+export function TimeInputControl({
+  id: ownId,
+  name: ownName,
+  value,
+  defaultValue,
+  onValueChange,
+  errorFields,
+  hourCycle = 24,
+  minuteStep = 1,
+  labels: ownLabels,
+  disabled = false,
+  className = "",
+  ...props
+}: TimeInputControlProps) {
+  const bound = useBoundField();
+  const generated = useId();
+  const groupId = ownId ?? bound?.id ?? `time-${generated}`;
+  const name = ownName ?? bound?.name;
+  const labels = useLabels("timeInput", defaultTimeInputLabels, ownLabels);
+  useFieldSummary({
     linkTo: `${groupId}-hour`,
-    hint,
-    errorMessage,
-    label: legend,
-    answer: (data) => {
-      if (!name) return undefined;
-      const [hour, minute, period] = ["hour", "minute", "period"].map((part) =>
-        String(data.get(`${name}-${part}`) ?? "").trim(),
-      );
-      const half = period === "am" ? labels.am : period === "pm" ? labels.pm : "";
-      return hour ? `${hour}:${minute || "00"}${half ? ` ${half}` : ""}` : undefined;
-    },
+    answer: name
+      ? (data) => {
+          const [hour, minute, period] = ["hour", "minute", "period"].map((part) =>
+            String(data.get(`${name}-${part}`) ?? "").trim(),
+          );
+          const half = period === "am" ? labels.am : period === "pm" ? labels.pm : "";
+          return hour ? `${hour}:${minute || "00"}${half ? ` ${half}` : ""}` : undefined;
+        }
+      : undefined,
   });
   // A Form can give the fields an answer to start with, such as one kept from an earlier visit.
   const savedHour = useFormDefault(name && `${name}-hour`)?.[0];
@@ -129,7 +215,8 @@ export function TimeInput({
       },
     onValueChange,
   );
-  const invalid = (part: Part) => field.invalid && (!errorFields || errorFields.includes(part));
+  const invalid = (part: Part) =>
+    Boolean(bound?.invalid) && (!errorFields || errorFields.includes(part));
   const twelve = hourCycle === 12;
   const dials: { part: Part; label: string; options: string[]; width: number }[] = [
     {
@@ -147,59 +234,45 @@ export function TimeInput({
   ];
 
   return (
-    <Field invalid={field.invalid}>
-      <fieldset
-        {...props}
-        className="x-govuk-ui-fieldset x-govuk-ui-date-input-fieldset"
-        id={groupId}
-        aria-describedby={field.controlProps["aria-describedby"]}
-      >
-        <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
-          {legend}
-        </FieldsetLegend>
-        <Hint id={field.hintId}>{hint}</Hint>
-        <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
-        <div className={`x-govuk-ui-date-input x-govuk-ui-time-input ${className}`.trim()}>
-          {dials.map(({ part, label, options, width }) => (
-            <div className="x-govuk-ui-date-input-item" key={part}>
-              <label className="x-govuk-ui-date-input-label" htmlFor={`${groupId}-${part}`}>
-                {label}
-              </label>
-              <Dial
-                id={`${groupId}-${part}`}
-                name={name ? `${name}-${part}` : undefined}
-                options={options}
-                width={width}
-                value={parts[part] ?? ""}
-                invalid={invalid(part)}
-                disabled={disabled}
-                onChange={(next) => set({ ...parts, [part]: next })}
-                tidy={(text) => {
-                  const number = Number(text);
-                  if (text.trim() === "" || !Number.isInteger(number)) return text;
-                  return part === "minute" || !twelve ? pad(number) : String(number);
-                }}
-              />
-            </div>
-          ))}
-          {twelve && (
-            <div className="x-govuk-ui-date-input-item x-govuk-ui-time-input-period">
-              <ToggleGroup
-                aria-label={labels.period}
-                id={`${groupId}-period`}
-                disabled={disabled}
-                data-invalid={invalid("period") || undefined}
-                value={parts.period ? [parts.period] : []}
-                onValueChange={([next]) => set({ ...parts, period: next ?? "" })}
-              >
-                <ToggleGroupItem value="am">{labels.am}</ToggleGroupItem>
-                <ToggleGroupItem value="pm">{labels.pm}</ToggleGroupItem>
-              </ToggleGroup>
-              {name && <input type="hidden" name={`${name}-period`} value={parts.period ?? ""} />}
-            </div>
-          )}
+    <div {...props} className={`x-govuk-ui-date-input x-govuk-ui-time-input ${className}`.trim()}>
+      {dials.map(({ part, label, options, width }) => (
+        <div className="x-govuk-ui-date-input-item" key={part}>
+          <label className="x-govuk-ui-date-input-label" htmlFor={`${groupId}-${part}`}>
+            {label}
+          </label>
+          <Dial
+            id={`${groupId}-${part}`}
+            name={name ? `${name}-${part}` : undefined}
+            options={options}
+            width={width}
+            value={parts[part] ?? ""}
+            invalid={invalid(part)}
+            disabled={disabled}
+            onChange={(next) => set({ ...parts, [part]: next })}
+            tidy={(text) => {
+              const number = Number(text);
+              if (text.trim() === "" || !Number.isInteger(number)) return text;
+              return part === "minute" || !twelve ? pad(number) : String(number);
+            }}
+          />
         </div>
-      </fieldset>
-    </Field>
+      ))}
+      {twelve && (
+        <div className="x-govuk-ui-date-input-item x-govuk-ui-time-input-period">
+          <ToggleGroup
+            aria-label={labels.period}
+            id={`${groupId}-period`}
+            disabled={disabled}
+            data-invalid={invalid("period") || undefined}
+            value={parts.period ? [parts.period] : []}
+            onValueChange={([next]) => set({ ...parts, period: next ?? "" })}
+          >
+            <ToggleGroupItem value="am">{labels.am}</ToggleGroupItem>
+            <ToggleGroupItem value="pm">{labels.pm}</ToggleGroupItem>
+          </ToggleGroup>
+          {name && <input type="hidden" name={`${name}-period`} value={parts.period ?? ""} />}
+        </div>
+      )}
+    </div>
   );
 }

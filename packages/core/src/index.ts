@@ -247,6 +247,8 @@ export {
 } from "./data-table";
 export {
   DateInput,
+  DateInputControl,
+  type DateInputControlProps,
   type DateInputLabels,
   type DateInputProps,
   defaultDateInputLabels,
@@ -835,6 +837,8 @@ export {
 export {
   defaultTimeInputLabels,
   TimeInput,
+  TimeInputControl,
+  type TimeInputControlProps,
   type TimeInputLabels,
   type TimeInputProps,
   type TimeParts,

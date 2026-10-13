@@ -158,16 +158,17 @@ export function useField({
   const errorMessage = own ?? (name ? form?.errors[name] : undefined);
   const invalid = present(errorMessage);
   const register = form?.register;
-  const target = linkTo ?? controlId;
   const shown = useContext(ShownContext);
   // One object for the field's life, which the Form keeps. It is brought up to date after each
   // render React commits, so the Form never reads a render that was thrown away.
   const [field] = useState<Entry>(() => {
     const entry: Entry = {
-      id: target,
       shown,
-      own: {},
+      own: { id: controlId, linkTo },
       given: {},
+      get id() {
+        return entry.own.linkTo ?? entry.given.linkTo?.value ?? entry.own.id;
+      },
       get label() {
         return entry.own.label ?? entry.given.label?.value;
       },
@@ -178,7 +179,8 @@ export function useField({
     return entry;
   });
   useLayoutEffect(() => {
-    field.id = target;
+    field.own.id = controlId;
+    field.own.linkTo = linkTo;
     field.shown = shown;
     field.own.label = label;
     field.own.answer = answer;
@@ -217,8 +219,17 @@ type Given<T> = { owner: object; value: T };
  * its parts give.
  */
 type Entry = FormField & {
-  own: { label?: ReactNode; answer?: (data: FormData) => ReactNode };
-  given: { label?: Given<ReactNode>; answer?: Given<(data: FormData) => ReactNode> };
+  own: {
+    id: string;
+    linkTo?: string;
+    label?: ReactNode;
+    answer?: (data: FormData) => ReactNode;
+  };
+  given: {
+    linkTo?: Given<string>;
+    label?: Given<ReactNode>;
+    answer?: Given<(data: FormData) => ReactNode>;
+  };
 };
 
 /** What a bound Field gives the parts inside it, which is `useField`'s result and its name. */
@@ -238,13 +249,18 @@ export type FieldSummary = {
   label?: ReactNode;
   /** How the answer shows in Check your answers. See `FormField`. */
   answer?: (data: FormData) => ReactNode;
+  /**
+   * Where a Form's error summary links to, when it is not the field's control, such as the day of
+   * a Date input's control.
+   */
+  linkTo?: string;
 };
 
 /**
- * Tells the bound Field around a part what it asks, such as a label's words, or how its control
- * shows its answer, as Select shows its option's label. Use it in a control of your own. The
- * field's own `label` and `answer`, given to Field or `useField`, come first. What the part gives
- * goes with it when it leaves the page.
+ * Tells the bound Field around a part what it asks, such as a label's words, how its control shows
+ * its answer, as Select shows its option's label, or where an error links to. Use it in a control
+ * of your own. The field's own `label`, `answer` and `linkTo`, given to Field or `useField`, come
+ * first. What the part gives goes with it when it leaves the page.
  */
 export function useFieldSummary(summary: FieldSummary) {
   const bound = useContext(FieldContext);
@@ -256,9 +272,11 @@ export function useFieldSummary(summary: FieldSummary) {
     const { given } = entry;
     if ("label" in summary) given.label = { owner, value: summary.label };
     if ("answer" in summary && summary.answer) given.answer = { owner, value: summary.answer };
+    if (summary.linkTo) given.linkTo = { owner, value: summary.linkTo };
     return () => {
       if (given.label?.owner === owner) given.label = undefined;
       if (given.answer?.owner === owner) given.answer = undefined;
+      if (given.linkTo?.owner === owner) given.linkTo = undefined;
     };
   });
 }

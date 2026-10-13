@@ -26,6 +26,7 @@ import {
   Combobox,
   CookieBanner,
   DateInput,
+  DateInputControl,
   dateFromParts,
   ErrorMessage,
   ErrorSummary,
@@ -59,6 +60,7 @@ import {
   Textarea,
   TextareaControl,
   TimeInput,
+  TimeInputControl,
   ToggleGroup,
   ToggleGroupItem,
   useControlProps,
@@ -266,6 +268,52 @@ test("a fieldset is its parts in a bound field, so a composed one matches", () =
   expect(shorthand).toContain('<h1 class="x-govuk-ui-legend-heading">What is your address?</h1>');
   // A field inside the fieldset is bound to itself, not to the fieldset.
   expect(shorthand).not.toContain('for="address"');
+});
+
+test("date and time inputs are their parts in a bound field, so a composed one matches", () => {
+  // Base UI numbers the calendar's trigger by its place in the tree, which composing changes.
+  const same = (html: string) => normalised(html).replace(/ id="base-ui-[^"]*"/g, "");
+  const date = renderToStaticMarkup(
+    <DateInput
+      id="birth"
+      name="birth"
+      legend="Date of birth"
+      hint="For example, 27 3 1985"
+      errorMessage="Enter a real year"
+      errorFields={["year"]}
+      calendar
+      autoCompleteBirthday
+    />,
+  );
+  const composedDate = renderToStaticMarkup(
+    <Field controlId="birth" name="birth" hasHint errorMessage="Enter a real year">
+      <FieldsetRoot id="birth" className="x-govuk-ui-date-input-fieldset">
+        <FieldsetLegend>Date of birth</FieldsetLegend>
+        <Hint>For example, 27 3 1985</Hint>
+        <ErrorMessage />
+        <DateInputControl errorFields={["year"]} calendar autoCompleteBirthday />
+      </FieldsetRoot>
+    </Field>,
+  );
+  expect(same(date)).toBe(same(composedDate));
+  // The control takes its fields' ids and names from the field, and only the year shows the error.
+  expect(composedDate).toContain('id="birth-day"');
+  expect(composedDate).toContain('name="birth-year"');
+  expect(composedDate.match(/aria-invalid="true"/g)).toHaveLength(1);
+  const time = renderToStaticMarkup(
+    <TimeInput id="start" name="start" legend="Start time" hourCycle={12} errorMessage="Enter" />,
+  );
+  const composedTime = renderToStaticMarkup(
+    <Field controlId="start" name="start" errorMessage="Enter">
+      <FieldsetRoot id="start" className="x-govuk-ui-date-input-fieldset">
+        <FieldsetLegend>Start time</FieldsetLegend>
+        <ErrorMessage />
+        <TimeInputControl hourCycle={12} />
+      </FieldsetRoot>
+    </Field>,
+  );
+  expect(same(time)).toBe(same(composedTime));
+  expect(composedTime).toContain('name="start-period"');
 });
 
 test("inputs generate distinct IDs and escape content during server rendering", () => {

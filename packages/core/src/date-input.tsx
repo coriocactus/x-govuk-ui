@@ -6,8 +6,16 @@ import { Button } from "./button";
 import { Calendar } from "./calendar";
 import { useControllableState } from "./controllable-state";
 import { Dial } from "./dial";
-import { ErrorMessage, Field, Hint, useField, useFormDefault } from "./field";
-import { FieldsetLegend } from "./fieldset";
+import {
+  ErrorMessage,
+  Field,
+  Hint,
+  present,
+  useBoundField,
+  useFieldSummary,
+  useFormDefault,
+} from "./field";
+import { FieldsetLegend, FieldsetRoot } from "./fieldset";
 import { type DateParts, dateFromParts } from "./helpers";
 import { useLabels, useLocale } from "./labels";
 import { useOverlaySound } from "./overlay";
@@ -90,6 +98,31 @@ export type DateInputProps = Omit<
   className?: string;
 };
 
+export type DateInputControlProps = Omit<
+  ComponentPropsWithRef<"div">,
+  "id" | "defaultValue" | "onChange"
+> &
+  Pick<
+    DateInputProps,
+    | "name"
+    | "value"
+    | "defaultValue"
+    | "onValueChange"
+    | "errorFields"
+    | "calendar"
+    | "labels"
+    | "min"
+    | "max"
+    | "autoCompleteBirthday"
+    | "disabled"
+  > & {
+    /**
+     * The group's id, from which the fields take theirs, `{id}-day`, `{id}-month` and `{id}-year`.
+     * In a bound Field, the field's.
+     */
+    id?: string;
+  };
+
 const calendarIcon = (
   <svg
     viewBox="0 0 24 24"
@@ -111,6 +144,10 @@ const calendarIcon = (
  * find, such as an appointment, a calendar button opens a Calendar beside the fields. Choosing a
  * day fills the fields in. Each field is also a Dial. Drag it up or down, scroll over it, or press
  * the arrow keys, and it turns a step at a time from today's date.
+ *
+ * It is a bound Field holding a `FieldsetRoot`, with a `FieldsetLegend`, a `Hint`, an
+ * `ErrorMessage` and a `DateInputControl`. Compose those parts yourself to put something between
+ * them.
  */
 export function DateInput({
   legend,
@@ -125,6 +162,64 @@ export function DateInput({
   defaultValue,
   onValueChange,
   calendar = false,
+  labels,
+  min,
+  max,
+  autoCompleteBirthday = false,
+  disabled = false,
+  className,
+  "aria-describedby": describedBy,
+  ...props
+}: DateInputProps) {
+  const generated = useId();
+  const groupId = id ?? `date-${generated}`;
+  return (
+    <Field
+      controlId={groupId}
+      name={name}
+      hasHint={present(hint)}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+    >
+      <FieldsetRoot {...props} id={groupId} className="x-govuk-ui-date-input-fieldset">
+        <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
+          {legend}
+        </FieldsetLegend>
+        <Hint>{hint}</Hint>
+        <ErrorMessage />
+        <DateInputControl
+          className={className}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={onValueChange}
+          errorFields={errorFields}
+          calendar={calendar}
+          labels={labels}
+          min={min}
+          max={max}
+          autoCompleteBirthday={autoCompleteBirthday}
+          disabled={disabled}
+        />
+      </FieldsetRoot>
+    </Field>
+  );
+}
+
+/**
+ * Date input's fields on their own, Day, Month and Year, with the calendar button when asked for,
+ * for a date composed from Field's parts. In a bound Field, the fields take their ids and names
+ * from the field's, such as `{controlId}-day` and `{name}-day`. They show the field's error, and a
+ * Form's error summary links to the day. Check your answers shows the date as a date, such as 5
+ * January 2026.
+ */
+export function DateInputControl({
+  id: ownId,
+  name: ownName,
+  value,
+  defaultValue,
+  onValueChange,
+  errorFields,
+  calendar = false,
   labels: ownLabels,
   min,
   max,
@@ -132,19 +227,16 @@ export function DateInput({
   disabled = false,
   className = "",
   ...props
-}: DateInputProps) {
+}: DateInputControlProps) {
+  const bound = useBoundField();
   const generated = useId();
-  const groupId = id ?? `date-${generated}`;
+  const groupId = ownId ?? bound?.id ?? `date-${generated}`;
+  const name = ownName ?? bound?.name;
   const labels = useLabels("dateInput", defaultDateInputLabels, ownLabels);
   const locale = useLocale();
-  const field = useField({
-    id: groupId,
-    name,
+  useFieldSummary({
     linkTo: `${groupId}-day`,
-    hint,
-    errorMessage,
-    label: legend,
-    answer: (data) => (name ? dateAnswer(data, name, locale) : undefined),
+    answer: name ? (data) => dateAnswer(data, name, locale) : undefined,
   });
   // A Form can give the fields an answer to start with, such as one kept from an earlier visit.
   const savedDay = useFormDefault(name && `${name}-day`)?.[0];
@@ -164,7 +256,8 @@ export function DateInput({
   const popup = useRef<HTMLDivElement>(null);
   const sound = useOverlaySound();
   const chosen = dateFromParts(parts);
-  const invalid = (part: Part) => field.invalid && (!errorFields || errorFields.includes(part));
+  const invalid = (part: Part) =>
+    Boolean(bound?.invalid) && (!errorFields || errorFields.includes(part));
 
   // Each field turns like a dial, from today's date when it is empty. Days and months go round.
   const today = new Date();
@@ -198,83 +291,69 @@ export function DateInput({
   );
 
   return (
-    <Field invalid={field.invalid}>
-      <fieldset
-        {...props}
-        className="x-govuk-ui-fieldset x-govuk-ui-date-input-fieldset"
-        id={groupId}
-        aria-describedby={field.controlProps["aria-describedby"]}
-      >
-        <FieldsetLegend size={legendSize} pageHeading={pageHeading}>
-          {legend}
-        </FieldsetLegend>
-        <Hint id={field.hintId}>{hint}</Hint>
-        <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
-        <div className={`x-govuk-ui-date-input ${className}`.trim()}>
-          {input("day", labels.day)}
-          {input("month", labels.month)}
-          {input("year", labels.year)}
-          {calendar && (
-            <Primitive.Root
-              open={open}
-              onOpenChange={(next, details) => {
-                sound(next, details.reason);
-                setOpen(next);
-              }}
+    <div {...props} className={`x-govuk-ui-date-input ${className}`.trim()}>
+      {input("day", labels.day)}
+      {input("month", labels.month)}
+      {input("year", labels.year)}
+      {calendar && (
+        <Primitive.Root
+          open={open}
+          onOpenChange={(next, details) => {
+            sound(next, details.reason);
+            setOpen(next);
+          }}
+        >
+          <Primitive.Trigger
+            render={
+              <Button
+                variant="outline"
+                size="icon"
+                className="x-govuk-ui-date-input-picker"
+                aria-label={labels.calendar}
+                disabled={disabled}
+              >
+                {calendarIcon}
+              </Button>
+            }
+          />
+          <Primitive.Portal>
+            <Primitive.Positioner
+              className="x-govuk-ui-floating-positioner"
+              side="bottom"
+              align="end"
+              sideOffset={8}
+              collisionPadding={8}
             >
-              <Primitive.Trigger
-                render={
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="x-govuk-ui-date-input-picker"
-                    aria-label={labels.calendar}
-                    disabled={disabled}
-                  >
-                    {calendarIcon}
-                  </Button>
+              <Primitive.Popup
+                ref={popup}
+                className="x-govuk-ui-floating x-govuk-ui-date-input-popup"
+                // Focus starts on the chosen day, or today, so the arrow keys move from there.
+                initialFocus={() =>
+                  popup.current?.querySelector<HTMLElement>(
+                    '.x-govuk-ui-calendar-day[tabindex="0"]',
+                  ) ?? true
                 }
-              />
-              <Primitive.Portal>
-                <Primitive.Positioner
-                  className="x-govuk-ui-floating-positioner"
-                  side="bottom"
-                  align="end"
-                  sideOffset={8}
-                  collisionPadding={8}
-                >
-                  <Primitive.Popup
-                    ref={popup}
-                    className="x-govuk-ui-floating x-govuk-ui-date-input-popup"
-                    // Focus starts on the chosen day, or today, so the arrow keys move from there.
-                    initialFocus={() =>
-                      popup.current?.querySelector<HTMLElement>(
-                        '.x-govuk-ui-calendar-day[tabindex="0"]',
-                      ) ?? true
-                    }
-                  >
-                    <Calendar
-                      value={chosen}
-                      min={min}
-                      max={max}
-                      label={labels.chooseDate}
-                      onValueChange={(date) => {
-                        if (!date) return;
-                        set({
-                          day: String(date.getDate()),
-                          month: String(date.getMonth() + 1),
-                          year: String(date.getFullYear()),
-                        });
-                        setOpen(false);
-                      }}
-                    />
-                  </Primitive.Popup>
-                </Primitive.Positioner>
-              </Primitive.Portal>
-            </Primitive.Root>
-          )}
-        </div>
-      </fieldset>
-    </Field>
+              >
+                <Calendar
+                  value={chosen}
+                  min={min}
+                  max={max}
+                  label={labels.chooseDate}
+                  onValueChange={(date) => {
+                    if (!date) return;
+                    set({
+                      day: String(date.getDate()),
+                      month: String(date.getMonth() + 1),
+                      year: String(date.getFullYear()),
+                    });
+                    setOpen(false);
+                  }}
+                />
+              </Primitive.Popup>
+            </Primitive.Positioner>
+          </Primitive.Portal>
+        </Primitive.Root>
+      )}
+    </div>
   );
 }

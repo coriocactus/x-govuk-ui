@@ -15,6 +15,7 @@ import {
   Tiles,
   TilesDock,
   type TilesLayout,
+  TilesTidy,
   tileIds,
 } from "@x-govuk-ui/belsize";
 import type { RefCallback } from "react";
@@ -30,6 +31,7 @@ import {
   DetailsRoot,
   DetailsSummary,
   DetailsText,
+  LabelsProvider,
   ResizableHandle,
   ScrollArea,
   Separator,
@@ -488,4 +490,22 @@ test("a tile's id in the page keeps ids apart that differ only in their spaces a
   expect(ids).toHaveLength(2);
   expect(new Set(ids).size).toBe(2);
   expect(ids.every((id) => !/\s/.test(id ?? ""))).toBe(true);
+});
+
+test("tiles take their words from a labels provider, and their own labels come first", () => {
+  const html = renderToStaticMarkup(
+    <LabelsProvider labels={{ tiles: { tidy: "Tacluso", dock: "Teils ar gau" } }}>
+      <Tiles
+        defaultValue={desk}
+        labels={{ dock: "Ar gau" }}
+        renderTile={(id) => <Tile title={id}>{id}</Tile>}
+      >
+        <TilesTidy />
+        <TilesDock />
+      </Tiles>
+    </LabelsProvider>,
+  );
+  expect(html).toContain("Tacluso");
+  expect(html).toContain("Ar gau");
+  expect(html).not.toContain("Teils ar gau");
 });

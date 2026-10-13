@@ -15,6 +15,7 @@ export {
   tileIds,
 } from "./layout";
 export {
+  defaultTilesLabels,
   Tile,
   TileBar,
   TileClose,
@@ -39,6 +40,7 @@ export {
   TilesDockItem,
   type TilesDockItemProps,
   type TilesDockProps,
+  type TilesLabels,
   type TilesLayoutOptions,
   type TilesProps,
   TilesProvider,

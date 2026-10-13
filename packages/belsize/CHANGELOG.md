@@ -6,6 +6,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added Tiles' words to LabelsProvider, from x-govuk-ui, as `tiles`, and `labels` to Tiles and TilesProvider. Every word Tiles write is a label, such as the buttons' names, the menu's items and what screen readers hear as tiles move. `defaultTilesLabels` are the English words.
+
 - Added `defaultMaximised` and `defaultActive` to Tiles and TilesProvider, for Tiles that keep track themselves from a start you choose.
 
 ## [0.3.0] - 2026-10-10

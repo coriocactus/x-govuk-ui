@@ -39,6 +39,7 @@ import {
 } from "x-govuk-ui";
 import {
   useControllableState,
+  useLabels,
   useMediaQuery,
   useMergedRef,
   useStoredState,
@@ -154,6 +155,8 @@ type TilesContextValue = TilesActions & {
   /** Marks a tile as the one in use. */
   use: (id: string) => void;
   announce: (words: string) => void;
+  /** The Tiles' words. */
+  labels: TilesLabels;
   canSplit: boolean;
   message: string;
   /** Tells the provider a tile's title and the id it has in the page, while it is open. */
@@ -278,20 +281,102 @@ const gripDots = (
   </svg>
 );
 
-// Each side's words, for the menu beside a tile and at an edge, and for the announcement.
-const sideWords: Record<TileSide, { beside: string; edge: string; moved: string }> = {
-  left: { beside: "On its left", edge: "To the left edge", moved: "to the left of" },
-  right: { beside: "On its right", edge: "To the right edge", moved: "to the right of" },
-  top: { beside: "Above it", edge: "To the top", moved: "above" },
-  bottom: { beside: "Below it", edge: "To the bottom", moved: "below" },
-};
-const sides = Object.keys(sideWords) as TileSide[];
-
-/** Names tiles in a sentence, such as "Notes", "Notes and Map", or "Notes, Map and Files". */
-function inWords(names: string[]) {
-  if (names.length < 2) return names[0] ?? "";
-  return `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+declare module "x-govuk-ui" {
+  /** Tiles' words, which a LabelsProvider or the Tiles' `labels` can change. */
+  interface ComponentLabels {
+    tiles: TilesLabels;
+  }
 }
+
+/** The words Tiles write, which a LabelsProvider or the Tiles' `labels` can change. */
+export type TilesLabels = {
+  /** Each side's words, for the menu beside a tile and at an edge, and for the announcement. */
+  sides: Record<TileSide, { beside: string; edge: string; moved: string }>;
+  /** Names tiles in a sentence, such as "Notes", "Notes and Map", or "Notes, Map and Files". */
+  list: (titles: string[]) => string;
+  closed: (tile: string) => string;
+  /** Says where a tile went, such as "to the left of Map" or "to the top". */
+  moved: (tile: string, where: string) => string;
+  swapped: (tile: string, other: string) => string;
+  shownInPlace: (shown: string, replaced: string) => string;
+  opened: (tile: string) => string;
+  split: (tile: string, direction: TileSplitDirection) => string;
+  madeLarger: (tile: string) => string;
+  setOutEvenly: string;
+  /** Says which tile is in use on a small screen, as in "Map, 2 of 3". */
+  position: (tile: string, place: number, count: number) => string;
+  /** Names a divider by the tiles before it. */
+  resize: (tiles: string) => string;
+  previousTile: string;
+  nextTile: string;
+  /** Names the pager's buttons by the tile each goes to. */
+  previousTileNamed: (tile: string) => string;
+  nextTileNamed: (tile: string) => string;
+  close: string;
+  closeTile: (tile: string) => string;
+  maximise: string;
+  restore: string;
+  maximiseTile: (tile: string) => string;
+  splitDirection: (direction: TileSplitDirection) => string;
+  splitTile: (tile: string, direction: TileSplitDirection) => string;
+  options: (tile: string) => string;
+  move: string;
+  beside: (tile: string) => string;
+  swapWith: string;
+  showHere: string;
+  /** Names the dock of closed tiles. */
+  dock: string;
+  /** Says how to close a tile by dragging it to the dock. */
+  dockHint: string;
+  openTile: (tile: string) => string;
+  /** The button that lays every tile out evenly. */
+  tidy: string;
+};
+
+export const defaultTilesLabels: TilesLabels = {
+  sides: {
+    left: { beside: "On its left", edge: "To the left edge", moved: "to the left of" },
+    right: { beside: "On its right", edge: "To the right edge", moved: "to the right of" },
+    top: { beside: "Above it", edge: "To the top", moved: "above" },
+    bottom: { beside: "Below it", edge: "To the bottom", moved: "below" },
+  },
+  list: (titles) =>
+    titles.length < 2
+      ? (titles[0] ?? "")
+      : `${titles.slice(0, -1).join(", ")} and ${titles.at(-1)}`,
+  closed: (tile) => `${tile} closed`,
+  moved: (tile, where) => `${tile} moved ${where}`,
+  swapped: (tile, other) => `${tile} swapped with ${other}`,
+  shownInPlace: (shown, replaced) => `${shown} shown in place of ${replaced}`,
+  opened: (tile) => `${tile} opened`,
+  split: (tile, direction) => `${tile} split ${direction}`,
+  madeLarger: (tile) => `${tile} made larger`,
+  setOutEvenly: "Tiles set out evenly",
+  position: (tile, place, count) => `${tile}, ${place} of ${count}`,
+  resize: (tiles) => `Resize ${tiles}`,
+  previousTile: "Previous tile",
+  nextTile: "Next tile",
+  previousTileNamed: (tile) => `Previous tile: ${tile}`,
+  nextTileNamed: (tile) => `Next tile: ${tile}`,
+  close: "Close",
+  closeTile: (tile) => `Close ${tile}`,
+  maximise: "Maximise",
+  restore: "Restore",
+  maximiseTile: (tile) => `Maximise ${tile}`,
+  splitDirection: (direction) => `Split ${direction}`,
+  splitTile: (tile, direction) => `Split ${tile} ${direction}`,
+  options: (tile) => `Options for ${tile}`,
+  move: "Move",
+  beside: (tile) => `Beside ${tile}`,
+  swapWith: "Swap with",
+  showHere: "Show here",
+  dock: "Closed tiles",
+  dockHint: "Drag a tile here to close it",
+  openTile: (tile) => `Open ${tile}`,
+  tidy: "Tidy the tiles",
+};
+
+const sides: TileSide[] = ["left", "right", "top", "bottom"];
 
 /** The first control in an element that can take focus now, which is shown and not disabled. */
 function firstControl(element: Element | null | undefined) {
@@ -412,6 +497,8 @@ export type TilesProviderProps = {
    * each have too little space. Without it, the tiles keep their arrangement at every width.
    */
   mobileBreakpoint?: number;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<TilesLabels>;
   children?: ReactNode;
 };
 
@@ -434,8 +521,12 @@ export function TilesProvider({
   defaultActive = null,
   onActiveChange,
   mobileBreakpoint,
+  labels: ownLabels,
   children,
 }: TilesProviderProps) {
+  const labels = useLabels("tiles", defaultTilesLabels, ownLabels);
+  const labelsNow = useRef(labels);
+  labelsNow.current = labels;
   const boardId = useId();
   const play = useScopeSound();
   const board = useRef<HTMLDivElement | null>(null);
@@ -589,7 +680,7 @@ export function TilesProvider({
       const next = before[at + 1] ?? before[at - 1];
       if (maximised === id) setMaximised(null);
       commit(removeTile(latest.current.committed, id));
-      announce(`${titleOf(id)} closed`);
+      announce(labelsNow.current.closed(titleOf(id)));
       if (!moveFocus) return;
       if (next) focus(next);
       else focusEmpty();
@@ -602,13 +693,13 @@ export function TilesProvider({
       const now = latest.current.committed;
       if (!tileIds(now).includes(id)) return;
       commit(placeTile(now, id, place));
-      const words = sideWords[place.side];
+      const words = labelsNow.current.sides[place.side];
       // A missing tile to go beside sends it to the edge, as `placeTile` does.
       const where =
         place.beside && place.beside !== id && tileIds(now).includes(place.beside)
           ? `${words.moved} ${titleOf(place.beside)}`
           : words.edge.toLowerCase();
-      announce(`${titleOf(id)} moved ${where}`);
+      announce(labelsNow.current.moved(titleOf(id), where));
     },
     [commit, announce, titleOf],
   );
@@ -617,7 +708,7 @@ export function TilesProvider({
       const now = latest.current.committed;
       if (!tileIds(now).includes(id) || !tileIds(now).includes(other)) return;
       commit(swapTiles(now, id, other));
-      announce(`${titleOf(id)} swapped with ${titleOf(other)}`);
+      announce(labelsNow.current.swapped(titleOf(id), titleOf(other)));
     },
     [commit, announce, titleOf],
   );
@@ -628,7 +719,7 @@ export function TilesProvider({
       // A maximised tile would hide the one shown, so it is restored first.
       setMaximised(null);
       commit(replaceTile(now, id, by));
-      announce(`${titleOf(by)} shown in place of ${titleOf(id)}`);
+      announce(labelsNow.current.shownInPlace(titleOf(by), titleOf(id)));
       if (moveFocus) focus(by);
     },
     [commit, announce, titleOf, focus, setMaximised],
@@ -638,7 +729,7 @@ export function TilesProvider({
     (id: string, place: TilePlace = { side: "right" }, { moveFocus = true } = {}) => {
       setMaximised(null);
       commit(placeTile(latest.current.committed, id, place));
-      announce(`${titleOf(id)} opened`);
+      announce(labelsNow.current.opened(titleOf(id)));
       if (moveFocus) focus(id);
     },
     [commit, announce, titleOf, focus, setMaximised],
@@ -659,7 +750,7 @@ export function TilesProvider({
       setMaximised(null);
       const side = direction === "across" ? "right" : "bottom";
       commit(placeTile(latest.current.committed, added, { beside: id, side }));
-      announce(`${titleOf(id)} split ${direction}`);
+      announce(labelsNow.current.split(titleOf(id), direction));
       // A tile made by a server can take a while. Focus moved elsewhere meanwhile is left there.
       // Focus still where it was, which a press does not move in Safari, moves to the new tile, as
       // does focus back in the split tile, where a menu returns it on closing.
@@ -681,7 +772,7 @@ export function TilesProvider({
   const expand = useCallback(
     (id: string) => {
       commit(expandTile(latest.current.committed, id));
-      announce(`${titleOf(id)} made larger`);
+      announce(labelsNow.current.madeLarger(titleOf(id)));
     },
     [commit, announce, titleOf],
   );
@@ -690,7 +781,7 @@ export function TilesProvider({
     const box = board.current?.getBoundingClientRect();
     const aspect = box && box.height > 0 ? box.width / box.height : 1;
     commit(balanceTiles(latest.current.committed, aspect));
-    announce("Tiles set out evenly");
+    announce(labelsNow.current.setOutEvenly);
   }, [commit, announce]);
   const maximise = useCallback((id: string) => setMaximised(id), [setMaximised]);
   const restore = useCallback(() => setMaximised(null), [setMaximised]);
@@ -777,6 +868,7 @@ export function TilesProvider({
       small,
       use,
       announce,
+      labels,
       canSplit: Boolean(createTile),
       message,
       register,
@@ -810,6 +902,7 @@ export function TilesProvider({
       small,
       use,
       announce,
+      labels,
       createTile,
       message,
       register,
@@ -979,7 +1072,7 @@ export function TilesBoard({
               snap={snap}
               grip={grip}
               preview={previewResize}
-              titleOf={tiles.titleOf}
+              label={tiles.labels.resize(tiles.labels.list(divider.before.map(tiles.titleOf)))}
               domId={tiles.domId}
               onDraggingChange={(dragging) => {
                 if (dragging) tiles.beginResize();
@@ -1034,7 +1127,8 @@ type DividerProps = {
   grip: boolean;
   /** Moves only the line while it is dragged, while the tiles wait for it to be let go. */
   preview: boolean;
-  titleOf: (id: string) => string;
+  /** Names the divider for screen readers. */
+  label: string;
   domId: (id: string) => string;
   onDraggingChange: (dragging: boolean) => void;
   onShareChange: (share: number) => void;
@@ -1053,7 +1147,7 @@ function TileDivider({
   snap,
   grip,
   preview,
-  titleOf,
+  label,
   domId,
   onDraggingChange,
   onShareChange,
@@ -1075,7 +1169,7 @@ function TileDivider({
     <ResizableHandle
       className="x-govuk-ui-tiles-divider"
       orientation={row ? "vertical" : "horizontal"}
-      label={`Resize ${inWords(divider.before.map(titleOf))}`}
+      label={label}
       controls={divider.before.map(domId).join(" ")}
       panel="before"
       value={pixels.size}
@@ -1135,6 +1229,7 @@ export function Tiles({
   defaultActive,
   onActiveChange,
   mobileBreakpoint,
+  labels,
   renderTile,
   dropBehaviour,
   minSize,
@@ -1161,6 +1256,7 @@ export function Tiles({
       defaultActive={defaultActive}
       onActiveChange={onActiveChange}
       mobileBreakpoint={mobileBreakpoint}
+      labels={labels}
     >
       <div {...props} className={`x-govuk-ui-tiles ${className}`.trim()}>
         {children}
@@ -1459,16 +1555,16 @@ export function TilePager({ className = "", ...props }: ComponentPropsWithRef<"d
   const after = order[at + 1];
   const go = (id: string) => {
     tiles.use(id);
-    tiles.announce(`${tiles.titleOf(id)}, ${order.indexOf(id) + 1} of ${order.length}`);
+    tiles.announce(tiles.labels.position(tiles.titleOf(id), order.indexOf(id) + 1, order.length));
     tiles.focus(id);
   };
   return (
     <div {...props} className={`x-govuk-ui-tile-pager ${className}`.trim()}>
       {before !== undefined && (
         <Control
-          label="Previous tile"
+          label={tiles.labels.previousTile}
           icon={icons.previous}
-          aria-label={`Previous tile: ${tiles.titleOf(before)}`}
+          aria-label={tiles.labels.previousTileNamed(tiles.titleOf(before))}
           action={() => go(before)}
         />
       )}
@@ -1477,9 +1573,9 @@ export function TilePager({ className = "", ...props }: ComponentPropsWithRef<"d
       </span>
       {after !== undefined && (
         <Control
-          label="Next tile"
+          label={tiles.labels.nextTile}
           icon={icons.next}
-          aria-label={`Next tile: ${tiles.titleOf(after)}`}
+          aria-label={tiles.labels.nextTileNamed(tiles.titleOf(after))}
           action={() => go(after)}
         />
       )}
@@ -1493,10 +1589,10 @@ export function TileClose({ className = "", ...props }: ControlProps) {
   return (
     <Control
       {...props}
-      label="Close"
+      label={tiles.labels.close}
       data-sound="close"
       icon={icons.close}
-      aria-label={`Close ${tile.title}`}
+      aria-label={tiles.labels.closeTile(tile.title)}
       className={`x-govuk-ui-tile-close ${className}`.trim()}
       action={() => tiles.close(tile.id)}
     />
@@ -1512,9 +1608,9 @@ export function TileMaximise({ className = "", ...props }: ControlProps) {
   return (
     <Control
       {...props}
-      label={on ? "Restore" : "Maximise"}
+      label={on ? tiles.labels.restore : tiles.labels.maximise}
       icon={on ? icons.restore : icons.maximise}
-      aria-label={`Maximise ${tile.title}`}
+      aria-label={tiles.labels.maximiseTile(tile.title)}
       aria-pressed={on}
       className={`x-govuk-ui-tile-maximise ${className}`.trim()}
       action={() => (on ? tiles.restore() : tiles.maximise(tile.id))}
@@ -1540,9 +1636,9 @@ export function TileSplit({ direction = "across", className = "", ...props }: Ti
   return (
     <Control
       {...props}
-      label={`Split ${direction}`}
+      label={tiles.labels.splitDirection(direction)}
       icon={icons[direction]}
-      aria-label={`Split ${tile.title} ${direction}`}
+      aria-label={tiles.labels.splitTile(tile.title, direction)}
       className={`x-govuk-ui-tile-split ${className}`.trim()}
       data-direction={direction}
       action={() => tiles.split(tile.id, direction)}
@@ -1562,7 +1658,7 @@ export type TileMenuProps = ControlProps & {
  * for.
  */
 export function TileMenu({ className = "", children, ...props }: TileMenuProps) {
-  const { tile } = useTilePart("TileMenu");
+  const { tiles, tile } = useTilePart("TileMenu");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -1570,7 +1666,7 @@ export function TileMenu({ className = "", children, ...props }: TileMenuProps) 
         variant="quiet"
         size="small-icon"
         chevron={false}
-        aria-label={`Options for ${tile.title}`}
+        aria-label={tiles.labels.options(tile.title)}
         className={`x-govuk-ui-tile-control x-govuk-ui-tile-menu-trigger ${className}`.trim()}
       >
         {icons.more}
@@ -1609,15 +1705,15 @@ function TileMenuItems({ children }: { children: ReactNode }) {
       )}
       {moves && (
         <MenuGroup>
-          <MenuSubmenu label="Move">
+          <MenuSubmenu label={tiles.labels.move}>
             {others.map((other) => (
-              <MenuSubmenu key={other} label={`Beside ${name(other)}`}>
+              <MenuSubmenu key={other} label={tiles.labels.beside(name(other))}>
                 {sides.map((side) => (
                   <MenuItem
                     key={side}
                     onSelect={() => tiles.move(tile.id, { beside: other, side })}
                   >
-                    {sideWords[side].beside}
+                    {tiles.labels.sides[side].beside}
                   </MenuItem>
                 ))}
               </MenuSubmenu>
@@ -1625,11 +1721,11 @@ function TileMenuItems({ children }: { children: ReactNode }) {
             <MenuSeparator />
             {sides.map((side) => (
               <MenuItem key={side} onSelect={() => tiles.move(tile.id, { side })}>
-                {sideWords[side].edge}
+                {tiles.labels.sides[side].edge}
               </MenuItem>
             ))}
           </MenuSubmenu>
-          <MenuSubmenu label="Swap with">
+          <MenuSubmenu label={tiles.labels.swapWith}>
             {others.map((other) => (
               <MenuItem key={other} onSelect={() => tiles.swap(tile.id, other)}>
                 {name(other)}
@@ -1639,7 +1735,7 @@ function TileMenuItems({ children }: { children: ReactNode }) {
         </MenuGroup>
       )}
       {shows && (
-        <MenuSubmenu label="Show here">
+        <MenuSubmenu label={tiles.labels.showHere}>
           {tiles.closed.map((entry) => (
             <MenuItem key={entry.id} onSelect={() => tiles.replace(tile.id, entry.id)}>
               {name(entry.id)}
@@ -1657,7 +1753,7 @@ function TileMenuItems({ children }: { children: ReactNode }) {
         icon={on ? icons.restore : icons.maximise}
         onSelect={() => (on ? tiles.restore() : tiles.maximise(tile.id))}
       >
-        {on ? "Restore" : "Maximise"}
+        {on ? tiles.labels.restore : tiles.labels.maximise}
       </MenuItem>
       <MenuItem icon={icons.close} onSelect={() => tiles.close(tile.id)}>
         Close
@@ -1683,8 +1779,8 @@ export type TilesDockProps = ComponentPropsWithRef<"div"> & {
  * dragged onto the dock closes. Put it anywhere inside the provider, such as in a sidebar.
  */
 export function TilesDock({
-  label = "Closed tiles",
-  hint = "Drag a tile here to close it",
+  label: ownLabel,
+  hint: ownHint,
   place,
   className = "",
   children,
@@ -1693,6 +1789,8 @@ export function TilesDock({
 }: TilesDockProps) {
   const tiles = useTiles("TilesDock");
   const { boardId } = tiles;
+  const label = ownLabel ?? tiles.labels.dock;
+  const hint = ownHint ?? tiles.labels.dockHint;
   const labelId = useId();
   // A tile from this provider's board dropped here closes, which react-mosaic takes `remove` to
   // mean.
@@ -1781,7 +1879,7 @@ export function TilesDockItem({
   return (
     <button
       type="button"
-      aria-label={`Open ${titleOf(tile)}`}
+      aria-label={tiles.labels.openTile(titleOf(tile))}
       {...props}
       ref={merged}
       className={`x-govuk-ui-tiles-dock-tile ${className}`.trim()}
@@ -1807,7 +1905,7 @@ export function TilesTidy({
   variant = "secondary",
   size = "small",
   className = "",
-  children = "Tidy the tiles",
+  children,
   disabled,
   onClick,
   ...props
@@ -1827,7 +1925,7 @@ export function TilesTidy({
       }}
     >
       {icons.tidy}
-      {children}
+      {children ?? tiles.labels.tidy}
     </Button>
   );
 }

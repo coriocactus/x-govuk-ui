@@ -26,7 +26,6 @@ import {
   type CSSProperties,
   createContext,
   type FormEvent,
-  Fragment,
   isValidElement,
   type MouseEvent,
   type ReactNode,
@@ -262,13 +261,18 @@ export function EditorToolbar({
       ),
     [children, chosen, files, options.headings, separators.keys],
   );
+  // A key that leaves the toolbar takes its mark with it, so a new item under it starts afresh.
+  const keys = items.map((item) => item.key).join(" ");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the marks are pruned as the keys change.
+  useLayoutEffect(() => separators.keep(new Set(keys.split(" "))), [keys]);
   const toolbar = useRef<HTMLDivElement>(null);
   const toolbarRef = useMergedRef(toolbar, ref);
   const [room, setRoom] = useState<number | null>(null);
   const [measured, setMeasured] = useState<Measured | null>(null);
-  // The items are measured whenever they change, before the browser paints, all in one wrapping
-  // row as the server sends them. After that, the toolbar's own width decides how many fit.
-  const signature = items.map((item) => item.key).join(" ");
+  // The items are measured whenever they or their roles change, before the browser paints, all in
+  // one wrapping row as the server sends them. After that, the toolbar's own width decides how many
+  // fit.
+  const signature = items.map((item) => `${item.key}:${item.role}`).join(" ");
   const measuring = measured?.signature !== signature;
   useLayoutEffect(() => {
     const element = toolbar.current;
@@ -337,7 +341,7 @@ export function EditorToolbar({
         {rest.length > 0 && (
           <>
             <span className="x-govuk-ui-editor-spacer" aria-hidden="true" />
-            <MoreControl label={labels.more} items={rest} />
+            <MoreControl label={labels.more} items={rest} markFor={separators.markFor} />
           </>
         )}
       </TooltipGroup>
@@ -398,29 +402,35 @@ function childItems(children: ReactNode): Item[] {
 }
 
 /** Lets a separator tell the item it is in that it is a keyline, not a control. */
-const SeparatorContext = createContext<(() => () => void) | null>(null);
+const SeparatorContext = createContext<(() => void) | null>(null);
 
-/** The items that hold a separator, by key, as the separators inside them say. */
+/**
+ * The items that hold a separator, by key, as the separators inside them say. An item keeps its
+ * mark while its key stays in the toolbar, wherever it is drawn. Otherwise a keyline that the row
+ * leaves out at its end would go, be counted as a control, fit, and come back, again and again. A
+ * wrapper of your own that renders an EditorSeparator should therefore always render one.
+ */
 function useSeparators() {
   const [keys, setKeys] = useState<ReadonlySet<string>>(new Set());
-  const marks = useRef(new Map<string, () => () => void>());
+  const marks = useRef(new Map<string, () => void>());
   const markFor = (key: string) => {
     let mark = marks.current.get(key);
     if (!mark) {
-      mark = () => {
-        setKeys((all) => new Set(all).add(key));
-        return () =>
-          setKeys((all) => {
-            const rest = new Set(all);
-            rest.delete(key);
-            return rest;
-          });
-      };
+      mark = () => setKeys((all) => (all.has(key) ? all : new Set(all).add(key)));
       marks.current.set(key, mark);
     }
     return mark;
   };
-  return { keys, markFor };
+  /** Forgets the marks of keys no longer in the toolbar. */
+  const keep = (present: ReadonlySet<string>) => {
+    for (const key of marks.current.keys()) if (!present.has(key)) marks.current.delete(key);
+    setKeys((all) =>
+      [...all].every((key) => present.has(key))
+        ? all
+        : new Set([...all].filter((key) => present.has(key))),
+    );
+  };
+  return { keys, markFor, keep };
 }
 
 /** An element's width inside its padding, which its items share. */
@@ -480,7 +490,15 @@ const moreIcon = (
  * rest, as a toolbar of their own. A control there with its own menu or popover opens it from
  * there.
  */
-function MoreControl({ label, items }: { label: string; items: Item[] }) {
+function MoreControl({
+  label,
+  items,
+  markFor,
+}: {
+  label: string;
+  items: Item[];
+  markFor: (key: string) => () => void;
+}) {
   const [open, setOpen] = useState(false);
   const popup = useRef<HTMLDivElement>(null);
   return (
@@ -522,7 +540,9 @@ function MoreControl({ label, items }: { label: string; items: Item[] }) {
             <Toolbar.Root aria-label={label} className="x-govuk-ui-editor-overflow">
               <TooltipGroup side="bottom">
                 {items.map((item) => (
-                  <Fragment key={item.key}>{item.node}</Fragment>
+                  <SeparatorContext key={item.key} value={markFor(item.key)}>
+                    {item.node}
+                  </SeparatorContext>
                 ))}
               </TooltipGroup>
             </Toolbar.Root>

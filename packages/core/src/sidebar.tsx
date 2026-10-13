@@ -118,7 +118,8 @@ export type SidebarItemProps = Omit<ComponentPropsWithRef<"button">, "children">
   children: ReactNode;
   icon?: ReactNode;
   badge?: ReactNode;
-  isActive?: boolean;
+  /** Marks the item as the current page, for screen readers and with the sidebar's line. */
+  current?: boolean;
   /** Shown beside the item while the sidebar is collapsed to icons. Defaults to the label. */
   tooltip?: ReactNode;
   /**
@@ -750,7 +751,7 @@ export function SidebarItem({
   children,
   icon,
   badge,
-  isActive = false,
+  current = false,
   tooltip,
   render,
   action,
@@ -777,11 +778,11 @@ export function SidebarItem({
   useEffect(() => {
     const row = element.current;
     const scroller = frame.content.current;
-    if (!isActive || !row || !scroller || frame.settled.current) return;
+    if (!current || !row || !scroller || frame.settled.current) return;
     const box = scroller.getBoundingClientRect();
     const place = row.getBoundingClientRect();
     scroller.scrollTop += place.top - box.top - (box.height - place.height) / 2;
-  }, [isActive, frame.content, frame.settled]);
+  }, [current, frame.content, frame.settled]);
 
   // After that, the current item stays in view, so the list follows when something else, such as
   // Next and Previous buttons, changes the page.
@@ -789,7 +790,7 @@ export function SidebarItem({
     const row = element.current;
     const scroller = frame.content.current;
     const from = frame.lineFrom.current;
-    if (!isActive || !row || !scroller || !frame.settled.current) return;
+    if (!current || !row || !scroller || !frame.settled.current) return;
     frame.lineFrom.current = null;
     // A glide still running stops where it is, and the next one starts from there.
     const layer = scroller.querySelector<HTMLElement>(".x-govuk-ui-scroll-area-content");
@@ -835,7 +836,7 @@ export function SidebarItem({
       if (frame.scrollGlide.current === glide) frame.scrollGlide.current = null;
     };
   }, [
-    isActive,
+    current,
     glides,
     frame.content,
     frame.settled,
@@ -852,8 +853,8 @@ export function SidebarItem({
       ...props,
       type: render ? undefined : "button",
       className: `x-govuk-ui-sidebar-item ${className}`.trim(),
-      "aria-current": isActive ? "page" : undefined,
-      "data-active": isActive || undefined,
+      "aria-current": current ? "page" : undefined,
+      "data-active": current || undefined,
       onPointerEnter,
       onClick: (event: MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
@@ -862,10 +863,10 @@ export function SidebarItem({
       },
       children: (
         <>
-          {isActive && frame.activeLine && (
+          {current && frame.activeLine && (
             <span ref={line} className="x-govuk-ui-sidebar-line" aria-hidden="true" />
           )}
-          <LineSnapshot active={isActive} line={line} from={frame.lineFrom} />
+          <LineSnapshot active={current} line={line} from={frame.lineFrom} />
           {icon && (
             <span className="x-govuk-ui-sidebar-icon" aria-hidden="true">
               {icon}

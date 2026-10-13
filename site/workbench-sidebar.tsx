@@ -57,7 +57,7 @@ export function WorkbenchSidebar({
   const entry = (key: string) => (
     <SidebarItem
       key={key}
-      isActive={key === name}
+      current={key === name}
       action={<SidebarItemMenu arranger={arranger} id={key} />}
       // An experimental component has the Experimental tag at the row's end, as a flask.
       badge={catalogue[key as ComponentName].experimental ? <ExperimentalMark /> : undefined}

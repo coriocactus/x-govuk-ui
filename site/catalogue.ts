@@ -3424,7 +3424,8 @@ const entries = {
       reference("href", "(page: number) => string", "Required"),
       reference("onPageChange", "(page: number, event) => void"),
       toggle("block", false),
-      reference("previousLabel / nextLabel", "ReactNode"),
+      reference("previousTitle / nextTitle", "ReactNode"),
+      reference("labels", "Partial<PaginationLabels>", "Previous, Next, Page n"),
     ],
     example: [
       number("pageCount", 10, { min: 1, note: "The number of pages.", needs: [whenOff("block")] }),
@@ -3783,7 +3784,7 @@ const entries = {
         ["collapse", "highlight", "active-line", "press", "tooltips", "folding"],
       ),
       reference("SidebarGroup", "{ label, icon, collapsible, defaultOpen }", "Part"),
-      reference("SidebarItem", "{ icon, badge, isActive, tooltip, render }", "Part"),
+      reference("SidebarItem", "{ icon, badge, current, tooltip, render }", "Part"),
       reference("SidebarSubmenu", "{ label, icon, defaultOpen, tooltip, children }", "Part"),
       reference("SidebarInput", "Input props, with a search icon", "Part"),
       reference("SidebarSkeleton", "{ rows, icons }", "Part"),

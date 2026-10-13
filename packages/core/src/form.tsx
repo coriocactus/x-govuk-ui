@@ -11,8 +11,9 @@ import {
   useState,
 } from "react";
 import { AutoHeight } from "./auto-height";
-import { ErrorSummary, ErrorSummaryItem } from "./error-summary";
+import { defaultErrorLabels, ErrorSummary, ErrorSummaryItem } from "./error-summary";
 import { FormContext, type FormField } from "./field";
+import { useLabels } from "./labels";
 import { useMergedRef } from "./refs";
 
 /** A message for each answer that needs fixing, keyed by the name its field submits under. */
@@ -34,9 +35,12 @@ export type FormProps = Omit<ComponentPropsWithRef<"form">, "onSubmit"> & {
     event: FormEvent<HTMLFormElement>,
     // biome-ignore lint/suspicious/noConfusingVoidType: An onSubmit that only sends returns nothing.
   ) => FormErrors | void | Promise<FormErrors | void>;
-  /** The error summary's title. */
+  /** The error summary's title. By default, its `errors` label, "There is a problem". */
   errorTitle?: ReactNode;
-  /** Adds "Error: " to the start of the page's title while there are errors, as GOV.UK asks. */
+  /**
+   * Adds "Error: " to the start of the page's title while there are errors, as GOV.UK asks. The
+   * word is its `errors` label's `prefix`.
+   */
   titlePrefix?: boolean;
   /**
    * Shows the errors in an Error summary above the fields, which takes focus, as GOV.UK does.
@@ -159,7 +163,7 @@ function answer(data: FormData, name: string) {
 export function Form({
   validate,
   onSubmit,
-  errorTitle = "There is a problem",
+  errorTitle,
   titlePrefix = true,
   errorSummary = true,
   defaultValues,
@@ -255,13 +259,15 @@ export function Form({
   };
 
   const failing = problems.length > 0;
+  const { prefix } = useLabels("errors", defaultErrorLabels);
   useEffect(() => {
     if (!titlePrefix || !failing) return;
-    document.title = `Error: ${document.title}`;
+    const start = `${prefix}: `;
+    document.title = `${start}${document.title}`;
     return () => {
-      if (document.title.startsWith("Error: ")) document.title = document.title.slice(7);
+      if (document.title.startsWith(start)) document.title = document.title.slice(start.length);
     };
-  }, [titlePrefix, failing]);
+  }, [titlePrefix, failing, prefix]);
 
   return (
     <FormContext value={context}>

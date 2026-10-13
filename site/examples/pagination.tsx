@@ -28,8 +28,8 @@ export default function PaginationExample({ pageCount = 10, block = false }: Pro
           setPage(target);
         }}
         block={block}
-        previousLabel={guide[current - 2]}
-        nextLabel={guide[current]}
+        previousTitle={guide[current - 2]}
+        nextTitle={guide[current]}
       />
     </div>
   );

@@ -34,6 +34,8 @@ import {
   useLayoutEffect,
   useState,
 } from "react";
+import { defaultErrorLabels } from "./error-summary";
+import { useLabels } from "./labels";
 import { duration, useMotionTiming } from "./motion";
 
 /**
@@ -416,6 +418,7 @@ export function ErrorMessage({
 }: ErrorMessageProps) {
   const timing = useMotionTiming();
   const field = useContext(FieldContext);
+  const labels = useLabels("errors", defaultErrorLabels);
   const id = ownId ?? field?.errorId;
   const children = given ?? field?.errorMessage;
   return (
@@ -430,7 +433,7 @@ export function ErrorMessage({
           transition={timing.ease(duration.medium)}
         >
           <p {...props} className="x-govuk-ui-error" id={id} role="alert">
-            <span className="x-govuk-ui-visually-hidden">Error: </span>
+            <span className="x-govuk-ui-visually-hidden">{labels.prefix}: </span>
             {children}
           </p>
         </motion.div>

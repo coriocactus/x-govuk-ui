@@ -146,7 +146,7 @@ test("the sidebar names its groups and marks the current page", () => {
       <Sidebar label="Account" collapsible="icon">
         <SidebarContent>
           <SidebarGroup label="Your account">
-            <SidebarItem isActive render={<a href="/details" />}>
+            <SidebarItem current render={<a href="/details" />}>
               Personal details
             </SidebarItem>
             <SidebarItem badge={2}>Messages</SidebarItem>

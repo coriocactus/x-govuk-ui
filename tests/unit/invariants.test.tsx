@@ -88,6 +88,7 @@ test("every part that renders an element takes a className", async () => {
   // Roots and providers render nothing of their own, or only through their parts.
   const elementless = new Set([
     "SoundScope",
+    "LabelsProvider",
     "Popover",
     "HoverCard",
     "Sheet",

@@ -1,6 +1,23 @@
 "use client";
 
 import { type ComponentPropsWithRef, type ReactNode, type Ref, useEffect, useRef } from "react";
+import { useLabels } from "./labels";
+
+/** The words about errors, which a LabelsProvider can change, as GOV.UK's Welsh pages do. */
+export type ErrorLabels = {
+  /** The error summary's title. */
+  summaryTitle: string;
+  /**
+   * Starts each error message for screen readers, and the page's title while a Form has errors,
+   * followed by a colon.
+   */
+  prefix: string;
+};
+
+export const defaultErrorLabels: ErrorLabels = {
+  summaryTitle: "There is a problem",
+  prefix: "Error",
+};
 
 export type ErrorSummaryProps = Omit<
   ComponentPropsWithRef<"div">,
@@ -8,6 +25,7 @@ export type ErrorSummaryProps = Omit<
 > & {
   /** The errors, as `ErrorSummaryItem` parts, in the order of the fields. */
   children: ReactNode;
+  /** The title. By default, its `errors` label, "There is a problem". */
   title?: ReactNode;
   /** Text between the title and the list, for a problem that is not about one field. */
   description?: ReactNode;
@@ -38,7 +56,7 @@ const FOCUSABLE =
 /** GOV.UK's summary of the errors on a page, above the form. Each error links to its field. */
 export function ErrorSummary({
   children,
-  title = "There is a problem",
+  title,
   description,
   autoFocus = true,
   className = "",
@@ -46,6 +64,7 @@ export function ErrorSummary({
   ...props
 }: ErrorSummaryProps) {
   const element = useRef<HTMLDivElement>(null);
+  const labels = useLabels("errors", defaultErrorLabels);
   useEffect(() => {
     if (autoFocus) element.current?.focus();
   }, [autoFocus]);
@@ -61,7 +80,7 @@ export function ErrorSummary({
       tabIndex={-1}
     >
       <div role="alert">
-        <h2 className="x-govuk-ui-error-summary-title">{title}</h2>
+        <h2 className="x-govuk-ui-error-summary-title">{title ?? labels.summaryTitle}</h2>
         {description && <div className="x-govuk-ui-error-summary-description">{description}</div>}
         <ul className="x-govuk-ui-error-summary-list">{children}</ul>
       </div>

@@ -12,12 +12,33 @@ import {
 import { Button } from "./button";
 import { useControllableState } from "./controllable-state";
 import { directionOf } from "./helpers";
+import { useLabels, useLocale } from "./labels";
 import { Select, SelectItem } from "./select";
 
 export type DateRange = { from: Date | null; to: Date | null };
 
 // The calendar is a section, which takes the rest of the props.
-type CalendarBase = Omit<ComponentPropsWithRef<"section">, "defaultValue"> & {
+/** The words Calendar writes, which a LabelsProvider or its `labels` can change. */
+export type CalendarLabels = {
+  /** Names the calendar for screen readers. */
+  calendar: string;
+  previousMonth: string;
+  nextMonth: string;
+  /** Names the Select of months. */
+  month: string;
+  /** Names the Select of years. */
+  year: string;
+};
+
+export const defaultCalendarLabels: CalendarLabels = {
+  calendar: "Choose a date",
+  previousMonth: "Previous month",
+  nextMonth: "Next month",
+  month: "Month",
+  year: "Year",
+};
+
+type CalendarBaseProps = Omit<ComponentPropsWithRef<"section">, "defaultValue"> & {
   /** How many months show side by side. */
   months?: 1 | 2;
   /** The earliest and latest dates that can be chosen. */
@@ -25,14 +46,19 @@ type CalendarBase = Omit<ComponentPropsWithRef<"section">, "defaultValue"> & {
   max?: Date;
   /** Dates that cannot be chosen, such as weekends. */
   isDateDisabled?: (date: Date) => boolean;
-  /** The language for the names of months and days, such as "en-GB" or "cy". */
+  /**
+   * The language for the names of months and days, such as "en-GB" or "cy". By default, the
+   * nearest LabelsProvider's, or else "en-GB".
+   */
   locale?: string;
   /** The first day of the week, 1 for Monday, as in the UK, or 0 for Sunday. */
   weekStartsOn?: 0 | 1;
   /** The month shown first when it opens. By default, the chosen date's month, or today's. */
   defaultMonth?: Date;
-  /** Names the calendar for screen readers. */
+  /** Names the calendar for screen readers, in place of its `calendar` label. */
   label?: string;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<CalendarLabels>;
   /**
    * Shows the month and year as Selects, so users can go straight to another month or year, as
    * for a date of birth. With two months, only the first has them.
@@ -45,7 +71,7 @@ type CalendarBase = Omit<ComponentPropsWithRef<"section">, "defaultValue"> & {
   years?: readonly number[];
 };
 
-export type CalendarProps = CalendarBase &
+export type CalendarProps = CalendarBaseProps &
   (
     | {
         /** One date. */
@@ -117,10 +143,11 @@ export function Calendar(props: CalendarProps) {
     min,
     max,
     isDateDisabled,
-    locale = "en-GB",
+    locale: ownLocale,
     weekStartsOn = 1,
     defaultMonth,
-    label = "Choose a date",
+    label,
+    labels: ownLabels,
     monthYearSelects = true,
     years: ownYears,
     className = "",
@@ -131,6 +158,9 @@ export function Calendar(props: CalendarProps) {
     ...rest
   } = props;
   const mode = props.mode ?? "single";
+  const labels = useLabels("calendar", defaultCalendarLabels, ownLabels);
+  const providedLocale = useLocale();
+  const locale = ownLocale ?? providedLocale;
   const today = day(new Date());
 
   // Every mode is kept as a list of dates, with one date, the two ends of a range, or many dates.
@@ -281,7 +311,7 @@ export function Calendar(props: CalendarProps) {
     <section
       {...rest}
       className={`x-govuk-ui-calendar ${className}`.trim()}
-      aria-label={label}
+      aria-label={label ?? labels.calendar}
       data-months={months}
     >
       <div className="x-govuk-ui-calendar-nav">
@@ -289,7 +319,7 @@ export function Calendar(props: CalendarProps) {
           variant="quiet"
           size="small-icon"
           className="x-govuk-ui-calendar-turn"
-          aria-label="Previous month"
+          aria-label={labels.previousMonth}
           disabled={Boolean(min && monthsBetween(startOfMonth(min), month) <= 0)}
           onClick={() => turn(-1)}
         >
@@ -302,7 +332,7 @@ export function Calendar(props: CalendarProps) {
           <div className="x-govuk-ui-calendar-selects">
             <div className="x-govuk-ui-calendar-select" data-part="month">
               <Select
-                label="Month"
+                label={labels.month}
                 hideLabel
                 size="small"
                 value={String(month.getMonth())}
@@ -322,7 +352,7 @@ export function Calendar(props: CalendarProps) {
             </div>
             <div className="x-govuk-ui-calendar-select" data-part="year">
               <Select
-                label="Year"
+                label={labels.year}
                 hideLabel
                 size="small"
                 value={String(month.getFullYear())}
@@ -344,7 +374,7 @@ export function Calendar(props: CalendarProps) {
           variant="quiet"
           size="small-icon"
           className="x-govuk-ui-calendar-turn"
-          aria-label="Next month"
+          aria-label={labels.nextMonth}
           disabled={Boolean(max && monthsBetween(visible.at(-1)!, startOfMonth(max)) <= 0)}
           onClick={() => turn(1)}
         >

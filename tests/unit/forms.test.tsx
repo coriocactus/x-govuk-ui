@@ -38,7 +38,9 @@ import {
   InputControl,
   InputOTP,
   Label,
+  LabelsProvider,
   MultiSelect,
+  Pagination,
   passwordStrength,
   Radio,
   Radios,
@@ -749,4 +751,40 @@ test("the editor sets its source HTML out a block to a line, its inline markup k
       "<p>Line<br>break</p>",
     ].join("\n"),
   );
+});
+
+test("a labels provider gives every component inside it a service's words, and a component's own come first", () => {
+  const welsh = renderToStaticMarkup(
+    <LabelsProvider
+      labels={{
+        locale: "cy",
+        dateInput: { day: "Diwrnod", month: "Mis", year: "Blwyddyn" },
+        errors: { prefix: "Gwall", summaryTitle: "Mae problem wedi codi" },
+        pagination: { previous: "Blaenorol", next: "Nesaf" },
+      }}
+    >
+      <DateInput legend="Dyddiad geni" name="birth" errorMessage="Rhowch ddyddiad" />
+      <ErrorSummary>
+        <ErrorSummaryItem href="#birth-day">Rhowch ddyddiad</ErrorSummaryItem>
+      </ErrorSummary>
+      <LabelsProvider labels={{ pagination: { next: "Ymlaen" } }}>
+        <Pagination page={2} pageCount={3} href={(page) => `?page=${page}`} />
+      </LabelsProvider>
+      <Pagination
+        page={2}
+        pageCount={3}
+        href={(page) => `?page=${page}`}
+        labels={{ previous: "Yn ôl" }}
+      />
+    </LabelsProvider>,
+  );
+  for (const word of ["Diwrnod", "Mis", "Blwyddyn", "Mae problem wedi codi", "Gwall: "])
+    expect(welsh).toContain(word);
+  // An inner provider adds to the outer one's words, and a component's own come before both.
+  expect(welsh).toContain("Blaenorol");
+  expect(welsh).toContain("Ymlaen");
+  expect(welsh).toContain("Yn ôl");
+  // Outside any provider, the words are English.
+  const english = renderToStaticMarkup(<DateInput legend="Date of birth" />);
+  for (const word of ["Day", "Month", "Year"]) expect(english).toContain(word);
 });

@@ -12,6 +12,7 @@ import {
 } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
 import { pagesAround } from "./helpers";
+import { useLabels } from "./labels";
 import { springs, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 
@@ -26,6 +27,26 @@ type Fit = "words" | "arrows" | "few";
 const SLOT = 46;
 const ARROW_LINK = 2 * 5 + 15;
 const ARROW_GAP = 10;
+
+/** The words Pagination writes, which a LabelsProvider or its `labels` can change. */
+export type PaginationLabels = {
+  /** Names the navigation for screen readers. */
+  navigation: string;
+  previous: ReactNode;
+  next: ReactNode;
+  /** Follows Previous and Next for screen readers only, as in "Previous page". */
+  page: string;
+  /** Names a page's number for screen readers, as in "Page 3". */
+  pageNumber: (page: number) => string;
+};
+
+export const defaultPaginationLabels: PaginationLabels = {
+  navigation: "Pagination",
+  previous: "Previous",
+  next: "Next",
+  page: "page",
+  pageNumber: (page) => `Page ${page}`,
+};
 
 export type PaginationProps = Omit<ComponentPropsWithRef<"nav">, "onPageChange" | "aria-label"> & {
   /** The current page, from 1. */
@@ -49,9 +70,10 @@ export type PaginationProps = Omit<ComponentPropsWithRef<"nav">, "onPageChange" 
    */
   block?: boolean;
   /** In block mode, the titles of the previous and next pages. */
-  previousLabel?: ReactNode;
-  nextLabel?: ReactNode;
-  "aria-label"?: string;
+  previousTitle?: ReactNode;
+  nextTitle?: ReactNode;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<PaginationLabels>;
 };
 
 /**
@@ -72,13 +94,14 @@ export function Pagination({
   onPageChange,
   render,
   block = false,
-  previousLabel,
-  nextLabel,
-  "aria-label": label = "Pagination",
+  previousTitle,
+  nextTitle,
+  labels: ownLabels,
   className = "",
   ref,
   ...props
 }: PaginationProps) {
+  const labels = useLabels("pagination", defaultPaginationLabels, ownLabels);
   const id = useId();
   const root = useRef<HTMLElement>(null);
   const merged = useMergedRef(root, ref);
@@ -120,7 +143,7 @@ export function Pagination({
   const step = (direction: "previous" | "next") => {
     const target = direction === "previous" ? page - 1 : page + 1;
     const enabled = target >= 1 && target <= pageCount;
-    const label = direction === "previous" ? previousLabel : nextLabel;
+    const label = direction === "previous" ? previousTitle : nextTitle;
     return (
       <div
         className={`x-govuk-ui-pagination-${direction}`}
@@ -141,8 +164,8 @@ export function Pagination({
             <path d={direction === "previous" ? previousArrow : nextArrow} />
           </svg>
           <span className="x-govuk-ui-pagination-title">
-            {direction === "previous" ? "Previous" : "Next"}
-            <span className="x-govuk-ui-visually-hidden"> page</span>
+            {direction === "previous" ? labels.previous : labels.next}
+            <span className="x-govuk-ui-visually-hidden"> {labels.page}</span>
           </span>
           {/* In block mode the title's line is kept when there is no title, so the pagination
               keeps its height from page to page. */}
@@ -163,15 +186,15 @@ export function Pagination({
       {...props}
       ref={merged}
       className={`x-govuk-ui-pagination ${className}`.trim()}
-      aria-label={label}
+      aria-label={labels.navigation}
       data-block={block || undefined}
       data-fit={block ? undefined : fit}
     >
       {/* Previous and Next in words, out of sight, so what they need is known in any fit. */}
       {!block && (
         <span className="x-govuk-ui-pagination-measure" aria-hidden="true">
-          <span className="x-govuk-ui-pagination-title">Previous</span>
-          <span className="x-govuk-ui-pagination-title">Next</span>
+          <span className="x-govuk-ui-pagination-title">{labels.previous}</span>
+          <span className="x-govuk-ui-pagination-title">{labels.next}</span>
         </span>
       )}
       {step("previous")}
@@ -205,7 +228,7 @@ export function Pagination({
                     render={render}
                     className="x-govuk-ui-pagination-number"
                     href={href(item)}
-                    aria-label={`Page ${item}`}
+                    aria-label={labels.pageNumber(item)}
                     aria-current={item === page ? "page" : undefined}
                     onClick={follow(item)}
                   >

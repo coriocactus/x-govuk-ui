@@ -247,7 +247,7 @@ export default function SidebarExample({
                           {item.children.map((child) => (
                             <SidebarItem
                               key={child}
-                              isActive={child === current}
+                              current={child === current}
                               onClick={() => setCurrent(child)}
                             >
                               {child}
@@ -259,7 +259,7 @@ export default function SidebarExample({
                           key={item.name}
                           icon={show.includes("icons") ? item.icon : undefined}
                           badge={show.includes("badges") ? item.badge : undefined}
-                          isActive={item.name === current}
+                          current={item.name === current}
                           onClick={() => setCurrent(item.name)}
                           action={
                             menus ? (

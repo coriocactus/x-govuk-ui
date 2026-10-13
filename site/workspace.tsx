@@ -458,7 +458,7 @@ function Shell() {
         key={name}
         icon={<Icon name={item.icon} size={18} />}
         badge={"badge" in item ? item.badge : undefined}
-        isActive={name === current}
+        current={name === current}
         onClick={() => setCurrent(item.name)}
         action={<SidebarItemMenu arranger={arranger} id={name} />}
       >

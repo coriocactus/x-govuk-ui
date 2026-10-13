@@ -5,10 +5,29 @@ import { useControllableState } from "./controllable-state";
 import { Dial } from "./dial";
 import { ErrorMessage, Field, Hint, useField, useFormDefault } from "./field";
 import { FieldsetLegend } from "./fieldset";
+import { useLabels } from "./labels";
 import { ToggleGroup, ToggleGroupItem } from "./toggle-group";
 
 export type TimeParts = { hour: string; minute: string; period?: string };
 type Part = keyof TimeParts;
+
+/** The words Time input writes, which a LabelsProvider or its `labels` can change. */
+export type TimeInputLabels = {
+  hour: string;
+  minute: string;
+  /** Names the choice of am or pm, on a 12-hour clock. */
+  period: string;
+  am: string;
+  pm: string;
+};
+
+export const defaultTimeInputLabels: TimeInputLabels = {
+  hour: "Hour",
+  minute: "Minute",
+  period: "am or pm",
+  am: "am",
+  pm: "pm",
+};
 
 export type TimeInputProps = Omit<
   ComponentPropsWithRef<"fieldset">,
@@ -20,7 +39,7 @@ export type TimeInputProps = Omit<
   /** Puts the legend in the page's `h1`, for a page that asks one question. */
   pageHeading?: boolean;
   hint?: ReactNode;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   /** The fields the error is about. By default, all of them. */
   errorFields?: Part[];
   /**
@@ -36,6 +55,8 @@ export type TimeInputProps = Omit<
   hourCycle?: 12 | 24;
   /** The minutes the dial stops at, such as 5 for every five minutes. Typing takes any minute. */
   minuteStep?: number;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<TimeInputLabels>;
   /** What has been typed, as text, because a time can be partly entered. */
   value?: TimeParts;
   defaultValue?: TimeParts;
@@ -67,6 +88,7 @@ export function TimeInput({
   name,
   hourCycle = 24,
   minuteStep = 1,
+  labels: ownLabels,
   value,
   defaultValue,
   onValueChange,
@@ -75,6 +97,7 @@ export function TimeInput({
   ...props
 }: TimeInputProps) {
   const generated = useId();
+  const labels = useLabels("timeInput", defaultTimeInputLabels, ownLabels);
   const groupId = id ?? `time-${generated}`;
   const field = useField({
     id: groupId,
@@ -88,7 +111,8 @@ export function TimeInput({
       const [hour, minute, period] = ["hour", "minute", "period"].map((part) =>
         String(data.get(`${name}-${part}`) ?? "").trim(),
       );
-      return hour ? `${hour}:${minute || "00"}${period ? ` ${period}` : ""}` : undefined;
+      const half = period === "am" ? labels.am : period === "pm" ? labels.pm : "";
+      return hour ? `${hour}:${minute || "00"}${half ? ` ${half}` : ""}` : undefined;
     },
   });
   // A Form can give the fields an answer to start with, such as one kept from an earlier visit.
@@ -110,13 +134,13 @@ export function TimeInput({
   const dials: { part: Part; label: string; options: string[]; width: number }[] = [
     {
       part: "hour",
-      label: "Hour",
+      label: labels.hour,
       options: twelve ? range(1, 12).map(String) : range(0, 23).map(pad),
       width: 2,
     },
     {
       part: "minute",
-      label: "Minute",
+      label: labels.minute,
       options: range(0, 59, Math.max(1, minuteStep)).map(pad),
       width: 2,
     },
@@ -161,15 +185,15 @@ export function TimeInput({
           {twelve && (
             <div className="x-govuk-ui-date-input-item x-govuk-ui-time-input-period">
               <ToggleGroup
-                aria-label="am or pm"
+                aria-label={labels.period}
                 id={`${groupId}-period`}
                 disabled={disabled}
                 data-invalid={invalid("period") || undefined}
                 value={parts.period ? [parts.period] : []}
                 onValueChange={([next]) => set({ ...parts, period: next ?? "" })}
               >
-                <ToggleGroupItem value="am">am</ToggleGroupItem>
-                <ToggleGroupItem value="pm">pm</ToggleGroupItem>
+                <ToggleGroupItem value="am">{labels.am}</ToggleGroupItem>
+                <ToggleGroupItem value="pm">{labels.pm}</ToggleGroupItem>
               </ToggleGroup>
               {name && <input type="hidden" name={`${name}-period`} value={parts.period ?? ""} />}
             </div>

@@ -44,7 +44,13 @@ export {
   type BubbleVariant,
 } from "./bubble";
 export { Button, ButtonGroup, type ButtonGroupProps, type ButtonProps } from "./button";
-export { Calendar, type CalendarProps, type DateRange } from "./calendar";
+export {
+  Calendar,
+  type CalendarLabels,
+  type CalendarProps,
+  type DateRange,
+  defaultCalendarLabels,
+} from "./calendar";
 export {
   Callout,
   type CalloutAnchor,
@@ -188,7 +194,12 @@ export {
 export { CookieBanner, type CookieBannerProps, type CookieChoice } from "./cookie-banner";
 export { CopyButton, type CopyButtonProps, type CopyLabels } from "./copy";
 export { DataTable, type DataTableColumn, type DataTableProps } from "./data-table";
-export { DateInput, type DateInputProps } from "./date-input";
+export {
+  DateInput,
+  type DateInputLabels,
+  type DateInputProps,
+  defaultDateInputLabels,
+} from "./date-input";
 export {
   Details,
   DetailsPanel,
@@ -219,6 +230,8 @@ export {
   type EmptyStateTitleProps,
 } from "./empty-state";
 export {
+  defaultErrorLabels,
+  type ErrorLabels,
   ErrorSummary,
   ErrorSummaryItem,
   type ErrorSummaryItemProps,
@@ -328,10 +341,24 @@ export {
 } from "./icons";
 export { ImageGeneration, type ImageGenerationProps } from "./image-generation";
 export { type CitationSource, InlineCitation, type InlineCitationProps } from "./inline-citation";
-export { Input, InputControl, type InputControlProps, type InputProps } from "./input";
+export {
+  defaultInputLabels,
+  Input,
+  InputControl,
+  type InputControlProps,
+  type InputLabels,
+  type InputProps,
+} from "./input";
 export { InputOTP, type InputOTPProps } from "./input-otp";
 export { InsetText, type InsetTextProps } from "./inset-text";
 export { Kbd, type KbdProps } from "./kbd";
+export {
+  type ComponentLabels,
+  type Labels,
+  LabelsProvider,
+  type LabelsProviderProps,
+  useLocale,
+} from "./labels";
 export {
   LanguageNavigation,
   LanguageNavigationItem,
@@ -423,7 +450,12 @@ export {
   type ServicePageLink,
   type ServicePageProps,
 } from "./page";
-export { Pagination, type PaginationProps } from "./pagination";
+export {
+  defaultPaginationLabels,
+  Pagination,
+  type PaginationLabels,
+  type PaginationProps,
+} from "./pagination";
 export { Panel, type PanelProps } from "./panel";
 export { PhaseBanner, type PhaseBannerProps } from "./phase-banner";
 export {
@@ -613,7 +645,13 @@ export {
   type UseThemeOptions,
   useTheme,
 } from "./theme-picker";
-export { TimeInput, type TimeInputProps, type TimeParts } from "./time-input";
+export {
+  defaultTimeInputLabels,
+  TimeInput,
+  type TimeInputLabels,
+  type TimeInputProps,
+  type TimeParts,
+} from "./time-input";
 export {
   Timeline,
   TimelineItem,

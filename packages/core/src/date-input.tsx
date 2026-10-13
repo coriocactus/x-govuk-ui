@@ -9,12 +9,13 @@ import { Dial } from "./dial";
 import { ErrorMessage, Field, Hint, useField, useFormDefault } from "./field";
 import { FieldsetLegend } from "./fieldset";
 import { type DateParts, dateFromParts } from "./helpers";
+import { useLabels, useLocale } from "./labels";
 import { useOverlaySound } from "./overlay";
 
 export type { DateParts };
 
 /** A date as Check your answers shows it, such as 5 January 2026, or as typed if it is no date. */
-function dateAnswer(data: FormData, name: string) {
+function dateAnswer(data: FormData, name: string, locale: string) {
   const [day, month, year] = ["day", "month", "year"].map((part) =>
     String(data.get(`${name}-${part}`) ?? "").trim(),
   );
@@ -32,6 +33,25 @@ const numbers = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, index) => String(from + index));
 type Part = keyof DateParts;
 
+/** The words Date input writes, which a LabelsProvider or its `labels` can change. */
+export type DateInputLabels = {
+  day: string;
+  month: string;
+  year: string;
+  /** Names the button that opens the calendar. */
+  calendar: string;
+  /** Names the calendar that the button opens. */
+  chooseDate: string;
+};
+
+export const defaultDateInputLabels: DateInputLabels = {
+  day: "Day",
+  month: "Month",
+  year: "Year",
+  calendar: "Choose the date from a calendar",
+  chooseDate: "Choose the date",
+};
+
 export type DateInputProps = Omit<
   ComponentPropsWithRef<"fieldset">,
   "id" | "name" | "defaultValue" | "onValueChange" | "disabled"
@@ -42,7 +62,7 @@ export type DateInputProps = Omit<
   /** Puts the legend in the page's `h1`, for a page that asks one question. */
   pageHeading?: boolean;
   hint?: ReactNode;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   /** The fields the error is about. By default, all three. */
   errorFields?: Part[];
   /**
@@ -58,6 +78,8 @@ export type DateInputProps = Omit<
   onValueChange?: (value: DateParts) => void;
   /** Offers a calendar to pick the date from, beside the fields. */
   calendar?: boolean;
+  /** Its words, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<DateInputLabels>;
   /** The earliest and latest dates the calendar offers. */
   min?: Date;
   max?: Date;
@@ -103,6 +125,7 @@ export function DateInput({
   defaultValue,
   onValueChange,
   calendar = false,
+  labels: ownLabels,
   min,
   max,
   autoCompleteBirthday = false,
@@ -112,6 +135,8 @@ export function DateInput({
 }: DateInputProps) {
   const generated = useId();
   const groupId = id ?? `date-${generated}`;
+  const labels = useLabels("dateInput", defaultDateInputLabels, ownLabels);
+  const locale = useLocale();
   const field = useField({
     id: groupId,
     name,
@@ -119,7 +144,7 @@ export function DateInput({
     hint,
     errorMessage,
     label: legend,
-    answer: (data) => (name ? dateAnswer(data, name) : undefined),
+    answer: (data) => (name ? dateAnswer(data, name, locale) : undefined),
   });
   // A Form can give the fields an answer to start with, such as one kept from an earlier visit.
   const savedDay = useFormDefault(name && `${name}-day`)?.[0];
@@ -186,9 +211,9 @@ export function DateInput({
         <Hint id={field.hintId}>{hint}</Hint>
         <ErrorMessage id={field.errorId}>{field.errorMessage}</ErrorMessage>
         <div className={`x-govuk-ui-date-input ${className}`.trim()}>
-          {input("day", "Day")}
-          {input("month", "Month")}
-          {input("year", "Year")}
+          {input("day", labels.day)}
+          {input("month", labels.month)}
+          {input("year", labels.year)}
           {calendar && (
             <Primitive.Root
               open={open}
@@ -203,7 +228,7 @@ export function DateInput({
                     variant="outline"
                     size="icon"
                     className="x-govuk-ui-date-input-picker"
-                    aria-label="Choose the date from a calendar"
+                    aria-label={labels.calendar}
                     disabled={disabled}
                   >
                     {calendarIcon}
@@ -232,7 +257,7 @@ export function DateInput({
                       value={chosen}
                       min={min}
                       max={max}
-                      label="Choose the date"
+                      label={labels.chooseDate}
                       onValueChange={(date) => {
                         if (!date) return;
                         set({

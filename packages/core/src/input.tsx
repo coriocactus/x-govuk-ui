@@ -18,6 +18,7 @@ import {
   useFormDefault,
 } from "./field";
 import { passwordStrength } from "./helpers";
+import { useLabels } from "./labels";
 
 export type InputProps = Omit<ComponentPropsWithRef<"input">, "prefix"> & {
   label: ReactNode;
@@ -37,9 +38,38 @@ export type InputProps = Omit<ComponentPropsWithRef<"input">, "prefix"> & {
    * can make it stronger before they continue.
    */
   strength?: boolean;
+  /** Its words for a password, in place of a LabelsProvider's or the defaults. */
+  labels?: Partial<InputLabels>;
 };
 
-const strengthWords = ["Too short", "Weak", "Fair", "Good", "Strong"];
+/** The words Input writes for a password, which a LabelsProvider or its `labels` can change. */
+export type InputLabels = {
+  show: string;
+  hide: string;
+  /** Names the Show button for screen readers. */
+  showPassword: string;
+  /** Names the Hide button for screen readers. */
+  hidePassword: string;
+  /** Tells screen readers that the password shows. */
+  passwordShown: string;
+  /** Tells screen readers that the password is covered again. */
+  passwordHidden: string;
+  /** Heads the strength meter. */
+  strength: string;
+  /** The strength meter's word for each score, from too short to strong. */
+  strengths: readonly [string, string, string, string, string];
+};
+
+export const defaultInputLabels: InputLabels = {
+  show: "Show",
+  hide: "Hide",
+  showPassword: "Show password",
+  hidePassword: "Hide password",
+  passwordShown: "Your password is visible",
+  passwordHidden: "Your password is hidden",
+  strength: "Password strength",
+  strengths: ["Too short", "Weak", "Fair", "Good", "Strong"],
+};
 
 /**
  * A familiar field, with GOV.UK's label, hint and error. With `type="password"`, it is GOV.UK's
@@ -76,7 +106,7 @@ export function Input({
 }
 
 export type InputControlProps = Omit<ComponentPropsWithRef<"input">, "prefix"> &
-  Pick<InputProps, "prefix" | "suffix" | "strength">;
+  Pick<InputProps, "prefix" | "suffix" | "strength" | "labels">;
 
 /**
  * Input's control on its own, for a field composed from Field's parts. It is the text box, with its
@@ -88,11 +118,13 @@ export function InputControl(given: InputControlProps) {
     prefix,
     suffix,
     strength = false,
+    labels: ownLabels,
     type = "text",
     className = "",
     onChange,
     ...props
   } = useControlProps(given);
+  const labels = useLabels("input", defaultInputLabels, ownLabels);
   // The Show button and the strength meter name the box by its id, so it always has one.
   const generated = useId();
   const controlId = props.id ?? `input-${generated}`;
@@ -171,14 +203,14 @@ export function InputControl(given: InputControlProps) {
               type="button"
               className="x-govuk-ui-input-reveal"
               aria-controls={controlId}
-              aria-label={shown ? "Hide password" : "Show password"}
+              aria-label={shown ? labels.hidePassword : labels.showPassword}
               disabled={props.disabled}
               onClick={() => {
                 setShown(!shown);
-                setAnnouncement(shown ? "Your password is hidden" : "Your password is visible");
+                setAnnouncement(shown ? labels.passwordHidden : labels.passwordShown);
               }}
             >
-              {shown ? "Hide" : "Show"}
+              {shown ? labels.hide : labels.show}
             </button>
           )}
         </div>
@@ -198,7 +230,7 @@ export function InputControl(given: InputControlProps) {
             ))}
           </span>
           <span className="x-govuk-ui-password-strength-word">
-            {value ? `Password strength: ${strengthWords[score]}` : "Password strength"}
+            {value ? `${labels.strength}: ${labels.strengths[score]}` : labels.strength}
           </span>
         </div>
       )}

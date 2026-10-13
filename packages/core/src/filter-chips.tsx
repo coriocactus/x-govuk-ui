@@ -15,7 +15,7 @@ import {
   useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
-import { useField } from "./field";
+import { useField, useFormDefault } from "./field";
 import { duration, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 
@@ -73,7 +73,7 @@ export function FilterChips({
   children,
   label,
   value,
-  defaultValue = [],
+  defaultValue,
   onValueChange,
   multiple = true,
   size = "medium",
@@ -83,7 +83,14 @@ export function FilterChips({
   ref,
   ...props
 }: FilterChipsProps) {
-  const [chosen, setChosen] = useControllableState(value, defaultValue, onValueChange);
+  // A Form can give the filters their answers to start with, such as ones kept from an earlier
+  // visit.
+  const saved = useFormDefault(name);
+  const [chosen, setChosen] = useControllableState(
+    value,
+    () => defaultValue ?? saved ?? [],
+    onValueChange,
+  );
   const [labels] = useState(() => new Map<string, ReactNode>());
   const field = useField({
     id: ownId,
@@ -268,7 +275,11 @@ export function FilterChip({
 }: FilterChipProps) {
   const labels = useContext(ChipLabels);
   useLayoutEffect(() => {
-    labels?.set(value, children);
+    if (!labels) return;
+    labels.set(value, children);
+    return () => {
+      if (labels.get(value) === children) labels.delete(value);
+    };
   });
   return (
     <Toggle

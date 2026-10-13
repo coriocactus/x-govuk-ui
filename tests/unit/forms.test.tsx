@@ -38,6 +38,7 @@ import {
   FileUpload,
   FilterChip,
   FilterChips,
+  Form,
   Hint,
   Input,
   InputControl,
@@ -840,6 +841,19 @@ test("a toggle group and filter chips with a name send their chosen values with 
     </FilterChips>,
   );
   expect(chips.match(/<input type="hidden" name="status"/g)).toHaveLength(2);
+  // A Form's kept answers start them, and a disabled group sends nothing.
+  const restored = renderToStaticMarkup(
+    <Form defaultValues={{ view: "list", status: ["closed"] }}>
+      <ToggleGroup aria-label="View" name="view" disabled>
+        <ToggleGroupItem value="list">List</ToggleGroupItem>
+      </ToggleGroup>
+      <FilterChips label="Status" name="status">
+        <FilterChip value="closed">Closed</FilterChip>
+      </FilterChips>
+    </Form>,
+  );
+  expect(restored).toContain('<input type="hidden" disabled="" name="view" value="list"/>');
+  expect(restored).toContain('<input type="hidden" name="status" value="closed"/>');
   // Without a name, nothing is sent.
   expect(
     renderToStaticMarkup(

@@ -13,7 +13,7 @@ import {
   useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
-import { useField } from "./field";
+import { useField, useFormDefault } from "./field";
 import { springs, useMotionTiming } from "./motion";
 
 type GroupContextValue = {
@@ -57,7 +57,7 @@ export type ToggleGroupProps = Omit<
 export function ToggleGroup({
   children,
   value: controlled,
-  defaultValue = [],
+  defaultValue,
   onValueChange,
   multiple = false,
   disabled = false,
@@ -68,7 +68,13 @@ export function ToggleGroup({
   ...props
 }: ToggleGroupProps) {
   const id = useId();
-  const [value, setValue] = useControllableState(controlled, defaultValue, onValueChange);
+  // A Form can give the group its answers to start with, such as ones kept from an earlier visit.
+  const saved = useFormDefault(name);
+  const [value, setValue] = useControllableState(
+    controlled,
+    () => defaultValue ?? saved ?? [],
+    onValueChange,
+  );
   const [labels] = useState(() => new Map<string, ReactNode>());
   const field = useField({
     id: ownId,
@@ -93,7 +99,10 @@ export function ToggleGroup({
         }}
       >
         {children}
-        {name && value.map((each) => <input key={each} type="hidden" name={name} value={each} />)}
+        {name &&
+          value.map((each) => (
+            <input key={each} type="hidden" name={name} value={each} disabled={disabled} />
+          ))}
       </Primitive>
     </GroupContext>
   );
@@ -119,6 +128,9 @@ export function ToggleGroupItem({
   const { labels } = group;
   useLayoutEffect(() => {
     labels.set(value, children);
+    return () => {
+      if (labels.get(value) === children) labels.delete(value);
+    };
   });
   return (
     <Toggle {...props} value={value} className={`x-govuk-ui-toggle ${className}`.trim()}>

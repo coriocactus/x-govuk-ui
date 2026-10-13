@@ -51,8 +51,18 @@ test("sidebar sub-items fold, and icons open the sidebar and the submenu togethe
   const applications = frame.getByRole("button", { name: "Applications" });
   await expect(applications).toHaveAttribute("aria-expanded", "false");
   await applications.click();
-  // The submenu opens before a sub-item is pressed, as a user waits for it to.
+  // The submenu opens before a sub-item is pressed, as a user waits for it to. It grows to its
+  // height first. While it grows, Linux's WebKit can press a sub-item that is still on its way.
   await expect(applications).toHaveAttribute("aria-expanded", "true");
+  const submenu = frame.locator(".x-govuk-ui-sidebar-group-panel", { hasText: "Submitted" });
+  await expect
+    .poll(() =>
+      submenu.evaluate(
+        (element) =>
+          element.getAnimations().filter((animation) => animation.playState === "running").length,
+      ),
+    )
+    .toBe(0);
   await frame.getByRole("button", { name: "Submitted" }).click();
   await expect(frame.getByRole("button", { name: "Submitted" })).toHaveAttribute(
     "aria-current",

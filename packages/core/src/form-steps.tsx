@@ -28,6 +28,7 @@ import { useLabels } from "./labels";
 import { Panel } from "./panel";
 import { useLatest, useMergedRef } from "./refs";
 import { type Registry, useRegister, useRegistry } from "./registry";
+import { stepAnswers } from "./step-answers";
 import { SummaryList, SummaryListAction, SummaryListRow } from "./summary-list";
 import { Tag } from "./tag";
 
@@ -491,46 +492,23 @@ export function FormSteps({
     rememberSoon.current = 0;
     const element = form.current;
     if (!keeping.current || !storageKey || !element) return;
-    // The answers of the steps that apply now, even before they are drawn so, read in one task, so
-    // nothing is drawn between. A step that a change has just brought in is still disabled, so it
-    // is opened while the answers are read. A step that applies no longer, even the one on show,
-    // has its controls' names taken off while the answers are read. Disabling the step instead
-    // would take the focus from a field in use in Chrome, and a `form` that names no form leaves a
-    // control without its form in Firefox once it is taken off. Steps that never apply together can
-    // therefore ask under one name.
-    const applies = new Set(planFor().filter((index) => !skipping.has(index)));
-    const steps = [...element.querySelectorAll<HTMLFieldSetElement>("fieldset[data-step]")];
-    const appliesTo = (fieldset: HTMLFieldSetElement) => applies.has(Number(fieldset.dataset.step));
-    const opened = steps.filter((fieldset) => fieldset.disabled && appliesTo(fieldset));
-    const leftOut = steps
-      .filter((fieldset) => !fieldset.disabled && !appliesTo(fieldset))
-      .flatMap((fieldset) => [...fieldset.elements]);
-    const leftNames = leftOut.map((control) => control.getAttribute("name"));
-    let data: FormData;
-    try {
-      for (const fieldset of opened) fieldset.disabled = false;
-      for (const control of leftOut) control.removeAttribute("name");
-      data = new FormData(element);
-    } finally {
-      for (const fieldset of opened) fieldset.disabled = true;
-      leftOut.forEach((control, place) => {
-        const name = leftNames[place];
-        if (name !== null && name !== undefined) control.setAttribute("name", name);
-      });
-    }
-    const answers = [...data.entries()].flatMap(([name, value]) =>
+    // The answers of the steps that apply now, even before the page shows them so.
+    const applies = planFor().filter((index) => !skipping.has(index));
+    const sent = stepAnswers(element, applies);
+    const answers = sent.flatMap(([name, value]) =>
       typeof value === "string" ? [[name, value] as [string, string]] : [],
     );
     // A field that sends nothing is kept as empty, so it comes back empty. A field on a step that
     // was skipped or does not apply sends nothing because its answers are left out, so it is not
     // kept, and comes back at its own default.
-    const live = new Set([...applies].map((index) => registered[index]?.id));
+    const live = new Set(applies.map((index) => registered[index]?.id));
     const names = new Set(
       [...stepFields.current]
         .filter(([id]) => live.has(id))
         .flatMap(([, fields]) => [...fields.keys()]),
     );
-    const empty = [...names].filter((name) => !data.has(name));
+    const given = new Set(sent.map(([name]) => name));
+    const empty = [...names].filter((name) => !given.has(name));
     writeSaved(storageKey, {
       at: where,
       passed: [...passing],

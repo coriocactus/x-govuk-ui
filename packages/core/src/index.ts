@@ -204,7 +204,10 @@ export {
 } from "./combobox";
 export {
   CommandMenu,
+  CommandMenuBestMatches,
+  type CommandMenuBestMatchesProps,
   CommandMenuClose,
+  type CommandMenuCommand,
   CommandMenuContent,
   type CommandMenuContentProps,
   CommandMenuGroup,
@@ -218,6 +221,8 @@ export {
   CommandMenuTrigger,
   type CommandMenuTriggerProps,
   defaultCommandMenuLabels,
+  matchesCommand,
+  rankCommandByName,
 } from "./command-menu";
 export { useControllableState } from "./controllable-state";
 export {

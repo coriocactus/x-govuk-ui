@@ -7,13 +7,16 @@ import {
   createContext,
   type ReactNode,
   type RefObject,
+  useCallback,
   useContext,
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { Button, type ButtonProps, withoutButtonLook } from "./button";
 import { useControllableState } from "./controllable-state";
 import { chain } from "./events";
@@ -26,7 +29,22 @@ import { ScrollArea } from "./scroll-area";
 import { shortcutKeys } from "./shortcut";
 import { useScopeSound } from "./sound-scope";
 
-type Entry = { text: string; page: string | null };
+/** A command as the search reads it. */
+export type CommandMenuCommand = {
+  /** Its name, as plain text, or empty where its label is not text and it has no `textValue`. */
+  name: string;
+  /** Its description, as plain text, or empty where it has none, or where it is not text. */
+  description: string;
+  keywords: readonly string[];
+};
+
+type Entry = { command: CommandMenuCommand; page: string | null };
+
+/** How a CommandMenuBestMatches ranks commands, and how many it shows. */
+type BestMatches = {
+  rank: (search: string, command: CommandMenuCommand) => number | null;
+  limit: number;
+};
 type Page = { id: string; label: string; placeholder?: string };
 
 type MenuContextValue = {
@@ -34,6 +52,10 @@ type MenuContextValue = {
   page: string | null;
   /** The commands that match the search on the open page. */
   visible: Set<string>;
+  /** Each command shown among the best matches, by its place there. */
+  best: Map<string, number>;
+  /** Where each best match is drawn, by its place, once a CommandMenuBestMatches is there. */
+  slots: (HTMLElement | null)[];
   entries: Map<string, Entry>;
   pages: Map<string, Page>;
   /** Opens a page, or closes the menu and runs the command. */
@@ -50,11 +72,27 @@ function useMenu(part: string) {
   return context;
 }
 
-/** Every word of the query must appear somewhere in the item's text. */
-function matches(query: string, text: string) {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const haystack = text.toLowerCase();
+/**
+ * The search a CommandMenu makes by default. Every word of the search appears somewhere in the
+ * command's name, description or keywords.
+ */
+export function matchesCommand(search: string, command: CommandMenuCommand) {
+  const words = search.toLowerCase().split(/\s+/).filter(Boolean);
+  const haystack = [command.name, command.description, ...command.keywords].join(" ").toLowerCase();
   return words.every((word) => haystack.includes(word));
+}
+
+/**
+ * How a CommandMenuBestMatches ranks commands by default, lower first. A command whose name is the
+ * search ranks 0, and one whose name starts with it ranks 1. Any other is not a best match, such as
+ * one the search finds only by a group's keyword.
+ */
+export function rankCommandByName(search: string, command: CommandMenuCommand) {
+  const typed = search.trim().toLowerCase();
+  const name = command.name.trim().toLowerCase();
+  if (!typed || !name) return null;
+  if (name === typed) return 0;
+  return name.startsWith(typed) ? 1 : null;
 }
 
 /**
@@ -118,6 +156,8 @@ export type CommandMenuLabels = {
   close: string;
   /** The first page in the trail of pages opened. */
   home: string;
+  /** Heads the commands that best match the search, in a CommandMenuBestMatches. */
+  best: string;
 };
 
 export const defaultCommandMenuLabels: CommandMenuLabels = {
@@ -129,6 +169,7 @@ export const defaultCommandMenuLabels: CommandMenuLabels = {
   home: "Home",
   help: "Use the arrow keys to choose a command, then press Enter.",
   helpBack: "Press Backspace to go back.",
+  best: "Best matches",
 };
 
 export type CommandMenuProps = {
@@ -143,6 +184,12 @@ export type CommandMenuProps = {
   disabled?: boolean;
   /** Its words, in place of a LabelsProvider's or the defaults. */
   labels?: Partial<CommandMenuLabels>;
+  /**
+   * Whether a command matches the search, such as by a fuzzy match of your own. By default,
+   * `matchesCommand`, where every word of the search is in the command's name, description or
+   * keywords.
+   */
+  filter?: (search: string, command: CommandMenuCommand) => boolean;
 };
 
 /** What the menu's trigger and content share, from its root. */
@@ -164,6 +211,10 @@ type Shared = {
   setOrder: (order: string[]) => void;
   navigated: boolean;
   back: (depth: number) => void;
+  /** Tells the menu how a CommandMenuBestMatches ranks, while it is there. */
+  rankWith: (best: BestMatches | null) => void;
+  /** Tells the menu where each best match is drawn. */
+  setSlots: (slots: (HTMLElement | null)[]) => void;
 };
 
 const SharedContext = createContext<Shared | null>(null);
@@ -187,6 +238,7 @@ export function CommandMenu({
   keyboardShortcut = true,
   disabled = false,
   labels: ownLabels,
+  filter = matchesCommand,
 }: CommandMenuProps) {
   const labels = useLabels("commandMenu", defaultCommandMenuLabels, ownLabels);
   const play = useScopeSound();
@@ -206,11 +258,32 @@ export function CommandMenu({
   const pages = useRef(new Map<string, Page>()).current;
   const page = stack.at(-1) ?? null;
   const current = page ? pages.get(page) : undefined;
-  // Base UI highlights and moves through these, in this order.
+  // The commands that match, in the order the page shows them. A command among the best matches
+  // is drawn there, so the page's order follows it, and Base UI highlights and moves through them
+  // in this order.
   const visible = order.filter((id) => {
     const entry = entries.get(id);
-    return entry?.page === page && matches(query, entry.text);
+    return entry?.page === page && filter(query, entry.command);
   });
+  // How a CommandMenuBestMatches ranks, and where it draws, while it is there.
+  const [bestMatches, rankWith] = useState<BestMatches | null>(null);
+  const [slots, setSlots] = useState<(HTMLElement | null)[]>([]);
+  const best = new Map<string, number>();
+  if (bestMatches && query.trim()) {
+    // Ties keep the order the commands were written in, wherever they show now.
+    const written = new Map([...entries.keys()].map((id, place) => [id, place]));
+    visible
+      .flatMap((id) => {
+        const command = entries.get(id)?.command;
+        const rank = command ? bestMatches.rank(query, command) : null;
+        return rank === null ? [] : [{ id, place: written.get(id) ?? 0, rank }];
+      })
+      .sort((a, b) => a.rank - b.rank || a.place - b.place)
+      .slice(0, bestMatches.limit)
+      .forEach(({ id }, place) => {
+        best.set(id, place);
+      });
+  }
 
   const go = (next: string[]) => {
     setNavigated(true);
@@ -253,6 +326,8 @@ export function CommandMenu({
       value={{
         page,
         visible: new Set(visible),
+        best,
+        slots,
         entries,
         pages,
         choose: (opens, onSelect) => {
@@ -304,6 +379,8 @@ export function CommandMenu({
               setOrder,
               navigated,
               back,
+              rankWith,
+              setSlots,
             }}
           >
             {children}
@@ -580,21 +657,21 @@ export function CommandMenuItem({
   const menu = useMenu("CommandMenuItem");
   const page = useContext(PageContext);
   const id = useId();
-  const text = [
-    textValue ?? (typeof children === "string" ? children : ""),
-    typeof description === "string" ? description : "",
-    ...keywords,
-  ].join(" ");
-  // The menu filters by this text before the commands render.
+  const command: CommandMenuCommand = {
+    name: textValue ?? (typeof children === "string" ? children : ""),
+    description: typeof description === "string" ? description : "",
+    keywords,
+  };
+  // The menu searches these before the commands render.
   useLayoutEffect(() => {
-    menu.entries.set(id, { text, page });
+    menu.entries.set(id, { command, page });
   });
   useLayoutEffect(() => () => void menu.entries.delete(id), [menu.entries, id]);
 
   if (page !== menu.page) return null;
   // A command that does not match leaves a marker, so the list still knows its place.
   if (!menu.visible.has(id)) return <span data-command={id} hidden />;
-  return (
+  const item = (
     <Autocomplete.Item
       {...props}
       value={id}
@@ -626,6 +703,84 @@ export function CommandMenuItem({
         shortcut && <Kbd aria-hidden="true">{shortcut}</Kbd>
       )}
     </Autocomplete.Item>
+  );
+  // A best match is drawn among the best matches, through a portal, so it stays in its own place
+  // in React's tree, with every context, ref and handler a service gave it.
+  const place = menu.best.get(id);
+  const slot = place === undefined ? null : menu.slots[place];
+  return slot ? createPortal(item, slot) : item;
+}
+
+/** The parts of a menu's best matches, from CommandMenuBestMatches's props. */
+export type CommandMenuBestMatchesProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
+  /** Its heading. By default, its `best` label, "Best matches". */
+  label?: string;
+  /** The most commands it shows. */
+  limit?: number;
+  /**
+   * How well the search names a command, lower first, or null where it is not a best match. By
+   * default, `rankCommandByName`, where a command whose name is the search comes first, then those
+   * whose names start with it. Ties keep the order the commands were written in.
+   */
+  rank?: (search: string, command: CommandMenuCommand) => number | null;
+};
+
+/**
+ * The commands that best match the search, shown together as users search, such as before every
+ * group, so a command named as typed is never lost beneath a group whose keywords match too.
+ * Place it among the groups, where the best matches should show. Each command shown here moves
+ * from its place, so it is listed once. Without it, the groups keep their order alone.
+ */
+export function CommandMenuBestMatches({
+  label,
+  limit = 3,
+  rank = rankCommandByName,
+  className = "",
+  ...props
+}: CommandMenuBestMatchesProps) {
+  const { labels, rankWith, setSlots } = useShared("CommandMenuBestMatches");
+  const latest = useLatest(rank);
+  // The menu ranks with the latest `rank`, so a function written inline does not rank again at
+  // every render.
+  const ranking = useCallback(
+    (search: string, command: CommandMenuCommand) => latest.current(search, command),
+    [],
+  );
+  useLayoutEffect(() => {
+    rankWith({ rank: ranking, limit });
+    return () => rankWith(null);
+  }, [rankWith, ranking, limit]);
+  // One place for each best match, so each is drawn in its rank's place, whichever moves first.
+  // The menu learns of the places once they are on the page, which is before any layout effect.
+  const places = useRef<(HTMLElement | null)[]>([]);
+  const refs = useMemo(
+    () =>
+      Array.from({ length: limit }, (_, index) => (element: HTMLElement | null) => {
+        places.current[index] = element;
+      }),
+    [limit],
+  );
+  useLayoutEffect(() => {
+    setSlots(refs.map((_, index) => places.current[index] ?? null));
+    return () => setSlots([]);
+  }, [refs, setSlots]);
+  return (
+    <Autocomplete.Group
+      {...props}
+      className={`x-govuk-ui-command-menu-group x-govuk-ui-command-menu-best ${className}`.trim()}
+    >
+      <Autocomplete.GroupLabel className="x-govuk-ui-command-menu-group-label">
+        {label ?? labels.best}
+      </Autocomplete.GroupLabel>
+      {Array.from({ length: limit }, (_, index) => (
+        <div
+          // biome-ignore lint/suspicious/noArrayIndexKey: Each place is its rank.
+          key={index}
+          ref={refs[index]}
+          className="x-govuk-ui-command-menu-best-place"
+        />
+      ))}
+    </Autocomplete.Group>
   );
 }
 

@@ -12,6 +12,7 @@ import {
   CodeBlock,
   CodeBlockCopy,
   CommandMenu,
+  CommandMenuBestMatches,
   CommandMenuContent,
   CommandMenuGroup,
   CommandMenuItem,
@@ -504,6 +505,7 @@ export function Workbench() {
             }}
             placeholder="Search components and actions…"
           >
+            <CommandMenuBestMatches />
             <CommandMenuGroup label="Preview">
               <CommandMenuItem icon={<Icon name="next" />} onSelect={() => openFromMenu(next)}>
                 {`Next component: ${catalogue[next].name}`}

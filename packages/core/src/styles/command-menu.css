@@ -117,6 +117,10 @@
 .x-govuk-ui-command-menu-group:not(:has(.x-govuk-ui-command-menu-item)) {
   display: none;
 }
+/* Each best match is drawn in the place of its rank, which lays out nothing of its own. */
+.x-govuk-ui-command-menu-best-place {
+  display: contents;
+}
 /* Labels sit above the highlight, so it glides behind them, as in the Sidebar. */
 .x-govuk-ui-command-menu-group-label {
   position: relative;

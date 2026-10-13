@@ -269,6 +269,11 @@ test("command menu groups commands, opens pages and goes back", async ({ page, f
   await expect(popup.getByRole("option", { name: /Change language/ })).toBeVisible();
   await search.fill("zzz");
   await expect(popup.getByText("No commands found.")).toBeVisible();
+  // A command named as typed shows first, among the best matches, and only there.
+  await search.fill("get");
+  await expect(popup.getByRole("group", { name: "Best matches" })).toBeVisible();
+  await expect(popup.getByRole("option").first()).toHaveText(/^Get help/);
+  await expect(popup.getByRole("option", { name: /Get help/ })).toHaveCount(1);
   await search.fill("save");
   await expect(popup.getByRole("option", { name: /Save your progress/ })).toHaveAttribute(
     "data-highlighted",
@@ -276,6 +281,41 @@ test("command menu groups commands, opens pages and goes back", async ({ page, f
   await search.press("Enter");
   await expect(popup).toBeHidden();
   await expect(frame.getByRole("status")).toContainText("Simulated save complete");
+});
+
+test("a command menu's best matches come first, keep each command's context, and rank as a service asks", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  await open("command-menu");
+  await frame.getByRole("button", { name: "Open command menu" }).click();
+  const popup = page.getByRole("dialog");
+  const search = popup.getByRole("combobox");
+  const best = popup.getByRole("group", { name: "Best matches" });
+  // A command whose name starts with the search shows among the best matches, once, still with
+  // the language its own context gives it, and Enter chooses it.
+  await search.fill("change");
+  await expect(best.getByRole("option")).toHaveText([
+    "Change language, now EnglishEnglish or Welsh.",
+  ]);
+  await expect(popup.getByRole("option", { name: /Change language/ })).toHaveCount(1);
+  await search.press("Enter");
+  await popup.getByRole("option", { name: "Cymraeg" }).click();
+  await expect(frame.getByRole("status")).toContainText("You chose Cymraeg.");
+  await frame.getByRole("button", { name: "Open command menu" }).click();
+  await search.fill("change");
+  await expect(best.getByRole("option")).toHaveText([/now Cymraeg/]);
+  // By default, a description is no best match. A ranking of the service's own can make it one.
+  await search.fill("check");
+  await expect(best).toBeHidden();
+  await page.keyboard.press("Escape");
+  await playground.set("ownRank", true);
+  await frame.getByRole("button", { name: "Open command menu" }).click();
+  await search.fill("check");
+  await expect(best.getByRole("option")).toHaveText([/^Review your details/]);
+  await expect(popup.getByRole("option").first()).toHaveAttribute("data-highlighted");
 });
 
 test("a command menu's list, once it scrolls, is a region named for its commands, which keyboards can scroll", async ({

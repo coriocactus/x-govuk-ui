@@ -59,6 +59,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Added
 
+- Added CommandMenuBestMatches, the commands that best match the search, shown together where a service places it, such as before every group, so a command named as typed is not lost beneath a group whose keywords match too. By default, the commands whose names are the search come first, then those whose names start with it, at most three. It takes `rank`, `limit` and `label`, and its heading is the `best` label. Each command shown there moves from its place, with its context, ref and handlers, so it is listed once.
+- Added `filter` to CommandMenu, for a search of your own, such as a fuzzy one, and `matchesCommand` and `rankCommandByName`, the search and the ranking it uses by default.
 - Added `controlId` to Field, which binds it to its control. A bound Field gives its `Label`, `Hint` and `ErrorMessage` their ids, and shows its own `errorMessage`, or its Form's error by its `name`. A field composed from its parts then needs no `useField`. `hasHint`, `linkTo` and `describedBy` say the rest. A Field without `controlId` works as before.
 - Added `label` and `answer` to Field and to `useField`, which say how FormSteps' Check your answers lists the field. A bound Field's `Label` or `FieldsetLegend` gives its question, unless the Field is given a `label`. Without an `answer`, the summary shows what the field sends under its name. `FormField` is the type of what a field tells its Form.
 - Added `useFieldSummary`, with which a control of your own, in a bound Field, gives its question, its answer, as Select gives its option's label, or where an error links to, as DateInputControl links to its day. What a part gives goes with it when it leaves the page.

@@ -106,7 +106,19 @@ test("the workbench's own page counts the components, says how to find one and d
   await frame.getByRole("link", { name: "Tour" }).click();
   await expect(page).toHaveURL(/\/workbench\/tour$/);
   await page.keyboard.press("ControlOrMeta+k");
-  await page.getByPlaceholder("Search components and actions…").fill("overview");
+  // A component named as typed comes first, ahead of the group of Form controls that the search
+  // names too, and is listed once.
+  const search = page.getByPlaceholder("Search components and actions…");
+  await search.fill("form");
+  const options = page.getByRole("option");
+  await expect(options.first()).toHaveText("Form");
+  await expect(page.getByRole("option", { name: "Form", exact: true })).toHaveCount(1);
+  await expect(options.nth(1)).toHaveText("Input");
+  // The keys go through the commands in the order they show.
+  await expect(options.first()).toHaveAttribute("data-highlighted");
+  await search.press("ArrowDown");
+  await expect(options.nth(1)).toHaveAttribute("data-highlighted");
+  await search.fill("overview");
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/workbench$/);
   await expect(frame.locator(".landing-number")).toBeVisible();

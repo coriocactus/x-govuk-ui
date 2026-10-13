@@ -1806,7 +1806,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "Built from parts. Base UI's Autocomplete sits inline in a dialog, as Base UI recommends for a command palette, so the first command is always highlighted. Commands sit in labelled groups, show their shortcuts as keyboard keys, and can open pages of further commands, with a trail back and Backspace to return. One highlight slides between commands, and the list, a Scroll area, eases to its new height as the search narrows it. Command-K or Control-K opens it anywhere on the page. This workbench uses it as its site-wide command menu.",
+      "Built from parts. Base UI's Autocomplete sits inline in a dialog, as Base UI recommends for a command palette, so the first command is always highlighted. Commands sit in labelled groups, show their shortcuts as keyboard keys, and can open pages of further commands, with a trail back and Backspace to return. CommandMenuBestMatches shows the commands whose names are the search, or start with it, before the groups, so typing a command's name finds it first, even where a whole group's keywords match too. A service places it, and can give it a limit and a ranking of its own, and the menu a search of its own. One highlight slides between commands, and the list, a Scroll area, eases to its new height as the search narrows it. Command-K or Control-K opens it anywhere on the page. This workbench uses it as its site-wide command menu.",
     props: [
       reference("open / defaultOpen / onOpenChange", "boolean / (open) => void", "Uncontrolled"),
       toggle("keyboardShortcut", true),
@@ -1819,6 +1819,8 @@ const entries = {
         "Part",
       ),
       reference("CommandMenuPage", "{ id, label, placeholder, children }", "Part"),
+      reference("CommandMenuBestMatches", "{ label, limit, rank }", "Part"),
+      reference("filter", "(search, command) => boolean", "matchesCommand"),
       reference("CommandMenuTrigger", "Button props and { render }", "Part"),
       reference("CommandMenuContent", "{ placeholder, finalFocus, children }", "Part"),
     ],
@@ -1828,6 +1830,9 @@ const entries = {
         note: "The built-in button's words, its trigger label.",
       }),
       toggle("shortcuts", true, { note: "Shows a shortcut on Save your progress." }),
+      toggle("ownRank", false, {
+        note: "Ranks the best matches by their descriptions too, with a ranking of the service's own.",
+      }),
     ],
   },
   bubble: {

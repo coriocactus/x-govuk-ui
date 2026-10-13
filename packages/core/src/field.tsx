@@ -9,13 +9,17 @@
  * - The order is label, hint, error message, then the control.
  * - The hint's id is `{id}-hint` and the error's id is `{id}-error`. The control is described by
  *   the caller's own ids, then the hint, then the error. GOV.UK's error summary links to `#{id}`.
- * - The error message starts with a visually hidden "Error:".
+ * - The error message starts with a visually hidden "Error:", the `errors` label's `prefix`.
+ *
+ * A Field given `controlId` is bound. It gives its parts their ids through context, and each field
+ * tells its Form what it asks and how to show its answer, for FormSteps' Check your answers.
  *
  * Base UI's Field assigns the control's id after the page loads, so the ids above would not be in
  * the first HTML and an error summary link could miss. The trade-offs of not using it:
  *
  * - Base UI controls, such as Select or Checkbox, do not connect to these parts by themselves.
- *   Spread `useField().controlProps` onto the element that takes focus, such as `Select.Trigger`.
+ *   In a bound Field, pass the control's props through `useControlProps`. Otherwise, spread
+ *   `useField().controlProps` onto the element that takes focus, such as `Select.Trigger`.
  * - Base UI's `Form` validation is not wired in. The library's own Form validates on submit, as
  *   GOV.UK recommends, and gives each field its message by the field's `name`. Outside a Form, a
  *   service passes each message as `errorMessage`.

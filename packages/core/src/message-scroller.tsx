@@ -15,7 +15,7 @@ import {
   useState,
 } from "react";
 import { useLabels } from "./labels";
-import { duration, easeOut, motionElementProps, useMotionTiming } from "./motion";
+import { duration, easeOut, MotionDiv, motionElementProps, useMotionTiming } from "./motion";
 import { ScrollArea } from "./scroll-area";
 
 /** Moves a Message scroller from outside it, such as from search results or a list of turns. */
@@ -472,7 +472,7 @@ export function MessageScrollerItem({
 }: MessageScrollerItemProps) {
   const timing = useMotionTiming();
   return (
-    <motion.div
+    <MotionDiv
       {...motionElementProps(props)}
       className={`x-govuk-ui-message-scroller-item ${className}`.trim()}
       data-message-id={id}
@@ -483,6 +483,6 @@ export function MessageScrollerItem({
       transition={timing.ease(duration.slow)}
     >
       {children}
-    </motion.div>
+    </MotionDiv>
   );
 }

@@ -21,7 +21,7 @@ import { CopyButton, type CopyButtonProps, readableText } from "./copy";
 import { useLabels } from "./labels";
 import { MessageActions } from "./message-actions";
 import { MessageScroller } from "./message-scroller";
-import { duration, motionElementProps, useMotionTiming } from "./motion";
+import { duration, MotionDiv, motionElementProps, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 import { TextShimmer } from "./text-shimmer";
 
@@ -260,7 +260,7 @@ export function ConversationMessage({
   }, [streaming, stream, id]);
   return (
     <MessageContext value={{ from, content, streaming }}>
-      <motion.div
+      <MotionDiv
         {...motionElementProps(props)}
         className={`x-govuk-ui-conversation-message-row ${className}`.trim()}
         data-role={from}
@@ -288,7 +288,7 @@ export function ConversationMessage({
           )}
           {children}
         </motion.article>
-      </motion.div>
+      </MotionDiv>
     </MessageContext>
   );
 }
@@ -395,7 +395,7 @@ export function ConversationThinking({
   }, [labels]);
   const word = labels[index % labels.length] ?? "Thinking";
   return (
-    <motion.div
+    <MotionDiv
       {...motionElementProps(props)}
       className={`x-govuk-ui-conversation-message-row ${className}`.trim()}
       data-role="assistant"
@@ -418,6 +418,6 @@ export function ConversationThinking({
       <span className="x-govuk-ui-visually-hidden" role="status">
         {words.writing(assistantName)}
       </span>
-    </motion.div>
+    </MotionDiv>
   );
 }

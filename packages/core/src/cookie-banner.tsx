@@ -1,12 +1,12 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
 import { type ComponentPropsWithRef, type ReactNode, useEffect, useRef, useState } from "react";
 import { AutoHeight } from "./auto-height";
 import { Button, ButtonGroup } from "./button";
 import { useLabels } from "./labels";
 import { Link } from "./link";
-import { duration, motionElementProps, useMotionTiming } from "./motion";
+import { duration, MotionDiv, motionElementProps, useMotionTiming } from "./motion";
 import { WidthContainer } from "./width-container";
 
 export type CookieChoice = "accepted" | "rejected";
@@ -104,7 +104,7 @@ export function CookieBanner({
   return (
     <AnimatePresence initial={false}>
       {!hidden && (
-        <motion.div
+        <MotionDiv
           key="banner"
           {...motionElementProps(props)}
           className={`x-govuk-ui-cookie-banner ${className}`.trim()}
@@ -140,7 +140,7 @@ export function CookieBanner({
               </WidthContainer>
             )}
           </AutoHeight>
-        </motion.div>
+        </MotionDiv>
       )}
     </AnimatePresence>
   );

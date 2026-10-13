@@ -1,8 +1,7 @@
 "use client";
 
-import type { HTMLMotionProps, Transition } from "motion/react";
-import { type ComponentPropsWithRef, useSyncExternalStore } from "react";
-import { both } from "./events";
+import { motion, type Transition } from "motion/react";
+import { type ComponentPropsWithRef, createElement, useSyncExternalStore } from "react";
 
 type Bezier = readonly [number, number, number, number];
 
@@ -118,29 +117,34 @@ export function useMotionTiming() {
   return reduced ? still : moving;
 }
 
+/** The element's own handlers that Motion would take as callbacks of its own. */
+type DomHandlers = Pick<
+  ComponentPropsWithRef<"div">,
+  "onAnimationStart" | "onDrag" | "onDragStart" | "onDragEnd"
+>;
+
+/** A div that gives itself the handlers Motion would take, which it is given under `dom`. */
+function DomDiv({ dom, ...props }: ComponentPropsWithRef<"div"> & { dom?: DomHandlers }) {
+  return createElement("div", { ...props, ...dom });
+}
+
 /**
- * A part's element props, which keep the DOM's meaning, for the Motion element it renders. Motion
- * reads `onAnimationStart` and the drag handlers as its own callbacks. They are given to the
- * element as their capturing twins, which Motion passes to the DOM. Each fires for the same events,
- * one phase earlier.
+ * A Motion div that keeps the DOM's meaning of every handler a part takes. Motion takes
+ * `onAnimationStart` and the drag handlers as callbacks of its own, even when nothing is dragged.
+ * It passes every other prop to a component of its own, so the handlers reach the div under `dom`,
+ * through `motionElementProps`. They then run as React's handlers do, in the phase they were given
+ * for, so a handler inside the part can stop one on the part from running.
  * @internal
  */
+export const MotionDiv = motion.create(DomDiv);
+
+/** A part's element props, for the MotionDiv it renders. */
 export function motionElementProps({
   onAnimationStart,
   onDrag,
   onDragStart,
   onDragEnd,
-  onAnimationStartCapture,
-  onDragCapture,
-  onDragStartCapture,
-  onDragEndCapture,
   ...props
-}: ComponentPropsWithRef<"div">): HTMLMotionProps<"div"> {
-  return {
-    ...(props as HTMLMotionProps<"div">),
-    onAnimationStartCapture: both(onAnimationStartCapture, onAnimationStart),
-    onDragCapture: both(onDragCapture, onDrag),
-    onDragStartCapture: both(onDragStartCapture, onDragStart),
-    onDragEndCapture: both(onDragEndCapture, onDragEnd),
-  };
+}: ComponentPropsWithRef<"div">) {
+  return { ...props, dom: { onAnimationStart, onDrag, onDragStart, onDragEnd } };
 }

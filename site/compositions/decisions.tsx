@@ -12,7 +12,7 @@ import {
   Tag,
   type TagColour,
 } from "x-govuk-ui";
-import { dateText, type Licence, money, useApplications } from "../workspace-data";
+import { type Licence, money, shortDate, useApplications } from "../workspace-data";
 
 const colours: Record<Licence, TagColour> = {
   "1 day": "green",
@@ -64,7 +64,7 @@ export default function Decisions() {
               </Tag>
             </TableCell>
             <TableCell numeric>{money(application.fee)}</TableCell>
-            <TableCell>{dateText(application.received, { short: true })}</TableCell>
+            <TableCell>{shortDate(application.received)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

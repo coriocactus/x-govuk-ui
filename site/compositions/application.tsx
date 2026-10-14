@@ -1,7 +1,9 @@
 import { Fragment, useState } from "react";
 import {
   Button,
-  Inline,
+  ButtonGroup,
+  formatDate,
+  formatTime,
   InsetText,
   NotificationBanner,
   Stack,
@@ -10,15 +12,7 @@ import {
   Tag,
   type TagColour,
 } from "x-govuk-ui";
-import {
-  askFor,
-  dateText,
-  issueLicence,
-  money,
-  type Status,
-  timeText,
-  useApplication,
-} from "../workspace-data";
+import { askFor, issueLicence, money, type Status, useApplication } from "../workspace-data";
 
 const statuses: Record<Status, [string, TagColour]> = {
   decision: ["Needs a decision", "orange"],
@@ -37,7 +31,6 @@ export default function Application() {
   // A banner takes focus only for a change made here, not when the view opens.
   const [changedHere, setChangedHere] = useState(false);
   if (!application) return <p>There is no application RL-48213.</p>;
-  const [status, colour] = statuses[application.status];
   const paid = application.payments[0];
 
   const act = async (action: "issue" | "ask", run: () => Promise<void>) => {
@@ -54,7 +47,7 @@ export default function Application() {
     <Stack>
       {application.status === "issued" && (
         <NotificationBanner type="success" title="Licence issued" autoFocus={changedHere}>
-          {`${application.name}'s licence starts on ${dateText(application.starts)}. It has been emailed to ${application.email}.`}
+          {`${application.name}'s licence starts on ${formatDate(application.starts)}. It has been emailed to ${application.email}.`}
         </NotificationBanner>
       )}
       {application.status === "waiting" && (
@@ -64,10 +57,10 @@ export default function Application() {
       )}
       <SummaryList>
         <SummaryListRow label="Status">
-          <Tag colour={colour}>{status}</Tag>
+          <Tag colour={statuses[application.status][1]}>{statuses[application.status][0]}</Tag>
         </SummaryListRow>
         <SummaryListRow label="Name">{application.name}</SummaryListRow>
-        <SummaryListRow label="Date of birth">{dateText(application.dateOfBirth)}</SummaryListRow>
+        <SummaryListRow label="Date of birth">{formatDate(application.dateOfBirth)}</SummaryListRow>
         <SummaryListRow label="Address">
           {application.address.map((line, index) => (
             <Fragment key={line}>
@@ -77,14 +70,14 @@ export default function Application() {
           ))}
         </SummaryListRow>
         <SummaryListRow label="Licence">
-          {`${application.licence}, from ${dateText(application.starts)}`}
+          {`${application.licence}, from ${formatDate(application.starts)}`}
         </SummaryListRow>
         <SummaryListRow label="Concession">
           {application.senior ? `Senior, at ${application.age} when the licence starts` : "None"}
         </SummaryListRow>
         {paid && (
           <SummaryListRow label="Paid">
-            {`${money(paid.amount)} at ${timeText(paid.date)} on ${dateText(paid.date)}, from the card ending ${paid.card}`}
+            {`${money(paid.amount)} at ${formatTime(paid.date)} on ${formatDate(paid.date)}, from the card ending ${paid.card}`}
           </SummaryListRow>
         )}
       </SummaryList>
@@ -94,7 +87,7 @@ export default function Application() {
             The date of birth does not match the driving licence. Check it before you issue a senior
             licence.
           </InsetText>
-          <Inline wrap>
+          <ButtonGroup>
             <Button
               loading={busy === "issue"}
               disabled={busy === "ask"}
@@ -110,7 +103,7 @@ export default function Application() {
             >
               Ask for proof of age
             </Button>
-          </Inline>
+          </ButtonGroup>
         </>
       )}
     </Stack>

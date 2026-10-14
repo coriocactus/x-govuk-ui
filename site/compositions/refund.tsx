@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { Button, Form, NotificationBanner, Radio, Radios, Stack, WarningText } from "x-govuk-ui";
 import {
-  dateText,
-  licenceKind,
-  money,
-  refundPayment,
-  timeText,
-  useApplication,
-} from "../workspace-data";
+  Button,
+  Form,
+  formatDate,
+  formatTime,
+  NotificationBanner,
+  Radio,
+  Radios,
+  Stack,
+  WarningText,
+} from "x-govuk-ui";
+import { licenceKind, money, refundPayment, useApplication } from "../workspace-data";
 
 /**
  * A refund of one of Gordon Brown's two payments for the same licence. The caseworker chooses
@@ -58,7 +61,7 @@ export default function Refund() {
               value={payment.id}
               hint={`From the card ending ${payment.card}`}
             >
-              {`${money(payment.amount)} at ${timeText(payment.date)} on ${dateText(payment.date)}`}
+              {`${money(payment.amount)} at ${formatTime(payment.date)} on ${formatDate(payment.date)}`}
             </Radio>
           ))}
         </Radios>

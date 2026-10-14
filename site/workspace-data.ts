@@ -372,39 +372,18 @@ export async function refundPayment(reference: string, payment: string) {
   );
 }
 
-// Writing it as GOV.UK does.
+// Writing it as GOV.UK does. Dates and times come from the library's formatDate and formatTime.
 
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-/** An amount in pence, as pounds, such as £36.80. */
+/** An amount in pence, as GOV.UK writes money, such as £36.80, or £75 for whole pounds. */
 export function money(pence: number) {
-  return `£${(pence / 100).toFixed(2)}`;
+  const pounds = (pence / 100).toLocaleString("en-GB", {
+    minimumFractionDigits: pence % 100 ? 2 : 0,
+    maximumFractionDigits: 2,
+  });
+  return `£${pounds}`;
 }
 
-/** A time as GOV.UK writes it, such as 10:02am, or midday. */
-export function timeText(date: Date) {
-  const hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  if (hours === 12 && minutes === "00") return "midday";
-  if (hours === 0 && minutes === "00") return "midnight";
-  return `${hours % 12 || 12}:${minutes}${hours < 12 ? "am" : "pm"}`;
-}
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-/** A date as GOV.UK writes it, such as 29 September 2026, or 29 Sep when `short`. */
-export const dateText = (date: Date, { short = false } = {}) =>
-  short
-    ? `${date.getDate()} ${months[date.getMonth()]!.slice(0, 3)}`
-    : `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+/** A day and its month, for a table's narrow column, such as 29 Sep. `en-GB` would write Sept. */
+export const shortDate = (date: Date) => `${date.getDate()} ${months[date.getMonth()]}`;

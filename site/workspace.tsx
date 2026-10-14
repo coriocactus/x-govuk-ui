@@ -102,10 +102,10 @@ import { Icon, type IconName } from "./icon";
 import {
   type Application,
   caseworker,
-  dateText,
   type Licence,
   money,
   type Status,
+  shortDate,
   useActivity,
   useApplications,
   useLicenceWeeks,
@@ -955,9 +955,7 @@ const Overview = memo(function Overview({
                             ),
                             fee: <span className="workspace-fee">{money(item.fee)}</span>,
                             received: (
-                              <span className="workspace-received">
-                                {dateText(item.received, { short: true })}
-                              </span>
+                              <span className="workspace-received">{shortDate(item.received)}</span>
                             ),
                             assigned: (
                               <AvatarGroup>

@@ -24,3 +24,9 @@ test("each applicant's age is worked out when the licence starts, and sets a sen
   expect(found).toContain("Boris Johnson, 62, 1 day, false, £7.30");
   expect(found).toContain("Rishi Sunak, 46, 8 days, false, £14.70");
 });
+
+test("money is written as GOV.UK writes it, with pence only when there are some", () => {
+  expect(money(7500)).toBe("£75");
+  expect(money(2450)).toBe("£24.50");
+  expect(money(123450)).toBe("£1,234.50");
+});

@@ -302,7 +302,7 @@ test("Piscine Assist composes views of the work from the library's parts, in til
   // The reply names the parts it composed the view from.
   await expect(
     assist.getByText(
-      "Composed from Button, Inline, InsetText, NotificationBanner, Stack, SummaryList, SummaryListRow and Tag.",
+      "Composed from Button, ButtonGroup, InsetText, NotificationBanner, Stack, SummaryList, SummaryListRow and Tag.",
     ),
   ).toBeVisible({ timeout: 10000 });
   expect(await violations()).toEqual([]);

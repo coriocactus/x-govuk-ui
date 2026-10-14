@@ -5,6 +5,7 @@ import {
   DropdownMenuTrigger,
   Kbd,
   MenuContent,
+  MenuItem,
   MenuLinkItem,
   MenuRadioGroup,
   MenuRadioItem,
@@ -15,8 +16,10 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarHeader,
+  SidebarInput,
   SidebarInset,
   SidebarItem,
+  SidebarItemAction,
   SidebarItemMenu,
   SidebarLayout,
   SidebarPageBar,
@@ -25,6 +28,7 @@ import {
   SidebarSeparator,
   SidebarSkeleton,
   SidebarSubmenu,
+  SidebarText,
   SidebarTrigger,
   useSidebarArrangement,
 } from "x-govuk-ui";
@@ -145,6 +149,9 @@ export default function SidebarExample({
   inverse = false,
 }: Props) {
   const [current, setCurrent] = useState("Overview");
+  // The field finds pages by their names, and a group with none of them leaves the list.
+  const [query, setQuery] = useState("");
+  const matches = (name: string) => name.toLowerCase().includes(query.trim().toLowerCase());
   const [service, setService] = useState(services[0]);
   // With item menus, users pin, move and hide the items, and arrange the whole sidebar in a sheet.
   const menus = show.includes("menus");
@@ -219,6 +226,12 @@ export default function SidebarExample({
               </MenuContent>
             </DropdownMenu>
           </SidebarHeader>
+          <SidebarInput
+            label="Find a page"
+            placeholder="Find a page"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
           <SidebarContent>
             {loading && (
               <>
@@ -229,59 +242,83 @@ export default function SidebarExample({
               </>
             )}
             {!loading &&
-              arranged.map((section, index) => (
-                <Fragment key={section.label ?? "main"}>
-                  {index > 0 && show.includes("separators") && <SidebarSeparator />}
-                  <SidebarGroup
-                    label={layout === "off" ? undefined : section.label}
-                    icon={section.icon}
-                    collapsible={layout === "collapsible"}
-                  >
-                    {section.items.map((item) =>
-                      item.children && show.includes("submenus") ? (
-                        <SidebarSubmenu
-                          key={item.name}
-                          label={item.name}
-                          icon={show.includes("icons") ? item.icon : undefined}
-                        >
-                          {item.children.map((child) => (
-                            <SidebarItem
-                              key={child}
-                              current={child === current}
-                              onClick={() => setCurrent(child)}
-                            >
-                              {child}
-                            </SidebarItem>
-                          ))}
-                        </SidebarSubmenu>
-                      ) : (
-                        <SidebarItem
-                          key={item.name}
-                          icon={show.includes("icons") ? item.icon : undefined}
-                          badge={show.includes("badges") ? item.badge : undefined}
-                          current={item.name === current}
-                          onClick={() => setCurrent(item.name)}
-                          action={
-                            menus ? (
-                              <SidebarItemMenu arranger={arranger} id={item.name} />
-                            ) : undefined
-                          }
-                        >
-                          {item.name}
-                        </SidebarItem>
-                      ),
-                    )}
-                  </SidebarGroup>
-                </Fragment>
-              ))}
+              arranged
+                .map((section) => ({
+                  ...section,
+                  items: section.items.filter(
+                    (item) => matches(item.name) || item.children?.some(matches),
+                  ),
+                }))
+                .filter((section) => section.items.length > 0)
+                .map((section, index) => (
+                  <Fragment key={section.label ?? "main"}>
+                    {index > 0 && show.includes("separators") && <SidebarSeparator />}
+                    <SidebarGroup
+                      label={layout === "off" ? undefined : section.label}
+                      icon={section.icon}
+                      collapsible={layout === "collapsible"}
+                    >
+                      {section.items.map((item) =>
+                        item.children && show.includes("submenus") ? (
+                          <SidebarSubmenu
+                            key={item.name}
+                            label={item.name}
+                            icon={show.includes("icons") ? item.icon : undefined}
+                          >
+                            {item.children.map((child) => (
+                              <SidebarItem
+                                key={child}
+                                current={child === current}
+                                onClick={() => setCurrent(child)}
+                              >
+                                {child}
+                              </SidebarItem>
+                            ))}
+                          </SidebarSubmenu>
+                        ) : (
+                          <SidebarItem
+                            key={item.name}
+                            icon={show.includes("icons") ? item.icon : undefined}
+                            badge={show.includes("badges") ? item.badge : undefined}
+                            current={item.name === current}
+                            onClick={() => setCurrent(item.name)}
+                            action={
+                              menus ? (
+                                <SidebarItemMenu arranger={arranger} id={item.name} />
+                              ) : undefined
+                            }
+                          >
+                            {item.name}
+                          </SidebarItem>
+                        ),
+                      )}
+                    </SidebarGroup>
+                  </Fragment>
+                ))}
           </SidebarContent>
           {show.includes("footer") && (
             <SidebarFooter>
               <SidebarGroup>
-                <SidebarItem icon={icon("M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10")}>
-                  Sign out
+                {/* The user's row has their own actions in a Dropdown menu, which its action
+                    button opens. */}
+                <SidebarItem
+                  icon={icon("M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4 20a8 8 0 0 1 16 0")}
+                  action={
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={<SidebarItemAction label="H. H. Asquith's options" />}
+                      />
+                      <MenuContent>
+                        <MenuItem>Your account</MenuItem>
+                        <MenuItem>Sign out</MenuItem>
+                      </MenuContent>
+                    </DropdownMenu>
+                  }
+                >
+                  H. H. Asquith
                 </SidebarItem>
               </SidebarGroup>
+              <SidebarText>Department for Business and Trade</SidebarText>
             </SidebarFooter>
           )}
         </Sidebar>

@@ -28,6 +28,7 @@ test("a menubar moves between its menus with the arrow keys", async ({ page, fra
 });
 
 test("sidebar sub-items fold, and icons open the sidebar and the submenu together", async ({
+  page,
   frame,
   open,
   playground,
@@ -68,6 +69,20 @@ test("sidebar sub-items fold, and icons open the sidebar and the submenu togethe
     "aria-current",
     "page",
   );
+  // The field above the rows finds pages by their names, and a group with none leaves the list.
+  const find = frame.getByRole("searchbox", { name: "Find a page" });
+  await find.fill("pay");
+  await expect(frame.getByRole("button", { name: "Payments", exact: true })).toBeVisible();
+  await expect(frame.getByRole("button", { name: "Overview", exact: true })).toHaveCount(0);
+  await expect(frame.getByRole("button", { name: "Security", exact: true })).toHaveCount(0);
+  await find.fill("");
+  await expect(frame.getByRole("button", { name: "Overview", exact: true })).toBeVisible();
+  // The user's row opens their own menu from its action button. The menu opens over the page.
+  await frame.getByRole("button", { name: "H. H. Asquith's options" }).click();
+  const signOut = page.getByRole("menuitem", { name: "Sign out" });
+  await expect(signOut).toBeVisible();
+  await signOut.press("Escape");
+  await expect(signOut).toHaveCount(0);
   await frame.getByRole("button", { name: "Collapse sidebar" }).click();
   await expect(frame.locator(".x-govuk-ui-sidebar")).toHaveAttribute("data-state", "collapsed");
   await applications.click();
@@ -76,10 +91,10 @@ test("sidebar sub-items fold, and icons open the sidebar and the submenu togethe
   await playground.set("collapsible", "Off the screen");
   await expect(footer).toHaveCSS("white-space", "normal");
   // Beside an inset sidebar, the page is a raised panel.
-  const page = frame.locator(".x-govuk-ui-sidebar-inset");
-  await expect(page).toHaveCSS("border-top-left-radius", "0px");
+  const inset = frame.locator(".x-govuk-ui-sidebar-inset");
+  await expect(inset).toHaveCSS("border-top-left-radius", "0px");
   await playground.set("variant", "Inset");
-  await expect(page).toHaveCSS("border-top-left-radius", "8px");
+  await expect(inset).toHaveCSS("border-top-left-radius", "8px");
 });
 
 test("words in the footer of a sidebar that narrows to its icons fit its open width in every variant, keep it as it narrows, and give up their height", async ({
@@ -89,21 +104,11 @@ test("words in the footer of a sidebar that narrows to its icons fit its open wi
 }) => {
   await open("sidebar");
   const footer = frame.locator(".x-govuk-ui-sidebar-footer");
-  // A service's own words in the footer, such as its department's name, as a SidebarText.
+  // The service's own words in the footer, its department's name, as a SidebarText.
   const text = footer.locator(".x-govuk-ui-sidebar-text");
-  const fit = async () => {
-    await footer.evaluate((element) => {
-      if (element.querySelector(".x-govuk-ui-sidebar-text")) return;
-      // SidebarText's markup, with its words in an inner element that clips them as the row eases.
-      const words = document.createElement("p");
-      words.className = "x-govuk-ui-sidebar-text";
-      const inner = document.createElement("span");
-      inner.className = "x-govuk-ui-sidebar-text-inner";
-      inner.textContent = "Department for Business, Innovation, Science and Trade";
-      words.append(inner);
-      element.append(words);
-    });
-    return footer.evaluate((element) => {
+  await expect(text).toHaveText("Department for Business and Trade");
+  const fit = async () =>
+    footer.evaluate((element) => {
       const style = getComputedStyle(element);
       const room =
         element.clientWidth -
@@ -114,7 +119,6 @@ test("words in the footer of a sidebar that narrows to its icons fit its open wi
         .getBoundingClientRect().width;
       return { width, off: Math.abs(width - room) };
     });
-  };
   // Open, each variant sets the words at the width its footer gives them, to the pixel.
   for (const variant of ["Floating", "Inset", "Sidebar"]) {
     await playground.set("variant", variant);

@@ -113,6 +113,16 @@
   font-weight: 700
   line-height: 1.5
   color: rgb(26, 101, 166)
+.x-govuk-ui-sidebar-input
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 2px
+  padding-right: 8px
+  padding-bottom: 10px
+  padding-left: 8px
 .x-govuk-ui-sidebar-inset
   display: flex
   font-size: 14px
@@ -267,6 +277,18 @@
   border-top-right-radius: 4px
   border-bottom-right-radius: 4px
   border-bottom-left-radius: 4px
+.x-govuk-ui-sidebar-text
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-sidebar-text-inner
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
 .x-govuk-ui-sidebar-trigger
   display: grid
   font-size: 14px

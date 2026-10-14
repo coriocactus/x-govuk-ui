@@ -180,11 +180,5 @@ export const unchecked = {
     "TilePager",
   ],
   /** No example uses them yet. */
-  "in no example": [
-    "FormStepsProgress",
-    "SearchIcon",
-    "SidebarInput",
-    "SidebarItemAction",
-    "SidebarText",
-  ],
+  "in no example": ["FormStepsProgress"],
 } as const;

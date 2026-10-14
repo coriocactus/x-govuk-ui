@@ -1,4 +1,4 @@
-import { GridColumn, GridRow, WidthContainer } from "x-govuk-ui";
+import { GridColumn, GridRow, Inline, Stack, WidthContainer } from "x-govuk-ui";
 
 type Layout = "two-thirds" | "halves" | "thirds" | "quarters";
 type Props = { width?: number; gutters?: boolean; layout?: Layout };
@@ -38,16 +38,23 @@ export default function WidthContainerExample({
   layout = "two-thirds",
 }: Props) {
   return (
-    // The tinted band stands for the screen, and the dashed line marks the container's edges.
+    // The tinted band stands for the screen, and the dashed line marks the container's edges. A
+    // stack sets the row and a line beneath it, as a page sets its parts.
     <div className="preview-screen">
       <WidthContainer width={width} gutters={gutters} className="preview-container">
-        <GridRow>
-          {layouts[layout].map(([place, share]) => (
-            <GridColumn key={`${layout}-${place}`} width={share}>
-              <div className="preview-column">{names[share]}</div>
-            </GridColumn>
-          ))}
-        </GridRow>
+        <Stack>
+          <GridRow>
+            {layouts[layout].map(([place, share]) => (
+              <GridColumn key={`${layout}-${place}`} width={share}>
+                <div className="preview-column">{names[share]}</div>
+              </GridColumn>
+            ))}
+          </GridRow>
+          <Inline>
+            <div className="preview-column">Side</div>
+            <div className="preview-column">by side</div>
+          </Inline>
+        </Stack>
       </WidthContainer>
     </div>
   );

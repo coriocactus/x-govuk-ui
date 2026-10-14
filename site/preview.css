@@ -893,6 +893,11 @@
   font-size: 16px;
   font-weight: 700;
 }
+/* A block in a line is as wide as its words, so it takes room around them. */
+.x-govuk-ui-inline > .preview-column {
+  min-height: 60px;
+  padding-inline: 24px;
+}
 /* A form's status message sits beneath its button. */
 .preview-example .x-govuk-ui-form {
   position: relative;

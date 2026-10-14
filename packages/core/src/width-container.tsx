@@ -144,7 +144,8 @@ export type InlineProps = ComponentPropsWithRef<"div"> & {
 
 /**
  * Parts side by side, such as a field and its button, as GOV.UK's search sets them. A button keeps
- * its width, and a field takes the rest of the line.
+ * its width, and a field takes the rest of the line. Put buttons that belong together in a
+ * ButtonGroup instead, which stacks them on a phone, as GOV.UK does.
  */
 export function Inline({
   gap = 3,

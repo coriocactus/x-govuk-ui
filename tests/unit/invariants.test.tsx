@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Button, Input, InsetText } from "x-govuk-ui";
 import { type ComponentName, catalogue, componentNames } from "../../site/catalogue";
@@ -248,4 +249,94 @@ test("the documentation for language models lists every component, each page wit
     expect(documents[`llms/${name}.md`]).toContain("```tsx");
   }
   expect(documents["llms-full.txt"]).toContain("## Button");
+});
+
+/**
+ * The index just past the bracket that closes the one at `at`, skipping strings and templates. It
+ * reads code that Bun has transpiled, where JSX's words are strings.
+ */
+function closeOf(code: string, at: number): number {
+  const pairs: Record<string, string> = { "(": ")", "{": "}", "[": "]" };
+  const open: string[] = [];
+  for (let index = at; index < code.length; index++) {
+    const char = code[index] ?? "";
+    if (char === '"' || char === "'") index = endOfString(code, index);
+    else if (char === "`") {
+      for (index++; index < code.length && code[index] !== "`"; index++) {
+        if (code[index] === "\\") index++;
+        else if (code[index] === "$" && code[index + 1] === "{")
+          index = closeOf(code, index + 1) - 1;
+      }
+    } else if (pairs[char]) open.push(pairs[char] ?? "");
+    else if (char === open.at(-1)) {
+      open.pop();
+      if (!open.length) return index + 1;
+    }
+  }
+  return code.length;
+}
+
+/** The index of the quote that ends the string starting at `at`. */
+function endOfString(code: string, at: number) {
+  let index = at + 1;
+  while (index < code.length && code[index] !== code[at]) index += code[index] === "\\" ? 2 : 1;
+  return index;
+}
+
+/** The entries of an object pattern, such as `{ ref, onClick: click, ...props }`. */
+function entriesOf(pattern: string) {
+  const inner = pattern.slice(1, -1);
+  const entries: string[] = [];
+  let start = 0;
+  for (let index = 0; index < inner.length; index++) {
+    const char = inner[index] ?? "";
+    if (char === '"' || char === "'") index = endOfString(inner, index);
+    else if ("`([{".includes(char)) index = closeOf(inner, index) - 1;
+    else if (char === ",") {
+      entries.push(inner.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+  return [...entries, inner.slice(start).trim()].filter(Boolean);
+}
+
+test("every part that takes a ref or a handler out of its props uses it", () => {
+  // A part that takes `ref` or an `on…` handler out of the props it spreads, and never uses it
+  // again, drops it. React 19 passes `ref` as a prop, so only a part that takes it out can lose
+  // it. A part may take a prop out only to keep it off its element, and read it from its props.
+  const transpiler = new Bun.Transpiler({
+    loader: "tsx",
+    tsconfig: { compilerOptions: { jsx: "react" } },
+  });
+  const dropped: string[] = [];
+  for (const file of new Bun.Glob("packages/*/src/*.tsx").scanSync(".")) {
+    const code = transpiler.transformSync(readFileSync(file, "utf8"));
+    for (const found of code.matchAll(/export function ([A-Z]\w*)\s*\(/g)) {
+      const open = found.index + found[0].length - 1;
+      const end = closeOf(code, open);
+      const params = code.slice(open + 1, end - 1).trim();
+      const bodyOpen = code.indexOf("{", end);
+      let body = code.slice(bodyOpen, closeOf(code, bodyOpen));
+      // The props are taken apart in the parameter, or in the body from the parameter.
+      let pattern = params.startsWith("{") ? params.slice(0, closeOf(params, 0)) : undefined;
+      if (!pattern && /^\w+$/.test(params))
+        for (const taken of body.matchAll(/(?:const|let)\s*\{/g)) {
+          const start = taken.index + taken[0].length - 1;
+          const finish = closeOf(body, start);
+          if (new RegExp(`^\\s*=\\s*[^;]*\\b${params}\\b`).test(body.slice(finish))) {
+            pattern = body.slice(start, finish);
+            body = body.slice(0, taken.index) + body.slice(finish);
+            break;
+          }
+        }
+      for (const entry of pattern ? entriesOf(pattern) : []) {
+        const [key = "", name] = (entry.split("=")[0] ?? "").split(":").map((side) => side.trim());
+        if (key !== "ref" && !/^on[A-Z]\w*$/.test(key)) continue;
+        const used = new RegExp(`\\b${name || key}\\b`).test(body);
+        const read = /^\w+$/.test(params) && new RegExp(`\\b${params}\\.${key}\\b`).test(body);
+        if (!used && !read) dropped.push(`${found[1]} drops ${key}`);
+      }
+    }
+  }
+  expect(dropped).toEqual([]);
 });

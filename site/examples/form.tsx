@@ -8,6 +8,7 @@ import {
   FormStep,
   FormSteps,
   FormStepsBack,
+  FormStepsProgress,
   type FormStepsProps,
   FormStepsProvider,
   FormStepsSummary,
@@ -283,6 +284,8 @@ function Application() {
           await wait(250);
         }}
       >
+        {/* The page places how far along it is itself, above each step, so FormSteps draws none. */}
+        <FormStepsProgress />
         <FormStep
           validate={(data): FormErrors => ({
             "full-name": answer(data, "full-name") ? undefined : "Enter your full name",

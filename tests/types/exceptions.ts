@@ -175,10 +175,9 @@ export const unchecked = {
   "under another setting": [
     "ChartBrush",
     "FormStepsBack",
+    "FormStepsProgress",
     "FormStepsSummary",
     "SidebarSkeleton",
     "TilePager",
   ],
-  /** No example uses them yet. */
-  "in no example": ["FormStepsProgress"],
 } as const;

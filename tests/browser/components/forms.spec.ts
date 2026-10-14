@@ -473,9 +473,11 @@ test("an application in pages takes its Back link, buttons and answers where it 
   await playground.set("example", "In pages: an application");
   const main = frame.locator("main");
   const back = frame.getByRole("link", { name: "Back", exact: true });
-  // The first question has no way back, and shows how far along it is.
+  // The first question has no way back, and shows how far along it is, once, where the page
+  // places it.
   await expect(back).toHaveCount(0);
   await expect(frame.getByText("Step 1 of 3")).toBeVisible();
+  await expect(frame.locator(".x-govuk-ui-form-steps-progress")).toHaveCount(1);
   await frame.getByRole("textbox", { name: "What is your full name?" }).fill("Jo Bloggs");
   await frame.getByRole("button", { name: "Continue" }).click();
   const email = frame.getByRole("textbox", { name: "What is your email address?" });

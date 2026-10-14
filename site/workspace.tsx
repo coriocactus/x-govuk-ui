@@ -83,7 +83,6 @@ import {
   SoundScope,
   StreamingText,
   Tag,
-  type TagColour,
   ThemePicker,
   Timeline,
   TimelineItem,
@@ -102,10 +101,11 @@ import { Icon, type IconName } from "./icon";
 import {
   type Application,
   caseworker,
-  type Licence,
+  licenceColours,
   money,
   type Status,
   shortDate,
+  statusNames,
   useActivity,
   useApplications,
   useLicenceWeeks,
@@ -185,18 +185,11 @@ const columns: GroupedTableColumn[] = [
   { id: "assigned", label: "Assigned to", align: "end" },
 ];
 
-/** Each licence's colour, in the table and the views Piscine Assist composes. */
-const licenceColours: Record<Licence, TagColour> = {
-  "1 day": "green",
-  "8 days": "teal",
-  "12 months": "blue",
-};
-
 /** The table's groups, by the applications' status. An issued application has left the table. */
-const bands: { status: Exclude<Status, "issued">; label: string; icon: IconName }[] = [
-  { status: "decision", label: "Needs a decision", icon: "decided" },
-  { status: "waiting", label: "Waiting for the applicant", icon: "clock" },
-  { status: "ready", label: "Ready to issue", icon: "circle" },
+const bands: { status: Exclude<Status, "issued">; icon: IconName }[] = [
+  { status: "decision", icon: "decided" },
+  { status: "waiting", icon: "clock" },
+  { status: "ready", icon: "circle" },
 ];
 
 /** The applications still open, which the table lists and the sidebar counts. */
@@ -937,7 +930,7 @@ const Overview = memo(function Overview({
                   return (
                     <GroupedTableGroup
                       key={band.status}
-                      label={band.label}
+                      label={statusNames[band.status]}
                       icon={<Icon name={band.icon} />}
                     >
                       {items.map((item) => (

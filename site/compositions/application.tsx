@@ -12,13 +12,20 @@ import {
   Tag,
   type TagColour,
 } from "x-govuk-ui";
-import { askFor, issueLicence, money, type Status, useApplication } from "../workspace-data";
+import {
+  askFor,
+  issueLicence,
+  money,
+  type Status,
+  statusNames,
+  useApplication,
+} from "../workspace-data";
 
-const statuses: Record<Status, [string, TagColour]> = {
-  decision: ["Needs a decision", "orange"],
-  waiting: ["Waiting for the applicant", "yellow"],
-  ready: ["Ready to issue", "blue"],
-  issued: ["Issued", "green"],
+const statusColours: Record<Status, TagColour> = {
+  decision: "orange",
+  waiting: "yellow",
+  ready: "blue",
+  issued: "green",
 };
 
 /**
@@ -57,7 +64,7 @@ export default function Application() {
       )}
       <SummaryList>
         <SummaryListRow label="Status">
-          <Tag colour={statuses[application.status][1]}>{statuses[application.status][0]}</Tag>
+          <Tag colour={statusColours[application.status]}>{statusNames[application.status]}</Tag>
         </SummaryListRow>
         <SummaryListRow label="Name">{application.name}</SummaryListRow>
         <SummaryListRow label="Date of birth">{formatDate(application.dateOfBirth)}</SummaryListRow>

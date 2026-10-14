@@ -10,15 +10,8 @@ import {
   TableHeader,
   TableRow,
   Tag,
-  type TagColour,
 } from "x-govuk-ui";
-import { type Licence, money, shortDate, useApplications } from "../workspace-data";
-
-const colours: Record<Licence, TagColour> = {
-  "1 day": "green",
-  "8 days": "teal",
-  "12 months": "blue",
-};
+import { licenceColours, money, shortDate, useApplications } from "../workspace-data";
 
 /**
  * The applications that need a decision, oldest first. The table follows the data, so each one
@@ -59,7 +52,7 @@ export default function Decisions() {
               {`${application.reference}: ${application.note}`}
             </TableCell>
             <TableCell>
-              <Tag variant="outline" colour={colours[application.licence]}>
+              <Tag variant="outline" colour={licenceColours[application.licence]}>
                 {application.licence}
               </Tag>
             </TableCell>

@@ -1,4 +1,5 @@
 import { useMemo, useSyncExternalStore } from "react";
+import type { TagColour } from "x-govuk-ui";
 
 /*
  * The workspace's data, as a service's API would give it. It has the rod fishing licence
@@ -387,3 +388,18 @@ const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 /** A day and its month, for a table's narrow column, such as 29 Sep. `en-GB` would write Sept. */
 export const shortDate = (date: Date) => `${date.getDate()} ${months[date.getMonth()]}`;
+
+/** What the workspace calls each status, in the Overview's table and in the views. */
+export const statusNames: Record<Status, string> = {
+  decision: "Needs a decision",
+  waiting: "Waiting for the applicant",
+  ready: "Ready to issue",
+  issued: "Issued",
+};
+
+/** Each licence's colour, in the Overview's table and in the views. */
+export const licenceColours: Record<Licence, TagColour> = {
+  "1 day": "green",
+  "8 days": "teal",
+  "12 months": "blue",
+};

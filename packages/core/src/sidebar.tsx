@@ -529,13 +529,24 @@ export function SidebarFooter({ className = "", ...props }: ComponentPropsWithRe
 /**
  * A compact field for finding items in the sidebar, built from Input. Place it between the
  * header and the content, so it stays in view. The label is hidden but still announced, and the
- * prefix shows a search icon unless another is given.
+ * prefix shows a search icon unless another is given. Its `className` and `style` go on the box
+ * around the field, which a sidebar of icons makes inert. Every other prop, including `ref`, goes
+ * on the field.
  */
-export function SidebarInput({ className = "", prefix = <SearchIcon />, ...props }: InputProps) {
+export function SidebarInput({
+  className = "",
+  style,
+  prefix = <SearchIcon />,
+  ...props
+}: InputProps) {
   const frame = useFrame();
   return (
     // A sidebar of icons has no space for the field, so the field cannot take focus there.
-    <div className={`x-govuk-ui-sidebar-input ${className}`.trim()} inert={frame.iconsOnly}>
+    <div
+      className={`x-govuk-ui-sidebar-input ${className}`.trim()}
+      style={style}
+      inert={frame.iconsOnly}
+    >
       <Input type="search" autoComplete="off" hideLabel prefix={prefix} {...props} />
     </div>
   );

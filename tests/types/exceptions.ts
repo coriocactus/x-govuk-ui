@@ -65,6 +65,7 @@ export const boxed = [
   "MultiSelectControl",
   "FileUpload",
   "FileUploadControl",
+  "SidebarInput",
 ] as const;
 
 /**

@@ -12,8 +12,6 @@ npm install x-govuk-ui
 
 The library needs React 19. It is built on Base UI and Motion, and takes each as a peer dependency, at the patches of the version it is tested with, such as `~1.8.0`. A service that uses either one itself therefore shares the library's copy, and can take its patches without waiting for a release. npm installs them, unless `--legacy-peer-deps` tells it not to. In that case, install them yourself, at the versions in `package.json`.
 
-A prerelease is tagged `next`. To try what is coming, install it with `npm install x-govuk-ui@next`.
-
 ## Usage
 
 Import the stylesheet once, then the components:

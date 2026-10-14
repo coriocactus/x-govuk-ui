@@ -7,11 +7,11 @@ import { packages } from "../../scripts/stage";
 test("a release sets every package to its version, public, with core as a peer at the same", async () => {
   for (const directory of packages) {
     const manifest = await Bun.file(`${directory}/package.json`).text();
-    const released = JSON.parse(releaseManifest(manifest, "2.3.4-next.1"));
-    expect(released.version).toBe("2.3.4-next.1");
+    const released = JSON.parse(releaseManifest(manifest, "2.3.4"));
+    expect(released.version).toBe("2.3.4");
     expect(released.private).toBeUndefined();
     if (released.peerDependencies?.["x-govuk-ui"])
-      expect(released.peerDependencies["x-govuk-ui"]).toBe("2.3.4-next.1");
+      expect(released.peerDependencies["x-govuk-ui"]).toBe("2.3.4");
     if (released.devDependencies?.["x-govuk-ui"])
       expect(released.devDependencies["x-govuk-ui"]).toBe("workspace:*");
   }
@@ -88,9 +88,8 @@ test("a release stamps the unreleased entries with its version, and leaves the n
   );
 });
 
-test("only a minor version, or a prerelease's own version, may break a service", () => {
+test("only a minor or major version may break a service", () => {
   expect(isPatch("0.2.0", "0.2.1")).toBe(true);
   expect(isPatch("0.2.0", "0.3.0")).toBe(false);
   expect(isPatch("0.2.1", "1.0.0")).toBe(false);
-  expect(isPatch("0.3.0-next.1", "0.3.0")).toBe(false);
 });

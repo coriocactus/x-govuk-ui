@@ -19,12 +19,8 @@ export function releaseManifest(manifest: string, version: string) {
     .replace(/("x-govuk-ui": )"(?!workspace:)[^"]*"/g, `$1"${version}"`);
 }
 
-/**
- * Whether going from one version to another changes only the patch, which must break nothing. A
- * prerelease, such as 0.3.0-next.1, promises nothing, so its own version can break it.
- */
+/** Whether going from one version to another changes only the patch, which must break nothing. */
 export function isPatch(from: string, to: string) {
-  if (from.includes("-")) return false;
   const [major, minor] = from.split(".");
   const [toMajor, toMinor] = to.split(".");
   return major === toMajor && minor === toMinor;
@@ -38,8 +34,8 @@ function run(command: string[]) {
 if (import.meta.main) {
   const version = process.argv[2] ?? "";
   const { version: current } = await Bun.file("packages/core/package.json").json();
-  if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(version))
-    throw new Error("Give the version, such as: bun run release 0.3.0");
+  if (!/^\d+\.\d+\.\d+$/.test(version))
+    throw new Error("Give the version, with no prerelease, such as: bun run release 0.3.0");
   if (Bun.semver.order(version, current) <= 0)
     throw new Error(`${version} must come after ${current}`);
 

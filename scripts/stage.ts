@@ -56,12 +56,14 @@ if (import.meta.main) {
       console.log(`${name} is private, so it is not staged.`);
       continue;
     }
+    // Every version goes out under npm's `latest` tag, which `npm install` takes, so a prerelease
+    // would reach every service. `bun run release` refuses one, and this catches one set by hand.
+    if (version.includes("-"))
+      throw new Error(`${name}@${version} is a prerelease, and x-govuk-ui releases none`);
     if (published(name, version)) {
       console.log(`${name}@${version} is on npm already.`);
       continue;
     }
-    // A prerelease goes out under the `next` tag, so `latest` stays the last release.
-    const tag = version.includes("-") ? "next" : "latest";
     run([
       "npm",
       "stage",
@@ -69,8 +71,6 @@ if (import.meta.main) {
       pack(directory, into),
       "--access",
       "public",
-      "--tag",
-      tag,
       ...(dryRun ? ["--dry-run"] : []),
     ]);
   }

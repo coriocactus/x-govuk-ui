@@ -10,7 +10,9 @@ const sources = [
   "site/**/*.{ts,tsx,css,html,md}",
   "packages/*/src/**/*.{ts,tsx,css}",
   "packages/*/package.json",
+  "packages/*/README.md",
   "mcp/src/**/*.ts",
+  "mcp/README.md",
   "package.json",
   "README.md",
   "THIRD_PARTY_NOTICES.txt",
@@ -75,23 +77,28 @@ const movedTo = (address: string, to: string) => {
   return home || same(to) === same(address) ? null : to;
 };
 
+// npmjs.com answers every script with 403, so a package's page is checked by asking npm's registry
+// for the package. The registry answers 404 for a package that does not exist.
+const npmPage = /^https:\/\/www\.npmjs\.com\/package\/((?:@[^/]+\/)?[^/?#]+)$/;
+
 /**
  * Where an address leads. A page that is not found, or a site that does not exist, is gone. A site
  * that refuses the check or does not answer, such as one that admits no scripts, is tried once
  * more. Then it is left for a person to try, because it may well be there.
  */
 async function follow(address: string): Promise<Verdict> {
+  const asked = address.replace(npmPage, "https://registry.npmjs.org/$1");
   let why = "";
   for (const attempt of [1, 2]) {
     try {
-      const response = await fetch(address, {
+      const response = await fetch(asked, {
         headers,
         redirect: "follow",
         signal: AbortSignal.timeout(15_000),
       });
       await response.body?.cancel();
       if (response.ok) {
-        const to = movedTo(address, response.url);
+        const to = movedTo(asked, response.url);
         return to ? { kind: "moved", to } : { kind: "fine" };
       }
       if (response.status === 404 || response.status === 410)

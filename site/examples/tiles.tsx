@@ -136,17 +136,17 @@ export default function TilesExample({
           <TileContent scroll className="preview-tile">
             {id === "application" && (
               <SummaryList>
-                <SummaryListRow label="Applicant">Priya Natarajan</SummaryListRow>
+                <SummaryListRow label="Applicant">David Lloyd George</SummaryListRow>
                 <SummaryListRow label="Reference">RL-48213</SummaryListRow>
                 <SummaryListRow label="Licence">
                   <Tag colour="blue">12 months</Tag>
                 </SummaryListRow>
-                <SummaryListRow label="Concession">Disability</SummaryListRow>
+                <SummaryListRow label="Concession">Senior</SummaryListRow>
               </SummaryList>
             )}
             {id === "evidence" && (
               <ul className="preview-tile-list">
-                <li>Blue Badge, both sides (JPEG, 1.2 MB)</li>
+                <li>Passport, photo page (JPEG, 1.2 MB)</li>
                 <li>Proof of address (PDF, 220 KB)</li>
               </ul>
             )}
@@ -154,17 +154,17 @@ export default function TilesExample({
               <Timeline label="History of the application">
                 <TimelineItem
                   title="Evidence received"
-                  by="Priya Natarajan"
+                  by="David Lloyd George"
                   date={new Date(2026, 8, 29, 9, 12)}
                 >
-                  A photo of her Blue Badge.
+                  A photo of his passport, as proof of age.
                 </TimelineItem>
                 <TimelineItem
                   title="Application received"
-                  by="Priya Natarajan"
+                  by="David Lloyd George"
                   date={new Date(2026, 8, 28, 18, 40)}
                 >
-                  A 12-month licence at the disability rate, £23.80.
+                  A 12-month licence at the senior rate, £24.50.
                 </TimelineItem>
               </Timeline>
             )}

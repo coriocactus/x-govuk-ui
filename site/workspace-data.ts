@@ -124,7 +124,7 @@ const given: Given[] = [
     received: new Date(2026, 8, 29, 10, 2),
     status: "decision",
     note: "paid twice, refund one",
-    assigned: ["Andy Burnham", "Sam Okafor"],
+    assigned: ["Andy Burnham", "Harold Wilson"],
     payments: [
       card("p-48207-1", new Date(2026, 8, 29, 10, 2), "4421"),
       card("p-48207-2", new Date(2026, 8, 29, 10, 4), "4421"),
@@ -141,7 +141,7 @@ const given: Given[] = [
     received: new Date(2026, 8, 28, 16, 40),
     status: "decision",
     note: "starts before payment",
-    assigned: ["Sam Okafor"],
+    assigned: ["Harold Wilson"],
     payments: [card("p-48199", new Date(2026, 8, 28, 16, 40), "0912")],
   },
   {
@@ -155,7 +155,7 @@ const given: Given[] = [
     received: new Date(2026, 8, 26, 11, 5),
     status: "waiting",
     note: "proof of age asked for",
-    assigned: ["Jo Reid"],
+    assigned: ["Margaret Thatcher"],
     payments: [card("p-48184", new Date(2026, 8, 26, 11, 5), "5106")],
   },
   {
@@ -169,7 +169,7 @@ const given: Given[] = [
     received: new Date(2026, 8, 25, 18, 22),
     status: "waiting",
     note: "address does not match",
-    assigned: ["Jo Reid", "Andy Burnham"],
+    assigned: ["Margaret Thatcher", "Andy Burnham"],
     payments: [card("p-48171", new Date(2026, 8, 25, 18, 22), "3348")],
   },
   {
@@ -183,7 +183,7 @@ const given: Given[] = [
     received: new Date(2026, 8, 24, 8, 47),
     status: "ready",
     note: "all checks passed",
-    assigned: ["Sam Okafor"],
+    assigned: ["Harold Wilson"],
     payments: [card("p-48160", new Date(2026, 8, 24, 8, 47), "8264")],
   },
   {
@@ -197,7 +197,7 @@ const given: Given[] = [
     received: new Date(2026, 8, 24, 13, 30),
     status: "ready",
     note: "all checks passed",
-    assigned: ["Jo Reid"],
+    assigned: ["Margaret Thatcher"],
     payments: [card("p-48152", new Date(2026, 8, 24, 13, 30), "6017")],
   },
   {
@@ -222,7 +222,7 @@ const activity: Activity[] = [
   {
     id: "issued",
     title: "Licence issued",
-    by: "Sam Okafor",
+    by: "Harold Wilson",
     date: new Date(2026, 8, 29, 16, 20),
     text: "RL-48139, a 12-month licence for Keir Starmer.",
   },
@@ -236,7 +236,7 @@ const activity: Activity[] = [
   {
     id: "asked",
     title: "Proof of age asked for",
-    by: "Jo Reid",
+    by: "Margaret Thatcher",
     date: new Date(2026, 8, 28, 11, 30),
     text: "From John Major, for a senior concession.",
   },

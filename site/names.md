@@ -27,5 +27,8 @@ The examples name people after UK prime ministers. Each person appears once acro
 | Stanley Baldwin | Editor |
 | Ramsay MacDonald | Editor |
 | Bonar Law | Editor |
+| David Lloyd George | Tiles |
 
-The next unused names are David Lloyd George, H. H. Asquith and Henry Campbell-Bannerman.
+The next unused names are H. H. Asquith, Henry Campbell-Bannerman and Arthur Balfour.
+
+The workspace names its applicants and caseworkers after prime ministers too. It is not an example, so it can share their names.

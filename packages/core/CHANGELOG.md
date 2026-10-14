@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-14
+
 ### Breaking Changes
 
 - Moved the Panel that says FormSteps' answers are sent out of `.x-govuk-ui-form-steps-review`, to the start of `.x-govuk-ui-form-steps-body`, above every list of the answers. Select it as `.x-govuk-ui-form-steps-body > .x-govuk-ui-panel`.

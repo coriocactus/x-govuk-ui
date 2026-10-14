@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-14
+
 ### Breaking Changes
 
 - Renamed `chartLabels` to `defaultChartLabels`, as every map of words' English defaults are named after its key in a LabelsProvider, such as `defaultPaginationLabels`. Import `defaultChartLabels` instead.

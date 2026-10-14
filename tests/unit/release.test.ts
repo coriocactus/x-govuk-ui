@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { notes, parse, SECTIONS, stamp } from "../../scripts/changelog";
 import { PEERS, patchRange } from "../../scripts/peers";
-import { isPatch, releaseManifest } from "../../scripts/release";
+import { isPatch, releaseManifest, stalePeers } from "../../scripts/release";
 import { packages } from "../../scripts/stage";
 
 test("a release sets every package to its version, public, with core as a peer at the same", async () => {
@@ -25,6 +25,14 @@ test("each extension takes core at exactly core's version", async () => {
     if (manifest.peerDependencies?.["x-govuk-ui"])
       expect(manifest.peerDependencies["x-govuk-ui"]).toBe(version);
   }
+  // bun.lock's copy of each package agrees, and a copy left at another version is found.
+  const lock = await Bun.file("bun.lock").text();
+  expect(stalePeers(lock, version)).toEqual([]);
+  expect(stalePeers(lock, "0.0.1")).toEqual([
+    "@x-govuk-ui/belsize",
+    "@x-govuk-ui/jorjorwel",
+    "@x-govuk-ui/memetics",
+  ]);
 });
 
 test("each package takes Base UI and Motion as peers at the patches of the versions it is tested with", async () => {

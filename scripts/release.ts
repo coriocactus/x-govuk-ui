@@ -6,8 +6,9 @@ import { packages } from "./stage";
 // takes core at exactly that version, because `x-govuk-ui/internal` changes without a release
 // saying so. It first checks the version against the changes: anything that can break a service
 // needs a minor version. Then it stamps each changelog's unreleased entries with the version, and
-// refreshes bun.lock, from which `bun pm pack` reads the workspace's versions. Push main
-// afterwards, and the release workflow stages each package on npm for you to approve.
+// refreshes bun.lock, from which `bun pm pack` reads the workspace's versions. It fails if bun.lock
+// still lists core as a peer at another version. Push main afterwards, and the release workflow
+// stages each package on npm for you to approve.
 //
 //   bun run release 0.3.0
 
@@ -24,6 +25,22 @@ export function isPatch(from: string, to: string) {
   const [major, minor] = from.split(".");
   const [toMajor, toMinor] = to.split(".");
   return major === toMajor && minor === toMinor;
+}
+
+/**
+ * The packages whose copy in bun.lock lists core as a peer at another version. bun.lock keeps a
+ * copy of each package's dependencies, and `bun install` can leave that copy's peers as they were.
+ */
+export function stalePeers(lock: string, version: string) {
+  const { workspaces } = Bun.JSONC.parse(lock) as {
+    workspaces: Record<string, { name: string; peerDependencies?: Record<string, string> }>;
+  };
+  return Object.values(workspaces)
+    .filter(
+      ({ peerDependencies: peers }) =>
+        peers?.["x-govuk-ui"] !== undefined && peers["x-govuk-ui"] !== version,
+    )
+    .map(({ name }) => name);
 }
 
 function run(command: string[]) {
@@ -71,6 +88,11 @@ if (import.meta.main) {
     await Bun.write(changelog, stamp(await changelog.text(), version, date));
   }
   run(["bun", "install"]);
+  const stale = stalePeers(await Bun.file("bun.lock").text(), version);
+  if (stale.length)
+    throw new Error(
+      `bun.lock lists x-govuk-ui at another version as a peer of ${stale.join(", ")}. Run bun install --force, check that bun.lock lists ${version}, and commit it with the release.`,
+    );
   console.log(
     `Every package is at ${version}, and each changelog is stamped. Push main: once its checks pass, the release workflow stages each package on npm for you to approve.`,
   );

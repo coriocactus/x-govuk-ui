@@ -95,3 +95,95 @@ export const ownWords = {
  * hear that it opened.
  */
 export const reportedBy = { AccordionItem: "Open", ContextMenu: "Open" } as const;
+
+/**
+ * Parts that no example shows with an element as it first renders, so the composition test,
+ * `tests/unit/composition.test.tsx`, cannot see what they do with a service's class, data and
+ * style. The type check still checks that each takes them. The test fails when a part is neither
+ * checked nor listed here, and when a listed part comes to be checked, so the list stays true.
+ */
+export const unchecked = {
+  /** They show only in a popup, which is closed as the page loads. */
+  "in a closed popup": [
+    "Calendar",
+    "CalloutClose",
+    "CalloutContent",
+    "CommandMenuBestMatches",
+    "CommandMenuClose",
+    "CommandMenuContent",
+    "CommandMenuGroup",
+    "CommandMenuItem",
+    "DialogClose",
+    "DialogContent",
+    "DialogDescription",
+    "DialogTitle",
+    "EditorAIAction",
+    "EditorAIAsk",
+    "EditorAIPrompt",
+    "EditorAISeparator",
+    "EditorAISuggestion",
+    "EditorAIToolbar",
+    "EditorAITools",
+    "EditorAttachmentTools",
+    "EditorCodeLanguage",
+    "EditorLinkTools",
+    "EditorPrompt",
+    "EditorTableTools",
+    "HoverCardContent",
+    "MenuCheckboxItem",
+    "MenuContent",
+    "MenuGroup",
+    "MenuHeader",
+    "MenuItem",
+    "MenuLinkItem",
+    "MenuRadioGroup",
+    "MenuRadioItem",
+    "MenuSeparator",
+    "NavigationMenuContent",
+    "PopoverClose",
+    "PopoverContent",
+    "PopoverDescription",
+    "PopoverTitle",
+    "SelectItem",
+    "SheetClose",
+    "SheetContent",
+    "SheetDescription",
+    "SheetTitle",
+    "SidebarCustomise",
+    "Tour",
+  ],
+  /** They show once users act, such as sending a message or attaching a file. */
+  "after users act": [
+    "ChatInputAttachment",
+    "ChatInputAttachments",
+    "ConversationActions",
+    "ConversationContent",
+    "ConversationCopy",
+    "ConversationMessage",
+    "ConversationNote",
+    "ConversationThinking",
+    "TilesDockItem",
+  ],
+  /** They show under another of their example's settings, or on a narrow screen. */
+  "under another setting": [
+    "ChartBrush",
+    "FormStepsBack",
+    "FormStepsSummary",
+    "SidebarSkeleton",
+    "TilePager",
+  ],
+  /** No example uses them yet. */
+  "in no example": [
+    "ChartCard",
+    "EditorTool",
+    "EditorTools",
+    "FormStepsProgress",
+    "GovukWordmark",
+    "LetteredChoices",
+    "NumberedChoices",
+    "SearchIcon",
+    "SidebarInput",
+    "SidebarItemAction",
+    "SidebarText",
+  ],
+} as const;

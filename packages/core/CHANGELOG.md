@@ -12,6 +12,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Visual
 
+- Changed SidebarInput to have as much room above its field as below, 10 pixels each, so it sits clear of a header of its own colour, such as an inverse one. Its box is 56 pixels tall, or 60 in the sheet, where it was 48 and 52.
 - Changed Calendar to fit a phone 320 pixels wide, the narrowest that WCAG asks a page to work on. On a screen narrower than 336 pixels, its days are 38 pixels, not 40, and its padding is 8 pixels, not 12.
 
 ### Added

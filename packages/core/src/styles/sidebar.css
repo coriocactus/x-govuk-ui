@@ -177,12 +177,14 @@
 .x-govuk-ui-sidebar[data-collapsible="icon"] .x-govuk-ui-sidebar-footer {
   white-space: nowrap;
 }
-/* The sidebar's search field, an Input sized to match the rows beneath it. */
+/* The sidebar's search field, an Input sized to match the rows beneath it. It has as much room
+   above it as below, so it sits as well under a header of its own colour, such as an inverse one,
+   as under a header on the sidebar's colour. */
 .x-govuk-ui-sidebar-input {
   box-sizing: border-box;
   flex-shrink: 0;
-  height: 48px;
-  padding: 2px 8px 10px;
+  height: 56px;
+  padding: 10px 8px;
 }
 .x-govuk-ui-sidebar-content .x-govuk-ui-sidebar-input {
   padding-inline: 0;
@@ -202,7 +204,7 @@
 }
 /* Small screens zoom into fields with text under 16 pixels. */
 .x-govuk-ui-sidebar-sheet .x-govuk-ui-sidebar-input {
-  height: 52px;
+  height: 60px;
 }
 .x-govuk-ui-sidebar-sheet .x-govuk-ui-sidebar-input .x-govuk-ui-input-group {
   height: 40px;

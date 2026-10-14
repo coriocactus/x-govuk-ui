@@ -4,7 +4,7 @@ import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
 import { useLabels } from "./labels";
-import { GovukCrown } from "./logo";
+import { GOVUKCrown } from "./logo";
 import { WidthContainer } from "./width-container";
 
 const licenceLogo = (
@@ -120,7 +120,7 @@ export function Footer({
       }
     >
       <WidthContainer className="x-govuk-ui-footer-container">
-        {crown && <GovukCrown className="x-govuk-ui-footer-crown" />}
+        {crown && <GOVUKCrown className="x-govuk-ui-footer-crown" />}
         {navigation && (
           <>
             <div className="x-govuk-ui-footer-navigation">{navigation}</div>

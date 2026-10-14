@@ -7,7 +7,7 @@ import type { ComponentPropsWithRef } from "react";
  * Footer shows the crown, and Inline citation shows the crown for a GOV.UK source. They are
  * decorative unless given a name with `aria-label`.
  */
-export type GovukMarkProps = ComponentPropsWithRef<"svg">;
+export type GOVUKMarkProps = ComponentPropsWithRef<"svg">;
 
 const crown = (
   <>
@@ -35,7 +35,7 @@ function Mark({
   className = "",
   children,
   ...props
-}: GovukMarkProps & { viewBox: string }) {
+}: GOVUKMarkProps & { viewBox: string }) {
   const named = Boolean(props["aria-label"] || props["aria-labelledby"]);
   return (
     // biome-ignore lint/a11y/noSvgWithoutTitle: A mark is hidden, or named by its aria-label.
@@ -55,7 +55,7 @@ function Mark({
 }
 
 /** GOV.UK's crown on its own, as the footer and a GOV.UK source's citation show it. */
-export function GovukCrown(props: GovukMarkProps) {
+export function GOVUKCrown(props: GOVUKMarkProps) {
   return (
     <Mark {...props} viewBox="0 0 64 60">
       {crown}
@@ -64,7 +64,7 @@ export function GovukCrown(props: GovukMarkProps) {
 }
 
 /** GOV.UK's lock-up, which is the crown beside the wordmark, as GOV.UK's header shows it. */
-export function GovukLockup(props: GovukMarkProps) {
+export function GOVUKLockup(props: GOVUKMarkProps) {
   return (
     <Mark {...props} viewBox="0 0 324 60">
       {crown}

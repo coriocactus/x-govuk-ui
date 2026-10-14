@@ -1,6 +1,6 @@
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
-import { GovukLockup } from "./logo";
+import { GOVUKLockup } from "./logo";
 import { WidthContainer } from "./width-container";
 
 export type HeaderProps = ComponentPropsWithRef<"header"> & {
@@ -43,7 +43,7 @@ export function Header({
     >
       <WidthContainer className="x-govuk-ui-header-container">
         <Anchor href={homepageUrl} render={render} className="x-govuk-ui-header-link">
-          {logo ?? <GovukLockup className="x-govuk-ui-header-logo" />}
+          {logo ?? <GOVUKLockup className="x-govuk-ui-header-logo" />}
           <span className="x-govuk-ui-visually-hidden">{logoLabel}</span>
           {productName && <span className="x-govuk-ui-header-product">{productName}</span>}
         </Anchor>

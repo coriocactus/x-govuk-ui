@@ -3326,7 +3326,7 @@ const entries = {
     upstream: "header",
     dependencies: "React",
     changes:
-      "GOV.UK's header, with the crown and logotype in white on brand blue, and GOV.UK's teal dot. The logo is the library's GovukLockup, GOV.UK's crown beside its wordmark, and GovukCrown gives the crown alone. A government service that is not part of GOV.UK gives its own logo, and the header becomes GOV.UK's generic header, with its mark and name in white on black at 30 pixels, because the crown and the blue are only for GOV.UK services.",
+      "GOV.UK's header, with the crown and logotype in white on brand blue, and GOV.UK's teal dot. The logo is the library's GOVUKLockup, GOV.UK's crown beside its wordmark, and GOVUKCrown gives the crown alone. A government service that is not part of GOV.UK gives its own logo, and the header becomes GOV.UK's generic header, with its mark and name in white on black at 30 pixels, because the crown and the blue are only for GOV.UK services.",
     props: [
       text("productName", "", { type: "ReactNode" }),
       reference("homepageUrl", "string", "https://www.gov.uk/"),
@@ -3362,7 +3362,7 @@ const entries = {
     upstream: "footer",
     dependencies: "React",
     changes:
-      "GOV.UK's footer under a band of brand blue, on its tinted surface. The crown sits at the top, then any navigation in sections, each a heading over a rule with its links, sharing the row by GOV.UK's widths and setting a long list in columns. A rule closes the navigation. Then come the support links, anything else given, such as who built the service, and the Open Government Licence, with Crown copyright under the Royal Arms at the end of the row. Built from parts. The crown is the library's GovukCrown, and the Royal Arms is GOV.UK Frontend's image, drawn in the text's colour. Both are only for GOV.UK services, so crown false leaves them out. Links are GOV.UK's blue, and the sections stack on a phone. The example sits at the foot of the preview, as it would at the foot of a page.",
+      "GOV.UK's footer under a band of brand blue, on its tinted surface. The crown sits at the top, then any navigation in sections, each a heading over a rule with its links, sharing the row by GOV.UK's widths and setting a long list in columns. A rule closes the navigation. Then come the support links, anything else given, such as who built the service, and the Open Government Licence, with Crown copyright under the Royal Arms at the end of the row. Built from parts. The crown is the library's GOVUKCrown, and the Royal Arms is GOV.UK Frontend's image, drawn in the text's colour. Both are only for GOV.UK services, so crown false leaves them out. Links are GOV.UK's blue, and the sections stack on a phone. The example sits at the foot of the preview, as it would at the foot of a page.",
     props: [
       toggle("crown", true, { default: "true" }),
       reference("crest", "string", "None"),

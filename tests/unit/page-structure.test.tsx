@@ -16,8 +16,8 @@ import {
   Footer,
   FooterLink,
   Form,
-  GovukCrown,
-  GovukLockup,
+  GOVUKCrown,
+  GOVUKLockup,
   GridColumn,
   GridRow,
   Header,
@@ -200,11 +200,11 @@ test("links, cards, avatars and page parts follow GOV.UK and name themselves", (
 });
 
 test("GOV.UK's marks are decorative unless named, and the workbench's own marks match its files", async () => {
-  const lockup = renderToStaticMarkup(<GovukLockup />);
+  const lockup = renderToStaticMarkup(<GOVUKLockup />);
   expect(lockup).toContain('aria-hidden="true"');
   expect(lockup).toContain('viewBox="0 0 324 60"');
   expect(lockup).toContain("x-govuk-ui-logo-dot");
-  expect(renderToStaticMarkup(<GovukCrown aria-label="GOV.UK" />)).toContain('role="img"');
+  expect(renderToStaticMarkup(<GOVUKCrown aria-label="GOV.UK" />)).toContain('role="img"');
   // The workbench's brand draws the same shapes as the files in site/assets/brand.
   const shapes = async (name: string) =>
     [...(await Bun.file(`site/assets/brand/${name}.svg`).text()).matchAll(/ d="([^"]+)"/g)].map(

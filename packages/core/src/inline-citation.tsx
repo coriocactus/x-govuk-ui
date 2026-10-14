@@ -6,7 +6,7 @@ import { type ComponentPropsWithRef, type ReactNode, useState } from "react";
 import { Button } from "./button";
 import { directionOf } from "./helpers";
 import { useLabels } from "./labels";
-import { GovukCrown } from "./logo";
+import { GOVUKCrown } from "./logo";
 import { useOverlaySound } from "./overlay";
 
 export type CitationSource = {
@@ -70,7 +70,7 @@ function SiteMark({ source }: { source: CitationSource }) {
   if (source.crown ?? (source.url !== undefined && hostOf(source.url).endsWith("gov.uk")))
     return (
       <span className="x-govuk-ui-inline-citation-mark" aria-hidden="true">
-        <GovukCrown />
+        <GOVUKCrown />
       </span>
     );
   const site = siteOf(source);

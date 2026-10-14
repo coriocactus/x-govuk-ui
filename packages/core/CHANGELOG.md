@@ -6,7 +6,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Breaking Changes
 
-- Removed GovukWordmark, which no part of the library used. Use GovukLockup, which shows the wordmark beside the crown, as GOV.UK's header does.
+- Renamed GovukCrown, GovukLockup and GovukMarkProps to GOVUKCrown, GOVUKLockup and GOVUKMarkProps, so the names write GOV.UK in capitals, as GOV.UK does. Import them by their new names.
+- Removed GovukWordmark, which no part of the library used. Use GOVUKLockup, which shows the wordmark beside the crown, as GOV.UK's header does.
 
 ### Added
 

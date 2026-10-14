@@ -106,7 +106,6 @@ export const reportedBy = { AccordionItem: "Open", ContextMenu: "Open" } as cons
 export const unchecked = {
   /** They show only in a popup, which is closed as the page loads. */
   "in a closed popup": [
-    "Calendar",
     "CalloutClose",
     "CalloutContent",
     "CommandMenuBestMatches",

@@ -11,6 +11,7 @@ import breadcrumbs from "./breadcrumbs";
 import bubble from "./bubble";
 import bulletChart from "./bullet-chart";
 import button from "./button";
+import calendar from "./calendar";
 import calendarHeatmap from "./calendar-heatmap";
 import callout from "./callout";
 import card from "./card";
@@ -187,6 +188,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   "language-navigation": languageNavigation,
   "exit-this-page": exitThisPage,
   "date-input": dateInput,
+  calendar,
   tiles,
   "time-input": timeInput,
   "file-upload": fileUpload,

@@ -465,6 +465,13 @@ const calendarDays = Array.from({ length: 14 * 7 }, (_, index) => {
   return { x: 9.5 + week * 5.5, y: 18 + day * 5.5, level: Math.max(1, Math.min(5, level)) };
 });
 
+// A month of 31 days that starts on a Wednesday, in rows of a week, for Calendar.
+const monthDays = Array.from({ length: 31 }, (_, index) => ({
+  day: index + 1,
+  x: 12 + ((index + 2) % 7) * 10.5,
+  y: 26 + Math.floor((index + 2) / 7) * 8.5,
+}));
+
 // A hundred cells, filled a column at a time, with 62 in the first colour and 18 in the second.
 const waffleCells = Array.from({ length: 100 }, (_, index) => {
   const column = Math.floor(index / 10);
@@ -621,6 +628,28 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Frame x={73} y={27} w={14} h={16} edge="border" fill="grey" weight={1} r={2} />
       <Frame x={76} y={31} w={8} h={8} edge="ink" fill="none" r={1} />
       <Area x={76} y={31} w={8} h={2.5} tone="ink" r={1} />
+    </>
+  ),
+  calendar: (
+    <>
+      <Stroke d="M15 9l-3 3 3 3" weight={1.5} />
+      <Words x={34} y={10} w={28} tone="ink" />
+      <Stroke d="M81 9l3 3-3 3" weight={1.5} />
+      {[0, 1, 2, 3, 4, 5, 6].map((day) => (
+        <Words key={day} x={14.5 + day * 10.5} y={19} w={4} h={2} />
+      ))}
+      {/* The 14th to the 17th, chosen as a range, its ends filled and the days between tinted. */}
+      <Area x={22.5} y={43} w={40.5} h={7} tone="tint" r={3.5} />
+      {monthDays.map(({ day, x, y }) =>
+        day === 14 || day === 17 ? (
+          <g key={day}>
+            <Area x={x} y={y} w={9} h={7} tone="brand" r={3.5} />
+            <Words x={x + 2.5} y={y + 2.5} w={4} h={2} tone="white" />
+          </g>
+        ) : (
+          <Words key={day} x={x + 2.5} y={y + 2.5} w={4} h={2} tone="ink" />
+        ),
+      )}
     </>
   ),
   "time-input": (

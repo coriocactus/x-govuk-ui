@@ -170,7 +170,7 @@ const entries = {
     upstream: "date-input",
     dependencies: "React · Base UI",
     changes:
-      "GOV.UK's date input, three short numeric fields in a fieldset with GOV.UK's ids, merged with a Calendar. Each field is also a dial, as Time input's are. Drag it up or down, scroll over it, or press the arrow keys, and it turns a step at a time from today's date. A button beside the fields, as tall as they are with its bottom edge, opens the calendar in a popover, and choosing a day fills the fields in. The calendar's month and year are Selects, so a date of birth decades back is two choices away. The calendar also stands alone, for one date, a range across two months or several days. Its arrow keys move a day or a week, Page Up and Page Down a month, a chosen day grows into place, and the month slides the way it turns.",
+      "GOV.UK's date input, three short numeric fields in a fieldset with GOV.UK's ids, merged with a Calendar. Each field is also a dial, as Time input's are. Drag it up or down, scroll over it, or press the arrow keys, and it turns a step at a time from today's date. A button beside the fields, as tall as they are with its bottom edge, opens the calendar in a popover, and choosing a day fills the fields in. The calendar's month and year are Selects, so a date of birth decades back is two choices away.",
     props: [
       text("legend", "When do you want your licence to start?", {
         type: "ReactNode",
@@ -181,7 +181,6 @@ const entries = {
       toggle("calendar", true, {
         default: "false",
         note: "Adds the button that opens a Calendar.",
-        needs: [when("show", "input")],
       }),
       toggle("disabled"),
       reference("value / onValueChange", "{ day, month, year } / (value) => void"),
@@ -189,25 +188,9 @@ const entries = {
       reference("min / max", "Date"),
       reference("errorFields", '("day" | "month" | "year")[]', "All three"),
       reference("autoCompleteBirthday", "boolean", "false"),
-      reference(
-        "Calendar",
-        '{ mode: "single" | "range" | "multiple", value, onValueChange, months, min, max, isDateDisabled, locale }',
-        "Part",
-      ),
       reference("dateFromParts", "(value) => Date | null", "Helper"),
     ],
     example: [
-      choice(
-        "show",
-        [
-          ["input", "Date input"],
-          ["single", "Calendar, one date"],
-          ["range", "Calendar, a range"],
-          ["multiple", "Calendar, several dates"],
-        ],
-        "input",
-        { note: "Shows the date input, or the calendar on its own." },
-      ),
       choice(
         "disabledDates",
         [
@@ -218,13 +201,7 @@ const entries = {
         "none",
         {
           note: "Dates the calendar will not offer, set by min or max.",
-          needs: [
-            {
-              test: (args: Record<string, unknown>) =>
-                args.show !== "input" || Boolean(args.calendar),
-              says: "a calendar showing, from `calendar` on or `show`",
-            },
-          ],
+          needs: [whenOn("calendar")],
         },
       ),
     ],
@@ -233,10 +210,73 @@ const entries = {
         name: "With an error",
         args: { errorMessage: "The date your licence starts must be today or in the future" },
       },
-      { name: "Calendar, one date", args: { show: "single" } },
-      { name: "Calendar, a range", args: { show: "range" } },
-      { name: "Calendar, several dates", args: { show: "multiple" } },
-      { name: "No past dates", args: { show: "single", disabledDates: "past" } },
+      { name: "No past dates", args: { disabledDates: "past" } },
+    ],
+  },
+  calendar: {
+    name: "Calendar",
+    width: 640,
+    description: "Let users choose a date, a range of dates or several, from a month.",
+    upstream: "",
+    dependencies: "React · Base UI",
+    changes:
+      "GOV.UK has no calendar. Ours is a month of dates, for one date, a range across two months or several days. Its arrow keys move a day or a week, Page Up and Page Down a month, and Home and End to the ends of the week. A chosen day grows into place, a range fills the days between its ends, and the month slides the way it turns. Its month and year are Selects, so a date of birth decades back is two choices away. Date input opens one from its button.",
+    props: [
+      choice(
+        "mode",
+        [
+          ["single", "One date"],
+          ["range", "A range"],
+          ["multiple", "Several dates"],
+        ],
+        "single",
+        { default: '"single"' },
+      ),
+      choice(
+        "months",
+        [
+          [1, "One"],
+          [2, "Two, side by side"],
+        ],
+        1,
+        { default: "1" },
+      ),
+      toggle("monthYearSelects", true, {
+        default: "true",
+        note: "Chooses the month and year from Selects, or names them as a heading.",
+      }),
+      choice(
+        "weekStartsOn",
+        [
+          [1, "Monday"],
+          [0, "Sunday"],
+        ],
+        1,
+        { default: "1" },
+      ),
+      reference("value / onValueChange", "Date | null, DateRange or Date[], by mode"),
+      reference("min / max", "Date"),
+      reference("isDateDisabled", "(date: Date) => boolean"),
+      reference("defaultMonth", "Date", "The chosen date's month, or today's"),
+      reference("label", "string", "Its calendar label"),
+      reference("locale / years", "string / number[]"),
+    ],
+    example: [
+      choice(
+        "disabledDates",
+        [
+          ["none", "None"],
+          ["future", "Future"],
+          ["past", "Past"],
+        ],
+        "none",
+        { note: "Dates the calendar will not offer, set by min or max." },
+      ),
+    ],
+    presets: [
+      { name: "A range across two months", args: { mode: "range", months: 2 } },
+      { name: "Several dates", args: { mode: "multiple" } },
+      { name: "No past dates", args: { disabledDates: "past" } },
     ],
   },
   "time-input": {
@@ -3998,6 +4038,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "checkboxes",
     "choices",
     "date-input",
+    "calendar",
     "time-input",
     "file-upload",
     "combobox",

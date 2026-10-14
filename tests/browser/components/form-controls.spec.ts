@@ -1026,6 +1026,54 @@ test("a date input fills its fields from its calendar, by keyboard", async ({
   expect(Math.abs((await day.boundingBox())!.x - before)).toBeLessThan(1);
 });
 
+test("a calendar chooses a date by its keys, a range across two months, and several dates", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  await open("calendar");
+  const status = frame.getByRole("status");
+  // Today's date takes focus first. Right moves a day, and Page Down a month, to the same date.
+  const one = frame.getByRole("region", { name: "Choose a date" });
+  await one.locator('[aria-current="date"]').focus();
+  const focused = async () =>
+    new Date(
+      `${await one.locator(".x-govuk-ui-calendar-day:focus").getAttribute("data-date")}T12:00`,
+    );
+  const today = await focused();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(async () => (await focused()).getTime() - today.getTime()).toBe(86_400_000);
+  const tomorrow = await focused();
+  await page.keyboard.press("PageDown");
+  await expect.poll(async () => (await focused()).getMonth()).toBe((tomorrow.getMonth() + 1) % 12);
+  // Enter chooses the focused day, which the example writes out, without its year.
+  const chosen = await one.locator(".x-govuk-ui-calendar-day:focus").getAttribute("aria-label");
+  await page.keyboard.press("Enter");
+  await expect(status).toHaveText(`You chose ${chosen?.replace(",", "").replace(/ \d{4}$/, "")}.`);
+  await expect(one.locator('[aria-selected="true"]')).toHaveCount(1);
+  // A range across two months: its first and last days, and the days between filled.
+  await playground.set("mode", "A range");
+  await playground.set("months", "Two, side by side");
+  const range = frame.getByRole("region", { name: "Dates of your event" });
+  const grids = range.getByRole("grid");
+  await expect(grids).toHaveCount(2);
+  await grids.nth(0).getByRole("button").nth(19).click();
+  await expect(status).toHaveText("Now choose the last day.");
+  await grids.nth(1).getByRole("button").nth(4).click();
+  await expect(status).toHaveText(/^From .+ to .+\.$/);
+  await expect(range.locator("[data-in-range]").first()).toBeVisible();
+  // Several dates: each day pressed is chosen, and pressed again, let go.
+  await playground.set("mode", "Several dates");
+  const several = frame.getByRole("region", { name: "Days you can attend" });
+  const days = several.getByRole("grid").first().getByRole("button");
+  await days.nth(9).click();
+  await days.nth(11).click();
+  await expect(status).toHaveText("2 days chosen.");
+  await days.nth(9).click();
+  await expect(status).toHaveText("1 day chosen.");
+});
+
 test("a calendar closed while its month list is open raises no resize loop", async ({
   page,
   frame,

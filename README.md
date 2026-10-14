@@ -128,7 +128,7 @@ claude mcp add x-govuk-ui -e X_GOVUK_UI_DOCS=$PWD/dist/docs -- node $PWD/mcp/dis
 
 ## Accessibility
 
-The tests check every page of the site. These are the front page, the workbench, the page of each of the 119 components, and the workspace.
+The tests check every page of the site. These are the front page, the workbench, the page of each of the 120 components, and the workspace.
 
 - axe checks each page against the WCAG 2.0, 2.1 and 2.2 A and AA rules it runs by default, in Chromium and in WebKit.
 - In Chromium, axe checks each page again in the dark theme. It checks that text contrasts with its background, and that links can be told apart from the words around them.

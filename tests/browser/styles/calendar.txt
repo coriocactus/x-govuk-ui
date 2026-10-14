@@ -1,0 +1,96 @@
+.x-govuk-ui-calendar
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 12px
+  padding-right: 12px
+  padding-bottom: 12px
+  padding-left: 12px
+  border-top-left-radius: 8px
+  border-top-right-radius: 8px
+  border-bottom-right-radius: 8px
+  border-bottom-left-radius: 8px
+  border-top: 1px solid rgb(206, 206, 206)
+  border-right: 1px solid rgb(206, 206, 206)
+  border-bottom: 1px solid rgb(206, 206, 206)
+  border-left: 1px solid rgb(206, 206, 206)
+.x-govuk-ui-calendar-caption
+  display: block
+  font-size: 16px
+  font-weight: 700
+  line-height: 32px
+.x-govuk-ui-calendar-cell
+  display: table-cell
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 2px
+  padding-bottom: 2px
+.x-govuk-ui-calendar-day
+  display: inline-block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 1px
+  padding-right: 6px
+  padding-bottom: 1px
+  padding-left: 6px
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px
+.x-govuk-ui-calendar-grid
+  display: table
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  margin-top: 8px
+.x-govuk-ui-calendar-month
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-calendar-months
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 24px
+  column-gap: 24px
+.x-govuk-ui-calendar-nav
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-calendar-select
+  display: block
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+.x-govuk-ui-calendar-selects
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  row-gap: 2px
+  column-gap: 2px
+.x-govuk-ui-calendar-turn
+  display: grid
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.3
+  color: rgb(11, 12, 12)
+  border-top-left-radius: 5px
+  border-top-right-radius: 5px
+  border-bottom-right-radius: 5px
+  border-bottom-left-radius: 5px

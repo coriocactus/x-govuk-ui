@@ -178,7 +178,6 @@ export const unchecked = {
     "EditorTool",
     "EditorTools",
     "FormStepsProgress",
-    "GovukWordmark",
     "LetteredChoices",
     "NumberedChoices",
     "SearchIcon",

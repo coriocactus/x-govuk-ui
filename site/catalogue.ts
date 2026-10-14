@@ -3326,7 +3326,7 @@ const entries = {
     upstream: "header",
     dependencies: "React",
     changes:
-      "GOV.UK's header, with the crown and logotype in white on brand blue, and GOV.UK's teal dot. The logo is the library's GovukLockup, GOV.UK's crown beside its wordmark, and GovukCrown and GovukWordmark give each alone. A government service that is not part of GOV.UK gives its own logo, and the header becomes GOV.UK's generic header, with its mark and name in white on black at 30 pixels, because the crown and the blue are only for GOV.UK services.",
+      "GOV.UK's header, with the crown and logotype in white on brand blue, and GOV.UK's teal dot. The logo is the library's GovukLockup, GOV.UK's crown beside its wordmark, and GovukCrown gives the crown alone. A government service that is not part of GOV.UK gives its own logo, and the header becomes GOV.UK's generic header, with its mark and name in white on black at 30 pixels, because the crown and the blue are only for GOV.UK services.",
     props: [
       text("productName", "", { type: "ReactNode" }),
       reference("homepageUrl", "string", "https://www.gov.uk/"),

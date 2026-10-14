@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Removed GovukWordmark, which no part of the library used. Use GovukLockup, which shows the wordmark beside the crown, as GOV.UK's header does.
+
 ### Added
 
 - Added Stack and Inline, which set parts one beneath another and side by side, spaced by GOV.UK's spacing scale, from `gap={0}` to `gap={9}`, which are 0 to 60 pixels. A Stack's default is 30 pixels, the space between a form's fields. In an Inline, a field shrinks to the room its button leaves. Each leaves out its parts' outer margins. In a Stack, a part that sits in a line of text, such as a Tag or a Button, keeps its own width.

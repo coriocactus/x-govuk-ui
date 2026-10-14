@@ -1,8 +1,8 @@
 import type { ComponentPropsWithRef } from "react";
 
 /**
- * GOV.UK's own marks, from GOV.UK Frontend's logo template. They are the crown, the GOV.UK wordmark
- * with its teal dot, and the two together as the lock-up. Each takes the colour of the text around
+ * GOV.UK's own marks, from GOV.UK Frontend's logo template. They are the crown, and the lock-up,
+ * which is the crown beside the GOV.UK wordmark with its teal dot. Each takes the colour of the text around
  * it. GOV.UK's brand rules allow them only on official GOV.UK services. Header shows the lock-up,
  * Footer shows the crown, and Inline citation shows the crown for a GOV.UK source. They are
  * decorative unless given a name with `aria-label`.
@@ -59,15 +59,6 @@ export function GovukCrown(props: GovukMarkProps) {
   return (
     <Mark {...props} viewBox="0 0 64 60">
       {crown}
-    </Mark>
-  );
-}
-
-/** The GOV.UK wordmark on its own, with GOV.UK's teal dot. */
-export function GovukWordmark(props: GovukMarkProps) {
-  return (
-    <Mark {...props} viewBox="84 0 240 60">
-      {wordmark}
     </Mark>
   );
 }

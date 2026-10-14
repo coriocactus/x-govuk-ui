@@ -18,7 +18,6 @@ import {
   Form,
   GovukCrown,
   GovukLockup,
-  GovukWordmark,
   GridColumn,
   GridRow,
   Header,
@@ -204,8 +203,8 @@ test("GOV.UK's marks are decorative unless named, and the workbench's own marks 
   const lockup = renderToStaticMarkup(<GovukLockup />);
   expect(lockup).toContain('aria-hidden="true"');
   expect(lockup).toContain('viewBox="0 0 324 60"');
+  expect(lockup).toContain("x-govuk-ui-logo-dot");
   expect(renderToStaticMarkup(<GovukCrown aria-label="GOV.UK" />)).toContain('role="img"');
-  expect(renderToStaticMarkup(<GovukWordmark />)).toContain("x-govuk-ui-logo-dot");
   // The workbench's brand draws the same shapes as the files in site/assets/brand.
   const shapes = async (name: string) =>
     [...(await Bun.file(`site/assets/brand/${name}.svg`).text()).matchAll(/ d="([^"]+)"/g)].map(

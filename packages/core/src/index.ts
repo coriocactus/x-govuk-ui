@@ -543,7 +543,7 @@ export {
   type LinkLabels,
   type LinkProps,
 } from "./link";
-export { GovukCrown, GovukLockup, type GovukMarkProps, GovukWordmark } from "./logo";
+export { GovukCrown, GovukLockup, type GovukMarkProps } from "./logo";
 export {
   defaultLogoCarouselLabels,
   LogoCarousel,

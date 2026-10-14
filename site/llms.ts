@@ -69,7 +69,7 @@ const usage = `- React 19 and TypeScript. Import the components from \`x-govuk-u
 - The styles sit in the \`x-govuk-ui\` cascade layer, so a service's own rules override them. Each component's page lists its classes, the data attributes its styles respond to and its custom properties.
 - Overlays stack in the order they open, the last on top, and toasts above them. Give the app's root \`isolation: isolate\`, so nothing in the page rises above an overlay.
 - The components are light, as GOV.UK is, and dark under \`data-theme="dark"\`, which \`useTheme\` and \`ThemePicker\` set on the page's root or on one part of the page.
-- GOV.UK's crown, wordmark, Royal Arms and GDS Transport are for official GOV.UK services only. The library ships the crown and wordmark, as \`GovukCrown\`, \`GovukWordmark\` and \`GovukLockup\`. It leaves out the GDS Transport font, and the Royal Arms, whose image a service gives by its address.
+- GOV.UK's crown, wordmark, Royal Arms and GDS Transport are for official GOV.UK services only. The library ships the crown and the lock-up, the crown beside the wordmark, as \`GovukCrown\` and \`GovukLockup\`. It leaves out the GDS Transport font, and the Royal Arms, whose image a service gives by its address.
 - Without GDS Transport, the components fall back to Noto Sans, then Arial. Noto Sans is the typeface for a service outside GOV.UK. Windows, macOS and iOS do not have it, so serve it, such as its weights 400 and 700 from \`@fontsource/noto-sans\`, whose family is \`Noto Sans\`, or set \`--x-govuk-ui-font\` to another.`;
 
 /** A table cell, with its pipes escaped. */

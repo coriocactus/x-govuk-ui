@@ -12,19 +12,27 @@ export function dateFromParts({ day, month, year }: DateParts) {
   return date.getDate() === d && date.getMonth() === m - 1 ? date : null;
 }
 
-/** A date and time as GOV.UK writes them, such as 15 March 2026 at 4:27pm, or at midday. */
-export function formatDateTime(date: Date) {
-  const day = date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+/** A date as GOV.UK writes it, in English, such as 15 March 2026. */
+export function formatDate(date: Date) {
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+/**
+ * A time as GOV.UK writes it, in English, such as 4:27pm. A time on the hour has no minutes, as
+ * 9am, and noon and the start of the day are midday and midnight.
+ */
+export function formatTime(date: Date) {
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  let time: string;
-  if (minutes === 0 && hours === 12) time = "midday";
-  else if (minutes === 0 && hours === 0) time = "midnight";
-  else {
-    const minute = minutes ? `:${String(minutes).padStart(2, "0")}` : "";
-    time = `${hours % 12 || 12}${minute}${hours < 12 ? "am" : "pm"}`;
-  }
-  return `${day} at ${time}`;
+  if (minutes === 0 && hours === 12) return "midday";
+  if (minutes === 0 && hours === 0) return "midnight";
+  const minute = minutes ? `:${String(minutes).padStart(2, "0")}` : "";
+  return `${hours % 12 || 12}${minute}${hours < 12 ? "am" : "pm"}`;
+}
+
+/** A date and time as GOV.UK writes them, in English, such as 15 March 2026 at 4:27pm. */
+export function formatDateTime(date: Date) {
+  return `${formatDate(date)} at ${formatTime(date)}`;
 }
 
 /**

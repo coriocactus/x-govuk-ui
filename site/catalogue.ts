@@ -2598,6 +2598,8 @@ const entries = {
       reference("headingLevel", "2 | 3 | 4 | 5 | 6", "3"),
       reference("TimelineItem", "{ title, by, date, children, actions }", "Part"),
       reference("formatDateTime", "(date: Date) => string", "Helper"),
+      reference("formatDate", "(date: Date) => string", "Helper"),
+      reference("formatTime", "(date: Date) => string", "Helper"),
     ],
   },
   "summary-list": {

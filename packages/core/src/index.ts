@@ -451,7 +451,9 @@ export { Header, type HeaderProps } from "./header";
 export {
   type DateParts,
   dateFromParts,
+  formatDate,
   formatDateTime,
+  formatTime,
   pagesAround,
   passwordStrength,
 } from "./helpers";

@@ -12,7 +12,9 @@ import {
   FileDiff,
   FormStep,
   FormSteps,
+  formatDate,
   formatDateTime,
+  formatTime,
   GroupedTable,
   GroupedTableGroup,
   GroupedTableRow,
@@ -355,6 +357,11 @@ test("timelines write dates as GOV.UK does, and media parts name themselves", ()
   expect(formatDateTime(new Date(2021, 2, 15, 16, 27))).toBe("15 March 2021 at 4:27pm");
   expect(formatDateTime(new Date(2021, 2, 15, 12, 0))).toBe("15 March 2021 at midday");
   expect(formatDateTime(new Date(2021, 0, 25, 9, 0))).toBe("25 January 2021 at 9am");
+  // The date and the time are written apart too, as GOV.UK writes each.
+  expect(formatDate(new Date(2026, 8, 29, 10, 2))).toBe("29 September 2026");
+  expect(formatTime(new Date(2026, 8, 29, 10, 2))).toBe("10:02am");
+  expect(formatTime(new Date(2026, 8, 29, 0, 0))).toBe("midnight");
+  expect(formatTime(new Date(2026, 8, 29, 17, 30))).toBe("5:30pm");
   const timeline = renderToStaticMarkup(
     <Timeline label="History">
       <TimelineItem

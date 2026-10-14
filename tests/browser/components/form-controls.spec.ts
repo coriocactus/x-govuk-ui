@@ -1065,9 +1065,10 @@ test("a long list's highlight follows the keys and the wheel, never against them
   await calendar.locator(".x-govuk-ui-select-trigger").first().click();
   // The keys start at once, while the list is still growing into place.
   await expect(page.locator(".x-govuk-ui-select-popup")).toBeVisible();
-  // For each frame, where the highlight and the highlighted row are in the list's box, and how far
-  // the list has scrolled.
-  type Frame = { mark: number; row: number; scroll: number; phase: string };
+  // For each frame, where the highlight and the highlighted row are in the list's box, how far the
+  // list has scrolled, and whether a glide has run past its end without being removed yet. In such
+  // a frame, Linux's WebKit puts the highlight short of where the glide ends.
+  type Frame = { mark: number; row: number; scroll: number; phase: string; overrun: boolean };
   await page.evaluate(() => {
     const mark = document.querySelector(".x-govuk-ui-select-highlight")!;
     let scroller = mark.parentElement;
@@ -1084,6 +1085,10 @@ test("a long list's highlight follows the keys and the wheel, never against them
           row: row.getBoundingClientRect().top - top,
           scroll: scroller.scrollTop,
           phase: (window as unknown as { phase_: string }).phase_,
+          overrun: mark.getAnimations().some((animation) => {
+            const end = animation.effect?.getComputedTiming().endTime;
+            return Number(animation.currentTime) > Number(end);
+          }),
         });
       }
       requestAnimationFrame(tick);
@@ -1107,9 +1112,22 @@ test("a long list's highlight follows the keys and the wheel, never against them
   await page.keyboard.down("ArrowUp");
   await page.waitForTimeout(250);
   await phase("up, held");
-  // The list scrolls back only as the highlight reaches its first row. The key is held past it, so
-  // the frames it scrolls in fall while the key is held, however the repeats are timed.
-  for (let repeat = 0; repeat < 14; repeat++) {
+  // The list scrolls back only as the highlight reaches its first row. The key is held past it until
+  // a frame shows the list scrolled since the frame before, so that frame falls while the key is
+  // held. No set number of repeats is enough, because Linux's WebKit can draw no frame for up to a
+  // second, such as after a list scrolls.
+  const scrolledWhileHeld = (frames: Frame[]) =>
+    frames.some(
+      (frame, index) =>
+        frame.phase === "up, held" && index > 0 && frame.scroll !== frames[index - 1]!.scroll,
+    );
+  const framesSoFar = () =>
+    page.evaluate(() => (window as unknown as { frames_: Frame[] }).frames_);
+  for (
+    let repeat = 0;
+    repeat < 14 || (repeat < 80 && !scrolledWhileHeld(await framesSoFar()));
+    repeat++
+  ) {
     await page.keyboard.down("ArrowUp");
     await page.waitForTimeout(30);
   }
@@ -1125,16 +1143,19 @@ test("a long list's highlight follows the keys and the wheel, never against them
     await page.waitForTimeout(60);
   }
   await page.waitForTimeout(200);
-  const frames = await page.evaluate(() => (window as unknown as { frames_: Frame[] }).frames_);
+  const frames = await framesSoFar();
   const against: string[] = [];
   const off: string[] = [];
   frames.forEach((now, index) => {
     const before = frames[index - 1];
     if (!before) return;
     const move = now.mark - before.mark;
+    // A frame in which a glide has overrun its end is not judged, because the browser misplaces
+    // the highlight there, not the highlight's code.
     if (
-      (now.phase === "down" && move < -0.5) ||
-      (now.phase.startsWith("up") && !now.phase.includes("rest") && move > 0.5)
+      !now.overrun &&
+      ((now.phase === "down" && move < -0.5) ||
+        (now.phase.startsWith("up") && !now.phase.includes("rest") && move > 0.5))
     )
       against.push(`${now.phase} ${move.toFixed(1)}`);
     if (now.phase === "up, held" && Math.abs(now.mark - now.row) > 0.5)
@@ -1149,9 +1170,8 @@ test("a long list's highlight follows the keys and the wheel, never against them
   for (const name of ["down, at rest", "up, at rest", "wheel"])
     expect(Math.abs(last(name).mark - last(name).row)).toBeLessThan(0.5);
   expect(off).toEqual([]);
-  // The held key scrolled the list, so the frames it scrolled in were checked too.
-  const held = frames.filter((frame) => frame.phase === "up, held");
-  expect(new Set(held.map((frame) => frame.scroll)).size).toBeGreaterThan(1);
+  // The held key scrolled the list, so a frame it scrolled in was checked too.
+  expect(scrolledWhileHeld(frames)).toBe(true);
 });
 
 test("a date input's fields are dials: an empty one starts from today, and a drag ends where it is let go", async ({

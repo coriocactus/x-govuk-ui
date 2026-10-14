@@ -93,6 +93,5 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           bun scripts/changelog.ts notes "$VERSION" > "$RUNNER_TEMP/notes.md"
-          options=(--target "$GITHUB_SHA" --title "$VERSION" --notes-file "$RUNNER_TEMP/notes.md")
-          if [[ "$VERSION" == *-* ]]; then options+=(--prerelease); fi
-          gh release create "v$VERSION" "${options[@]}"
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "$VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md"

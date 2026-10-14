@@ -71,6 +71,31 @@ test("each package keeps a changelog that ships with it, with a section for its 
   }
 });
 
+test("each package's README, which npm shows as its page, links to every other package's page", async () => {
+  const names: string[] = await Promise.all(
+    packages.map(async (directory) => (await Bun.file(`${directory}/package.json`).json()).name),
+  );
+  const readmes = [
+    ...packages.map((directory, index) => ({ path: `${directory}/README.md`, own: names[index] })),
+    // The repository's README, which GitHub shows, links all five.
+    { path: "README.md", own: undefined },
+  ];
+  const missing: string[] = [];
+  const unknown: string[] = [];
+  for (const { path, own } of readmes) {
+    const text = await Bun.file(path).text();
+    for (const name of names)
+      if (name !== own && !text.includes(`](https://www.npmjs.com/package/${name})`))
+        missing.push(`${path} → ${name}`);
+    // A link to a package that is not one of the five, such as a renamed one, leads nowhere.
+    for (const [, name = ""] of text.matchAll(/npmjs\.com\/package\/([^\s)]+)/g))
+      if (/^(@x-govuk-ui\/|x-govuk-ui)/.test(name) && !names.includes(name))
+        unknown.push(`${path} → ${name}`);
+  }
+  expect(missing).toEqual([]);
+  expect(unknown).toEqual([]);
+});
+
 test("a release stamps the unreleased entries with its version, and leaves the next ones empty", async () => {
   const text =
     "# Changelog\n\n## [Unreleased]\n\n### Fixed\n\n- Fixed a thing.\n\n## [0.2.0] - 2026-10-09\n\nFirst release.\n";

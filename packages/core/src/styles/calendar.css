@@ -214,6 +214,26 @@
     flex-direction: column;
   }
 }
+/* On a phone 320 pixels wide, the narrowest WCAG asks a page to work on, a month of 40-pixel days
+   and the calendar's padding are wider than GOV.UK's page leaves them. There the days are 38
+   pixels, which still leaves the month and year room between the arrows, and the padding is 8. */
+@media (max-width: 21em) {
+  .x-govuk-ui-calendar {
+    padding: 8px;
+  }
+  .x-govuk-ui-calendar-nav {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+  }
+  .x-govuk-ui-calendar-grid th,
+  .x-govuk-ui-calendar-day {
+    width: 38px;
+  }
+  .x-govuk-ui-calendar-day {
+    height: 38px;
+  }
+}
 @media (forced-colors: active) {
   .x-govuk-ui-calendar-day[data-selected] {
     forced-color-adjust: none;

@@ -152,8 +152,12 @@ export const unchecked = {
     "SidebarCustomise",
     "Tour",
   ],
-  /** They show once users act, such as sending a message or attaching a file. */
+  /**
+   * They show once users act, such as sending a message, attaching a file, pointing at a chart's
+   * figures or choosing words in the Editor.
+   */
   "after users act": [
+    "ChartCard",
     "ChatInputAttachment",
     "ChatInputAttachments",
     "ConversationActions",
@@ -162,6 +166,8 @@ export const unchecked = {
     "ConversationMessage",
     "ConversationNote",
     "ConversationThinking",
+    "EditorTool",
+    "EditorTools",
     "TilesDockItem",
   ],
   /** They show under another of their example's settings, or on a narrow screen. */
@@ -174,9 +180,6 @@ export const unchecked = {
   ],
   /** No example uses them yet. */
   "in no example": [
-    "ChartCard",
-    "EditorTool",
-    "EditorTools",
     "FormStepsProgress",
     "SearchIcon",
     "SidebarInput",

@@ -951,8 +951,13 @@ export {
   type GridColumnProps,
   GridRow,
   type GridRowProps,
+  Inline,
+  type InlineProps,
   MainWrapper,
   type MainWrapperProps,
+  type Spacing,
+  Stack,
+  type StackProps,
   WidthContainer,
   type WidthContainerProps,
 } from "./width-container";

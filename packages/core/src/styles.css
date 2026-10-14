@@ -114,3 +114,5 @@
 @import "./styles/feedback.css" layer(x-govuk-ui);
 @import "./styles/menubar.css" layer(x-govuk-ui);
 @import "./styles/filter-chips.css" layer(x-govuk-ui);
+/* Last, so a stack's spacing comes after the margins of the parts it holds. */
+@import "./styles/stack.css" layer(x-govuk-ui);

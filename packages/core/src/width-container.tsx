@@ -113,3 +113,53 @@ export function GridColumn({
     />
   );
 }
+
+/** GOV.UK's spacing scale, from none to 60 pixels, as 0, 5, 10, 15, 20, 25, 30, 40, 50 and 60. */
+export type Spacing = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
+export type StackProps = ComponentPropsWithRef<"div"> & {
+  /**
+   * The space between its parts, on GOV.UK's spacing scale. 6, which is 30 pixels, is the space
+   * GOV.UK puts between a form's fields.
+   */
+  gap?: Spacing;
+};
+
+/**
+ * Parts one beneath another, with the same space between each, as a page's fields are. The stack
+ * sets the space, so the outer margins of its parts above and below them are left out.
+ */
+export function Stack({ gap = 6, className = "", ...props }: StackProps) {
+  return <div {...props} className={`x-govuk-ui-stack ${className}`.trim()} data-gap={gap} />;
+}
+
+export type InlineProps = ComponentPropsWithRef<"div"> & {
+  /** The space between its parts, on GOV.UK's spacing scale. 3 is 15 pixels. */
+  gap?: Spacing;
+  /** Lets its parts wrap onto more lines when they do not fit. Otherwise a field among them shrinks. */
+  wrap?: boolean;
+  /** How its parts line up across it. `end` lines up their feet, as a field's and its button's. */
+  align?: "start" | "centre" | "end" | "baseline";
+};
+
+/**
+ * Parts side by side, such as a field and its button, as GOV.UK's search sets them. A button keeps
+ * its width, and a field takes the rest of the line.
+ */
+export function Inline({
+  gap = 3,
+  wrap = false,
+  align = "end",
+  className = "",
+  ...props
+}: InlineProps) {
+  return (
+    <div
+      {...props}
+      className={`x-govuk-ui-inline ${className}`.trim()}
+      data-gap={gap}
+      data-wrap={wrap || undefined}
+      data-align={align}
+    />
+  );
+}

@@ -3415,7 +3415,7 @@ const entries = {
     upstream: "",
     dependencies: "React",
     changes:
-      "GOV.UK's layout as parts. The width container keeps content to 960 pixels in the middle of the screen, with space at its sides when the screen is narrower. GridRow and GridColumn share a row in GOV.UK's quarters, thirds and halves, with its 30 pixel gutter. The columns follow their row's width instead of the screen's, so a row in a narrow space stacks even on a wide screen. Header, Service navigation, Footer, Cookie banner and Page use the width container, so they line up, and the workbench sets each example in one.",
+      "GOV.UK's layout as parts. The width container keeps content to 960 pixels in the middle of the screen, with space at its sides when the screen is narrower. GridRow and GridColumn share a row in GOV.UK's quarters, thirds and halves, with its 30 pixel gutter. The columns follow their row's width instead of the screen's, so a row in a narrow space stacks even on a wide screen. Header, Service navigation, Footer, Cookie banner and Page use the width container, so they line up, and the workbench sets each example in one. Stack sets parts one beneath another, and Inline sets them side by side, each spaced by GOV.UK's spacing scale. 30 pixels between a stack's parts is the space between a form's fields, and a field in a line shrinks beside its button.",
     props: [
       range("width", 960, 480, 1200, 20),
       toggle("gutters", true, { default: "true" }),
@@ -3423,6 +3423,12 @@ const entries = {
       reference(
         "GridColumn",
         '{ width: "full" | "three-quarters" | "two-thirds" | "one-half" | "one-third" | "one-quarter", from: "tablet" | "desktop" }',
+        "Part",
+      ),
+      reference("Stack", "{ gap: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 }", "Part"),
+      reference(
+        "Inline",
+        '{ gap: Spacing, wrap: boolean, align: "start" | "centre" | "end" | "baseline" }',
         "Part",
       ),
     ],

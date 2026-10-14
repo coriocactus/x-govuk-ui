@@ -22,6 +22,7 @@ import {
   GridColumn,
   GridRow,
   Header,
+  Inline,
   Input,
   Kbd,
   Link,
@@ -30,6 +31,7 @@ import {
   Page,
   SearchIcon,
   ServicePage,
+  Stack,
   VisuallyHidden,
   WidthContainer,
 } from "x-govuk-ui";
@@ -54,6 +56,13 @@ test("pages follow GOV.UK's template, and forms leave validation to themselves",
   );
   expect(page).toContain(
     'class="x-govuk-ui-grid-column" data-width="two-thirds" data-from="tablet"',
+  );
+  // A stack and a line space their parts on GOV.UK's scale, 30 and 15 pixels unless given.
+  expect(renderToStaticMarkup(<Stack id="page" />)).toBe(
+    '<div id="page" class="x-govuk-ui-stack" data-gap="6"></div>',
+  );
+  expect(renderToStaticMarkup(<Inline gap={2} wrap align="baseline" />)).toBe(
+    '<div class="x-govuk-ui-inline" data-gap="2" data-wrap="true" data-align="baseline"></div>',
   );
   // The header and footer keep their content in width containers, so they line up with the page.
   expect(page.match(/x-govuk-ui-width-container/g)).toHaveLength(3);
@@ -261,4 +270,12 @@ test("a footer's copyright links to Crown copyright, to a service's own terms, o
   expect(routed).toMatch(
     /<a data-router="" class="x-govuk-ui-footer-link x-govuk-ui-footer-copyright" href="\/copyright">© Example Ltd<\/a>/,
   );
+});
+
+test("a stack's spacing comes after the margins of the parts it holds", async () => {
+  // Each part sets its own margin at the stack's specificity, so the stack's stylesheet is last.
+  const imports = [
+    ...(await Bun.file("packages/core/src/styles.css").text()).matchAll(/@import "([^"]+)"/g),
+  ].map(([, path]) => path);
+  expect(imports.at(-1)).toBe("./styles/stack.css");
 });

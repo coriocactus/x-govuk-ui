@@ -252,11 +252,18 @@ test("pagination changes page in place, fits a narrow page in one row of one wid
 
 test("command menu groups commands, opens pages and goes back", async ({ page, frame, open }) => {
   await open("command-menu");
-  await frame.getByRole("button", { name: "Open command menu" }).click();
+  const trigger = frame.getByRole("button", { name: "Open command menu" });
   const popup = page.getByRole("dialog");
+  // Closed before its Recent group has loaded, it opens again with the group's command once.
+  await trigger.click();
+  await expect(popup).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(popup).toHaveCount(0);
+  await trigger.click();
   const search = popup.getByRole("combobox");
   await expect(popup.getByRole("group", { name: "Your application" })).toBeVisible();
   // A group that loads its commands once the menu opens shows them as they come.
+  await expect(popup.getByRole("option", { name: /Renew your fishing licence/ })).toHaveCount(1);
   await expect(popup.getByRole("option", { name: /Renew your fishing licence/ })).toBeVisible();
   await search.fill("lang");
   await expect(popup.getByRole("group", { name: "Your application" })).toBeHidden();

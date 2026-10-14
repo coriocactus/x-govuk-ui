@@ -256,6 +256,8 @@ test("command menu groups commands, opens pages and goes back", async ({ page, f
   const popup = page.getByRole("dialog");
   const search = popup.getByRole("combobox");
   await expect(popup.getByRole("group", { name: "Your application" })).toBeVisible();
+  // A group that loads its commands once the menu opens shows them as they come.
+  await expect(popup.getByRole("option", { name: /Renew your fishing licence/ })).toBeVisible();
   await search.fill("lang");
   await expect(popup.getByRole("group", { name: "Your application" })).toBeHidden();
   // The first match is highlighted as the search narrows, so Enter chooses it.

@@ -57,6 +57,11 @@ type MenuContextValue = {
   /** Where each best match is drawn, by its place, once a CommandMenuBestMatches is there. */
   slots: (HTMLElement | null)[];
   entries: Map<string, Entry>;
+  /**
+   * Tells the menu that a command came or went, so it reads its commands again, such as ones a
+   * part of a service's own draws once they load.
+   */
+  listed: () => void;
   pages: Map<string, Page>;
   /** Opens a page, or closes the menu and runs the command. */
   choose: (opens: string | undefined, onSelect: (() => void) | undefined) => void;
@@ -250,6 +255,9 @@ export function CommandMenu({
   const { reduced } = useMotionTiming();
   const [open, setOpen] = useControllableState(controlled, defaultOpen, onOpenChange);
   const close = useCallback(() => setOpen(false), [setOpen]);
+  // Drawn again as a command comes or goes, so the list is read again.
+  const [, setListing] = useState(0);
+  const listed = useCallback(() => setListing((count) => count + 1), []);
   const isOpen = useLatest(open);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -335,6 +343,7 @@ export function CommandMenu({
         best,
         slots,
         entries,
+        listed,
         pages,
         choose: (opens, onSelect) => {
           if (opens) return go([...stack, opens]);
@@ -713,7 +722,16 @@ export function CommandMenuItem({
   useLayoutEffect(() => {
     menu.entries.set(id, { command, page });
   });
-  useLayoutEffect(() => () => void menu.entries.delete(id), [menu.entries, id]);
+  // A command that comes or goes later, such as one a part of your own draws once it loads, tells
+  // the menu, which reads its commands again.
+  const { entries, listed } = menu;
+  useLayoutEffect(() => {
+    listed();
+    return () => {
+      entries.delete(id);
+      listed();
+    };
+  }, [entries, listed, id]);
 
   if (page !== menu.page) return null;
   // A command that does not match leaves a marker, so the list still knows its place.

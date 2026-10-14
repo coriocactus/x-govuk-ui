@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   Button,
   CommandMenu,
@@ -15,6 +15,32 @@ import {
 
 /** The language the service is in, which the service keeps for every part of its page. */
 const Language = createContext("English");
+
+/**
+ * The applications started recently, which the group loads itself once the menu opens, as from a
+ * server. Its commands join the menu as they come.
+ */
+function RecentApplications({ chose }: { chose: (status: string) => void }) {
+  const [recent, setRecent] = useState<string[]>([]);
+  useEffect(() => {
+    const loaded = setTimeout(() => setRecent(["Renew your fishing licence"]), 300);
+    return () => clearTimeout(loaded);
+  }, []);
+  if (recent.length === 0) return null;
+  return (
+    <CommandMenuGroup label="Recent">
+      {recent.map((name) => (
+        <CommandMenuItem
+          key={name}
+          description="Started on 3 October."
+          onSelect={() => chose(`You chose to carry on: ${name}.`)}
+        >
+          {name}
+        </CommandMenuItem>
+      ))}
+    </CommandMenuGroup>
+  );
+}
 
 /** What shows when nothing matches, with a way on to the commands for help. */
 function NothingFound() {
@@ -110,6 +136,7 @@ export default function CommandMenuExample({
                 Get help
               </CommandMenuItem>
             </CommandMenuGroup>
+            <RecentApplications chose={setStatus} />
             <CommandMenuPage id="language" label="Language" placeholder="Search languages…">
               <CommandMenuItem
                 onSelect={() => {

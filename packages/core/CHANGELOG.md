@@ -141,6 +141,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed CommandMenu leaving out commands that a part of your own draws once the menu is open, such as ones it loads from a server, until the search changed. They now join the menu as they come.
 - Fixed Aside's `title` taking only a string. It is the heading that names the aside, and takes any content.
 - Fixed focus once FormSteps sends its answers on a page. The Panel's heading now takes focus, where focus was lost as the buttons went.
 - Fixed a Form's error summary linking a message about no one field, such as one about the whole form from `validateWith` or `onSubmit`, to a place that does not exist. Such a message now shows beneath the summary's title, without a link.

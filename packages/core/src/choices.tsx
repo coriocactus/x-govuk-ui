@@ -266,13 +266,3 @@ export function Choices({
     </Fieldset>
   );
 }
-
-/** Choices marked A, B, C, each chosen by pressing its letter. */
-export function LetteredChoices(props: Omit<ChoicesProps, "markers">) {
-  return <Choices {...props} markers="letters" />;
-}
-
-/** Choices marked 1, 2, 3, each chosen by pressing its number, for up to nine answers. */
-export function NumberedChoices(props: Omit<ChoicesProps, "markers">) {
-  return <Choices {...props} markers="numbers" />;
-}

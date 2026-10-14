@@ -179,8 +179,6 @@ export {
   Choices,
   type ChoicesOption,
   type ChoicesProps,
-  LetteredChoices,
-  NumberedChoices,
 } from "./choices";
 export {
   CodeBlock,

@@ -20,10 +20,8 @@ import {
   GroupedTableRow,
   ImageGeneration,
   Kbd,
-  LetteredChoices,
   Lightbox,
   LogoCarousel,
-  NumberedChoices,
   PlanCard,
   QrCode,
   QuestionCard,
@@ -263,7 +261,8 @@ test("summary lists, task lists, diffs and galleries keep GOV.UK's structure and
   expect(question).toContain('aria-valuetext="Question 1 of 2"');
   // Choices are marked with letters, numbers or nothing, and only marked ones have keys.
   const numbered = renderToStaticMarkup(
-    <NumberedChoices
+    <Choices
+      markers="numbers"
       name="contact"
       legend="How should we contact you?"
       options={[
@@ -287,7 +286,12 @@ test("summary lists, task lists, diffs and galleries keep GOV.UK's structure and
   expect(plain).not.toContain("aria-keyshortcuts");
   expect(
     renderToStaticMarkup(
-      <LetteredChoices name="contact" legend="How?" options={[{ value: "a", label: "A" }]} />,
+      <Choices
+        markers="letters"
+        name="contact"
+        legend="How?"
+        options={[{ value: "a", label: "A" }]}
+      />,
     ),
   ).toContain('aria-keyshortcuts="A"');
   // Form steps shows its first step on a page, with how far along it is, and keeps the rest.

@@ -783,7 +783,7 @@ const entries = {
     upstream: "",
     dependencies: "React",
     changes:
-      "Answers as rows, each with a letter, a number from 1 to 9, or nothing, for a question that should be quick to answer, such as an agent's. Pressing an answer's letter or number chooses it, anywhere on the page while they are the only choices on show and nobody is typing, or only within their form, or not at all. Enter on a chosen answer sends the form, and a last row can take any words, which choose it as they are typed. One answer or several. They are native radios or checkboxes in a Fieldset, so they submit with a form, take part in a Form by their name, show its error, and start with an answer it kept. LetteredChoices and NumberedChoices are Choices with their markers set. Question card asks with them. For a service's own questions, Radios and Checkboxes are GOV.UK's.",
+      "Answers as rows, each with a letter, a number from 1 to 9, or nothing, for a question that should be quick to answer, such as an agent's. Pressing an answer's letter or number chooses it, anywhere on the page while they are the only choices on show and nobody is typing, or only within their form, or not at all. Enter on a chosen answer sends the form, and a last row can take any words, which choose it as they are typed. One answer or several. They are native radios or checkboxes in a Fieldset, so they submit with a form, take part in a Form by their name, show its error, and start with an answer it kept. Question card asks with them. For a service's own questions, Radios and Checkboxes are GOV.UK's.",
     props: [
       reference("name", "string", "Required"),
       reference("legend", "ReactNode", "Required"),
@@ -813,7 +813,6 @@ const entries = {
       ),
       reference("other", "string, the words shown in the last row", "None"),
       reference("value / defaultValue / onValueChange", "string[]", "Optional"),
-      reference("LetteredChoices / NumberedChoices", "Choices props", "Part"),
     ],
     example: [toggle("other", true, { note: "Adds a last row to type another answer into." })],
     presets: [

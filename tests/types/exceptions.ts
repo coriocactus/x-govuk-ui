@@ -178,8 +178,6 @@ export const unchecked = {
     "EditorTool",
     "EditorTools",
     "FormStepsProgress",
-    "LetteredChoices",
-    "NumberedChoices",
     "SearchIcon",
     "SidebarInput",
     "SidebarItemAction",

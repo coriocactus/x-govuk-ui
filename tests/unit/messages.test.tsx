@@ -218,10 +218,10 @@ test("an empty state can be the whole page, headed at level 1", () => {
   expect(
     renderToStaticMarkup(
       <EmptyState>
-        <EmptyStateTitle level={1}>Redbox is not answering</EmptyStateTitle>
+        <EmptyStateTitle level={1}>Sorry, the service is unavailable</EmptyStateTitle>
       </EmptyState>,
     ),
-  ).toContain('<h1 class="x-govuk-ui-empty-state-title">Redbox is not answering</h1>');
+  ).toContain('<h1 class="x-govuk-ui-empty-state-title">Sorry, the service is unavailable</h1>');
 });
 
 test("rich text takes its document as html or as markdown, not both", () => {

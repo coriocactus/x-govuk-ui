@@ -295,6 +295,8 @@ export default function SidebarExample({
                     </SidebarGroup>
                   </Fragment>
                 ))}
+            {/* Words at the foot of the rows, which scroll with them. */}
+            <SidebarText>© Crown copyright</SidebarText>
           </SidebarContent>
           {show.includes("footer") && (
             <SidebarFooter>
@@ -318,7 +320,6 @@ export default function SidebarExample({
                   H. H. Asquith
                 </SidebarItem>
               </SidebarGroup>
-              <SidebarText>Department for Business and Trade</SidebarText>
             </SidebarFooter>
           )}
         </Sidebar>

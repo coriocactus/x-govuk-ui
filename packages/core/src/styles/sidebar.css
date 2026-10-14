@@ -809,7 +809,7 @@
   padding: 8px 16px 8px 12px;
   border-bottom: 1px solid var(--x-govuk-ui-line);
 }
-/* Words in the header or the footer, which wrap. They are one grid row, so their height can ease
+/* Words in the header, the footer or at the foot of the rows, which wrap. They are one grid row, so their height can ease
    to zero and back. A height cannot ease to and from auto in every browser, but a row can. */
 .x-govuk-ui-sidebar-text {
   display: grid;
@@ -841,6 +841,23 @@
 }
 .x-govuk-ui-sidebar[data-collapsible="icon"] .x-govuk-ui-sidebar-header > .x-govuk-ui-sidebar-text {
   width: calc(var(--x-govuk-ui-sidebar-width) - var(--x-govuk-ui-sidebar-edges) - 24px);
+}
+/* At the foot of the rows, they sit as far from the last group as a group from the one before, and
+   line up with the groups' labels. Their width includes that inset, so it is the footer's. */
+.x-govuk-ui-sidebar-content
+  > .x-govuk-ui-scroll-area-viewport
+  > .x-govuk-ui-scroll-area-content
+  > .x-govuk-ui-sidebar-text {
+  box-sizing: border-box;
+  margin-top: 12px;
+  padding-inline: 11px;
+}
+.x-govuk-ui-sidebar[data-collapsible="icon"]
+  .x-govuk-ui-sidebar-content
+  > .x-govuk-ui-scroll-area-viewport
+  > .x-govuk-ui-scroll-area-content
+  > .x-govuk-ui-sidebar-text {
+  width: calc(var(--x-govuk-ui-sidebar-width) - var(--x-govuk-ui-sidebar-edges) - 16px);
 }
 .x-govuk-ui-sidebar[data-collapsible="icon"][data-state="collapsed"] .x-govuk-ui-sidebar-text {
   grid-template-rows: 0fr;

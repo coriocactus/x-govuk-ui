@@ -1080,14 +1080,15 @@ export function SidebarPageBar({ render, className = "", ...props }: SidebarPage
 }
 
 /**
- * Words in the sidebar's header or footer, such as a department's name or a copyright notice.
+ * Words in the sidebar's header or footer, or at the foot of its rows, such as a copyright notice.
  * Unlike the sidebar's rows, they wrap. While the sidebar is narrow, they fade away, and their
  * height eases to zero as its width does. The footer's rows then sit at its foot.
  *
- * Put it directly in SidebarHeader or SidebarFooter, not inside an element of your own. There, in a
- * sidebar that narrows to its icons, it keeps the width the open sidebar gives it, so its words do
- * not reflow as the sidebar narrows and widens. That width allows for the header's or footer's own
- * padding, and nothing else. Anywhere deeper, it still fades away, but its words reflow.
+ * Put it directly in SidebarHeader or SidebarFooter, or last in SidebarContent, after the groups,
+ * not inside an element of your own. There, in a sidebar that narrows to its icons, it keeps the
+ * width the open sidebar gives it, so its words do not reflow as the sidebar narrows and widens.
+ * That width allows for its container's own padding, and nothing else. At the foot of the rows,
+ * it lines up with the groups' labels. Anywhere deeper, it still fades away, but its words reflow.
  *
  * A margin, padding or border given to SidebarText keeps its space, so give these their own rules
  * for the narrow sidebar.

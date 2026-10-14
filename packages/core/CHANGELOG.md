@@ -20,6 +20,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added Stack and Inline, which set parts one beneath another and side by side, spaced by GOV.UK's spacing scale, from `gap={0}` to `gap={9}`, which are 0 to 60 pixels. A Stack's default is 30 pixels, the space between a form's fields. In an Inline, a field shrinks to the room its button leaves. Each leaves out its parts' outer margins. In a Stack, a part that sits in a line of text, such as a Tag or a Button, keeps its own width.
 - Added `formatDate` and `formatTime`, which write a date and a time apart, as GOV.UK writes them, such as 29 September 2026 and 10:02am. `formatDateTime` writes both, as before.
 
+### Changed
+
+- Changed SidebarText to take its place last in SidebarContent too, at the foot of the rows, where it lines up with the groups' labels. In a sidebar that narrows to its icons, it keeps its width there as it does in SidebarHeader and SidebarFooter, so its words do not reflow.
+
 ### Fixed
 
 - Fixed SidebarInput putting its `className` on its box but its `style` and data attributes on the field. Its `className` and `style` now go on the box, and every other prop on the field, as Combobox's do.

@@ -283,6 +283,9 @@
   font-weight: 400
   line-height: 1.4
   color: rgb(72, 73, 73)
+  padding-right: 11px
+  padding-left: 11px
+  margin-top: 12px
 .x-govuk-ui-sidebar-text-inner
   display: block
   font-size: 14px

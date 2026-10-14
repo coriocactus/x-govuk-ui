@@ -97,60 +97,88 @@ test("sidebar sub-items fold, and icons open the sidebar and the submenu togethe
   await expect(inset).toHaveCSS("border-top-left-radius", "8px");
 });
 
-test("words in the footer of a sidebar that narrows to its icons fit its open width in every variant, keep it as it narrows, and give up their height", async ({
+test("words in a sidebar that narrows to its icons fit its open width at the foot of its rows and in its footer, keep it as it narrows, and give up their height", async ({
   frame,
   open,
   playground,
 }) => {
   await open("sidebar");
   const footer = frame.locator(".x-govuk-ui-sidebar-footer");
-  // The service's own words in the footer, its department's name, as a SidebarText.
-  const text = footer.locator(".x-govuk-ui-sidebar-text");
-  await expect(text).toHaveText("Department for Business and Trade");
-  const fit = async () =>
+  const rows = frame.locator(".x-govuk-ui-sidebar-content .x-govuk-ui-scroll-area-content");
+  // The example's own words, at the foot of its rows, as a SidebarText.
+  const atFoot = rows.locator(":scope > .x-govuk-ui-sidebar-text");
+  await expect(atFoot).toHaveText("© Crown copyright");
+  // Words in the footer too, in SidebarText's markup, with its words in an inner element that clips
+  // them as the row eases. They are added again whenever the example draws the footer afresh.
+  const inFooter = footer.locator(":scope > .x-govuk-ui-sidebar-text");
+  const addToFooter = () =>
     footer.evaluate((element) => {
+      if (element.querySelector(":scope > .x-govuk-ui-sidebar-text")) return;
+      const words = document.createElement("p");
+      words.className = "x-govuk-ui-sidebar-text";
+      const inner = document.createElement("span");
+      inner.className = "x-govuk-ui-sidebar-text-inner";
+      inner.textContent = "Rod fishing licences, renewed online every year";
+      words.append(inner);
+      element.append(words);
+    });
+  // How wide the words are, and how far that is from the width their container gives them.
+  const fit = async (container: typeof footer) => {
+    await addToFooter();
+    return container.evaluate((element) => {
       const style = getComputedStyle(element);
       const room =
         element.clientWidth -
         Number.parseFloat(style.paddingLeft) -
         Number.parseFloat(style.paddingRight);
       const width = element
-        .querySelector(".x-govuk-ui-sidebar-text")!
+        .querySelector(":scope > .x-govuk-ui-sidebar-text")!
         .getBoundingClientRect().width;
       return { width, off: Math.abs(width - room) };
     });
-  // Open, each variant sets the words at the width its footer gives them, to the pixel.
+  };
+  // Open, each variant sets the words at the width each container gives them, to the pixel.
   for (const variant of ["Floating", "Inset", "Sidebar"]) {
     await playground.set("variant", variant);
-    await expect.poll(async () => `${variant}: ${(await fit()).off < 1}`).toBe(`${variant}: true`);
+    for (const [where, container] of [
+      ["rows", rows],
+      ["footer", footer],
+    ] as const)
+      await expect
+        .poll(async () => `${variant}, ${where}: ${(await fit(container)).off < 1}`)
+        .toBe(`${variant}, ${where}: true`);
   }
-  // Narrowed to its icons, the sidebar hides them, still at that width, so they never reflow.
-  const { width } = await fit();
-  const height = () => text.evaluate((element) => element.getBoundingClientRect().height);
-  const tall = await height();
+  // Narrowed to its icons, the sidebar hides them, still at those widths, so they never reflow.
+  const widths = [(await fit(rows)).width, (await fit(footer)).width];
+  const height = (text: typeof footer) =>
+    text.evaluate((element) => element.getBoundingClientRect().height);
+  const tall = [await height(atFoot), await height(inFooter)];
   const sidebar = frame.locator(".x-govuk-ui-sidebar");
   await frame.getByRole("button", { name: "Collapse sidebar" }).click();
   await expect(sidebar).toHaveAttribute("data-state", "collapsed");
-  await expect(text).toHaveCSS("visibility", "hidden");
-  expect((await fit()).width).toBeCloseTo(width, 1);
+  await expect(atFoot).toHaveCSS("visibility", "hidden");
+  await expect(inFooter).toHaveCSS("visibility", "hidden");
+  expect((await fit(rows)).width).toBeCloseTo(widths[0]!, 1);
+  expect((await fit(footer)).width).toBeCloseTo(widths[1]!, 1);
   // Their height eases away with the sidebar's width, on the same timing, so nothing jumps.
   const timing = await sidebar.evaluate((element) => {
     const style = getComputedStyle(element);
     return `${style.transitionDuration} ${style.transitionTimingFunction}`;
   });
-  const rows = await text.evaluate((element) => {
+  const easing = await atFoot.evaluate((element) => {
     const style = getComputedStyle(element);
     // Lists split at the commas between their items, not those inside cubic-bezier().
     const items = (list: string) => list.split(/,\s*(?![^(]*\))/);
     const at = items(style.transitionProperty).indexOf("grid-template-rows");
     return `${items(style.transitionDuration)[at]} ${items(style.transitionTimingFunction)[at]}`;
   });
-  expect(rows).toBe(timing);
+  expect(easing).toBe(timing);
   // Once narrow, the words take no space, so the footer's rows sit at its foot.
-  await expect.poll(height).toBe(0);
+  await expect.poll(() => height(atFoot)).toBe(0);
+  await expect.poll(() => height(inFooter)).toBe(0);
   const withWords = await footer.evaluate((element) => element.getBoundingClientRect().height);
   const withoutWords = await footer.evaluate((element) => {
-    const words = element.querySelector(".x-govuk-ui-sidebar-text")!;
+    const words = element.querySelector(":scope > .x-govuk-ui-sidebar-text")!;
     words.remove();
     const room = element.getBoundingClientRect().height;
     element.append(words);
@@ -160,8 +188,9 @@ test("words in the footer of a sidebar that narrows to its icons fit its open wi
   // Open again, they take their height back, and stop clipping, so a link's focus style shows in
   // full.
   await frame.getByRole("button", { name: "Expand sidebar" }).click();
-  await expect.poll(height).toBeCloseTo(tall, 1);
-  await expect(text.locator(".x-govuk-ui-sidebar-text-inner")).toHaveCSS("overflow", "visible");
+  await expect.poll(() => height(atFoot)).toBeCloseTo(tall[0]!, 1);
+  await expect.poll(() => height(inFooter)).toBeCloseTo(tall[1]!, 1);
+  await expect(atFoot.locator(".x-govuk-ui-sidebar-text-inner")).toHaveCSS("overflow", "visible");
 });
 
 test("a sidebar's header on GOV.UK's black, an inverse part of the page, keeps its contrast in either theme", async ({

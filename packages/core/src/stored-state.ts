@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 
 const STORED = "x-govuk-ui-stored";
 
@@ -69,11 +69,19 @@ export function useStoredState<T>(
     },
     [key, storage],
   );
-  if (stored === null) return [own, set];
+  // What is kept is read again each render, and parsed only as it changes, so a part keeps one
+  // value while it stays the same.
+  const kept = useMemo(() => parse<T>(stored), [stored]);
+  return [kept ? kept.value : own, set];
+}
+
+/** What a stored string holds, or nothing where it holds nothing the part can read. */
+function parse<T>(stored: string | null): { value: T } | null {
+  if (stored === null) return null;
   try {
-    return [JSON.parse(stored) as T, set];
+    return { value: JSON.parse(stored) as T };
   } catch {
-    return [own, set];
+    return null;
   }
 }
 

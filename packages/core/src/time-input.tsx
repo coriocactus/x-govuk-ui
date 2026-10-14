@@ -199,7 +199,7 @@ export function TimeInputControl({
           const [hour, minute, period] = ["hour", "minute", "period"].map((part) =>
             String(data.get(`${name}-${part}`) ?? "").trim(),
           );
-          const half = period === "am" ? labels.am : period === "pm" ? labels.pm : "";
+          const half = period === "am" || period === "pm" ? labels[period] : "";
           return hour ? `${hour}:${minute || "00"}${half ? ` ${half}` : ""}` : undefined;
         }
       : undefined,

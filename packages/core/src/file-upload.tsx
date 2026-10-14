@@ -2,7 +2,6 @@
 
 import {
   type ComponentPropsWithRef,
-  type CSSProperties,
   type DragEvent,
   type ReactNode,
   useId,
@@ -167,7 +166,7 @@ export function FileUploadControl(given: FileUploadControlProps) {
     setAttempts((count) => count + 1);
   };
   const [dragging, setDragging] = useState(false);
-  const [pull, setPull] = useState({ x: 0, y: 0 });
+  const box = useRef<HTMLDivElement>(null);
   const play = useScopeSound();
   const listId = `${controlId}-files`;
 
@@ -188,29 +187,30 @@ export function FileUploadControl(given: FileUploadControlProps) {
     update(files.filter((each) => each !== file));
     input.current?.focus();
   };
-  // While files are dragged over the zone, its contents lean a little towards the pointer.
+  // While files are dragged over the zone, its contents lean a little towards the pointer. Dragging
+  // reports the pointer many times a second, so the lean is written to the box's style, and the
+  // field is not drawn again for each.
+  const pull = (x: number, y: number) => {
+    box.current?.style.setProperty("--x-govuk-ui-pull-x", `${x}px`);
+    box.current?.style.setProperty("--x-govuk-ui-pull-y", `${y}px`);
+  };
   const lean = (event: DragEvent<HTMLInputElement>) => {
-    const box = event.currentTarget.getBoundingClientRect();
-    setPull({
-      x: (event.clientX - box.left - box.width / 2) * 0.06,
-      y: (event.clientY - box.top - box.height / 2) * 0.1,
-    });
+    const zone = event.currentTarget.getBoundingClientRect();
+    pull(
+      (event.clientX - zone.left - zone.width / 2) * 0.06,
+      (event.clientY - zone.top - zone.height / 2) * 0.1,
+    );
   };
 
   return (
     <>
       <div
+        ref={box}
         className={`x-govuk-ui-file-upload ${className}`.trim()}
         data-dragging={dragging || undefined}
         data-disabled={disabled || undefined}
         data-invalid={invalid || undefined}
-        style={
-          {
-            ...style,
-            "--x-govuk-ui-pull-x": `${pull.x}px`,
-            "--x-govuk-ui-pull-y": `${pull.y}px`,
-          } as CSSProperties
-        }
+        style={style}
       >
         <input
           ref={inputRef}
@@ -235,11 +235,11 @@ export function FileUploadControl(given: FileUploadControlProps) {
           onDragOver={both(onDragOver, lean)}
           onDragLeave={both(onDragLeave, () => {
             setDragging(false);
-            setPull({ x: 0, y: 0 });
+            pull(0, 0);
           })}
           onDrop={both(onDrop, () => {
             setDragging(false);
-            setPull({ x: 0, y: 0 });
+            pull(0, 0);
           })}
         />
         <span className="x-govuk-ui-file-upload-body" aria-hidden="true">

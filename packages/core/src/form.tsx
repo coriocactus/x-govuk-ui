@@ -17,7 +17,8 @@ import { defaultErrorLabels, ErrorSummary, ErrorSummaryItem } from "./error-summ
 import { both } from "./events";
 import { FormContext, type FormField, present } from "./field";
 import { useLabels } from "./labels";
-import { useMergedRef } from "./refs";
+import { useLatest, useMergedRef } from "./refs";
+import { inPageOrder } from "./registry";
 
 /**
  * A message for each answer that needs fixing, keyed by the name its field submits under. A message
@@ -163,11 +164,9 @@ export type FormProblem = {
   id: string | null;
 };
 
-type Problem = FormProblem;
-
 /** What `useFormErrors` gives a part of your own. */
 export type UseFormErrorsResult = {
-  /** The answers that need fixing, in the order of their fields. */
+  /** The answers that need fixing, in their fields' order, with any about no one field last. */
   errors: FormProblem[];
   /** How many times the form has been sent with errors, as a key that moves focus again. */
   attempt: number;
@@ -189,10 +188,10 @@ function answer(data: FormData, name: string) {
  * on the page. An Error summary opens above everything inside the form and takes focus, and each
  * field shows its own message. Put the page's heading inside the Form, so the summary opens above
  * it, as GOV.UK puts it. The fields' gap, `--x-govuk-ui-form-gap`, then follows the heading too, so
- * give back that much of the heading's own margin beneath it. The summary lists the messages in the fields' order, and each links to its field.
- * Fixing an answer clears its message and its line in the summary at once. The summary folds away
- * once nothing is wrong. The fields stack with GOV.UK's spacing between them. The browser's own
- * validation is off, as GOV.UK advises.
+ * give back that much of the heading's own margin beneath it. The summary lists the messages in the
+ * fields' order, and each links to its field. Fixing an answer clears its message and its line in
+ * the summary at once. The summary folds away once nothing is wrong. The fields stack with GOV.UK's
+ * spacing between them. The browser's own validation is off, as GOV.UK advises.
  */
 export function Form({
   validate,
@@ -212,7 +211,7 @@ export function Form({
 }: FormProps) {
   const form = useRef<HTMLFormElement | null>(null);
   const mergedRef = useMergedRef(form, ref);
-  const [problems, setProblems] = useState<Problem[]>([]);
+  const [problems, setProblems] = useState<FormProblem[]>([]);
   const [attempt, setAttempt] = useState(0);
   // Each field, by its name, so the summary can link to it.
   const fields = useRef(new Map<string, FormField>());
@@ -268,39 +267,41 @@ export function Form({
       const field = fieldOf(name, fields.current.keys());
       if (present(message) && !owned.has(field)) owned.set(field, message);
     }
-    const listed = [...owned].map(([name, message]) => ({
-      name,
-      message,
-      id: fields.current.get(name)?.id ?? null,
-    }));
-    const place = (problem: Problem) => (problem.id ? document.getElementById(problem.id) : null);
-    listed.sort((a, b) => {
-      const [first, second] = [place(a), place(b)];
-      if (!first || !second) return 0;
-      return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
-    });
+    const listed = inPageOrder(
+      [...owned].map(([name, message]) => ({
+        name,
+        message,
+        id: fields.current.get(name)?.id ?? null,
+      })),
+      (problem) => (problem.id ? document.getElementById(problem.id) : null),
+    );
     found.current = data;
     setProblems(listed);
     if (listed.length > 0) setAttempt((count) => count + 1);
     // Without a summary to take focus, the first field that needs fixing does.
-    const first = listed.find((problem) => problem.id);
-    if (first?.id && !errorSummary)
+    const firstId = listed.find((problem) => problem.id)?.id;
+    if (firstId && !errorSummary)
       requestAnimationFrame(() => {
-        if (!claimed()) document.getElementById(first.id ?? "")?.focus();
+        if (!claimed()) document.getElementById(firstId)?.focus();
       });
     return listed.length > 0;
   };
 
   // An answer that has changed and now passes loses its error at once. One that still fails keeps
-  // its message until the form is sent again.
+  // its message until the form is sent again. A press on a radio brings a click, an input and a
+  // change in one frame, so the answers are checked once a frame, however many come.
+  const checking = useRef(0);
+  // The check runs a frame later, with the validate of then, not of the event that asked for it.
+  const latestValidate = useLatest(validate);
   const recheck = () => {
-    if (problems.length === 0) return;
-    requestAnimationFrame(() => {
+    if (problems.length === 0 || checking.current) return;
+    checking.current = requestAnimationFrame(() => {
+      checking.current = 0;
       const element = form.current;
       const before = found.current;
       if (!element || !before) return;
       const data = new FormData(element);
-      const now = Object.entries(validate?.(data) ?? {}).flatMap(([name, message]) =>
+      const now = Object.entries(latestValidate.current?.(data) ?? {}).flatMap(([name, message]) =>
         present(message) ? [fieldOf(name, fields.current.keys())] : [],
       );
       setProblems((current) => {
@@ -386,7 +387,9 @@ export function useFormErrors({
   const form = useContext(FormContext);
   const addSummary = summary ? form?.addSummary : undefined;
   useLayoutEffect(() => addSummary?.(), [addSummary]);
-  const [inForm, errors, attempt] = [Boolean(form), form?.problems, form?.attempt];
+  const inForm = Boolean(form);
+  const errors = form?.problems;
+  const attempt = form?.attempt;
   return useMemo(
     () => (inForm ? { errors: errors ?? noProblems, attempt: attempt ?? 0 } : null),
     [inForm, errors, attempt],

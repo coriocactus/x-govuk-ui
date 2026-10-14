@@ -224,7 +224,7 @@ export function RadiosRoot({
   const saved = useFormDefault(name);
   const [value, setValue] = useControllableState<string | null>(
     controlled,
-    () => (saved ? (saved[0] ?? null) : defaultValue === undefined ? null : defaultValue),
+    () => (saved ? (saved[0] ?? null) : (defaultValue ?? null)),
     (next) => next !== null && onValueChange?.(next),
   );
   const target = useLinkTarget(controlId);

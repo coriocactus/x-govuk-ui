@@ -117,9 +117,7 @@ export function useSidebarArrangement({
     null,
     storage,
   );
-  const signature = JSON.stringify(kept);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the arrangement follows what is kept.
-  const arrangement = useMemo(() => fit(kept, entries, groups), [signature, entries, groups]);
+  const arrangement = useMemo(() => fit(kept, entries, groups), [kept, entries, groups]);
   const labels = useMemo(
     () => Object.fromEntries(entries.map((entry) => [entry.id, entry.label])),
     [entries],
@@ -440,7 +438,6 @@ export function SidebarCustomise({
       ]),
     );
   };
-  const signature = JSON.stringify(arrangement);
   // biome-ignore lint/correctness/useExhaustiveDependencies: rows glide after each change.
   useLayoutEffect(() => {
     const was = before.current;
@@ -458,7 +455,7 @@ export function SidebarCustomise({
         duration: glideEasing.duration,
         easing: glideEasing.easing,
       });
-  }, [signature, reduced]);
+  }, [arrangement, reduced]);
 
   /** Notes where everything is, then makes the change, so it glides. */
   const then =

@@ -29,7 +29,7 @@ import { Kbd } from "./kbd";
 import { useLabels } from "./labels";
 import { Panel } from "./panel";
 import { useLatest, useMergedRef } from "./refs";
-import { type Registry, useRegister, useRegistry } from "./registry";
+import { inPageOrder, type Registry, useRegister, useRegistry } from "./registry";
 import { stepAnswers } from "./step-answers";
 import { browserStorage, type StorageLike } from "./stored-state";
 import { SummaryList, SummaryListAction, SummaryListRow } from "./summary-list";
@@ -101,8 +101,12 @@ const StepsContext = createContext<StepsHost | null>(null);
 
 /** A part that a service can place, in place of the one FormSteps draws. */
 type Part = "back" | "progress" | "summary";
-/** Tells FormSteps that a part of a service's own is on the page, until it calls what it returns. */
+/**
+ * Tells FormSteps that a part of a service's own is on the page, until it calls what it returns.
+ */
 type Claim = (part: Part) => () => void;
+/** How many of each part a service has placed. */
+type Placed = Partial<Record<Part, number>>;
 
 /** What FormSteps shares with its parts, inside it or in a FormStepsProvider around it. */
 type StepsShared = {
@@ -128,12 +132,12 @@ const ClaimContext = createContext<Claim | null>(null);
 const ProviderContext = createContext<{
   publish: (shared: StepsShared | null) => void;
   claim: Claim;
-  placed: Partial<Record<Part, number>>;
+  placed: Placed;
 } | null>(null);
 
 /** How many of each part are placed, and a way for each to say so. */
 function useClaims() {
-  const [placed, setPlaced] = useState<Partial<Record<Part, number>>>({});
+  const [placed, setPlaced] = useState<Placed>({});
   const claim = useCallback<Claim>((part) => {
     setPlaced((now) => ({ ...now, [part]: (now[part] ?? 0) + 1 }));
     return () => setPlaced((now) => ({ ...now, [part]: (now[part] ?? 1) - 1 }));
@@ -442,6 +446,14 @@ function answersOf(field: FormField, name: string, data: FormData): ReactNode[] 
     .filter(Boolean);
 }
 
+/** The form's answers, leaving out a step's, such as a step being skipped. */
+function answersLeaving(form: HTMLFormElement, step: number) {
+  const data = new FormData(form);
+  for (const field of form.querySelectorAll<HTMLInputElement>(`[data-step="${step}"] [name]`))
+    data.delete(field.name);
+  return data;
+}
+
 /**
  * Moves focus to the first element that takes it, passing over any out of sight. An element that
  * cannot take focus, such as a heading, is made to take it from a script alone.
@@ -555,9 +567,10 @@ export function FormSteps({
   // Each step registers itself once it renders, in the page's order. Until then, as the server
   // renders, the steps are the direct children.
   const { items: registered, registry } = useRegistry<StepEntry>();
-  const direct = Children.toArray(children)
-    .filter((child) => isValidElement(child) && child.type === FormStep)
-    .map((child) => (child as { props: FormStepProps }).props);
+  const elements = Children.toArray(children).filter(isValidElement);
+  const direct = elements
+    .filter((child) => child.type === FormStep)
+    .map((child) => child.props as FormStepProps);
   const steps = registered.length > 0 ? registered.map((entry) => entry.props) : direct;
   const count = steps.length;
   // The first HTML is the same on the server and in the browser, so answers kept in the browser
@@ -577,6 +590,12 @@ export function FormSteps({
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
   const [rows, setRows] = useState<FormStepsAnswer[]>([]);
   const rememberSoon = useRef(0);
+  const cancelKeepSoon = () => {
+    window.clearTimeout(rememberSoon.current);
+    rememberSoon.current = 0;
+  };
+  // Where the answers are kept: a storage of the service's own, or else the browser's.
+  const storage = ownStorage ?? browserStorage();
   // Whether the answers are kept, which they are not while they are sent or once they are.
   const keeping = useRef(true);
   // Whether the answers are being sent, read as a press comes, before the form draws itself busy.
@@ -593,19 +612,20 @@ export function FormSteps({
   const historyKey = `x-govuk-ui-form-steps:${storageKey ?? titleId}`;
   // Before any step is known, as when every step is in a wrapper of your own, nothing shows.
   const ready = count > 0;
-  const reviewing = ready && at >= count;
+  // At Check your answers, before the answers are sent and after.
+  const atReview = ready && at >= count;
   const step = steps[at];
   // Check your answers lists the answers again when a field's question or answer changes while it
   // shows, such as when a Select's labels arrive from items in a wrapper after a restore.
   const [summaries, setSummaries] = useState(0);
-  const listing = useLatest(reviewing && !sent);
+  const listing = useLatest(atReview && !sent);
   const fieldChanged = useCallback(() => {
     if (listing.current) setSummaries((count) => count + 1);
   }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: answers are restored once, as the form first mounts.
   useLayoutEffect(() => {
-    const saved = readSaved(storageKey, ownStorage ?? browserStorage());
+    const saved = readSaved(storageKey, storage);
     if (!saved) return;
     const answers: Record<string, string[]> = {};
     for (const name of saved.empty) answers[name] = [];
@@ -621,12 +641,7 @@ export function FormSteps({
   const planFor = (leaving?: number) => {
     const element = form.current;
     if (!element) return steps.map((_, index) => index);
-    const data = new FormData(element);
-    if (leaving !== undefined)
-      for (const field of element.querySelectorAll<HTMLInputElement>(
-        `[data-step="${leaving}"] [name]`,
-      ))
-        data.delete(field.name);
+    const data = leaving === undefined ? new FormData(element) : answersLeaving(element, leaving);
     return steps.flatMap((each, index) => (!each.when || each.when(data) ? [index] : []));
   };
   const replan = (leaving?: number) => {
@@ -645,8 +660,7 @@ export function FormSteps({
    * a form that has gone.
    */
   const remember = (where = at, passing = passed, skipping = skipped) => {
-    window.clearTimeout(rememberSoon.current);
-    rememberSoon.current = 0;
+    cancelKeepSoon();
     const element = form.current;
     if (!keeping.current || !storageKey || !element) return;
     // The answers of the steps that apply now, even before the page shows them so.
@@ -666,7 +680,7 @@ export function FormSteps({
     );
     const given = new Set(sent.map(([name]) => name));
     const empty = [...names].filter((name) => !given.has(name));
-    writeSaved(storageKey, ownStorage ?? browserStorage(), {
+    writeSaved(storageKey, storage, {
       at: where,
       passed: [...passing],
       skipped: [...skipping],
@@ -685,7 +699,7 @@ export function FormSteps({
   });
   const keepSoon = () => {
     if (!keeping.current) return;
-    window.clearTimeout(rememberSoon.current);
+    cancelKeepSoon();
     rememberSoon.current = window.setTimeout(() => later.current(), 300);
   };
   useLayoutEffect(() => {
@@ -699,26 +713,28 @@ export function FormSteps({
     };
   }, []);
 
-  const go = (where: number, { push = true } = {}) => {
-    replan();
+  /** Shows a step, or Check your answers, and moves focus to it, with its place in history. */
+  const moveTo = (where: number, push = true) => {
     setAt(where);
     focusNext.current = where >= count ? "summary" : "step";
     if (historyOn && push)
       window.history.pushState({ ...window.history.state, [historyKey]: where }, "");
   };
+  const go = (where: number, { push = true } = {}) => {
+    replan();
+    moveTo(where, push);
+  };
   const summaryRows = (index: number, skipping: Set<number>): FormStepsAnswer[] => {
     if (!form.current) return [];
     const data = new FormData(form.current);
     // The step's questions in the page's order, leaving out any users cannot see.
-    const place = (id: string) => document.getElementById(id);
     const id = registered[index]?.id;
-    const asked = [...((id && stepFields.current.get(id)) || [])]
-      .filter(([, field]) => field.shown?.() !== false)
-      .sort(([, a], [, b]) => {
-        const [first, second] = [place(a.id), place(b.id)];
-        if (!first || !second) return 0;
-        return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
-      });
+    const asked = inPageOrder(
+      [...((id && stepFields.current.get(id)) || [])].filter(
+        ([, field]) => field.shown?.() !== false,
+      ),
+      ([, field]) => document.getElementById(field.id),
+    );
     const each = asked.map(
       ([name, field]): FormStepsAnswer => ({
         step: index,
@@ -797,8 +813,8 @@ export function FormSteps({
       }
       const current = root.querySelector<HTMLElement>(`[data-step="${at}"]`);
       // On a page, the step's title takes focus at whatever level it is, or else its question's
-      // heading.
-      // In a card, the step's chosen answer takes focus, or else its first.
+      // heading. In a card, and on a page without either, the chosen answer takes focus, or else
+      // the first.
       const headings =
         layout === "page"
           ? [
@@ -823,8 +839,8 @@ export function FormSteps({
   // steps register anew after it.
   // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are listed as the form arrives, and as its steps register.
   useLayoutEffect(() => {
-    if (reviewing && !sent) setRows(planFor().flatMap((index) => summaryRows(index, skipped)));
-  }, [reviewing, sent, restored.round, registered, summaries]);
+    if (atReview && !sent) setRows(planFor().flatMap((index) => summaryRows(index, skipped)));
+  }, [atReview, sent, restored.round, registered, summaries]);
 
   // With history, the browser's current entry always records the step the form is on. Continue and
   // Back add an entry first. Otherwise the step changes in place, such as when the steps in a
@@ -847,11 +863,10 @@ export function FormSteps({
 
   const finish = async (data: FormData, skipping = skipped) => {
     const element = form.current;
-    window.clearTimeout(rememberSoon.current);
-    rememberSoon.current = 0;
+    cancelKeepSoon();
     keeping.current = false;
     if (!onComplete) {
-      writeSaved(storageKey, ownStorage ?? browserStorage(), null);
+      writeSaved(storageKey, storage, null);
       element?.submit();
       return;
     }
@@ -879,13 +894,12 @@ export function FormSteps({
         setAt(first);
         focusNext.current = "step";
       }
-      return errors ?? undefined;
+      return errors;
     }
     // Anything that asked to keep the answers while they were sent, such as a press, keeps nothing.
-    window.clearTimeout(rememberSoon.current);
-    rememberSoon.current = 0;
+    cancelKeepSoon();
     keeping.current = false;
-    writeSaved(storageKey, ownStorage ?? browserStorage(), null);
+    writeSaved(storageKey, storage, null);
     // The answers stay on show once sent, unless something else takes their place.
     setRows(planFor().flatMap((index) => summaryRows(index, skipping)));
     setSent(true);
@@ -894,7 +908,7 @@ export function FormSteps({
 
   const onSubmit = async (data: FormData) => {
     if (busy) return;
-    if (reviewing) return finish(data);
+    if (atReview) return finish(data);
     const own = step?.onContinue;
     if (own) {
       setBusy(true);
@@ -913,7 +927,8 @@ export function FormSteps({
       // The last step sends the answers, without Check your answers.
       return finish(data, skipping);
     }
-    go(next);
+    // The plan is worked out already, just above.
+    moveTo(next);
     remember(next, passing, skipping);
   };
 
@@ -927,19 +942,12 @@ export function FormSteps({
     const route = replan(at);
     const next = following(at, route, passing, skipping);
     if (next >= count && !checkAnswers) {
-      const element = form.current;
-      if (!element) return;
-      const data = new FormData(element);
-      for (const field of element.querySelectorAll<HTMLInputElement>(`[data-step="${at}"] [name]`))
-        data.delete(field.name);
-      void finish(data, skipping);
+      if (form.current) void finish(answersLeaving(form.current, at), skipping);
       return;
     }
     // The skipped step is disabled once the form renders again, so its answers stay out of the
-    // plan and Check your answers.
-    setAt(next);
-    focusNext.current = next >= count ? "summary" : "step";
-    if (historyOn) window.history.pushState({ ...window.history.state, [historyKey]: next }, "");
+    // plan and Check your answers. The plan already leaves them out, so it is not worked out again.
+    moveTo(next);
     remember(next, passing, skipping);
   };
 
@@ -965,10 +973,10 @@ export function FormSteps({
     event.currentTarget.requestSubmit();
   };
 
-  const position = reviewing ? plan.length : plan.indexOf(at);
+  const position = atReview ? plan.length : plan.indexOf(at);
   const settled = plan.filter((index) => passed.has(index) || skipped.has(index)).length;
   const last = !checkAnswers && plan.at(-1) === at;
-  const label = reviewing || last ? labels.submit : (step?.labels?.continue ?? labels.continue);
+  const label = atReview || last ? labels.submit : (step?.labels?.continue ?? labels.continue);
   const card = layout === "card";
   const replaced = sent && Boolean(doneContent);
 
@@ -981,8 +989,8 @@ export function FormSteps({
   // Steps skipped or not asked are disabled, so the form leaves their answers out.
   const dataNow = useCallback(() => (form.current ? new FormData(form.current) : null), []);
   const canGoBack = !sent && previous !== undefined;
-  const canSkip = Boolean(step?.optional) && !reviewing && !sent;
-  const listed = reviewing || sent ? rows : noAnswers;
+  const canSkip = Boolean(step?.optional) && !atReview && !sent;
+  const listed = atReview || sent ? rows : noAnswers;
   const controls = useMemo<UseFormStepsResult>(
     () => ({
       step: at,
@@ -990,7 +998,7 @@ export function FormSteps({
       position,
       total: plan.length,
       settled,
-      reviewing: reviewing && !sent,
+      reviewing: atReview && !sent,
       sent,
       busy,
       back: canGoBack ? backNow : null,
@@ -1003,7 +1011,7 @@ export function FormSteps({
       position,
       plan.length,
       settled,
-      reviewing,
+      atReview,
       sent,
       busy,
       canGoBack,
@@ -1028,9 +1036,7 @@ export function FormSteps({
   const [ownPlaced, ownClaim] = useClaims();
   const placed = provider?.placed ?? ownPlaced;
   const claim = provider?.claim ?? ownClaim;
-  const types = Children.toArray(children).flatMap((child) =>
-    isValidElement(child) ? [child.type] : [],
-  );
+  const types = elements.map((child) => child.type);
   const drawBack = back && !placed.back && !types.includes(FormStepsBack);
   const drawProgress = progress && !placed.progress && !types.includes(FormStepsProgress);
   const drawSummary = !placed.summary && !types.includes(FormStepsSummary);
@@ -1045,7 +1051,7 @@ export function FormSteps({
       aria-valuemax={plan.length}
       aria-valuenow={sent ? plan.length : settled}
       aria-valuetext={
-        sent || reviewing ? labels.allAnswered : labels.progress(position + 1, plan.length)
+        sent || atReview ? labels.allAnswered : labels.progress(position + 1, plan.length)
       }
     >
       <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
@@ -1194,21 +1200,23 @@ export function FormSteps({
                 {!card && backControl}
                 <Form
                   {...formProps}
-                  // Restored answers start the form again, because each field reads its answer once.
+                  // Restored answers start the form again, because each field reads its answer
+                  // once.
                   key={restored.round}
                   ref={formRef}
                   className="x-govuk-ui-form-steps-form"
-                  // Pressing anywhere in it that is not a control puts focus in the form, so keys that work
-                  // across it, such as Choices' letters, reach it.
+                  // Pressing anywhere in it that is not a control puts focus in the form, so keys
+                  // that work across it, such as Choices' letters, reach it.
                   tabIndex={-1}
                   errorSummary={errorSummary}
                   defaultValues={restored.answers}
-                  validate={(data) => (reviewing || !step?.validate ? {} : step.validate(data))}
+                  validate={(data) => (atReview || !step?.validate ? {} : step.validate(data))}
                   onSubmit={(data) => onSubmit(data)}
                   onKeyDown={chain(givenKeyDown, onKeyDown)}
-                  // Keeping the answers and working out the steps again follow every change, whatever a
-                  // service's own handlers do. A control that sends its value from a hidden input, such as a
-                  // slider or a toggle group, changes it with a key or a press, not with typing.
+                  // Keeping the answers and working out the steps again follow every change,
+                  // whatever a service's own handlers do. A control that sends its value from a
+                  // hidden input, such as a slider or a toggle group, changes it with a key or a
+                  // press, not with typing.
                   onInput={both(givenInput, keepSoon)}
                   onChange={both(givenChange, () => {
                     replan();
@@ -1259,9 +1267,8 @@ export type FormStepsProviderProps = {
 /**
  * Lets FormStepsBack and FormStepsProgress sit outside the FormSteps inside it, such as a
  * FormStepsBack in a ServicePage's `back`, above the page's main content, where GOV.UK puts a Back
- * link.
- * `useFormSteps` reads the form there too. Put it around one FormSteps and its parts. It renders no
- * element.
+ * link. `useFormSteps` reads the form there too. Put it around one FormSteps and its parts. It
+ * renders no element.
  *
  * The form tells it where it is once the page has loaded, so a part outside the form shows nothing
  * in the first HTML. Give ServicePage's `back` a FormStepsBack only while `useFormSteps().back` is
@@ -1294,7 +1301,8 @@ export function useFormSteps(): UseFormStepsResult | null {
 /**
  * The answers Check your answers lists, and Change, for a list of your own, as FormStepsSummary
  * lists them. Null outside the form, as a FormStepsProvider does not carry them. Read it in the
- * part that lists them, not in one that draws the steps, which would list them again each time.
+ * part that lists them, not in one that draws the steps, which would list them again each time
+ * without end.
  *
  * As the answers come, focus moves to the form's first `h1` on a page, or else to a heading with
  * the class `x-govuk-ui-form-steps-review-title`. Give your list one, or move focus to it yourself.
@@ -1305,8 +1313,7 @@ export function useFormStepsAnswers({
   summary = false,
 }: UseFormStepsAnswersOptions = {}): UseFormStepsAnswersResult | null {
   const answers = useContext(AnswersContext);
-  // A list that has no answers to show, outside the form, takes the form's own list's place from
-  // nothing.
+  // Outside the form there are no answers, so a list there takes no place from the form's own.
   useClaim(summary && answers ? "summary" : null);
   return answers;
 }
@@ -1411,7 +1418,9 @@ function StepsSummary({
   const card = layout === "card";
   const rows = only ? answers.filter((answer) => only.includes(answer.step)) : answers;
   if (only && rows.length === 0 && !children) return null;
-  const heading = title === undefined ? (card || sent ? null : labels.checkAnswers) : title;
+  // Check your answers heads the list on a page until the answers are sent, unless given a title.
+  let heading = title;
+  if (heading === undefined) heading = card || sent ? null : labels.checkAnswers;
   const Heading = `h${titleLevel ?? (card ? 3 : 1)}` as const;
   return (
     <div {...props} className={`x-govuk-ui-form-steps-review ${className}`.trim()}>
@@ -1427,11 +1436,9 @@ function StepsSummary({
       >
         {rows.map((row, index) => {
           const muted = row.skipped || row.values.length === 0;
-          const values = row.skipped
-            ? [labels.skipped]
-            : row.values.length > 0
-              ? row.values
-              : [labels.notAnswered];
+          let values = row.values;
+          if (row.skipped) values = [labels.skipped];
+          else if (values.length === 0) values = [labels.notAnswered];
           return (
             <SummaryListRow
               key={`${row.step}-${row.id || index}`}

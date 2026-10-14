@@ -502,7 +502,9 @@ export type UseCommandMenuResult = {
 /** The command menu around a part of it, such as an empty state of your own. Null outside one. */
 export function useCommandMenu(): UseCommandMenuResult | null {
   const shared = useContext(SharedContext);
-  const [search, setSearch, close] = [shared?.query, shared?.setQuery, shared?.close];
+  const search = shared?.query;
+  const setSearch = shared?.setQuery;
+  const close = shared?.close;
   return useMemo(
     () => (setSearch && close ? { search: search ?? "", setSearch, close } : null),
     [search, setSearch, close],

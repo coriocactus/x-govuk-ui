@@ -34,7 +34,10 @@ test("a form checks every answer when sent, and its date can come from the calen
   // the problems in the fields' order.
   const summary = frame.locator(".x-govuk-ui-error-summary");
   await expect(summary).toBeFocused();
-  expect((await summary.boundingBox())!.y).toBeLessThan((await heading.boundingBox())!.y);
+  // It eases open from nothing, so the heading is beneath it once it has.
+  await expect
+    .poll(async () => (await heading.boundingBox())!.y - (await summary.boundingBox())!.y)
+    .toBeGreaterThan(0);
   await expect(page).toHaveTitle(/^Error: Form/);
   await expect(summary.getByRole("link")).toHaveText([
     "Enter an email address in the correct format, like name@example.com",

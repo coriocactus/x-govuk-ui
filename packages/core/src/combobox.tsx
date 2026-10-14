@@ -5,6 +5,7 @@ import {
   type ComponentPropsWithRef,
   type ReactNode,
   type RefObject,
+  useCallback,
   useId,
   useMemo,
   useRef,
@@ -109,7 +110,7 @@ export const defaultComboboxLabels: ComboboxLabels = {
   remove: (option) => `Remove ${option}`,
 };
 
-/** The labels of the options sent, for Check your answers, from every option the field has shown. */
+/** The labels of the options sent, for Check your answers, from each option the field has shown. */
 function labelsOf(known: Map<string, ComboboxOption>, sent: FormDataEntryValue[]) {
   return sent
     .filter((value): value is string => typeof value === "string" && value !== "")
@@ -154,6 +155,16 @@ function Options({
   emptyText: string;
   field: RefObject<HTMLDivElement | null>;
 }) {
+  // A stable ref, which React does not attach again as the text changes, so the field is measured
+  // once as the list opens, not again for each key.
+  const measure = useCallback(
+    (popup: HTMLDivElement | null) => {
+      if (!popup) return;
+      const width = field.current?.offsetWidth;
+      if (width) popup.style.setProperty("--x-govuk-ui-combobox-width", `${width}px`);
+    },
+    [field],
+  );
   return (
     <Primitive.Portal>
       <Primitive.Positioner
@@ -161,14 +172,7 @@ function Options({
         sideOffset={6}
         anchor={field}
       >
-        <Primitive.Popup
-          ref={(popup) => {
-            const width = field.current?.offsetWidth;
-            if (popup && width)
-              popup.style.setProperty("--x-govuk-ui-combobox-width", `${width}px`);
-          }}
-          className="x-govuk-ui-floating x-govuk-ui-combobox-popup"
-        >
+        <Primitive.Popup ref={measure} className="x-govuk-ui-floating x-govuk-ui-combobox-popup">
           {/* The options scroll in a Scroll area, which fades the edge with more beyond it. */}
           <ScrollArea viewportRef={followHighlight} className="x-govuk-ui-combobox-scroll" fade>
             <span className="x-govuk-ui-combobox-highlight" aria-hidden="true" />
@@ -244,6 +248,13 @@ export function Combobox({
     </Field>
   );
 }
+
+/** How Base UI reads an option, by its label and its value, in both controls. */
+const optionKeys = {
+  itemToStringLabel: (option: ComboboxOption) => option.label,
+  itemToStringValue: (option: ComboboxOption) => option.value,
+  isItemEqualToValue: (item: ComboboxOption, chosen: ComboboxOption) => item.value === chosen.value,
+};
 
 /**
  * Every option the field has been given, each by its value. A chosen option stays chosen when
@@ -335,11 +346,7 @@ export function ComboboxControl(given: ComboboxControlProps) {
       defaultValue={find(saved ? (saved[0] ?? null) : defaultValue)}
       onValueChange={(next) => onValueChange?.((next as ComboboxOption | null)?.value ?? null)}
       {...search.root}
-      itemToStringLabel={(option: ComboboxOption) => option.label}
-      itemToStringValue={(option: ComboboxOption) => option.value}
-      isItemEqualToValue={(item: ComboboxOption, chosen: ComboboxOption) =>
-        item.value === chosen.value
-      }
+      {...optionKeys}
       name={name}
       disabled={disabled}
     >
@@ -454,11 +461,7 @@ export function MultiSelectControl(given: MultiSelectControlProps) {
         onValueChange?.((next as ComboboxOption[]).map((option) => option.value))
       }
       {...search.root}
-      itemToStringLabel={(option: ComboboxOption) => option.label}
-      itemToStringValue={(option: ComboboxOption) => option.value}
-      isItemEqualToValue={(item: ComboboxOption, chosen: ComboboxOption) =>
-        item.value === chosen.value
-      }
+      {...optionKeys}
       name={name}
       disabled={disabled}
     >

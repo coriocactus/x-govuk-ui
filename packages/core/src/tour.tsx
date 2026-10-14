@@ -257,7 +257,7 @@ export function Tour({
   const labels = useLabels("tour", defaultTourLabels, ownLabels);
   const stepLabel = labels.step;
   const { steps, registry } = useSteps(children);
-  // How far someone got, in local storage with a key, or else in memory.
+  // How far someone got, in `storage` under a key, or else in memory.
   const [progress, setProgress] = useStoredState<Progress>(
     storageKey,
     { step: defaultStep, ended: null },
@@ -376,9 +376,10 @@ export function Tour({
     if (moving || index < 0 || index >= steps.length) return;
     // Focus on a button among the step's words or its own buttons, which leave with the step, moves
     // on to Next first. Otherwise Base UI puts it on the card as they go.
-    const leaving = card?.querySelectorAll(".x-govuk-ui-tour-step, .x-govuk-ui-tour-actions");
-    if ([...(leaving ?? [])].some((part) => part.contains(document.activeElement)))
-      next.current?.focus();
+    const leaving = document.activeElement?.closest(
+      ".x-govuk-ui-tour-step, .x-govuk-ui-tour-actions",
+    );
+    if (leaving && card?.contains(leaving)) next.current?.focus();
     direction.current = index > step ? 1 : -1;
     const wanted = steps[index]?.target;
     const coming = wanted === undefined ? null : resolveAnchor(wanted);

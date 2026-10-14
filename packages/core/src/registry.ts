@@ -37,6 +37,21 @@ function before(first: Element | null, second: Element | null) {
   return Boolean(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING);
 }
 
+/**
+ * The items in the order their elements come in the page, each element looked up once. Items
+ * without an element come last, in the order they were given.
+ * @internal
+ */
+export function inPageOrder<T>(items: Iterable<T>, elementOf: (item: T) => Element | null): T[] {
+  const placed = [...items].map((item) => ({ item, element: elementOf(item) }));
+  placed.sort((a, b) => {
+    if (before(a.element, b.element)) return -1;
+    if (before(b.element, a.element)) return 1;
+    return 0;
+  });
+  return placed.map(({ item }) => item);
+}
+
 function inOrder<T>(entries: readonly Entry<T>[]) {
   return entries.every(
     (entry, index) =>
@@ -45,11 +60,7 @@ function inOrder<T>(entries: readonly Entry<T>[]) {
 }
 
 function sorted<T>(entries: readonly Entry<T>[]) {
-  return [...entries].sort((a, b) => {
-    if (before(a.place.current, b.place.current)) return -1;
-    if (before(b.place.current, a.place.current)) return 1;
-    return 0;
-  });
+  return inPageOrder(entries, (entry) => entry.place.current);
 }
 
 /**

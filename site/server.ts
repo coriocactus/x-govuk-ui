@@ -2,7 +2,14 @@ import { workbenchPort } from "../scripts/checkout";
 import { type ComponentName, componentNames } from "./catalogue";
 import index from "./index.html";
 import { docsDocuments, llmsDocuments } from "./llms";
-import { assets, fontAssets, fontFaces, sources } from "./sources";
+import {
+  assets,
+  compiledComposition,
+  compositions,
+  fontAssets,
+  fontFaces,
+  sources,
+} from "./sources";
 import { stylingContracts } from "./styling";
 
 const redirect = (to: string, status: number) =>
@@ -50,6 +57,26 @@ const server = Bun.serve({
           }),
       ]),
     ),
+    // The views Piscine Assist composes, as written and compiled for the page, from the current
+    // source.
+    ...Object.fromEntries(
+      Object.entries(compositions).flatMap(([name, path]) => [
+        [
+          `/compositions/${name}.tsx`,
+          () =>
+            new Response(Bun.file(path), {
+              headers: { "Content-Type": "text/plain; charset=utf-8" },
+            }),
+        ],
+        [
+          `/compositions/${name}.js`,
+          async () =>
+            new Response(await compiledComposition(path), {
+              headers: { "Content-Type": "text/javascript; charset=utf-8" },
+            }),
+        ],
+      ]),
+    ),
     // Each component's styling contract and the documentation for language models, read from
     // the current source, so an edit shows on the next request.
     "/styling/:file": async (request) => {
@@ -70,6 +97,7 @@ const server = Bun.serve({
     // Any other address is the app's page for an address the site does not have. A missing
     // file is a plain 404.
     "/source/*": () => new Response("Not found", { status: 404 }),
+    "/compositions/*": () => new Response("Not found", { status: 404 }),
     "/assets/*": () => new Response("Not found", { status: 404 }),
     "/*": index,
   },

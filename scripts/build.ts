@@ -1,7 +1,14 @@
 import { copyFile, mkdir, rm } from "node:fs/promises";
 import { dirname } from "node:path";
 import { componentDocs, docsDocuments, llmsDocuments } from "../site/llms";
-import { assets, fontAssets, fontFaces, sources } from "../site/sources";
+import {
+  assets,
+  compiledComposition,
+  compositions,
+  fontAssets,
+  fontFaces,
+  sources,
+} from "../site/sources";
 import { stylingContracts } from "../site/styling";
 import sass from "./sass";
 
@@ -31,6 +38,15 @@ await Promise.all(
 await Bun.write("dist/assets/fonts.css", await fontFaces("production"));
 await Promise.all(
   Object.entries(sources).map(([name, path]) => copyFile(path, `dist/source/${name}`)),
+);
+// The views Piscine Assist composes, as written, which the workspace shows, and compiled, which
+// it draws.
+await mkdir("dist/compositions", { recursive: true });
+await Promise.all(
+  Object.entries(compositions).flatMap(([name, path]) => [
+    copyFile(path, `dist/compositions/${name}.tsx`),
+    compiledComposition(path).then((code) => Bun.write(`dist/compositions/${name}.js`, code)),
+  ]),
 );
 // Each component's styling contract, for the playground's Styling tab, and the documentation for
 // language models and the MCP server, all read from the current source.

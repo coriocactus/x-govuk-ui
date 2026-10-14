@@ -1,4 +1,6 @@
 import {
+  placeTile,
+  replaceTile,
   Tile,
   TileBar,
   TileClose,
@@ -10,6 +12,7 @@ import {
   Tiles,
   type TilesLayout,
   TileTitle,
+  tileIds,
   useTilesLayout,
 } from "@x-govuk-ui/belsize";
 import { Chart } from "@x-govuk-ui/memetics";
@@ -17,7 +20,6 @@ import {
   type CSSProperties,
   Fragment,
   memo,
-  type ReactNode,
   type RefObject,
   useEffect,
   useLayoutEffect,
@@ -95,7 +97,19 @@ import {
 } from "x-govuk-ui";
 import { useStoredState } from "../packages/core/src/stored-state";
 import { BrandLockup, brandPaths } from "./brand";
+import { ComposedParts, ComposedView, prefetch } from "./composition";
 import { Icon, type IconName } from "./icon";
+import {
+  type Application,
+  caseworker,
+  dateText,
+  type Licence,
+  money,
+  type Status,
+  useActivity,
+  useApplications,
+  useLicenceWeeks,
+} from "./workspace-data";
 
 /*
  * The workspace, a service made from the components, as a caseworker would use it. This one is the
@@ -106,7 +120,9 @@ import { Icon, type IconName } from "./icon";
  * - The Overview is Tiles that caseworkers arrange for themselves. It shows the week's licences in
  *   a chart, the latest activity, and the applications waiting in a grouped table.
  * - Piscine Assist, the licensing team's assistant, sits beside the work, as wide as its handle is
- *   dragged.
+ *   dragged. Asked for a view of the work, it composes one from the library's parts, as JSX, which
+ *   opens in a tile on the Overview and acts on the same data.
+ * - The data is site/workspace-data.ts, which stands in for the service's API.
  *
  * Command-K finds any part or action. The other parts are still to come.
  */
@@ -117,7 +133,7 @@ const sections = [
     label: "Main",
     items: [
       { name: "Overview", icon: "overview" },
-      { name: "Applications", icon: "applications", badge: 8 },
+      { name: "Applications", icon: "applications" },
       { name: "Payments", icon: "payments" },
       { name: "Activity", icon: "clock" },
     ],
@@ -138,7 +154,7 @@ const sections = [
   },
 ] as const satisfies readonly {
   label: string;
-  items: readonly { name: string; icon: IconName; badge?: number }[];
+  items: readonly { name: string; icon: IconName }[];
 }[];
 type Section = (typeof sections)[number]["items"][number]["name"];
 const groupNames = sections.map((section) => section.label);
@@ -152,20 +168,8 @@ const itemsByName = new Map(
 /** The workspaces to switch between. There is one so far, and the switcher is where others go. */
 const workspaces = ["Fishing licences"];
 
-/** The caseworker. */
-const you = { name: "Andy Burnham", role: "Licensing team" };
-
-// Licences issued each week, over the last eight, by length. The figures are made up.
-const weeks = [
-  ["w/c 11 Aug", 410, 180, 240],
-  ["w/c 18 Aug", 460, 210, 230],
-  ["w/c 25 Aug", 520, 240, 260],
-  ["w/c 1 Sep", 380, 170, 310],
-  ["w/c 8 Sep", 300, 140, 350],
-  ["w/c 15 Sep", 250, 120, 390],
-  ["w/c 22 Sep", 210, 90, 420],
-  ["w/c 29 Sep", 190, 80, 460],
-].map(([week, day, eight, year]) => ({ week, day, eight, year }));
+/** The caseworker signed in. */
+const you = caseworker;
 
 const licenceSeries = [
   { key: "day", label: "1 day" },
@@ -181,99 +185,23 @@ const columns: GroupedTableColumn[] = [
   { id: "assigned", label: "Assigned to", align: "end" },
 ];
 
-type Application = {
-  applicant: string;
-  reference: string;
-  type: ["1 day" | "8 days" | "12 months", TagColour];
-  fee: string;
-  received: string;
-  assigned: string[];
+/** Each licence's colour, in the table and the views Piscine Assist composes. */
+const licenceColours: Record<Licence, TagColour> = {
+  "1 day": "green",
+  "8 days": "teal",
+  "12 months": "blue",
 };
 
-const bands: { label: string; mark: ReactNode; items: Application[] }[] = [
-  {
-    label: "Needs a decision",
-    mark: <Icon name="decided" />,
-    items: [
-      {
-        applicant: "Priya Natarajan: check a Blue Badge",
-        reference: "RL-48213",
-        type: ["12 months", "blue"],
-        fee: "£35.80",
-        received: "29 Sep",
-        assigned: ["Andy Burnham"],
-      },
-      {
-        applicant: "Tomasz Zieliński: paid twice, refund one",
-        reference: "RL-48207",
-        type: ["12 months", "blue"],
-        fee: "£23.80",
-        received: "29 Sep",
-        assigned: ["Andy Burnham", "Sam Okafor"],
-      },
-      {
-        applicant: "Megan Hughes: starts before payment",
-        reference: "RL-48199",
-        type: ["8 days", "teal"],
-        fee: "£13.80",
-        received: "28 Sep",
-        assigned: ["Sam Okafor"],
-      },
-    ],
-  },
-  {
-    label: "Waiting for the applicant",
-    mark: <Icon name="clock" />,
-    items: [
-      {
-        applicant: "Daniel Okonkwo: proof of age asked for",
-        reference: "RL-48184",
-        type: ["12 months", "blue"],
-        fee: "£35.80",
-        received: "26 Sep",
-        assigned: ["Jo Reid"],
-      },
-      {
-        applicant: "Fiona MacLeod: address does not match",
-        reference: "RL-48171",
-        type: ["1 day", "green"],
-        fee: "£7.10",
-        received: "25 Sep",
-        assigned: ["Jo Reid", "Andy Burnham"],
-      },
-    ],
-  },
-  {
-    label: "Ready to issue",
-    mark: <Icon name="circle" />,
-    items: [
-      {
-        applicant: "Harriet Cole: all checks passed",
-        reference: "RL-48160",
-        type: ["12 months", "blue"],
-        fee: "£35.80",
-        received: "24 Sep",
-        assigned: ["Sam Okafor"],
-      },
-      {
-        applicant: "Yusuf Demir: all checks passed",
-        reference: "RL-48152",
-        type: ["8 days", "teal"],
-        fee: "£13.80",
-        received: "24 Sep",
-        assigned: ["Jo Reid"],
-      },
-      {
-        applicant: "Grace Whitfield: starts tomorrow",
-        reference: "RL-48147",
-        type: ["1 day", "green"],
-        fee: "£7.10",
-        received: "23 Sep",
-        assigned: ["Andy Burnham"],
-      },
-    ],
-  },
+/** The table's groups, by the applications' status. An issued application has left the table. */
+const bands: { status: Exclude<Status, "issued">; label: string; icon: IconName }[] = [
+  { status: "decision", label: "Needs a decision", icon: "decided" },
+  { status: "waiting", label: "Waiting for the applicant", icon: "clock" },
+  { status: "ready", label: "Ready to issue", icon: "circle" },
 ];
+
+/** The applications still open, which the table lists and the sidebar counts. */
+const useOpenApplications = () =>
+  useApplications().filter((application: Application) => application.status !== "issued");
 
 type Message = {
   id: string;
@@ -281,6 +209,19 @@ type Message = {
   text: string;
   streaming?: boolean;
   stopped?: boolean;
+  /** The view the reply composed, by its composition's name. */
+  composition?: string;
+};
+
+/** A view Piscine Assist composed, in a tile on the Overview. */
+type Composed = {
+  /** The tile's id. */
+  id: string;
+  /** The composition's name, which is its file's in site/compositions. */
+  name: string;
+  title: string;
+  /** When it started to be written, on `performance.now()`'s clock. */
+  started: number;
 };
 
 const opening: Message[] = [
@@ -296,51 +237,45 @@ const opening: Message[] = [
   },
 ];
 
-// The questions caseworkers ask most, each with Piscine Assist's answer. Anything else gets the
-// last answer.
-const suggestions = [
-  [
-    "Which concessions need proof?",
-    "A senior concession needs a date of birth, which the application already has. A disability concession needs the applicant's Blue Badge number or their Personal Independence Payment letter. Ask for it before you issue the licence, and record which you saw.",
-  ],
-  [
-    "Can a 12-month licence start next month?",
-    "Yes. A 12-month licence can start on any day up to 30 days ahead. Set the start date on the application before you issue it, and the fee stays the same.",
-  ],
-  [
-    "What if the applicant is under 13?",
-    'Children under 13 do not need a licence. Decline the application with the reason "Under 13" and the fee is refunded by itself.',
-  ],
-] as const;
-const fallback =
-  "Thanks. This is a demonstration, so nothing was sent to Piscine Assist. A real one would answer here.";
-
-// What the caseworkers did last. The names are made up.
-const activity = [
+// The questions caseworkers ask most, each with Piscine Assist's answer. A question about the
+// work composes a view of it, in a tile on the Overview. Anything else gets the last answer.
+const suggestions: {
+  question: string;
+  answer: string;
+  compose?: { name: string; title: string };
+}[] = [
   {
-    id: "issued",
-    title: "Licence issued",
-    by: "Sam Okafor",
-    date: new Date(2026, 8, 29, 16, 20),
-    text: "RL-48160, a 12-month licence for Harriet Cole.",
+    question: "Show me Theresa May's application",
+    answer:
+      "Here is Theresa May's application, in a tile on the overview. Her date of birth does not match her driving licence, so check it, then issue her licence or ask her for proof of age.",
+    compose: { name: "application", title: "Theresa May" },
   },
   {
-    id: "refund",
-    title: "Refund sent",
-    by: "Andy Burnham",
-    date: new Date(2026, 8, 29, 14, 5),
-    text: "£23.80 to Tomasz Zieliński, who paid twice.",
+    question: "What needs a decision?",
+    answer:
+      "These are the applications that need a decision, oldest first, in a tile on the overview. The list follows the applications, so each one leaves it as it is decided.",
+    compose: { name: "decisions", title: "Needs a decision" },
   },
   {
-    id: "asked",
-    title: "Proof of age asked for",
-    by: "Jo Reid",
-    date: new Date(2026, 8, 28, 11, 30),
-    text: "From Daniel Okonkwo, for a senior concession.",
+    question: "Refund Gordon Brown's second payment",
+    answer:
+      "Gordon Brown paid twice for the same licence. Choose the payment to refund in the tile on the overview, and send it. The other payment pays for his licence.",
+    compose: { name: "refund", title: "Refund for Gordon Brown" },
+  },
+  {
+    question: "How are 12-month licences selling?",
+    answer:
+      "12-month licences have risen for 6 weeks in a row, to 460 last week, while the shorter licences fell. The tile on the overview sets them side by side.",
+    compose: { name: "licences", title: "12-month licences" },
+  },
+  {
+    question: "Which concessions need proof?",
+    answer:
+      "A senior concession needs a date of birth, which the application already has. A disability concession needs the applicant's Blue Badge number or their Personal Independence Payment letter. Ask for it before you issue the licence, and record which you saw.",
   },
 ];
-
-const applicationCount = bands.reduce((sum, band) => sum + band.items.length, 0);
+const fallback =
+  "Thanks. This is a demonstration, so nothing was sent to Piscine Assist. A real one would answer here.";
 
 /** The Overview's tiles, open or not, with their titles. */
 const overviewTiles = [
@@ -355,6 +290,11 @@ const ASSIST = { min: 300, max: 560, start: 380 };
  * Narrower than this, the body has no space for Piscine Assist beside the work, so it is a sheet.
  */
 const BESIDE = 760;
+/**
+ * Narrower than this, the work has no room for a composed view in a column beside its tiles, so the
+ * view goes beneath them.
+ */
+const COLUMN = 720;
 /** The chart's plot height, which follows its tile's, within these. */
 const PLOT = { min: 140, max: 520 };
 /**
@@ -416,6 +356,7 @@ function Shell() {
   const [resizingAssist, setResizingAssist] = useState(false);
   const assistShow = useRef<HTMLButtonElement>(null);
   const body = useRef<HTMLDivElement>(null);
+  const work = useRef<HTMLDivElement>(null);
   const beside = useRoomFor(body, BESIDE);
   // Where it is too narrow beside the work, Piscine Assist opens over the work as a sheet. Its own
   // state is not kept, so the sheet never opens over the work by itself as the window narrows.
@@ -427,7 +368,41 @@ function Shell() {
     setRoomWas(beside);
     setSheetOpen(false);
   }
-  const chat = useAssistChat();
+  // The views Piscine Assist composed, each a tile of the Overview, which keeps their arrangement
+  // with its own tiles. A composed view lasts as long as the page, so a tile kept from an earlier
+  // visit that is not here now is left out.
+  const [composed, setComposed] = useState<Composed[]>([]);
+  const [layout, setLayout] = useTilesLayout({
+    storageKey: "x-govuk-ui-workspace-overview-tiles",
+    defaultValue: overview,
+    ids: [...overviewTiles, ...composed].map((tile) => tile.id),
+  });
+  const [maximised, setMaximised] = useState<string | null>(null);
+  const column = useRoomFor(work, COLUMN);
+  // A view opens on the Overview, in the place of the composed view open there, so the Overview
+  // keeps room for each. The earlier view stays among the tiles, to show again from a tile's menu.
+  // Without one open, the view takes the Overview's right, or its foot where the work is too
+  // narrow for a column beside the tiles. A maximised tile gives way, so the view is seen.
+  // Composed again, a view is written again.
+  const compose = (view: Composed) => {
+    setCurrent("Overview");
+    setMaximised((current) => (current === view.id ? current : null));
+    setComposed((current) => [...current.filter((each) => each.id !== view.id), view]);
+    const open = tileIds(layout);
+    if (open.includes(view.id)) return;
+    const shown = composed.filter((each) => open.includes(each.id)).at(-1);
+    setLayout(
+      shown
+        ? replaceTile(layout, shown.id, view.id)
+        : placeTile(
+            layout,
+            view.id,
+            column ? { side: "right", share: 45 } : { side: "bottom", share: 50 },
+          ),
+    );
+  };
+  const chat = useAssistChat(compose);
+  const openApplications = useOpenApplications().length;
   // The fish disappears as it is pressed, so its message box takes focus instead.
   const showAssist = () => {
     if (!beside) return setSheetOpen(true);
@@ -458,7 +433,7 @@ function Shell() {
       <SidebarItem
         key={name}
         icon={<Icon name={item.icon} size={18} />}
-        badge={"badge" in item ? item.badge : undefined}
+        badge={name === "Applications" ? openApplications : undefined}
         current={name === current}
         onClick={() => setCurrent(item.name)}
         action={<SidebarItemMenu arranger={arranger} id={name} />}
@@ -672,7 +647,9 @@ function Shell() {
                       variant="quiet"
                       size="small-icon"
                       aria-label="Show Piscine Assist"
-                      aria-controls="workspace-assist"
+                      // The sheet is not in the page while it is closed, so the fish names it only
+                      // while there is a pane or an open sheet to name.
+                      aria-controls={beside || sheetOpen ? "workspace-assist" : undefined}
                       onClick={showAssist}
                     >
                       <Icon name="fish" />
@@ -692,9 +669,15 @@ function Shell() {
               data-resizing={resizingAssist || undefined}
               style={{ "--workspace-assist-width": `${assistWidth}px` } as CSSProperties}
             >
-              <div id="workspace-work" className="workspace-work">
+              <div ref={work} id="workspace-work" className="workspace-work">
                 {current === "Overview" ? (
-                  <Overview />
+                  <Overview
+                    layout={layout}
+                    onLayoutChange={setLayout}
+                    maximised={maximised}
+                    onMaximisedChange={setMaximised}
+                    composed={composed}
+                  />
                 ) : (
                   <section className="workspace-panel workspace-coming" aria-label={current}>
                     <p className="workspace-coming-title">{current} is still to come.</p>
@@ -843,24 +826,35 @@ function useRoomFor(element: RefObject<HTMLElement | null>, width: number) {
 
 /**
  * The Overview, which is Tiles that caseworkers arrange for themselves, kept in this browser. They
- * start with the week's licences beside the latest activity, above the applications waiting.
- * Closing every tile leaves a way to lay them out again. Piscine Assist's conversation changes the
- * workspace, not the Overview, so the Overview does not render again as it streams.
+ * start with the week's licences beside the latest activity, above the applications waiting, and
+ * each view Piscine Assist composes joins them. The arrangement is controlled, so the empty state
+ * can lay the tiles out again, and Piscine Assist can place its views. Piscine Assist's
+ * conversation changes the workspace, not the Overview, so the Overview does not render again as
+ * it streams.
  */
-const Overview = memo(function Overview() {
-  // Controlled, so the empty state can lay the tiles out again. The hook checks what was kept, as
-  // the Tiles' own storageKey would. A broken arrangement, or a tile since renamed, gives way.
-  const [layout, setLayout] = useTilesLayout({
-    storageKey: "x-govuk-ui-workspace-overview-tiles",
-    defaultValue: overview,
-    ids: overviewTiles.map((tile) => tile.id),
-  });
+const Overview = memo(function Overview({
+  layout,
+  onLayoutChange: setLayout,
+  maximised,
+  onMaximisedChange,
+  composed,
+}: {
+  layout: TilesLayout | null;
+  onLayoutChange: (layout: TilesLayout | null) => void;
+  maximised: string | null;
+  onMaximisedChange: (id: string | null) => void;
+  composed: Composed[];
+}) {
+  const applications = useOpenApplications();
+  const activity = useActivity();
   return (
     <Tiles
       value={layout}
       onValueChange={setLayout}
+      maximised={maximised}
+      onMaximisedChange={onMaximisedChange}
       // A closed tile comes back in another's place, from that tile's Show here.
-      tiles={overviewTiles}
+      tiles={[...overviewTiles, ...composed]}
       minSize={160}
       className="workspace-overview"
       empty={
@@ -877,6 +871,16 @@ const Overview = memo(function Overview() {
         </EmptyState>
       }
       renderTile={(id) => {
+        const view = composed.find((each) => each.id === id);
+        if (view)
+          return (
+            <Tile title={view.title}>
+              <TileContent scroll className="workspace-tile">
+                {/* Asked for again, the view is written again. */}
+                <ComposedView key={view.started} name={view.name} started={view.started} />
+              </TileContent>
+            </Tile>
+          );
         if (id === "licences")
           return (
             <Tile title="Licences issued">
@@ -914,7 +918,7 @@ const Overview = memo(function Overview() {
                 <TileGrip>
                   <TileTitle>
                     Applications{" "}
-                    <span className="workspace-applications-count">{applicationCount}</span>
+                    <span className="workspace-applications-count">{applications.length}</span>
                   </TileTitle>
                 </TileGrip>
                 <TileControls>
@@ -927,33 +931,47 @@ const Overview = memo(function Overview() {
           >
             <TileContent scroll className="workspace-applications">
               <GroupedTable label="Applications" columns={columns}>
-                {bands.map((band) => (
-                  <GroupedTableGroup key={band.label} label={band.label} icon={band.mark}>
-                    {band.items.map((item) => (
-                      <GroupedTableRow
-                        key={item.reference}
-                        title={item.applicant}
-                        cells={{
-                          reference: <span className="workspace-reference">{item.reference}</span>,
-                          type: (
-                            <Tag variant="outline" colour={item.type[1]}>
-                              {item.type[0]}
-                            </Tag>
-                          ),
-                          fee: <span className="workspace-fee">{item.fee}</span>,
-                          received: <span className="workspace-received">{item.received}</span>,
-                          assigned: (
-                            <AvatarGroup>
-                              {item.assigned.map((name) => (
-                                <Avatar key={name} name={name} size="small" />
-                              ))}
-                            </AvatarGroup>
-                          ),
-                        }}
-                      />
-                    ))}
-                  </GroupedTableGroup>
-                ))}
+                {bands.map((band) => {
+                  const items = applications.filter((each) => each.status === band.status);
+                  if (items.length === 0) return null;
+                  return (
+                    <GroupedTableGroup
+                      key={band.status}
+                      label={band.label}
+                      icon={<Icon name={band.icon} />}
+                    >
+                      {items.map((item) => (
+                        <GroupedTableRow
+                          key={item.reference}
+                          title={`${item.name}: ${item.note}`}
+                          cells={{
+                            reference: (
+                              <span className="workspace-reference">{item.reference}</span>
+                            ),
+                            type: (
+                              <Tag variant="outline" colour={licenceColours[item.licence]}>
+                                {item.licence}
+                              </Tag>
+                            ),
+                            fee: <span className="workspace-fee">{money(item.fee)}</span>,
+                            received: (
+                              <span className="workspace-received">
+                                {dateText(item.received, { short: true })}
+                              </span>
+                            ),
+                            assigned: (
+                              <AvatarGroup>
+                                {item.assigned.map((name) => (
+                                  <Avatar key={name} name={name} size="small" />
+                                ))}
+                              </AvatarGroup>
+                            ),
+                          }}
+                        />
+                      ))}
+                    </GroupedTableGroup>
+                  );
+                })}
               </GroupedTable>
             </TileContent>
           </Tile>
@@ -969,6 +987,7 @@ const Overview = memo(function Overview() {
  * plot, the tile scrolls.
  */
 function LicencesChart() {
+  const weeks = useLicenceWeeks();
   const box = useRef<HTMLDivElement>(null);
   const [plot, setPlot] = useState(240);
   useLayoutEffect(() => {
@@ -1010,9 +1029,10 @@ function LicencesChart() {
 
 /**
  * The conversation with Piscine Assist, kept by the workspace, so it lasts as the assist moves
- * between its pane and its sheet.
+ * between its pane and its sheet. A reply that composes a view opens it with `compose` as the
+ * reply arrives.
  */
-function useAssistChat() {
+function useAssistChat(compose: (view: Composed) => void) {
   const [messages, setMessages] = useState(opening);
   const [asked, setAsked] = useState(0);
   // Waiting for a reply is a state of its own, so stopping before the reply arrives ends it.
@@ -1020,20 +1040,41 @@ function useAssistChat() {
   const streaming = messages.some((message) => message.streaming);
   const reply = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(reply.current), []);
+  // The reply composes with the workspace as it is when the reply arrives, not when it was asked.
+  const composeNow = useRef(compose);
+  useEffect(() => {
+    composeNow.current = compose;
+  });
 
   const ask = (question: string) => {
-    const answer = suggestions.find(([each]) => each === question)?.[1] ?? fallback;
+    const suggestion = suggestions.find((each) => each.question === question);
+    const view = suggestion?.compose;
+    // The composition is fetched while the assist thinks, so it is ready to be written.
+    if (view) prefetch(view.name);
     const id = `q${asked}`;
     setAsked(asked + 1);
     setMessages((current) => [...current, { id, from: "you", text: question }]);
     setWaiting(true);
-    // The assist answers a moment later, and the answer streams in.
+    // The assist answers a moment later, and the answer streams in, as its view is written.
     reply.current = setTimeout(() => {
       setWaiting(false);
       setMessages((current) => [
         ...current,
-        { id: `${id}-reply`, from: "assist", text: answer, streaming: true },
+        {
+          id: `${id}-reply`,
+          from: "assist",
+          text: suggestion?.answer ?? fallback,
+          streaming: true,
+          composition: view?.name,
+        },
       ]);
+      if (view)
+        composeNow.current({
+          id: `composed-${view.name}`,
+          name: view.name,
+          title: view.title,
+          started: performance.now(),
+        });
     }, 700);
   };
   const done = (id: string) =>
@@ -1051,8 +1092,10 @@ function useAssistChat() {
       ),
     );
   };
-  const unasked = suggestions.filter(([question]) =>
-    messages.every((message) => message.text !== question),
+  // A question that composes a view stays, so the view can be asked for again.
+  const unasked = suggestions.filter(
+    (suggestion) =>
+      suggestion.compose || messages.every((message) => message.text !== suggestion.question),
   );
   return { messages, waiting, streaming, ask, done, stop, unasked };
 }
@@ -1121,6 +1164,9 @@ function PiscineAssist({
                   ) : (
                     message.text
                   )}
+                  {message.composition && !message.streaming && (
+                    <ComposedParts name={message.composition} />
+                  )}
                 </BubbleContent>
               </Bubble>
             </BubbleGroup>
@@ -1135,7 +1181,7 @@ function PiscineAssist({
         {unasked.length > 0 && !waiting && !streaming && (
           <MessageScrollerItem id="suggestions">
             <MessageSuggestions>
-              {unasked.map(([question]) => (
+              {unasked.map(({ question }) => (
                 <MessageSuggestion key={question} onClick={() => ask(question)}>
                   {question}
                 </MessageSuggestion>

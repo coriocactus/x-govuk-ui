@@ -200,6 +200,53 @@
 .workspace-tile {
   padding: 16px 20px;
 }
+/* A view Piscine Assist composed arrives as its JSX is written, so it rises in, unless users ask
+   for reduced motion. */
+.workspace-composed-view {
+  animation: workspace-composed-arrive var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out)
+    both;
+}
+@keyframes workspace-composed-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-composed-view {
+    animation: none;
+  }
+}
+.workspace-composed-status,
+.workspace-composed-error {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.25;
+}
+.workspace-composed-status {
+  margin-bottom: 15px;
+  color: var(--x-govuk-ui-muted);
+}
+/* Once the view is drawn, its status is for screen readers alone, so it takes no room. */
+.workspace-composed-status[data-stage="drawn"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.workspace-composed-error {
+  color: var(--x-govuk-ui-error);
+}
+/* The parts a reply's view is built from, beneath the reply. */
+.workspace-assist-parts {
+  margin: 8px 0 0;
+  color: var(--x-govuk-ui-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
 .workspace-applications-count {
   color: var(--x-govuk-ui-muted);
   font-weight: 400;

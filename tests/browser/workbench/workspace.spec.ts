@@ -1,4 +1,8 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "../fixtures";
+
+// The rules the sweep checks every page against, which the views Piscine Assist composes meet too.
+const wcag = ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];
 
 test("the workspace opens on its overview, its sidebar leads to the parts, and the caseworker's menu opens over their name", async ({
   page,
@@ -114,7 +118,7 @@ test("the overview is tiles: the table fills its tile and scrolls in it, the cha
   await applications.focus();
   await page.keyboard.press("End");
   await expect.poll(() => applications.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-  await expect(page.getByText("Grace Whitfield")).toBeInViewport();
+  await expect(page.getByText("David Cameron")).toBeInViewport();
   await page.keyboard.press("Home");
   // The chart's plot is as tall as its tile allows. The divider beneath the chart and the activity
   // makes the plot taller, from the keyboard too.
@@ -131,9 +135,9 @@ test("the overview is tiles: the table fills its tile and scrolls in it, the cha
   await expect(band).toHaveAttribute("aria-expanded", "true");
   await band.click();
   await expect(band).toHaveAttribute("aria-expanded", "false");
-  await expect(page.getByText("Priya Natarajan")).toBeHidden();
+  await expect(page.getByText("Theresa May: check a date of birth")).toBeHidden();
   await band.click();
-  await expect(page.getByText("Priya Natarajan")).toBeVisible();
+  await expect(page.getByText("Theresa May: check a date of birth")).toBeVisible();
   // The chart's figures are there as a table.
   await expect(page.getByRole("img", { name: /Licences for 1 day and 8 days/ })).toBeVisible();
   await page.getByText("Show the figures as a table").click();
@@ -257,6 +261,161 @@ test("Piscine Assist copies, resizes, answers, floats its message box, closes wi
   await page.reload();
   await expect(fish).toBeVisible();
   await expect(page.locator("#workspace-assist")).toHaveAttribute("inert", "");
+});
+
+test("Piscine Assist composes views of the work from the library's parts, in tiles that act on the workspace's data", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page.goto("/workspace");
+  const assist = page.getByRole("complementary", { name: "Piscine Assist" });
+  const overview = page.getByRole("region", { name: /^Applications \d/ });
+  // A tile, by the heading in its bar.
+  const tile = (title: string) =>
+    page
+      .locator(".x-govuk-ui-tile")
+      .filter({ has: page.getByRole("heading", { name: title, exact: true }) });
+  const violations = async (rules?: string[]) => {
+    const builder = new AxeBuilder({ page }).exclude("[data-base-ui-focus-guard]");
+    return (await (rules ? builder.withRules(rules) : builder.withTags(wcag)).analyze()).violations;
+  };
+  const count = page.locator(".workspace-applications-count");
+  const badge = page.locator(".x-govuk-ui-sidebar").getByRole("button", { name: /^Applications/ });
+  await expect(count).toHaveText("8");
+  await expect(badge).toContainText("8");
+  // Asked for an application, it opens a tile and writes the view's JSX into it.
+  await assist.getByRole("button", { name: "Show me Theresa May's application" }).click();
+  const theresa = tile("Theresa May");
+  await expect(theresa.getByText("Piscine Assist is writing this view")).toBeVisible();
+  await expect(theresa.locator(".x-govuk-ui-code-block")).toContainText("export default function");
+  // Once it is written, the view it draws takes its place, from the data, with the JSX beneath.
+  // Its status then says so to screen readers alone.
+  const issue = theresa.getByRole("button", { name: "Issue licence" });
+  await expect(issue).toBeVisible({ timeout: 10000 });
+  await expect(theresa.getByText("1 October 1956")).toBeVisible();
+  await expect(theresa.getByRole("status")).toHaveText("Piscine Assist has drawn this view.");
+  await expect(theresa.getByText("Piscine Assist is writing this view")).toHaveCount(0);
+  await theresa.getByText("The JSX Piscine Assist wrote").click();
+  await expect(theresa.locator(".x-govuk-ui-code-block")).toContainText(
+    'useApplication("RL-48213")',
+  );
+  // The reply names the parts it composed the view from.
+  await expect(
+    assist.getByText(
+      "Composed from Button, Inline, InsetText, NotificationBanner, Stack, SummaryList, SummaryListRow and Tag.",
+    ),
+  ).toBeVisible({ timeout: 10000 });
+  expect(await violations()).toEqual([]);
+  // Issuing the licence changes the data, so the banner says so and takes focus, and the
+  // Overview's table, its count, the sidebar and the activity follow.
+  await issue.click();
+  const banner = theresa.locator(".x-govuk-ui-notification-banner");
+  await expect(banner).toBeFocused();
+  await expect(banner).toContainText("Licence issued");
+  await expect(count).toHaveText("7");
+  await expect(badge).toContainText("7");
+  await expect(overview.getByText("Theresa May: check a date of birth")).toHaveCount(0);
+  await expect(page.getByText("RL-48213, a 12-month licence for Theresa May.")).toBeVisible();
+  // The next view takes the first one's place, and follows the same data.
+  await assist.getByRole("button", { name: "What needs a decision?" }).click();
+  const decisions = tile("Needs a decision");
+  await expect(decisions.getByText("2 applications need a decision")).toBeVisible({
+    timeout: 10000,
+  });
+  await expect(theresa).toHaveCount(0);
+  // A form in a view checks its answers as any Form does, and its refund moves the application.
+  await assist.getByRole("button", { name: "Refund Gordon Brown's second payment" }).click();
+  const refund = tile("Refund for Gordon Brown");
+  const send = refund.getByRole("button", { name: "Send refund" });
+  await expect(send).toBeVisible({ timeout: 10000 });
+  expect(await violations()).toEqual([]);
+  await send.click();
+  await expect(refund.locator(".x-govuk-ui-error-summary")).toBeFocused();
+  await expect(refund.getByRole("link", { name: "Select the payment to refund" })).toBeVisible();
+  await refund.getByRole("radio", { name: /10:04am/ }).check();
+  await send.click();
+  await expect(refund.locator(".x-govuk-ui-notification-banner")).toBeFocused();
+  await expect(refund.getByText(/£24.50 is on its way to the card ending 4421/)).toBeVisible();
+  await expect(overview.getByText("Gordon Brown: refund sent")).toBeVisible();
+  // The views, their banners and the replies that name their parts pass axe. The last view's
+  // colours pass in the dark theme too, as the licences' do on a phone.
+  await expect(assist.getByText(/^Composed from Button, Form/)).toBeVisible({ timeout: 10000 });
+  expect(await violations()).toEqual([]);
+  await page.getByRole("button", { name: "Andy Burnham" }).click();
+  await page.getByRole("menuitem", { name: "Switch to dark theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  expect(await violations(["color-contrast"])).toEqual([]);
+});
+
+test("on a phone, a view Piscine Assist composes opens beneath the tiles, across the work", async ({
+  page,
+}) => {
+  // In the dark theme, so axe reads a view's colours in it too.
+  await page.addInitScript(() => localStorage.setItem("x-govuk-ui-theme", '"dark"'));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/workspace");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Show Piscine Assist" }).click();
+  const sheet = page.getByRole("dialog", { name: "Piscine Assist" });
+  await sheet.getByRole("button", { name: "How are 12-month licences selling?" }).click();
+  await expect(sheet.getByText(/^Composed from Chart, Stack, Stat and Stats/)).toBeVisible({
+    timeout: 10000,
+  });
+  await page.keyboard.press("Escape");
+  const view = page
+    .locator(".x-govuk-ui-tile")
+    .filter({ has: page.getByRole("heading", { name: "12-month licences", exact: true }) });
+  await expect(view.getByText("12-month licences have risen for 6 weeks in a row")).toBeVisible({
+    timeout: 10000,
+  });
+  const work = (await page.locator("#workspace-work").boundingBox())!;
+  const tile = (await view.boundingBox())!;
+  expect(Math.abs(tile.width - work.width)).toBeLessThan(2);
+  expect(tile.y).toBeGreaterThan(work.y + work.height / 3);
+  // The tile followed the JSX to its end as it was written, and the view starts at its top.
+  // The tile's own viewport, around the code block's and the chart's.
+  const viewport = view.locator(".x-govuk-ui-scroll-area-viewport").first();
+  expect(await viewport.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(
+    true,
+  );
+  expect(await viewport.evaluate((element) => element.scrollTop)).toBe(0);
+  const checked = await new AxeBuilder({ page })
+    .exclude("[data-base-ui-focus-guard]")
+    .withTags(wcag)
+    .analyze();
+  expect(checked.violations).toEqual([]);
+});
+
+test("a view asked for while a tile is maximised is seen, and a change it makes is confirmed where focus was", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page.goto("/workspace");
+  const assist = page.getByRole("complementary", { name: "Piscine Assist" });
+  await page.getByRole("button", { name: "Maximise Applications" }).click();
+  await assist.getByRole("button", { name: "Show me Theresa May's application" }).click();
+  const theresa = page
+    .locator(".x-govuk-ui-tile")
+    .filter({ has: page.getByRole("heading", { name: "Theresa May", exact: true }) });
+  const ask = theresa.getByRole("button", { name: "Ask for proof of age" });
+  await expect(ask).toBeVisible({ timeout: 10000 });
+  await expect(page.getByRole("button", { name: "Maximise Applications" })).toBeVisible();
+  // The button pressed goes as the application waits, so the banner that says so takes focus.
+  await ask.press("Enter");
+  const banner = theresa.locator(".x-govuk-ui-notification-banner");
+  await expect(banner).toBeFocused();
+  await expect(banner).toContainText("Proof of age asked for");
+  await expect(page.getByText("Theresa May: proof of age asked for")).toBeVisible();
+  // Asked for again, the view is written again, and focus stays in the message box.
+  const message = assist.getByRole("textbox", { name: "Message Piscine Assist" });
+  await message.fill("Show me Theresa May's application");
+  await message.press("Enter");
+  await expect(theresa.getByText("Piscine Assist is writing this view")).toBeVisible();
+  await expect(theresa.getByRole("status")).toHaveText("Piscine Assist has drawn this view.", {
+    timeout: 10000,
+  });
+  await expect(banner).toBeVisible();
+  await expect(message).toBeFocused();
 });
 
 test("the sidebar's parts can be pinned and hidden, from their menus or the command menu, and the arrangement lasts", async ({

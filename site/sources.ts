@@ -1,9 +1,62 @@
 import { type ComponentName, componentNames } from "./catalogue";
+import { composable } from "./composable";
 
 /** Each component's example file. It renders the preview and is shown as the usage code. */
 export const sources = Object.fromEntries(
   componentNames.map((name) => [name, `site/examples/${name}.tsx`]),
 ) as Record<ComponentName, string>;
+
+/**
+ * The views Piscine Assist composes in the workspace, by name. Each is a file of JSX, as an agent
+ * writes one, which the page shows as it is written and then draws.
+ */
+export const compositions = Object.fromEntries(
+  [...new Bun.Glob("*.tsx").scanSync("site/compositions")]
+    .sort()
+    .map((file) => [file.replace(/\.tsx$/, ""), `site/compositions/${file}`]),
+);
+
+/**
+ * A composition compiled for the page. It is a module whose default export takes a `require` for
+ * the modules the composition imports, and returns the composition's exports. The page loads it
+ * from the site, as it loads its own scripts, so the site's Content Security Policy needs no
+ * `unsafe-eval`.
+ *
+ * An import of anything but `composable` fails here, before the page sees it. The check reads the
+ * imports the code names, so it is an allowlist for the site's own files, not a sandbox. A
+ * composition runs with the page's rights, as any of the site's scripts does.
+ */
+export async function compiledComposition(path: string) {
+  const result = await Bun.build({
+    entrypoints: [path],
+    throw: false,
+    format: "cjs",
+    target: "browser",
+    define: { "process.env.NODE_ENV": JSON.stringify("production") },
+    plugins: [
+      {
+        name: "composable",
+        setup(build) {
+          build.onResolve({ filter: /.*/ }, (args) => {
+            if (args.kind === "entry-point-build") return undefined;
+            if ((composable as readonly string[]).includes(args.path))
+              return { path: args.path, external: true };
+            throw new Error(`${path} imports ${args.path}, which a composition cannot import`);
+          });
+        },
+      },
+    ],
+  });
+  if (!result.success)
+    throw new Error(`${path} did not compile: ${result.logs.map((log) => log.message).join("; ")}`);
+  const code = await result.outputs[0]!.text();
+  return `export default function (require) {
+var module = { exports: {} }, exports = module.exports;
+${code}
+return module.exports;
+}
+`;
+}
 
 const transport = "node_modules/govuk-frontend/dist/govuk/assets/fonts";
 const noto = "node_modules/@fontsource-variable/noto-sans";

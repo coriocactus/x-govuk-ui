@@ -87,7 +87,7 @@ const listen = (port: number | string) =>
       // A missing file is a plain 404. Any other address gets the app's page for an address the
       // site does not have, with the same status.
       if (!file) {
-        if (/^\/(source|assets|styling|llms|docs)\//.test(path)) {
+        if (/^\/(source|assets|styling|llms|docs|compositions)\//.test(path)) {
           return new Response("Not found", { status: 404, headers: security });
         }
         return new Response(Bun.file("dist/index.html"), {
@@ -103,7 +103,9 @@ const listen = (port: number | string) =>
         headers: {
           ...security,
           "Cache-Control": caching(path),
-          ...(path.startsWith("/source/") ? { "Content-Type": "text/plain; charset=utf-8" } : {}),
+          ...(path.startsWith("/source/") || path.endsWith(".tsx")
+            ? { "Content-Type": "text/plain; charset=utf-8" }
+            : {}),
           ...(path.endsWith(".md") ? { "Content-Type": "text/markdown; charset=utf-8" } : {}),
         },
       });

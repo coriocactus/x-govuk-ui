@@ -31,9 +31,9 @@ The styles are in the `x-govuk-ui` cascade layer, so a service's own rules overr
 
 The components with large dependencies are in packages of their own. Each is released with this one, at the same version.
 
-- `@x-govuk-ui/jorjorwel`, the Editor, on Lexical
-- `@x-govuk-ui/memetics`, the charts, on Recharts
-- `@x-govuk-ui/belsize`, Tiles, on react-mosaic
+- [`@x-govuk-ui/jorjorwel`](https://www.npmjs.com/package/@x-govuk-ui/jorjorwel), the Editor, on Lexical
+- [`@x-govuk-ui/memetics`](https://www.npmjs.com/package/@x-govuk-ui/memetics), the charts, on Recharts
+- [`@x-govuk-ui/belsize`](https://www.npmjs.com/package/@x-govuk-ui/belsize), Tiles, on react-mosaic
 
 ## Versions
 
@@ -41,7 +41,7 @@ The library and its extensions are released together, at one version. Before 1.0
 
 ## For AI tools
 
-The site serves its documentation for language models at [x-govuk-ui.org/llms.txt](https://x-govuk-ui.org/llms.txt). `@x-govuk-ui/mcp` answers an agent's questions about the components.
+The site serves its documentation for language models at [x-govuk-ui.org/llms.txt](https://x-govuk-ui.org/llms.txt). [`@x-govuk-ui/mcp`](https://www.npmjs.com/package/@x-govuk-ui/mcp) answers an agent's questions about the components.
 
 ## Licence
 

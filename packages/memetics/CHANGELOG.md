@@ -20,6 +20,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Changed Gauge, Bullet chart and Sparkline to draw themselves in x-govuk-ui's `--x-govuk-ui-duration-draw`. They take as long as they did.
 - Changed the charts' corners, such as a chart's tooltip's, to follow x-govuk-ui's tokens for corners, such as `--x-govuk-ui-radius-surface`. They look as they did.
+- Changed the package's page on npm to link to the other four packages.
 
 ## [0.3.0] - 2026-10-10
 

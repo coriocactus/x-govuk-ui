@@ -22,6 +22,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed the Editor's corners, and its AI toolbar's, to follow x-govuk-ui's tokens for corners, such as `--x-govuk-ui-radius-control`. They look as they did.
 - Changed the Editor's `errorMessage` to take any React content, as every field's does.
 - Changed the Editor's `count` label to take only the words it changes. The rest come from a LabelsProvider's `characterCount` words, which Textarea's count shares, then GOV.UK's.
+- Changed the package's page on npm to link to the other four packages.
 
 ### Fixed
 

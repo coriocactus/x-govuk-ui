@@ -17,6 +17,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 ### Changed
 
 - Changed Tiles' corners to follow x-govuk-ui's tokens for corners, such as `--x-govuk-ui-radius-small`. They look as they did.
+- Changed the package's page on npm to link to the other four packages.
 
 ## [0.3.0] - 2026-10-10
 

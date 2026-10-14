@@ -139,6 +139,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed a Form's `defaultValues` to come before a field's own `defaultValue`. A field then shows an answer kept from an earlier visit, or the answer in a record being changed, in place of where it usually starts. FormSteps restores every field it kept, even one with a `defaultValue`. A kept answer with nothing in it, such as a switch that is off, means that nothing was chosen. InputOTP starts from the Form's answer too.
 - Changed `errorMessage` on every field to take any React content, as Fieldset's does. `FormErrors` takes any React content too, so a Form's `validate` and `onSubmit` can give a message with a link.
 - Changed the package's page on npm to stop offering prereleases under the `next` tag. No version has had the tag, and none will.
+- Changed the package's page on npm to link to the other four packages.
 
 ### Fixed
 

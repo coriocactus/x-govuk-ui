@@ -1,107 +1,193 @@
-/* Timeline. Events down a rail, the latest first. Each event's heading has a knob on the rail, like
-   Slider's thumb, with a line as thick as the rail from its edge to the heading. The latest is in
-   brand blue. The rail is one unbroken rounded bar, as Inset text's is, from the first knob to the
-   last. The list measures where the last event starts. */
+/* Timeline. Events down a rail, the latest first. A tick branches off the rail to each event's
+   heading. The rail and the ticks are one 4px stroke, and a highlighted event differs only in its
+   colour. Screen readers hear a marked event's `highlighted` label instead, and the order of the
+   events says which is the latest. Highlighted events are in brand blue, and so is the rail between
+   highlighted events next to each other. Each item draws its own stretch of the rail, above and
+   below its tick. The rail therefore follows each item as it opens, with nothing to measure. */
 .x-govuk-ui-timeline {
-  --x-govuk-ui-timeline-knob: 16px;
-  /* The middle of the first line of a heading, where its knob sits. */
+  /* The middle of the first line of a heading, where its tick sits. */
   --x-govuk-ui-timeline-middle: 13px;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  /* The colour of highlighted events, and of the rail between them. */
+  --x-govuk-ui-timeline-highlight: var(--x-govuk-ui-brand);
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
 }
-.x-govuk-ui-timeline::before {
-  content: "";
-  position: absolute;
-  top: var(--x-govuk-ui-timeline-middle);
-  left: calc(var(--x-govuk-ui-timeline-knob) / 2 - 2px);
-  width: 4px;
-  height: var(--x-govuk-ui-timeline-rail, calc(100% - var(--x-govuk-ui-timeline-middle)));
-  border-radius: 2px;
-  background: var(--x-govuk-ui-line);
+.x-govuk-ui-timeline-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
+/* Each item clips its event as it opens and closes. It is a stacking context, so its tick and
+   dashes rise above its own rail and above nothing else on the page, such as a sticky header. */
 .x-govuk-ui-timeline-item {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+}
+/* The rail above the tick, and the rail below it. The tick covers the join between them. The first
+   event has no rail above, and the last none below, unless a TimelineMore follows. */
+.x-govuk-ui-timeline-item::before,
+.x-govuk-ui-timeline-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 4px;
+  background: var(--x-govuk-ui-line);
+}
+.x-govuk-ui-timeline-item::before {
+  top: 0;
+  height: var(--x-govuk-ui-timeline-middle);
+}
+.x-govuk-ui-timeline-item::after {
+  top: var(--x-govuk-ui-timeline-middle);
+  bottom: 0;
+}
+.x-govuk-ui-timeline-item:first-child::before,
+.x-govuk-ui-timeline:not(:has(> .x-govuk-ui-timeline-foot))
+  > .x-govuk-ui-timeline-list
+  > .x-govuk-ui-timeline-item:last-child::after {
+  display: none;
+}
+.x-govuk-ui-timeline-item[data-highlighted] + [data-highlighted]::before,
+.x-govuk-ui-timeline-item[data-highlighted]:has(+ [data-highlighted])::after {
+  background: var(--x-govuk-ui-timeline-highlight);
 }
 .x-govuk-ui-timeline-event {
-  --x-govuk-ui-timeline-colour: var(--x-govuk-ui-muted);
+  --x-govuk-ui-timeline-colour: var(--x-govuk-ui-line);
   position: relative;
-  padding: 0 0 26px 38px;
+  padding: 0 0 30px 32px;
 }
-.x-govuk-ui-timeline-item:first-child .x-govuk-ui-timeline-event {
-  --x-govuk-ui-timeline-colour: var(--x-govuk-ui-brand);
+.x-govuk-ui-timeline-item[data-highlighted] > .x-govuk-ui-timeline-event {
+  --x-govuk-ui-timeline-colour: var(--x-govuk-ui-timeline-highlight);
 }
-/* The knob on the rail, and the line from its edge to the heading. An event that arrives grows
-   its knob, then draws its line out. */
-.x-govuk-ui-timeline-event::before,
+/* Where a highlighted event meets one that is not, the rail does not turn grey at once. Blue dashes
+   run on over the grey from the highlighted tick, for about half the way to the next tick. Each
+   dash is 6px, with 4px between, and the first meets the tick's edge. The way from one tick to the
+   next is as tall as the event above, so half of it is 50% of that event's height. The dashes stop
+   at the nearest 10px to it, after a whole dash, so none is cut short. A browser without `round()`
+   draws no dashes, and forced colours drop them with every other background image. The rail then
+   changes colour at the tick.
+
+   The event draws the dashes, over the rail that its item draws. Below a highlighted tick, they
+   start at the tick. Above one, they cross the join between two items. The event above draws them
+   down to its foot, and the stretch of rail above the tick draws the rest. Both count the dashes
+   from the tick, so they meet in step. */
+.x-govuk-ui-timeline-item[data-highlighted]:not(:has(+ [data-highlighted]))
+> .x-govuk-ui-timeline-event::before,
+.x-govuk-ui-timeline-item:not([data-highlighted]):has(+ [data-highlighted])
+  > .x-govuk-ui-timeline-event::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  width: 4px;
+  background-image: repeating-linear-gradient(
+    transparent 0 2px,
+    var(--x-govuk-ui-timeline-highlight) 2px 8px,
+    transparent 8px 10px
+  );
+  background-repeat: no-repeat;
+}
+.x-govuk-ui-timeline-item[data-highlighted]:not(:has(+ [data-highlighted]))
+  > .x-govuk-ui-timeline-event::before {
+  top: var(--x-govuk-ui-timeline-middle);
+  height: round(nearest, 50%, 10px);
+}
+/* Above a highlighted tick, the dashes count up from the tick, which is the middle's height beneath
+   the event's foot. Their background therefore reaches that far beneath the box it is drawn in. */
+.x-govuk-ui-timeline-item:not([data-highlighted]):has(+ [data-highlighted])
+> .x-govuk-ui-timeline-event::before,
+.x-govuk-ui-timeline-item:not([data-highlighted]) + [data-highlighted]::before {
+  background-image: repeating-linear-gradient(
+    to top,
+    transparent 0 2px,
+    var(--x-govuk-ui-timeline-highlight) 2px 8px,
+    transparent 8px 10px
+  );
+}
+.x-govuk-ui-timeline-item:not([data-highlighted]):has(+ [data-highlighted])
+  > .x-govuk-ui-timeline-event::before {
+  bottom: 0;
+  height: calc(round(nearest, 50%, 10px) - var(--x-govuk-ui-timeline-middle));
+  background-size: 100% calc(100% + var(--x-govuk-ui-timeline-middle));
+}
+/* The last event has no rail below it, unless a TimelineMore follows, so it has no dashes either. */
+.x-govuk-ui-timeline:not(:has(> .x-govuk-ui-timeline-foot))
+  > .x-govuk-ui-timeline-list
+  > .x-govuk-ui-timeline-item:last-child
+  > .x-govuk-ui-timeline-event::before {
+  display: none;
+}
+/* The tick, from the rail's outer edge to near the heading. An event that arrives draws its tick
+   out from the rail. Its far end is round. Its corners on the rail are square, so the rail meets it
+   in a straight line, unless the rail ends there. */
 .x-govuk-ui-timeline-event::after {
   content: "";
   position: absolute;
-  box-sizing: border-box;
-}
-.x-govuk-ui-timeline-event::before {
   z-index: 1;
-  top: calc(var(--x-govuk-ui-timeline-middle) - var(--x-govuk-ui-timeline-knob) / 2);
-  left: 0;
-  width: var(--x-govuk-ui-timeline-knob);
-  height: var(--x-govuk-ui-timeline-knob);
-  border: 2px solid var(--x-govuk-ui-timeline-colour);
-  border-radius: 50%;
-  background: var(--x-govuk-ui-paper);
-}
-/* The line runs on from under the knob's ring, as thick as the rail, so the notch and the rail
-   read as one weight. Only its far end is rounded. */
-.x-govuk-ui-timeline-event::after {
   top: calc(var(--x-govuk-ui-timeline-middle) - 2px);
-  left: calc(var(--x-govuk-ui-timeline-knob) - 2px);
-  width: 16px;
+  left: 0;
+  width: 22px;
   height: 4px;
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 999px 999px 0;
   background: var(--x-govuk-ui-timeline-colour);
   transform-origin: left center;
 }
-.x-govuk-ui-timeline-item[data-entered] .x-govuk-ui-timeline-event::before {
-  animation: x-govuk-ui-timeline-knob var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out)
-    120ms backwards;
+.x-govuk-ui-timeline-item:first-child > .x-govuk-ui-timeline-event::after {
+  border-top-left-radius: 999px;
 }
-.x-govuk-ui-timeline-item[data-entered] .x-govuk-ui-timeline-event::after {
-  animation: x-govuk-ui-timeline-line var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out)
-    260ms backwards;
+.x-govuk-ui-timeline:not(:has(> .x-govuk-ui-timeline-foot))
+  > .x-govuk-ui-timeline-list
+  > .x-govuk-ui-timeline-item:last-child
+  > .x-govuk-ui-timeline-event::after {
+  border-bottom-left-radius: 999px;
 }
-@keyframes x-govuk-ui-timeline-knob {
-  from {
-    scale: 0;
-  }
+.x-govuk-ui-timeline-item[data-entered] > .x-govuk-ui-timeline-event::after {
+  animation: x-govuk-ui-timeline-tick var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out)
+    160ms backwards;
 }
-@keyframes x-govuk-ui-timeline-line {
+@keyframes x-govuk-ui-timeline-tick {
   from {
     scale: 0 1;
   }
 }
+/* The heading fits its words, so its focus does too. */
 .x-govuk-ui-timeline-title {
+  width: fit-content;
   margin: 0;
   font-size: 19px;
   font-weight: 700;
   line-height: 1.32;
 }
-.x-govuk-ui-timeline-by,
-.x-govuk-ui-timeline-date {
+/* Focus moves to the heading of the first earlier event after users press TimelineMore. From the
+   keyboard, the heading shows GOV.UK's focus for text, as a focused link does, so users see where
+   they are. Its item would clip an outline at its top, so the focus is drawn inside it and below
+   it. The transparent outline shows in forced colours. */
+.x-govuk-ui-timeline-title:focus {
+  outline: none;
+}
+.x-govuk-ui-timeline-title:focus-visible {
+  outline: 3px solid transparent;
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: 0 4px var(--x-govuk-ui-focus-text);
+}
+/* The date and who did it, as one line that reads as a sentence, such as 12 March 2026 at 2:05pm
+   by the Passport Office. */
+.x-govuk-ui-timeline-meta {
   margin: 2px 0 0;
   color: var(--x-govuk-ui-muted);
   font-size: 16px;
   line-height: 1.4;
 }
+/* GOV.UK's body text, so the title and what it means are one size, set apart by weight. */
 .x-govuk-ui-timeline-description {
   margin-top: 8px;
-  font-size: 17px;
-  line-height: 1.45;
+  font-size: 19px;
+  line-height: 1.32;
 }
 .x-govuk-ui-timeline-description > p {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 .x-govuk-ui-timeline-description > :last-child {
   margin-bottom: 0;
@@ -113,18 +199,38 @@
   margin-top: 10px;
   font-size: 16px;
 }
+/* The foot, which sets TimelineMore in line with the headings. The rail runs on from the last
+   event and fades out beside the button, so the history reads as going on. */
+.x-govuk-ui-timeline-foot {
+  position: relative;
+  padding-left: 32px;
+}
+.x-govuk-ui-timeline-foot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(var(--x-govuk-ui-line), transparent);
+}
 @media (prefers-reduced-motion: reduce) {
-  .x-govuk-ui-timeline-item[data-entered] .x-govuk-ui-timeline-event::before,
-  .x-govuk-ui-timeline-item[data-entered] .x-govuk-ui-timeline-event::after {
+  .x-govuk-ui-timeline-item[data-entered] > .x-govuk-ui-timeline-event::after {
     animation: none;
   }
 }
 @media (forced-colors: active) {
-  .x-govuk-ui-timeline::before,
-  .x-govuk-ui-timeline-event::after {
+  .x-govuk-ui-timeline-item::before,
+  .x-govuk-ui-timeline-item::after,
+  .x-govuk-ui-timeline-foot::before {
     background: CanvasText;
   }
-  .x-govuk-ui-timeline-event::before {
-    border-color: CanvasText;
+  .x-govuk-ui-timeline-event {
+    --x-govuk-ui-timeline-colour: CanvasText;
+  }
+  /* Forced colours turn brand blue and grey into one colour, so highlighted events take the
+     system's highlight. */
+  .x-govuk-ui-timeline {
+    --x-govuk-ui-timeline-highlight: Highlight;
   }
 }

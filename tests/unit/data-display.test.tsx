@@ -52,6 +52,7 @@ import {
   TaskListItem,
   Timeline,
   TimelineItem,
+  TimelineMore,
 } from "x-govuk-ui";
 import { isOneCharacter, isOneGlyph } from "../../packages/core/src/glyph";
 
@@ -378,9 +379,14 @@ test("timelines write dates as GOV.UK does, and media parts name themselves", ()
       </TimelineItem>
     </Timeline>,
   );
-  expect(timeline).toContain('<ol class="x-govuk-ui-timeline" aria-label="History">');
+  expect(timeline).toContain(
+    '<div class="x-govuk-ui-timeline"><ol aria-label="History" class="x-govuk-ui-timeline-list">',
+  );
   expect(timeline).toContain('<h3 class="x-govuk-ui-timeline-title">Passport sent</h3>');
-  expect(timeline).toMatch(/<time dateTime="2026-03-14T[^"]+">14 March 2026 at 9am<\/time>/i);
+  // The date and who did it read as one sentence.
+  expect(timeline).toMatch(
+    /<p class="x-govuk-ui-timeline-meta"><time class="x-govuk-ui-timeline-date" dateTime="2026-03-14T[^"]+">14 March 2026 at 9am<\/time> <span class="x-govuk-ui-timeline-by">by the Passport Office<\/span><\/p>/,
+  );
   const qr = renderToStaticMarkup(<QrCode value="https://www.gov.uk/" label="GOV.UK" />);
   expect(qr).toContain('role="img" aria-label="QR code for GOV.UK"');
   expect(qr.match(/<circle/g)?.length).toBeGreaterThan(50);
@@ -414,6 +420,45 @@ test("timelines write dates as GOV.UK does, and media parts name themselves", ()
   );
   expect(made).toContain('alt="A chimney"');
   expect(made).not.toContain('role="progressbar"');
+});
+
+test("a timeline highlights the events it is told to, or the latest, and sets its button apart", () => {
+  const events = (marks: (boolean | undefined)[]) =>
+    renderToStaticMarkup(
+      <Timeline label="History">
+        {marks.map((highlighted, index) => (
+          <TimelineItem
+            // biome-ignore lint/suspicious/noArrayIndexKey: the events are made up for the test, in a fixed order.
+            key={index}
+            title={`Event ${index}`}
+            date={new Date(2026, 2, 14 - index)}
+            highlighted={highlighted}
+          />
+        ))}
+        <TimelineMore />
+      </Timeline>,
+    );
+  const highlightedItems = (html: string) =>
+    [...html.matchAll(/<li class="x-govuk-ui-timeline-item"( data-highlighted="true")?/g)].map(
+      (item) => item[1] !== undefined,
+    );
+  // With no event marked, the latest is highlighted, and screen readers hear nothing more, because
+  // the order already says it is the latest.
+  const latest = events([undefined, undefined, undefined]);
+  expect(highlightedItems(latest)).toEqual([true, false, false]);
+  expect(latest).not.toContain("x-govuk-ui-visually-hidden");
+  // Once any event is marked, only the marked events are, and each says so before its title.
+  const marked = events([true, true, false]);
+  expect(highlightedItems(marked)).toEqual([true, true, false]);
+  expect(marked).toContain(
+    '<h3 class="x-govuk-ui-timeline-title"><span class="x-govuk-ui-visually-hidden">New: </span>Event 1</h3>',
+  );
+  expect(highlightedItems(events([false, undefined, undefined]))).toEqual([false, false, false]);
+  // The button is beneath the list, so the list has only the events in it.
+  expect(latest).toMatch(
+    /<\/ol><div class="x-govuk-ui-timeline-foot"><button[^>]* class="x-govuk-ui-button [^"]*x-govuk-ui-timeline-more"[^>]*><span class="x-govuk-ui-button-label">Show earlier events<\/span>/,
+  );
+  expect(latest.match(/<li/g)).toHaveLength(3);
 });
 
 test("a figure is named by its caption's headline, and stats are set in one", () => {

@@ -2631,11 +2631,12 @@ const entries = {
     upstream: "",
     dependencies: "React · Motion",
     changes:
-      "The Home Office design system's timeline. Events run down one unbroken rail, the latest first. Each event's heading has a knob on the rail, as Slider's thumb is, with a line as thick as the rail running on from its ring to the heading, the latest in brand blue. Each event says what happened, who or what did it, and when, written as GOV.UK writes dates and times, such as 12 March 2026 at 2:05pm, in a time element. An event added while the timeline is on screen opens into place at once as the others move down, its knob grows on the rail and its line draws out, and it plays the notification sound. The rail is a rounded bar, as Inset text's is.",
+      "The Home Office design system's timeline, with a tick as thick as the rail at each heading, and the date and who did it on one line beneath it, such as 12 March 2026 at 2:05pm by the Passport Office. Here, the events since users last looked are highlighted. Add the next update adds an event above them, which joins them. Show earlier events loads 3 more events beneath the others, after a moment, as a service's API would, then the last one.",
     props: [
       reference("label", "string"),
       reference("headingLevel", "2 | 3 | 4 | 5 | 6", "3"),
-      reference("TimelineItem", "{ title, by, date, children, actions }", "Part"),
+      reference("TimelineItem", "{ title, by, date, highlighted, children, actions }", "Part"),
+      reference("TimelineMore", "{ loading, onClick, children }", "Part"),
       reference("formatDateTime", "(date: Date) => string", "Helper"),
       reference("formatDate", "(date: Date) => string", "Helper"),
       reference("formatTime", "(date: Date) => string", "Helper"),

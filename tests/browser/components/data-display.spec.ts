@@ -324,11 +324,102 @@ test("a file diff wraps its lines at its width, and scrolls inside at its most r
   expect(await viewport.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
 });
 
-test("a timeline takes a new event at its head, dated as GOV.UK does", async ({ frame, open }) => {
+test("a timeline highlights a run of events, loads earlier ones beneath and takes new ones above", async ({
+  page,
+  frame,
+  open,
+}) => {
   await open("timeline");
+  const items = frame.locator(".x-govuk-ui-timeline-item");
+  /**
+   * For each event, whether it is highlighted, and the colours of the rail above and below its
+   * tick. Also how long its dashes are, and how long the way is to the next tick.
+   */
+  const rail = () =>
+    items.evaluateAll((all) =>
+      all.map((item) => {
+        const event = item.querySelector(".x-govuk-ui-timeline-event");
+        const dashes = event && getComputedStyle(event, "::before");
+        // Without dashes, the event's `::before` has no content. Engines write that as none or normal.
+        const drawn = dashes && !/^(none|normal)$/.test(dashes.content);
+        const length = drawn ? Number.parseFloat(dashes.height) : 0;
+        return {
+          highlighted: item.hasAttribute("data-highlighted"),
+          above: getComputedStyle(item, "::before").backgroundColor,
+          below: getComputedStyle(item, "::after").backgroundColor,
+          dashes: length,
+          way: item.getBoundingClientRect().height,
+        };
+      }),
+    );
+  // The two events since users last looked are highlighted, and screen readers hear that they are
+  // new. The rail is blue between them. Below them, blue dashes run on over the grey for about half
+  // the way, and stop after a whole dash, every 10 pixels.
+  const [first, second, third] = await rail();
+  expect([first?.highlighted, second?.highlighted, third?.highlighted]).toEqual([
+    true,
+    true,
+    false,
+  ]);
+  expect(second?.above).toBe(first?.below);
+  expect(second?.below).not.toBe(second?.above);
+  expect(third?.above).toBe(second?.below);
+  expect([first?.dashes, third?.dashes]).toEqual([0, 0]);
+  expect((second?.dashes ?? 0) % 10).toBe(0);
+  expect(Math.abs((second?.dashes ?? 0) - (second?.way ?? 0) / 2)).toBeLessThanOrEqual(5);
+  await expect(frame.getByRole("heading", { level: 3 }).first()).toHaveAccessibleName(
+    "New: Application approved",
+  );
+  // The button keeps focus while the earlier events load. Focus then moves to the first of them,
+  // with the button still beneath for more. They open quietly, as history users asked for.
+  const more = frame.getByRole("button", { name: "Show earlier events" });
+  await more.focus();
+  await page.keyboard.press("Enter");
+  await expect(more).toHaveAttribute("aria-busy", "true");
+  await expect(more).toBeFocused();
+  await expect(frame.getByRole("heading", { name: "Documents posted" })).toBeFocused();
+  await expect(items).toHaveCount(6);
+  await expect(frame.locator("[data-sound-enter]")).toHaveCount(0);
+  // The last earlier event takes the button away, and focus still moves to it.
+  await more.focus();
+  await page.keyboard.press("Enter");
+  await expect(frame.getByRole("heading", { name: "Eligibility checked" })).toBeFocused();
+  await expect(items).toHaveCount(7);
+  await expect(more).toHaveCount(0);
+  // A new event arrives above the others, highlighted with them, and plays its sound.
   await frame.getByRole("button", { name: "Add the next update" }).click();
-  await expect(frame.getByRole("heading", { level: 3 }).first()).toHaveText("Passport sent");
+  await expect(frame.getByRole("heading", { level: 3 }).first()).toHaveAccessibleName(
+    "New: Passport sent",
+  );
   await expect(frame.locator("time").first()).toHaveText("14 March 2026 at 9am");
+  await expect(items.first()).toHaveAttribute("data-sound-enter", "notification");
+  const [arrived, latest] = await rail();
+  expect(arrived?.highlighted).toBe(true);
+  expect(arrived?.below).toBe(latest?.above);
+  expect(latest?.above).toBe(first?.below);
+  // Above a highlighted event beneath a plain one, the dashes count up from its tick, across the
+  // join. The plain event draws them down to its foot, and the rail above the tick draws the rest.
+  // The test highlights the fifth event alone, as a service may.
+  await items.evaluateAll((all) => {
+    for (const [index, item] of all.entries())
+      item.toggleAttribute("data-highlighted", index === 4);
+  });
+  const join = await items.evaluateAll((all) => {
+    const [plain, highlighted] = [all[3], all[4]];
+    const event = plain?.querySelector(".x-govuk-ui-timeline-event");
+    const dashes = event && getComputedStyle(event, "::before");
+    return {
+      dashes: Number.parseFloat(dashes?.height ?? "0"),
+      bottom: dashes?.bottom,
+      way: plain?.getBoundingClientRect().height ?? 0,
+      above: highlighted && getComputedStyle(highlighted, "::before").backgroundImage,
+    };
+  });
+  // The dashes in the plain event and the 13 pixels above the tick end after a whole dash.
+  expect(join.bottom).toBe("0px");
+  expect((join.dashes + 13) % 10).toBe(0);
+  expect(Math.abs(join.dashes + 13 - join.way / 2)).toBeLessThanOrEqual(5);
+  expect(join.above).toContain("repeating-linear-gradient");
 });
 
 test("an avatar group lifts the avatar under the pointer most, and its neighbours less", async ({

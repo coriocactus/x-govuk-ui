@@ -52,9 +52,10 @@ export const unstyled = ["InputOTP", "InputOTPControl"] as const;
 
 /**
  * Parts whose box holds a control of its own, such as Combobox's box around its input and buttons,
- * or FormSteps' section around its form. Their `className` and `style` go on the box, which is what
- * users see. Every other prop, including `ref`, goes on the control. Each says so in its JSDoc.
- * Every other part gives all it is given to one element.
+ * FormSteps' section around its form, or Timeline's box around its list and its TimelineMore. Their
+ * `className` and `style` go on the box, which is what users see. Every other prop, including
+ * `ref`, goes on the control. Each says so in its JSDoc. Every other part gives all it is given to
+ * one element.
  */
 export const boxed = [
   "FormSteps",
@@ -66,6 +67,7 @@ export const boxed = [
   "FileUpload",
   "FileUploadControl",
   "SidebarInput",
+  "Timeline",
 ] as const;
 
 /**

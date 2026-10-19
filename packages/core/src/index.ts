@@ -905,6 +905,8 @@ export {
   TimelineItem,
   type TimelineItemProps,
   type TimelineLabels,
+  TimelineMore,
+  type TimelineMoreProps,
   type TimelineProps,
 } from "./timeline";
 export {

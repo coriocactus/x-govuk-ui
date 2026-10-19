@@ -1436,16 +1436,17 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
   ),
   timeline: (
     <>
-      <Area x={15} y={13} w={1.5} h={46} tone="line" />
+      {/* The first two events are highlighted, and so is the rail between them. Dashes run on below. */}
+      <Area x={12} y={12} w={1.5} h={42} tone="line" />
+      <Area x={12} y={12} w={1.5} h={21} tone="brand" />
+      {[34, 37.5, 41].map((y) => (
+        <Area key={y} x={12} y={y} w={1.5} h={2} tone="brand" />
+      ))}
       {[10, 31, 52].map((y, index) => (
         <g key={y}>
-          {index === 0 ? (
-            <Dot x={15.75} y={y + 3} r={4} tone="brand" />
-          ) : (
-            <Ring x={15.75} y={y + 3} r={4} />
-          )}
+          <Area x={12} y={y + 1.25} w={9} h={1.5} r={0.75} tone={index < 2 ? "brand" : "line"} />
           <Words x={26} y={y} w={[40, 34, 44][index] ?? 40} h={4} tone="ink" />
-          <Words x={26} y={y + 7} w={20} h={2.5} />
+          <Words x={26} y={y + 7} w={[38, 32, 36][index] ?? 36} h={2.5} />
           <Words x={26} y={y + 12} w={[56, 48, 52][index] ?? 50} />
         </g>
       ))}

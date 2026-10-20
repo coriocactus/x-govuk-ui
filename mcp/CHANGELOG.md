@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-20
+
+No changes of its own.
+
 ## [0.4.0] - 2026-10-14
 
 ### Changed

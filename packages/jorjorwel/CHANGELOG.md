@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-20
+
 ### Changed
 
 - Changed the Base UI peer dependency to `~1.8.0 || ~1.9.0`, from `~1.8.0`, so a service can install Base UI 1.9 too.

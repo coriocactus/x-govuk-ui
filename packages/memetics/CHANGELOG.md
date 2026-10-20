@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-20
+
 ### Breaking Changes
 
 - Removed the 30 pixels of margin beneath BarList, which came from x-govuk-ui's Table. The box it sits in now spaces it, as it spaces a Table. Put it in a box that stacks its parts, such as a GridColumn or a Stack.

@@ -1,10 +1,10 @@
 name: Peers
 
-# The packages take Base UI and Motion as peers at a patch range, such as ~1.8.0, so a service can
-# take a patch of either without waiting for a release. Each day, this checks whether either has a
-# newer patch than the version the repository pins. If one has, it runs the static checks and the
-# Chromium behaviour tests with it. A failure means a published range admits a patch that breaks
-# the library, so the next release should fix the library or narrow the range.
+# The packages take Base UI and Motion as peers, at the ranges in core's package.json. Every other
+# check runs with the lowest version of each range. Each day, this checks whether either has a newer
+# version within its range. If one has, it runs the static checks and the behaviour tests in every
+# engine with it. A failure means a published range admits a version that breaks the library, so
+# the next release should fix the library or narrow the range.
 on:
   schedule:
     - cron: "0 6 * * *"
@@ -27,12 +27,14 @@ jobs:
           install_args: --locked
       - id: newer
         run: |
+          set -o pipefail
           patches=$(bun scripts/peers.ts newer | tr '\n' ' ')
-          echo "${patches:-No newer patches.}"
+          echo "${patches:-No newer versions.}"
           echo "patches=$patches" >> "$GITHUB_OUTPUT"
           echo "playwright=$(jq -r '.devDependencies["@playwright/test"]' package.json)" >> "$GITHUB_OUTPUT"
 
-  # In Playwright's own image, as the browser checks run, as the runner's user.
+  # In Playwright's own image, as the browser checks run, as the runner's user. Each engine has a job
+  # of its own, because a peer can break one engine alone.
   test:
     needs: newer
     if: needs.newer.outputs.patches != ''
@@ -41,6 +43,10 @@ jobs:
       image: mcr.microsoft.com/playwright:v${{ needs.newer.outputs.playwright }}-noble
       options: --user 1001
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
@@ -49,4 +55,4 @@ jobs:
       - run: bun scripts/peers.ts use
       - run: bun install
       - run: bun run check:static
-      - run: bunx --bun playwright test --project chromium
+      - run: bunx --bun playwright test --project ${{ matrix.project }}

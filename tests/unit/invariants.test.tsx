@@ -111,14 +111,30 @@ test("every custom property the library declares starts x-govuk-ui-", async () =
   expect(declared.filter((entry) => !entry.includes(": --x-govuk-ui-"))).toEqual([]);
 });
 
-test("an extension declares the cascade layers in core's order, whichever stylesheet loads first", async () => {
+test("each extension declares the cascade layers in core's order, and puts its styles in its own layer", async () => {
   // The first stylesheet to name a layer decides its place, so each must name them all the same
   // way.
-  const order = async (path: string) =>
-    (await Bun.file(`${import.meta.dir}/../../${path}`).text()).match(/@layer [^;{]+;/)?.[0];
+  const text = (path: string) => Bun.file(`${import.meta.dir}/../../${path}`).text();
+  const order = async (path: string) => (await text(path)).match(/@layer [^;{]+;/)?.[0];
   const core = await order("packages/core/src/layers.css");
   expect(core).toBe("@layer reset, govuk-frontend, x-govuk-ui, x-govuk-ui-extensions;");
-  expect(await order("packages/jorjorwel/src/layers.css")).toBe(core);
+  const extensions = [...new Bun.Glob("packages/*/src/styles.css").scanSync(".")]
+    .map((path) => path.split("/")[1] ?? "")
+    .filter((name) => name !== "core")
+    .sort();
+  expect(extensions).toEqual(["belsize", "jorjorwel", "memetics"]);
+  for (const name of extensions) {
+    expect(await order(`packages/${name}/src/layers.css`)).toBe(core);
+    // The order comes first, and every stylesheet after it is in the extensions' layer, so an
+    // extension's rules overrule core's at the same specificity, whichever loads first.
+    const imports = [
+      ...(await text(`packages/${name}/src/styles.css`)).matchAll(/@import [^;]+;/g),
+    ].map(([line]) => line);
+    expect(imports[0]).toBe('@import "./layers.css";');
+    expect(imports.slice(1).every((line) => line.endsWith("layer(x-govuk-ui-extensions);"))).toBe(
+      true,
+    );
+  }
 });
 
 // Each component's props keep the library's conventions, such as taking `className` and `ref`, and

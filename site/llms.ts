@@ -70,7 +70,7 @@ const usage = `- React 19 and TypeScript. Import the components from \`x-govuk-u
 - A box that spaces its parts is a flex column, so put running text in a paragraph, or in \`Prose\`, which spaces headings, paragraphs and lists as GOV.UK does. Text and a link loose in such a box would each take a line. An element of your own around parts, such as a \`form\`, keeps them apart from the box's spacing, so make it a Stack, as \`<Stack gap={4} render={<form />}>\`, or use \`Form\`, which keeps a page's space between its fields.
 - Put buttons that belong together in a \`ButtonGroup\`, which stacks them on a phone, and a field with its button in an \`Inline\`. A tile's content keeps 16 pixels of space around it, and \`padded={false}\` lets a table or a chart reach the tile's edges.
 - Fields are built from \`Field\`, \`Label\`, \`Hint\` and \`ErrorMessage\`, with GOV.UK's ids. \`Form\` checks a page of answers when it is sent, by the names the fields send, and shows GOV.UK's error summary. \`validateWith\` makes its check from a Standard Schema, such as one from Zod.
-- The styles sit in the \`x-govuk-ui\` cascade layer, so a service's own rules override them. Each component's page lists its classes, the data attributes its styles respond to and its custom properties.
+- The styles sit in the \`x-govuk-ui\` cascade layer, and an extension's in \`x-govuk-ui-extensions\`, after it, so a service's own rules override them. Each component's page lists its classes, the data attributes its styles respond to and its custom properties.
 - Overlays stack in the order they open, the last on top, and toasts above them. Give the app's root \`isolation: isolate\`, so nothing in the page rises above an overlay.
 - The components are light, as GOV.UK is, and dark under \`data-theme="dark"\`, which \`useTheme\` and \`ThemePicker\` set on the page's root or on one part of the page.
 - GOV.UK's crown, wordmark, Royal Arms and GDS Transport are for official GOV.UK services only. The library ships the crown and the lock-up, the crown beside the wordmark, as \`GOVUKCrown\` and \`GOVUKLockup\`. It leaves out the GDS Transport font, and the Royal Arms, whose image a service gives by its address.
@@ -107,7 +107,7 @@ const selectors = (classes: readonly string[]) => classes.map((one) => `\`.${one
 /** A component's styling contract in Markdown. */
 export function stylingMarkdown(contract: StylingContract) {
   const lines = [
-    "Style any part from your own stylesheet. The library's rules sit in the `x-govuk-ui` cascade layer, so yours override them.",
+    "Style any part from your own stylesheet. The library's rules sit in the `x-govuk-ui` and `x-govuk-ui-extensions` cascade layers, so yours override them.",
     "",
     "### Classes",
     "",

@@ -16,6 +16,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Added `padded` to TileContent, which keeps 16 pixels of space around the content unless it is false.
 
+### Fixed
+
+- Fixed Tiles' styles depending on loading after x-govuk-ui's stylesheet to overrule its rules. They are now in the `x-govuk-ui-extensions` cascade layer, after x-govuk-ui's, as the Editor's are, so they overrule its rules whichever stylesheet loads first. A service's own rules still overrule both.
+
 ## [0.4.0] - 2026-10-14
 
 ### Visual

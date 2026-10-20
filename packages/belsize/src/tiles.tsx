@@ -260,6 +260,56 @@ function blankPicture() {
   return emptyImage;
 }
 
+let stopSupplying: (() => void) | undefined;
+
+/**
+ * Supplies the `pointerdown` that Safari leaves out of the first press after a drag. Safari sends
+ * only its `mousedown`, because WebKit still holds the drag's button down:
+ * https://bugs.webkit.org/show_bug.cgi?id=202287. Base UI tells a mouse press by its
+ * `pointerdown`. Without one, the press counts twice, so a menu that it opens on `mousedown` closes
+ * on `click`, such as the tile's own. The event copies the press as a mouse's, pressed, so Base UI
+ * does not take it for a screen reader's. A browser that sends its own `pointerdown` first stops
+ * this before it dispatches anything. @internal
+ */
+function supplyPointerDownAfterDrag() {
+  stopSupplying?.();
+  const press = (event: MouseEvent) => {
+    stopSupplying?.();
+    if (event.type !== "mousedown" || !event.target) return;
+    event.target.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        view: event.view,
+        screenX: event.screenX,
+        screenY: event.screenY,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        ctrlKey: event.ctrlKey,
+        shiftKey: event.shiftKey,
+        altKey: event.altKey,
+        metaKey: event.metaKey,
+        button: event.button,
+        buttons: event.buttons,
+        pointerId: 1,
+        pointerType: "mouse",
+        isPrimary: true,
+        width: 1,
+        height: 1,
+        pressure: 0.5,
+      }),
+    );
+  };
+  window.addEventListener("pointerdown", press, true);
+  window.addEventListener("mousedown", press, true);
+  stopSupplying = () => {
+    window.removeEventListener("pointerdown", press, true);
+    window.removeEventListener("mousedown", press, true);
+    stopSupplying = undefined;
+  };
+}
+
 /** Gives a drag the blank picture, instead of the browser's own. */
 function useBlankPreview(preview: ConnectDragPreview) {
   useEffect(() => {
@@ -806,6 +856,7 @@ export function TilesProvider({
   const endDrag = useCallback(
     (item: DragItem, result: DropResult | null) => {
       clearTimeout(hideTimer.current);
+      supplyPointerDownAfterDrag();
       try {
         if (!result) return;
         const target = result.path ? tileAt(latest.current.layout, result.path) : undefined;

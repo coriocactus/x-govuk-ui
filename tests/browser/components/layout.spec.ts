@@ -168,8 +168,19 @@ test("tiles resize from their dividers, move by a drag or their menus, split, ma
       return Math.abs(notes.x - evidence.x) < 1 && evidence.y > notes.y;
     })
     .toBe(true);
-  // The tile's menu moves it from the keyboard too, announces it, and keeps focus on its button.
+  // After a drag, Safari sends no pointerdown for the next press. The tile's menu opens as that
+  // press goes down, and stays open once it ends.
   const options = frame.getByRole("button", { name: "Options for Application" });
+  const press = (await options.boundingBox())!;
+  await page.mouse.move(press.x + press.width / 2, press.y + press.height / 2);
+  await page.mouse.down();
+  await expect(options).toHaveAttribute("aria-expanded", "true");
+  await page.mouse.up();
+  await page.evaluate(() => new Promise(requestAnimationFrame));
+  await expect(options).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Escape");
+  await expect(options).toHaveAttribute("aria-expanded", "false");
+  // The tile's menu moves it from the keyboard too, announces it, and keeps focus on its button.
   await options.focus();
   await page.keyboard.press("Enter");
   await page.getByRole("menuitem", { name: "Move" }).click();

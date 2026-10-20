@@ -558,7 +558,9 @@ body {
   box-sizing: border-box;
 }
 
+/* Its parts meet edge to edge, with no space between them, in the sheet as beside the preview. */
 .inspector {
+  --x-govuk-ui-stack-gap: 0px;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -764,9 +766,6 @@ body {
   overflow-wrap: anywhere;
 }
 /* Props without a control are a Table, with each name, its type and note, and its default. */
-.prop-table.x-govuk-ui-table-scroll {
-  margin: 0;
-}
 .prop-table {
   font-size: 11px;
   line-height: 1.5;

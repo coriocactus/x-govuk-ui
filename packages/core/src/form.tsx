@@ -414,7 +414,7 @@ function Summary() {
   const loose = problems.filter((problem) => !problem.id);
   return (
     // A new attempt opens a new summary, which takes focus again.
-    <div key={form?.attempt} data-sound-enter="error">
+    <div key={form?.attempt} className="x-govuk-ui-form-summary-content" data-sound-enter="error">
       <ErrorSummary
         ref={box}
         autoFocus={false}

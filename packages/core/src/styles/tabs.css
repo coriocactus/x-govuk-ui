@@ -75,17 +75,16 @@
     width var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
 }
 /* The new panel replaces the old one at once. Fading it in from nothing would make the content
-   blink out on every change. The bar gliding beneath the tabs is the motion. */
+   blink out on every change. The bar gliding beneath the tabs is the motion. The panel stacks its
+   parts, such as a heading, a table and a button, with a surface's space between them. */
 .x-govuk-ui-tabs-panel {
+  --x-govuk-ui-stack-gap: var(--x-govuk-ui-space-surface);
   padding: 24px 0 8px;
   outline: none;
 }
 .x-govuk-ui-tabs-panel:focus-visible {
   outline: 3px solid var(--x-govuk-ui-focus);
   outline-offset: 2px;
-}
-.x-govuk-ui-tabs-panel > :first-child {
-  margin-top: 0;
 }
 @media (forced-colors: active) {
   .x-govuk-ui-tabs-indicator {

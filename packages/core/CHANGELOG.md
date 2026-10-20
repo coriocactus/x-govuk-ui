@@ -11,6 +11,14 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Removed GovukWordmark, which no part of the library used. Use GOVUKLockup, which shows the wordmark beside the crown, as GOV.UK's header does.
 - Changed Timeline to draw a box around its list, so a TimelineMore can sit beneath the list and outside it. The box has the class `.x-govuk-ui-timeline`, which was the list's, and takes Timeline's `className` and `style`. The list is now `.x-govuk-ui-timeline-list`, and takes every other prop, including `ref`. Select the list and its events by their classes, such as `.x-govuk-ui-timeline-item`, not as children of `.x-govuk-ui-timeline`.
 - Changed TimelineItem to write when and by whom in one paragraph, `.x-govuk-ui-timeline-meta`. The date, `.x-govuk-ui-timeline-date`, is now its `time` element, and who did it, `.x-govuk-ui-timeline-by`, is a `span`. Each was a paragraph of its own. Select each by its class, not its element.
+- Changed MainWrapper, GridColumn, DialogContent, SheetContent and TabsPanel to stack their parts as a Stack does. Each is now a flex column with the class `.x-govuk-ui-stack`, and sets the space between its parts. MainWrapper and GridColumn keep `--x-govuk-ui-space-page` between them, which is 20 pixels on a phone and 30 from tablet width. The others keep `--x-govuk-ui-space-surface`, which is 20 pixels. To move to it:
+  - Put running text that sits loose in one of them in a paragraph or in Prose. Loose text and a link in it would each take a line of their own.
+  - Remove margins of your own between their parts, which now add to the space. Set `--x-govuk-ui-stack-gap` on the box for other space.
+  - Check a `.x-govuk-ui-stack` selector of your own, which now reaches these boxes too.
+  - Put parts that must keep normal flow in an element of your own inside the box.
+  - Put a `form` of your own in a Dialog or a Sheet as a Stack, as `<Stack gap={4} render={<form />}>`, or use a Form. Otherwise its parts touch, because the box spaces only its own parts.
+- Removed the margins of BackLink, Breadcrumbs, NotificationBanner, Panel, Pagination, ErrorSummary, SummaryCard and Table's scroll box, `.x-govuk-ui-table-scroll`. The box each sits in now spaces it. Put them in a box that stacks its parts, such as a GridColumn or a Stack. A BackLink or Breadcrumbs directly in Page's `beforeContent` keeps GOV.UK's 15 pixels above and below it, and a Form keeps its gap beneath its ErrorSummary.
+- Changed Separator's `spacing` to `none` by default, so the box it sits in spaces it. Give `spacing="medium"` for GOV.UK's section break spacing as before. In a box that stacks its parts, it adds to the box's space.
 - Removed `--x-govuk-ui-timeline-knob`, because an event no longer has a knob, and `--x-govuk-ui-timeline-rail`, because Timeline no longer measures its rail. Remove any you set. `--x-govuk-ui-timeline-highlight` sets the colour of highlighted events.
 
 ### Visual
@@ -18,11 +26,17 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed SidebarInput to have as much room above its field as below, 10 pixels each, so it sits clear of a header of its own colour, such as an inverse one. Its box is 56 pixels tall, or 60 in the sheet, where it was 48 and 52.
 - Changed Calendar to fit a phone 320 pixels wide, the narrowest that WCAG asks a page to work on. On a screen narrower than 336 pixels, its days are 38 pixels, not 40, and its padding is 8 pixels, not 12.
 - Changed Timeline's events to branch off the rail with a tick as thick as the rail, in place of a ring with a line. The rail and its ticks are the same grey, and a highlighted event's tick is brand blue.
+- Changed DialogContent's title, description, content and buttons to be 20 pixels apart. Its description was 12 pixels beneath its title, and its buttons 24 pixels beneath what was above them.
+- Changed SheetContent's content to start 20 pixels beneath its description, where it was 24. Its buttons now sit at least 20 pixels beneath its content, where they had 24 pixels of padding above them.
+- Changed TabsPanel's parts to be 20 pixels apart. Each kept its own margin before.
+- Changed SidebarCustomise's groups to be 20 pixels beneath its description and above its Done and Reset buttons, where they were 18 and 8.
+- Changed Form to leave out the margins of a heading or a paragraph of your own among its fields, so the Form's gap alone spaces them. A heading below the first level keeps 20 pixels beneath it, as GOV.UK's medium heading does. An ErrorSummary in a Form is now the Form's gap above its fields, 20 pixels on a phone and 30 from tablet width, where it was 16.
 - Changed TimelineItem to write the date and who did it on one line, the date first, such as 12 March 2026 at 2:05pm by the Passport Office. Its description is 19 pixels, GOV.UK's body size, where it was 17. The space beneath each event is 30 pixels, where it was 26.
 
 ### Added
 
-- Added Stack and Inline, which set parts one beneath another and side by side, spaced by GOV.UK's spacing scale, from `gap={0}` to `gap={9}`, which are 0 to 60 pixels. A Stack's default is 30 pixels, the space between a form's fields. In an Inline, a field shrinks to the room its button leaves. Each leaves out its parts' outer margins. In a Stack, a part that sits in a line of text, such as a Tag or a Button, keeps its own width.
+- Added Stack and Inline, which set parts one beneath another and side by side, spaced by GOV.UK's spacing scale, from `gap={0}` to `gap={9}`, which are 0 to 60 pixels. A Stack's default is 30 pixels, the space between a form's fields. In an Inline, a field shrinks to the room its button leaves. Each leaves out its parts' outer margins. In a Stack, a part that sits in a line of text, such as a Tag or a Button, keeps its own width, and a heading below the first level keeps 20 pixels beneath it where the gap is larger, as GOV.UK's medium heading does. `render` makes either one another element, such as a `form`.
+- Added `--x-govuk-ui-space-page` and `--x-govuk-ui-space-surface`, the space between a page's parts and between the parts in a surface, such as a dialog. Added `--x-govuk-ui-stack-gap`, which sets the space in any box that stacks its parts.
 - Added `formatDate` and `formatTime`, which write a date and a time apart, as GOV.UK writes them, such as 29 September 2026 and 10:02am. `formatDateTime` writes both, as before.
 - Added `highlighted` to TimelineItem, which highlights an event in brand blue, such as one that is new since users last looked. The rail between highlighted events next to each other is brand blue too. Where they meet an event that is not, blue dashes run on over the grey for about half the way to its tick, and end with a whole dash. Once any event is given `highlighted`, only the events marked `true` are highlighted. With none given it, the latest is highlighted, as before. Screen readers hear the `highlighted` label before each marked event's heading. It is New by default. `--x-govuk-ui-timeline-highlight` changes the colour.
 - Added TimelineMore, a button at the foot of a Timeline for earlier events. The service adds them beneath the others in its `onClick`, and sets `loading` while they load. The button keeps focus while they load. Focus then moves to the first earlier event, unless users have moved it elsewhere. Its words are the `more` label, Show earlier events by default.
@@ -36,6 +50,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Fixed SidebarInput putting its `className` on its box but its `style` and data attributes on the field. Its `className` and `style` now go on the box, and every other prop on the field, as Combobox's do.
 - Fixed Timeline dropping an `aria-label` given in place of `label`.
+- Fixed a Form's ErrorSummary losing 8 pixels of the space beneath it.
 
 ## [0.4.0] - 2026-10-14
 

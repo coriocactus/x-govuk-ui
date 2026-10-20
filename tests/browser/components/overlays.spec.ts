@@ -1,4 +1,22 @@
+import type { Locator } from "@playwright/test";
 import { expect, test } from "../fixtures";
+
+/**
+ * The space above each part that a box stacks, after the first, from the layout. A box that grows
+ * into place is scaled meanwhile, which its layout does not see. A part placed on top, such as the
+ * close button, is not stacked.
+ */
+const gaps = (box: Locator) =>
+  box.evaluate((element) => {
+    const parts = [...element.children].filter(
+      (part): part is HTMLElement =>
+        part instanceof HTMLElement && getComputedStyle(part).position !== "absolute",
+    );
+    return parts.slice(1).map((part, index) => {
+      const above = parts[index] as HTMLElement;
+      return part.offsetTop - (above.offsetTop + above.offsetHeight);
+    });
+  });
 
 test("a dialog starts on its safe choice, closes with Escape and returns focus", async ({
   page,
@@ -12,6 +30,8 @@ test("a dialog starts on its safe choice, closes with Escape and returns focus",
   const dialog = page.getByRole("dialog", { name: "Delete this draft?" });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Cancel" })).toBeFocused();
+  // It spaces its title, its description and its buttons by a surface's 20 pixels.
+  expect(await gaps(dialog)).toEqual([20, 20]);
   // A service can give it more space.
   await page.evaluate(() =>
     document.documentElement.style.setProperty("--x-govuk-ui-dialog-width", "640px"),
@@ -329,6 +349,21 @@ test("a sheet holds a draft of its filters, which Apply keeps and Cancel throws 
   await trigger.click();
   const sheet = page.getByRole("dialog", { name: "Filter licences" });
   await expect(sheet).toBeVisible();
+  // Its description sits 8 pixels beneath its title, and its choices 20 pixels beneath that. Its
+  // buttons sit at its foot, inside its 24 pixels of padding.
+  const [beneathTitle, beneathDescription, aboveButtons] = await gaps(sheet);
+  expect([beneathTitle, beneathDescription]).toEqual([8, 20]);
+  expect(aboveButtons).toBeGreaterThan(20);
+  expect(
+    await sheet.evaluate((element) => {
+      const buttons = element.querySelector<HTMLElement>(":scope > .x-govuk-ui-button-group");
+      return buttons ? element.clientHeight - (buttons.offsetTop + buttons.offsetHeight) : 0;
+    }),
+  ).toBe(24);
+  // With more space between its parts, its description stays 8 pixels beneath its title.
+  await sheet.evaluate((element) => element.style.setProperty("--x-govuk-ui-stack-gap", "40px"));
+  expect((await gaps(sheet)).slice(0, 2)).toEqual([8, 40]);
+  await sheet.evaluate((element) => element.style.removeProperty("--x-govuk-ui-stack-gap"));
   // A service can give a sheet at the side more space.
   await page.evaluate(() =>
     document.documentElement.style.setProperty("--x-govuk-ui-sheet-width", "420px"),

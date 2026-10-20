@@ -425,12 +425,26 @@
     display: none;
   }
 }
+/* Its content keeps a surface's space between its parts. The property is set here, so a service can
+   set it on the content for other space. */
 .x-govuk-ui-tile-content {
+  --x-govuk-ui-stack-gap: var(--x-govuk-ui-space-surface);
   flex: 1;
   min-height: 0;
 }
 div.x-govuk-ui-tile-content {
   overflow: hidden;
+}
+/* Without a Scroll area, the content is as tall as the tile, so a part of its own can take a share of
+   that height, such as `height: 100%`. */
+.x-govuk-ui-tile-body {
+  box-sizing: border-box;
+}
+.x-govuk-ui-tile-content > .x-govuk-ui-tile-body {
+  height: 100%;
+}
+.x-govuk-ui-tile-body[data-padded] {
+  padding: 16px;
 }
 
 /* The dock, a row of the closed tiles, as chips with the grip a tile's bar has. While a tile from

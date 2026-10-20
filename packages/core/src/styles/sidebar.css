@@ -210,7 +210,8 @@
   height: 40px;
   font-size: 16px;
 }
-.x-govuk-ui-sidebar-separator {
+.x-govuk-ui-sidebar-separator,
+.x-govuk-ui-sidebar-panel > .x-govuk-ui-sidebar-separator {
   margin: 10px 8px;
   border: 0;
   border-top: 1px solid var(--x-govuk-ui-line);
@@ -327,7 +328,6 @@
 .x-govuk-ui-sidebar-customise-groups {
   display: grid;
   gap: 24px;
-  margin: 18px 0 8px;
 }
 .x-govuk-ui-sidebar-customise-group-head {
   display: flex;
@@ -475,10 +475,15 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin: auto -24px 0;
+  margin-inline: -24px;
   padding: 16px 24px 20px;
   border-top: 1px solid var(--x-govuk-ui-line);
   background: var(--x-govuk-ui-paper);
+}
+/* The sheet stacks its parts, so the actions take the space left above them as the sheet's own
+   buttons do. */
+.x-govuk-ui-sidebar-customise > .x-govuk-ui-sidebar-customise-actions {
+  margin-top: auto;
 }
 /* Skeleton rows sit where items will, at their height. */
 .x-govuk-ui-sidebar-skeleton-row {
@@ -757,8 +762,10 @@
   left: 0;
 }
 
-/* On small screens, the sidebar opens as the library's Sheet, as wide as the sidebar. */
+/* On small screens, the sidebar opens as the library's Sheet, as wide as the sidebar. Its parts
+   fill it edge to edge, with no space between them. */
 .x-govuk-ui-sheet.x-govuk-ui-sidebar-sheet {
+  --x-govuk-ui-stack-gap: 0px;
   width: min(var(--x-govuk-ui-sidebar-width), calc(100vw - 48px));
   padding: 0;
   overflow: hidden;

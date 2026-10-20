@@ -868,7 +868,7 @@ const Overview = memo(function Overview({
         if (view)
           return (
             <Tile title={view.title}>
-              <TileContent scroll className="workspace-tile">
+              <TileContent scroll>
                 {/* Asked for again, the view is written again. */}
                 <ComposedView key={view.started} name={view.name} started={view.started} />
               </TileContent>
@@ -877,7 +877,8 @@ const Overview = memo(function Overview({
         if (id === "licences")
           return (
             <Tile title="Licences issued">
-              <TileContent scroll>
+              {/* The chart keeps its own space, so it can fit its plot to the tile. */}
+              <TileContent scroll padded={false}>
                 <LicencesChart />
               </TileContent>
             </Tile>
@@ -885,7 +886,7 @@ const Overview = memo(function Overview({
         if (id === "activity")
           return (
             <Tile title="Recent activity">
-              <TileContent scroll className="workspace-tile">
+              <TileContent scroll>
                 <Timeline label="What the licensing team did last">
                   {activity.map((event) => (
                     <TimelineItem
@@ -922,7 +923,7 @@ const Overview = memo(function Overview({
               </TileBar>
             }
           >
-            <TileContent scroll className="workspace-applications">
+            <TileContent scroll padded={false} className="workspace-applications">
               <GroupedTable label="Applications" columns={columns}>
                 {bands.map((band) => {
                   const items = applications.filter((each) => each.status === band.status);

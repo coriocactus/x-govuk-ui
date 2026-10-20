@@ -50,11 +50,12 @@ test("pages follow GOV.UK's template, and forms leave validation to themselves",
   expect(page).toMatch(
     /^<div class="x-govuk-ui-page" style="--x-govuk-ui-page-width:1100px"><a href="#main-content"/,
   );
+  // The main content and its column stack their parts, as a Stack does.
   expect(page).toContain(
-    '<main id="main-content" class="x-govuk-ui-main-wrapper" data-size="large">',
+    '<main id="main-content" class="x-govuk-ui-main-wrapper x-govuk-ui-stack" data-size="large">',
   );
   expect(page).toContain(
-    'class="x-govuk-ui-grid-column" data-width="two-thirds" data-from="tablet"',
+    'class="x-govuk-ui-grid-column x-govuk-ui-stack" data-width="two-thirds" data-from="tablet"',
   );
   // A stack and a line space their parts on GOV.UK's scale, 30 and 15 pixels unless given.
   expect(renderToStaticMarkup(<Stack id="page" />)).toBe(
@@ -62,6 +63,10 @@ test("pages follow GOV.UK's template, and forms leave validation to themselves",
   );
   expect(renderToStaticMarkup(<Inline gap={2} wrap align="baseline" />)).toBe(
     '<div class="x-govuk-ui-inline" data-gap="2" data-wrap="true" data-align="baseline"></div>',
+  );
+  // Either can be another element, such as a form, so its parts are spaced with none around them.
+  expect(renderToStaticMarkup(<Stack gap={4} render={<form aria-label="Search" />} />)).toBe(
+    '<form aria-label="Search" class="x-govuk-ui-stack" data-gap="4"></form>',
   );
   // The header and footer keep their content in width containers, so they line up with the page.
   expect(page.match(/x-govuk-ui-width-container/g)).toHaveLength(3);
@@ -72,7 +77,9 @@ test("pages follow GOV.UK's template, and forms leave validation to themselves",
         <MainWrapper render={<div />}>Content</MainWrapper>
       </Page>,
     ),
-  ).toContain('<div id="main-content" class="x-govuk-ui-main-wrapper">Content</div>');
+  ).toContain(
+    '<div id="main-content" class="x-govuk-ui-main-wrapper x-govuk-ui-stack">Content</div>',
+  );
   expect(renderToStaticMarkup(<WidthContainer width="40rem" gutters={false} />)).toBe(
     '<div class="x-govuk-ui-width-container" data-gutters="none" style="--x-govuk-ui-container-width:40rem"></div>',
   );

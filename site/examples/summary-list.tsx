@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   Input,
+  Stack,
   SummaryCard,
   SummaryList,
   SummaryListAction,
@@ -93,7 +94,8 @@ export default function SummaryListExample({ noBorder = false, card = true }: Pr
       )}
       <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent finalFocus={opener}>
-          <form onSubmit={save}>
+          {/* The form is a stack, so its parts keep the dialog's space between them. */}
+          <Stack gap={4} render={<form onSubmit={save} />}>
             <DialogTitle>Change {editing ? labels[editing].toLowerCase() : ""}</DialogTitle>
             <Input
               label={editing ? labels[editing] : ""}
@@ -105,7 +107,7 @@ export default function SummaryListExample({ noBorder = false, card = true }: Pr
               <Button type="submit">Save</Button>
               <DialogClose>Cancel</DialogClose>
             </ButtonGroup>
-          </form>
+          </Stack>
         </DialogContent>
       </Dialog>
       <p className="preview-message" role="status">

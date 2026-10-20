@@ -1,29 +1,36 @@
 /* Form. The error summary opens above everything inside the form in a box that eases to its height,
    so what is beneath moves down smoothly. The box reaches a little past the summary on every side,
-   so the summary's focus ring shows in full, and the box takes no extra space for it. */
+   so the summary's focus ring shows in full, and the box takes no extra space for it. The box's
+   height is its content's, so its padding stays outside that height, where the library's own box
+   sizing would put it inside. */
 .x-govuk-ui-form-summary.x-govuk-ui-auto-height {
+  box-sizing: content-box;
   margin: -4px;
   padding: 4px;
 }
-/* The summary's own margin stays inside the box. */
-.x-govuk-ui-form-summary > div {
-  display: flow-root;
+/* The space beneath the summary is inside the box, so it opens and closes with the summary. */
+.x-govuk-ui-form-summary-content {
+  padding-bottom: var(--x-govuk-ui-form-gap);
 }
-/* The space between the fields, GOV.UK's 20 pixels on a phone and 30 on a wider screen. */
+/* The space between the fields, a page's space, as GOV.UK spaces its form groups. */
 .x-govuk-ui-form {
-  --x-govuk-ui-form-gap: 20px;
+  --x-govuk-ui-form-gap: var(--x-govuk-ui-space-page);
 }
 /* Fields stack with GOV.UK's spacing between them, and buttons keep their own width. The column is
    the form's width, so a field with something wide inside, such as a long line of code, scrolls
-   that content instead of widening the field and every field with it. */
+   that content instead of widening the field and every field with it. The form sets the space, so
+   the margins above and below a heading or a paragraph of your own are left out. */
 .x-govuk-ui-form-fields {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   justify-items: start;
   gap: var(--x-govuk-ui-form-gap);
 }
-@media (min-width: 40.0625em) {
-  .x-govuk-ui-form {
-    --x-govuk-ui-form-gap: 30px;
-  }
+/* A heading below the first level keeps 20 pixels beneath it, as in a stack. Both rules add no
+   specificity, so a component's own spacing among the fields wins, such as Feedback's. */
+:where(.x-govuk-ui-form-fields > *) {
+  margin-block: 0;
+}
+:where(.x-govuk-ui-form-fields > :is(h2, h3, h4, h5, h6):not(:last-child)) {
+  margin-bottom: min(0px, 20px - var(--x-govuk-ui-form-gap));
 }

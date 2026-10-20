@@ -183,6 +183,7 @@
 }
 /* On a narrow screen, Piscine Assist is a sheet over the work, as wide as it is beside it. */
 .workspace-assist-sheet.x-govuk-ui-sheet {
+  --x-govuk-ui-stack-gap: 0px;
   display: flex;
   flex-direction: column;
   width: min(380px, 100%);

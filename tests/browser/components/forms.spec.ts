@@ -38,6 +38,13 @@ test("a form checks every answer when sent, and its date can come from the calen
   await expect
     .poll(async () => (await heading.boundingBox())!.y - (await summary.boundingBox())!.y)
     .toBeGreaterThan(0);
+  // Once open, the summary is a page's 30 pixels above the heading, as the fields are apart.
+  await expect
+    .poll(async () => {
+      const above = (await summary.boundingBox())!;
+      return Math.round((await heading.boundingBox())!.y - (above.y + above.height));
+    })
+    .toBe(30);
   await expect(page).toHaveTitle(/^Error: Form/);
   await expect(summary.getByRole("link")).toHaveText([
     "Enter an email address in the correct format, like name@example.com",

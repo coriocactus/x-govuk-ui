@@ -108,7 +108,6 @@
 
 /* Summary card. A tinted band with the title and the card's actions, over a bordered list. */
 .x-govuk-ui-summary-card {
-  margin-bottom: 20px;
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: var(--x-govuk-ui-radius-surface);
   overflow: clip;

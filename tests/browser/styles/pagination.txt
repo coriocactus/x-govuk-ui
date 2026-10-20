@@ -4,7 +4,6 @@
   font-weight: 400
   line-height: 1.25
   color: rgb(11, 12, 12)
-  margin-bottom: 30px
   row-gap: 4px
   column-gap: 15px
 .x-govuk-ui-pagination-ellipsis

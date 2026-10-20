@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { componentNames } from "../../site/catalogue";
+import { spaced as spacedParts } from "../types/exceptions";
 
 // Every page is swept once, for accessibility in both themes, and for text that fits its box in
 // any typeface. The whole sweep is static, so it runs only in the sweep projects, not once for
@@ -125,6 +126,101 @@ async function styles(page: Page, name: string) {
       return `${lines.join("\n")}\n`;
     },
     { classes, looks },
+  );
+}
+
+/**
+ * What the styling contracts say about classes. Each part has its own classes, which every element
+ * it renders carries, and a component may put classes on elements inside its parts. A class written
+ * with a placeholder, such as `x-govuk-ui-button--{variant}`, is a pattern.
+ */
+const contractClasses = (() => {
+  const parts: { name: string; component: string; classes: string[] }[] = [];
+  const inner: Record<string, string[]> = {};
+  const patterns: string[] = [];
+  for (const component of componentNames) {
+    const contract = JSON.parse(readFileSync(`dist/docs/${component}.json`, "utf8")).styling as {
+      parts: { name: string; classes: string[]; inner: string[] }[];
+    };
+    for (const part of contract.parts) {
+      const own = part.classes.filter((name) => !name.includes("{"));
+      if (own.length > 0) parts.push({ name: part.name, component, classes: own });
+      for (const name of part.inner) inner[name] = [...(inner[name] ?? []), component];
+      for (const name of [...part.classes, ...part.inner])
+        if (name.includes("{")) patterns.push(`^${name.replace(/\{\w+\}/g, "[a-z0-9-]+")}$`);
+    }
+  }
+  return { parts, inner, patterns };
+})();
+
+/**
+ * Parts that set space outside their own box, as "class margin-top margin-bottom". The box a part
+ * sits in sets the space around it, as a Stack does, so a part has no margin above or below of its
+ * own.
+ *
+ * Each part's element in the example is drawn again alone, at the end of the page, with its tag,
+ * its classes from the contracts and its data attributes. Its margins there are its own,
+ * from the library's rules or the browser's. A box that spaces it, such as a Page around its Back
+ * link, is not there to do so.
+ *
+ * A component lays out its own parts, as a Figure spaces its key, so a part inside a part of its
+ * own component is left out. An element is a component's part when it carries all of the own
+ * classes of one of the component's parts. Matching all of a part's classes, not one, keeps a
+ * shared class apart from its part, such as the stack's class on a GridColumn from a
+ * DialogContent's. A part also belongs to a component that puts a class of its own on it, as Date
+ * input does on its Button. A wrapper with only such a class is no part, so a Table inside its own
+ * scroll box is still checked. The search stops at the example's edge.
+ */
+async function spaced(page: Page) {
+  return page.evaluate(
+    ({ parts, inner, patterns, allowed }) => {
+      const matchers = patterns.map((pattern) => new RegExp(pattern));
+      const named = new Set([...parts.flatMap(({ classes }) => classes), ...Object.keys(inner)]);
+      const known = (element: Element) =>
+        [...element.classList].filter(
+          (name) => named.has(name) || matchers.some((matcher) => matcher.test(name)),
+        );
+      const partsOf = (element: Element) =>
+        parts.filter(({ classes }) => classes.every((name) => element.classList.contains(name)));
+      const componentsOf = (element: Element) =>
+        new Set([
+          ...partsOf(element).map(({ component }) => component),
+          ...[...element.classList].flatMap((name) => inner[name] ?? []),
+        ]);
+      const out = new Set<string>();
+      const example = document.querySelector(".preview-example");
+      for (const element of example?.querySelectorAll("[class*='x-govuk-ui-']") ?? []) {
+        // An element inside a part that is no part itself is placed by its component.
+        const classes = known(element);
+        if (partsOf(element).length === 0 || classes.some((name) => allowed.includes(name)))
+          continue;
+        const mine = componentsOf(element);
+        let inside = false;
+        for (
+          let around = element.parentElement;
+          around && around !== example && !inside;
+          around = around.parentElement
+        )
+          inside = partsOf(around).some(({ component }) => mine.has(component));
+        if (inside) continue;
+        const alone = document.createElement(element.tagName);
+        alone.className = classes.join(" ");
+        for (const { name, value } of element.attributes)
+          if (name.startsWith("data-")) alone.setAttribute(name, value);
+        document.body.append(alone);
+        const { marginTop, marginBottom } = getComputedStyle(alone);
+        alone.remove();
+        if (marginTop !== "0px" || marginBottom !== "0px")
+          out.add(`.${classes[0]} ${marginTop} ${marginBottom}`);
+      }
+      return [...out];
+    },
+    {
+      ...contractClasses,
+      allowed: contractClasses.parts
+        .filter(({ name }) => name in spacedParts)
+        .flatMap(({ classes }) => classes),
+    },
   );
 }
 
@@ -255,6 +351,32 @@ async function rounded(page: Page) {
   });
 }
 
+test("the check for margins finds a Table's margin inside its own scroll box", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== "chromium", "Engines compute margins alike, so Chromium checks.");
+  await page.goto("/workbench/table");
+  await ready(page);
+  await page.addStyleTag({ content: ".x-govuk-ui-table { margin-bottom: 30px; }" });
+  expect(await spaced(page)).toContain(".x-govuk-ui-table 0px 30px");
+});
+
+test("the check for margins finds a part's own margin, and leaves a box's space alone", async ({
+  page,
+  browserName,
+}) => {
+  test.skip(browserName !== "chromium", "Engines compute margins alike, so Chromium checks.");
+  await page.goto("/workbench/page");
+  await ready(page);
+  // The Back link has 15 pixels above and below it from the Page, which is the Page's space.
+  expect(await spaced(page)).toEqual([]);
+  // A Button in the Form in a GridColumn is a part of another component inside a box that stacks,
+  // and a margin of its own is found.
+  await page.addStyleTag({ content: ".x-govuk-ui-button { margin-bottom: 22px; }" });
+  expect(await spaced(page)).toContain(".x-govuk-ui-button 0px 22px");
+});
+
 // The site's pages, the workbench's own page and every component's page.
 const pages = [
   ["the front page", "/"],
@@ -299,6 +421,7 @@ for (const [name, path] of pages) {
         await ready(still);
         expect(await styles(still, name)).toMatchSnapshot(`${name}.txt`);
         expect(await rounded(still), "rounded with the corners' tokens at 0").toEqual([]);
+        expect(await spaced(still), "spaced by margins of their own").toEqual([]);
         await still.close();
       });
     await test.step("colours contrast in dark", async () => {
@@ -349,6 +472,7 @@ for (const [name, path] of pages) {
         await ready(phone);
         expect(await overflowing(phone)).toEqual([]);
         expect(await clipped(phone, { fields: false })).toEqual([]);
+        expect(await spaced(phone), "spaced by margins of their own").toEqual([]);
         await phone.close();
       });
     // What a page shows only once it is used is checked as it shows, where the page alone would

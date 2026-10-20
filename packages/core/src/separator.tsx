@@ -7,8 +7,9 @@ export type SeparatorProps = ComponentPropsWithRef<"div"> & {
   /** `vertical` suits a row, such as the groups in a toolbar. */
   orientation?: "horizontal" | "vertical";
   /**
-   * The space either side of a horizontal separator, as GOV.UK's section break sizes it. `none`
-   * leaves the spacing to the layout around it.
+   * Space above and below a horizontal separator, as GOV.UK's section break sizes it, for a
+   * separator in running text. By default, the box it sits in spaces it, as a Stack does. In a box
+   * that spaces its parts, this space is added to the box's.
    */
   spacing?: "none" | "small" | "medium" | "large";
 };
@@ -16,7 +17,7 @@ export type SeparatorProps = ComponentPropsWithRef<"div"> & {
 /** A line between sections of a page, or between groups in a row, such as a toolbar's tools. */
 export function Separator({
   orientation = "horizontal",
-  spacing = "medium",
+  spacing = "none",
   className = "",
   ...props
 }: SeparatorProps) {

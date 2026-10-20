@@ -78,7 +78,10 @@ export type DialogContentProps = ComponentPropsWithRef<"div"> & {
 
 /**
  * The dialog itself, centred over a dimmed page. It grows into place and shrinks away, and it
- * scrolls within the window when its content is long.
+ * scrolls within the window when its content is long. It stacks its parts as a Stack does, with
+ * `--x-govuk-ui-space-surface` between them, from its title to its buttons. A `form` of your own
+ * inside it would hold its parts apart from that, so make it a Stack, as
+ * `<Stack gap={4} render={<form />}>`, or use a Form, which keeps a page's space between its fields.
  */
 export function DialogContent({
   closeButton = true,
@@ -95,7 +98,7 @@ export function DialogContent({
       <Primitive.Viewport className="x-govuk-ui-dialog-viewport">
         <Primitive.Popup
           {...props}
-          className={`x-govuk-ui-dialog ${className}`.trim()}
+          className={`x-govuk-ui-dialog x-govuk-ui-stack ${className}`.trim()}
           initialFocus={initialFocus}
           finalFocus={finalFocus}
         >

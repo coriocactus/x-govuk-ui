@@ -3,7 +3,6 @@
 .x-govuk-ui-breadcrumbs {
   --x-govuk-ui-breadcrumbs-step: var(--x-govuk-ui-muted);
   --x-govuk-ui-breadcrumbs-page: var(--x-govuk-ui-text);
-  margin: 15px 0;
   font-family: var(--x-govuk-ui-font);
   font-size: 16px;
   line-height: 1.25;

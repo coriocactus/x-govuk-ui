@@ -1,8 +1,5 @@
 /* GOV.UK's table, with bold headings, keylines between rows and no fills. A row is shaded under the
    pointer, so the eye can follow it across. */
-.x-govuk-ui-table-scroll {
-  margin-bottom: 30px;
-}
 .x-govuk-ui-table {
   width: 100%;
   border-collapse: collapse;

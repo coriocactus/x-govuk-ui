@@ -56,7 +56,8 @@ export type MainWrapperProps = ComponentPropsWithRef<"main"> & {
 
 /**
  * The page's main content, with GOV.UK's spacing above and below. It is the `main` landmark, with
- * the id the skip link goes to.
+ * the id the skip link goes to. It stacks its parts as a Stack does, with
+ * `--x-govuk-ui-space-page` between them, so put running text in a paragraph or in Prose.
  */
 export function MainWrapper({
   size,
@@ -74,7 +75,7 @@ export function MainWrapper({
     props: {
       ...props,
       id,
-      className: `x-govuk-ui-main-wrapper ${className}`.trim(),
+      className: `x-govuk-ui-main-wrapper x-govuk-ui-stack ${className}`.trim(),
       "data-size": large ? "large" : undefined,
     },
   });
@@ -97,7 +98,10 @@ export type GridColumnProps = ComponentPropsWithRef<"div"> & {
   from?: "tablet" | "desktop";
 };
 
-/** One column of a GridRow, in GOV.UK's shares of the row, as quarters, thirds and halves. */
+/**
+ * One column of a GridRow, in GOV.UK's shares of the row, as quarters, thirds and halves. It stacks
+ * its parts as a Stack does, with `--x-govuk-ui-space-page` between them.
+ */
 export function GridColumn({
   width = "full",
   from = "tablet",
@@ -107,7 +111,7 @@ export function GridColumn({
   return (
     <div
       {...props}
-      className={`x-govuk-ui-grid-column ${className}`.trim()}
+      className={`x-govuk-ui-grid-column x-govuk-ui-stack ${className}`.trim()}
       data-width={width}
       data-from={from}
     />
@@ -123,14 +127,30 @@ export type StackProps = ComponentPropsWithRef<"div"> & {
    * GOV.UK puts between a form's fields.
    */
   gap?: Spacing;
+  /**
+   * Renders another element in place of the `div`, such as a `form`. Its parts are then spaced
+   * with no element of your own around them.
+   */
+  render?: useRender.RenderProp;
 };
 
 /**
  * Parts one beneath another, with the same space between each, as a page's fields are. The stack
- * sets the space, so the outer margins of its parts above and below them are left out.
+ * sets the space, so the margins of its parts above and below them are left out. A heading below
+ * the first level keeps 20 pixels beneath it when the gap is larger, as GOV.UK's medium heading
+ * does, so it sits nearer what it heads.
+ *
+ * Parts that hold other parts stack them in the same way, such as MainWrapper, GridColumn,
+ * DialogContent and SheetContent. A stack is for the parts inside anything else, such as a
+ * `section` of your own. Its parts are flex items, so put running text in a paragraph or in Prose.
+ * Text and a link loose in a stack would each take a line of their own.
  */
-export function Stack({ gap = 6, className = "", ...props }: StackProps) {
-  return <div {...props} className={`x-govuk-ui-stack ${className}`.trim()} data-gap={gap} />;
+export function Stack({ gap = 6, render, className = "", ...props }: StackProps) {
+  return useRender({
+    defaultTagName: "div",
+    render,
+    props: { ...props, className: `x-govuk-ui-stack ${className}`.trim(), "data-gap": gap },
+  });
 }
 
 export type InlineProps = ComponentPropsWithRef<"div"> & {
@@ -140,6 +160,8 @@ export type InlineProps = ComponentPropsWithRef<"div"> & {
   wrap?: boolean;
   /** How its parts line up across it. `end` lines up their feet, as a field's and its button's. */
   align?: "start" | "centre" | "end" | "baseline";
+  /** Renders another element in place of the `div`, such as a `ul` of links. */
+  render?: useRender.RenderProp;
 };
 
 /**
@@ -151,16 +173,19 @@ export function Inline({
   gap = 3,
   wrap = false,
   align = "end",
+  render,
   className = "",
   ...props
 }: InlineProps) {
-  return (
-    <div
-      {...props}
-      className={`x-govuk-ui-inline ${className}`.trim()}
-      data-gap={gap}
-      data-wrap={wrap || undefined}
-      data-align={align}
-    />
-  );
+  return useRender({
+    defaultTagName: "div",
+    render,
+    props: {
+      ...props,
+      className: `x-govuk-ui-inline ${className}`.trim(),
+      "data-gap": gap,
+      "data-wrap": wrap || undefined,
+      "data-align": align,
+    },
+  });
 }

@@ -1,7 +1,6 @@
 /* Error summary. GOV.UK's red-edged box above a form, listing each error as a link. */
 .x-govuk-ui-error-summary {
   box-sizing: border-box;
-  margin-bottom: 24px;
   padding: 18px 20px 20px;
   border: 4px solid var(--x-govuk-ui-error);
   border-radius: var(--x-govuk-ui-radius-surface);

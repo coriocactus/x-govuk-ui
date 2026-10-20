@@ -1,14 +1,38 @@
 /* A stack sets its parts one beneath another, and a line sets them side by side. Each spaces its
-   parts by GOV.UK's spacing scale, and leaves out the outer margins of its parts, so the space is
-   the same whatever the parts. A part's own margin, such as a notification banner's, is set at the
-   same specificity, so this file comes after every other part's in styles.css. A margin set in
-   the extensions' later layer would still win, and none of their parts has one. */
+   parts, and leaves out their margins above and below, so the space is the same whatever the parts.
+   Parts that hold other parts stack them too, such as MainWrapper and DialogContent. Each adds this
+   class to its own element, and sets --x-govuk-ui-stack-gap to the space it keeps between them.
+
+   Some parts set a margin inside their own component, such as a Label's beneath it, at the same
+   specificity as a stack's. This file therefore comes after every other part's in styles.css. A
+   margin set in the extensions' later layer, or by a service's own stylesheet, still wins. */
 .x-govuk-ui-stack {
   display: flex;
   flex-direction: column;
+  gap: var(--x-govuk-ui-stack-gap, 30px);
+}
+/* A stack or a line rendered as another element, such as a list, leaves out the browser's margins
+   and the list's markers. These rules add no specificity, so a part's own margin still wins. */
+:where(.x-govuk-ui-stack, .x-govuk-ui-inline) {
+  margin-block: 0;
+}
+:where(.x-govuk-ui-stack, .x-govuk-ui-inline):where(ul, ol) {
+  padding-left: 0;
+  list-style: none;
 }
 .x-govuk-ui-stack > * {
   margin-block: 0;
+}
+/* A stack's display would otherwise show it while it is hidden, such as a tab's panel that is not
+   open, because the browser hides a hidden element with a style of its own. */
+:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[hidden] {
+  display: none;
+}
+/* A heading sits nearer what it heads than what comes before it, as on GOV.UK. Where the gap is
+   more than 20 pixels, a heading below the first level keeps 20 pixels beneath it, as GOV.UK's
+   medium heading does. Its negative margin takes the rest of the gap away. */
+.x-govuk-ui-stack > :where(h2, h3, h4, h5, h6):not(:last-child) {
+  margin-bottom: min(0px, 20px - var(--x-govuk-ui-stack-gap, 30px));
 }
 /* A part that sits in a line of text, such as a Tag, a link or a button, keeps its own width, as in
    a page's column. A column of flex items would stretch it across. */
@@ -65,33 +89,64 @@
 .x-govuk-ui-inline > .x-govuk-ui-button {
   flex-shrink: 0;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="0"] {
-  gap: 0;
+/* GOV.UK's spacing scale. A Stack's gap is the custom property, so its headings can follow it. */
+.x-govuk-ui-stack[data-gap="0"] {
+  --x-govuk-ui-stack-gap: 0px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="1"] {
+.x-govuk-ui-stack[data-gap="1"] {
+  --x-govuk-ui-stack-gap: 5px;
+}
+.x-govuk-ui-stack[data-gap="2"] {
+  --x-govuk-ui-stack-gap: 10px;
+}
+.x-govuk-ui-stack[data-gap="3"] {
+  --x-govuk-ui-stack-gap: 15px;
+}
+.x-govuk-ui-stack[data-gap="4"] {
+  --x-govuk-ui-stack-gap: 20px;
+}
+.x-govuk-ui-stack[data-gap="5"] {
+  --x-govuk-ui-stack-gap: 25px;
+}
+.x-govuk-ui-stack[data-gap="6"] {
+  --x-govuk-ui-stack-gap: 30px;
+}
+.x-govuk-ui-stack[data-gap="7"] {
+  --x-govuk-ui-stack-gap: 40px;
+}
+.x-govuk-ui-stack[data-gap="8"] {
+  --x-govuk-ui-stack-gap: 50px;
+}
+.x-govuk-ui-stack[data-gap="9"] {
+  --x-govuk-ui-stack-gap: 60px;
+}
+.x-govuk-ui-inline[data-gap="0"] {
+  gap: 0px;
+}
+.x-govuk-ui-inline[data-gap="1"] {
   gap: 5px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="2"] {
+.x-govuk-ui-inline[data-gap="2"] {
   gap: 10px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="3"] {
+.x-govuk-ui-inline[data-gap="3"] {
   gap: 15px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="4"] {
+.x-govuk-ui-inline[data-gap="4"] {
   gap: 20px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="5"] {
+.x-govuk-ui-inline[data-gap="5"] {
   gap: 25px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="6"] {
+.x-govuk-ui-inline[data-gap="6"] {
   gap: 30px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="7"] {
+.x-govuk-ui-inline[data-gap="7"] {
   gap: 40px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="8"] {
+.x-govuk-ui-inline[data-gap="8"] {
   gap: 50px;
 }
-:is(.x-govuk-ui-stack, .x-govuk-ui-inline)[data-gap="9"] {
+.x-govuk-ui-inline[data-gap="9"] {
   gap: 60px;
 }

@@ -12,3 +12,8 @@
 .x-govuk-ui-page-body {
   flex: 1 0 auto;
 }
+/* A Back link or Breadcrumbs above the content has GOV.UK's 15 pixels above and below it. The page
+   sets the space, so either one placed elsewhere, such as in a tile, has none of its own. */
+.x-govuk-ui-page-body > :is(.x-govuk-ui-back-link, .x-govuk-ui-breadcrumbs) {
+  margin-block: 15px;
+}

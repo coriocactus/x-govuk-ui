@@ -1471,24 +1471,43 @@ export function TileControls({ className = "", ...props }: ComponentPropsWithRef
 export type TileContentProps = ComponentPropsWithRef<"div"> & {
   /** Scrolls the content in a Scroll area named by the tile's heading, so Tab reaches it. */
   scroll?: boolean;
+  /**
+   * Keeps 16 pixels of space around the content. Turn it off for content that reaches the tile's
+   * edges, such as a table that the tile frames, or a chart that fills it.
+   */
+  padded?: boolean;
 };
 
-/** The tile's content beneath its bar, filling the rest of it. */
+/**
+ * The tile's content beneath its bar, filling the rest of it. It stacks its parts as a Stack does,
+ * with `--x-govuk-ui-space-surface` between them, so put running text in a paragraph. With `scroll`,
+ * they stack inside the Scroll area, which takes the tile's class, style and props.
+ */
 export function TileContent({
   scroll = false,
+  padded = true,
   className = "",
   children,
   ...props
 }: TileContentProps) {
   const { tile } = useTilePart("TileContent");
-  const classes = `x-govuk-ui-tile-content ${className}`.trim();
-  return scroll ? (
-    <ScrollArea {...props} className={classes} labelledBy={tile.headingId} fade>
+  const body = (
+    <div className="x-govuk-ui-tile-body x-govuk-ui-stack" data-padded={padded || undefined}>
       {children}
+    </div>
+  );
+  return scroll ? (
+    <ScrollArea
+      {...props}
+      className={`x-govuk-ui-tile-content ${className}`.trim()}
+      labelledBy={tile.headingId}
+      fade
+    >
+      {body}
     </ScrollArea>
   ) : (
-    <div {...props} className={classes}>
-      {children}
+    <div {...props} className={`x-govuk-ui-tile-content ${className}`.trim()}>
+      {body}
     </div>
   );
 }

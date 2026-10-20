@@ -4,6 +4,18 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Changed TileContent to keep 16 pixels of space around its content, and to stack its parts 20 pixels apart, as a Stack does, in an element inside it, `.x-govuk-ui-tile-body`. With `scroll`, that element is inside the Scroll area. Remove padding of your own, or give `padded={false}` for content that reaches the tile's edges, such as a table that the tile frames. Select the content's parts through `.x-govuk-ui-tile-body`, not as children of `.x-govuk-ui-tile-content`. Put running text that sits loose in it in a paragraph.
+
+### Visual
+
+- Changed TileContent to keep 16 pixels of space around its content, and 20 pixels between its parts.
+
+### Added
+
+- Added `padded` to TileContent, which keeps 16 pixels of space around the content unless it is false.
+
 ## [0.4.0] - 2026-10-14
 
 ### Visual

@@ -92,6 +92,20 @@
   --x-govuk-ui-radius-surface: 8px;
   /* Large boxes that frame other parts, such as a data table or a card of questions. */
   --x-govuk-ui-radius-large: 10px;
+
+  /* Space. A part sets no space outside its own box. The box it sits in sets the space between its
+     parts. */
+  /* Between the parts of a page, such as its fields, as GOV.UK spaces its form groups. 20 pixels on
+     a phone and 30 from tablet width. MainWrapper, GridColumn and Form keep it. */
+  --x-govuk-ui-space-page: 20px;
+  /* Between the parts in a surface, such as a dialog, a sheet, a tab's panel or a tile. 20 pixels,
+     as GOV.UK leaves beneath a medium heading. */
+  --x-govuk-ui-space-surface: 20px;
+}
+@media (min-width: 40.0625em) {
+  :root {
+    --x-govuk-ui-space-page: 30px;
+  }
 }
 [data-theme="light"] {
   color-scheme: light;
@@ -151,6 +165,7 @@
   left: 0;
   width: 1px;
   height: 1px;
+  margin: 0;
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;

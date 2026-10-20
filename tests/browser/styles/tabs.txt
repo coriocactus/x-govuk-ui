@@ -1,3 +1,13 @@
+.x-govuk-ui-stack
+  display: flex
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  color: rgb(11, 12, 12)
+  padding-top: 24px
+  padding-bottom: 8px
+  row-gap: 20px
+  column-gap: 20px
 .x-govuk-ui-tabs
   display: block
   font-size: 14px
@@ -33,13 +43,15 @@
   column-gap: 4px
   border-bottom: 1px solid rgb(206, 206, 206)
 .x-govuk-ui-tabs-panel
-  display: block
+  display: flex
   font-size: 14px
   font-weight: 400
   line-height: 1.5
   color: rgb(11, 12, 12)
   padding-top: 24px
   padding-bottom: 8px
+  row-gap: 20px
+  column-gap: 20px
 .x-govuk-ui-tabs-trigger
   display: block
   font-size: 17px

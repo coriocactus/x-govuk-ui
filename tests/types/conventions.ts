@@ -20,6 +20,7 @@ import type {
   notRouted,
   ownWords,
   reportedBy,
+  spaced,
   unchecked,
   unstyled,
 } from "./exceptions";
@@ -66,6 +67,7 @@ type Boxed = (typeof boxed)[number];
 type NotRouted = (typeof notRouted)[number];
 type OwnWords = typeof ownWords;
 type ReportedBy = typeof reportedBy;
+type Spaced = typeof spaced;
 type Unchecked = (typeof unchecked)[keyof typeof unchecked][number];
 
 /** Every name the exceptions list is a part that a package exports. */
@@ -78,7 +80,8 @@ export type UnknownExceptions = None<
     | NotRouted
     | Unchecked
     | keyof OwnWords
-    | keyof ReportedBy,
+    | keyof ReportedBy
+    | keyof Spaced,
     keyof Components
   >
 >;

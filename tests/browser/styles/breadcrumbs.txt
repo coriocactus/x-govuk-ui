@@ -4,8 +4,6 @@
   font-weight: 400
   line-height: 1.25
   color: rgb(11, 12, 12)
-  margin-top: 15px
-  margin-bottom: 15px
 .x-govuk-ui-breadcrumbs-ellipsis
   display: grid
   font-size: 16px

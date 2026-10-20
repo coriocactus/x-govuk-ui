@@ -27,7 +27,7 @@
 /* The main content, with GOV.UK's spacing above and below, and more above when nothing sits
    there. */
 .x-govuk-ui-main-wrapper {
-  display: block;
+  --x-govuk-ui-stack-gap: var(--x-govuk-ui-space-page);
   padding-block: 20px;
 }
 .x-govuk-ui-main-wrapper[data-size="large"] {
@@ -60,6 +60,7 @@
   gap: 20px clamp(0px, (100% - 559px) * 1000, 30px);
 }
 .x-govuk-ui-grid-column {
+  --x-govuk-ui-stack-gap: var(--x-govuk-ui-space-page);
   grid-column: span 12;
   min-width: 0;
 }

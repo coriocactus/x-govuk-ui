@@ -5,7 +5,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 15px;
-  margin: 0 0 30px;
+  margin: 0;
   font-family: var(--x-govuk-ui-font);
   font-size: 17px;
   line-height: 1.25;

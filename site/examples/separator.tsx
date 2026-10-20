@@ -1,4 +1,4 @@
-import { Separator } from "x-govuk-ui";
+import { Prose, Separator } from "x-govuk-ui";
 
 type Props = {
   orientation?: "horizontal" | "vertical";
@@ -20,12 +20,12 @@ export default function SeparatorExample({
       </p>
     );
   return (
-    <div className="preview-prose">
+    <Prose>
       <h2>Before you start</h2>
       <p>You’ll need your National Insurance number and your passport.</p>
       <Separator spacing={spacing} />
       <h2>What happens next</h2>
       <p>We’ll email you within 5 working days.</p>
-    </div>
+    </Prose>
   );
 }

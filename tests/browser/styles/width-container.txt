@@ -1,9 +1,11 @@
 .x-govuk-ui-grid-column
-  display: block
+  display: flex
   font-size: 14px
   font-weight: 400
   line-height: 1.5
   color: rgb(11, 12, 12)
+  row-gap: 30px
+  column-gap: 30px
 .x-govuk-ui-grid-row
   display: grid
   font-size: 14px

@@ -4,7 +4,6 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 15px 0;
   color: var(--x-govuk-ui-text);
   font-family: var(--x-govuk-ui-font);
   font-size: 16px;

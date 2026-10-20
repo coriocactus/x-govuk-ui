@@ -100,6 +100,15 @@ test("tiles resize from their dividers, move by a drag or their menus, split, ma
   const tile = (id: string) => frame.locator(`[data-tile-id="${id}"]`);
   const box = async (id: string) => (await tile(id).boundingBox())!;
   const live = frame.locator('.x-govuk-ui-tiles [aria-live="polite"]');
+  // A tile's content keeps 16 pixels of space around it, and stacks its parts 20 pixels apart.
+  const content = tile("application").locator(".x-govuk-ui-tile-body");
+  await expect(content).toHaveCSS("padding-top", "16px");
+  expect(
+    await content.evaluate((element) => {
+      const [list, link] = [...element.children] as HTMLElement[];
+      return list && link ? link.offsetTop - (list.offsetTop + list.offsetHeight) : 0;
+    }),
+  ).toBe(20);
   // Each divider is a window splitter for the tiles before it, in pixels. The arrow keys move it,
   // and the tile follows. Home and End take it to its limits, and a double-click shares the space
   // evenly.

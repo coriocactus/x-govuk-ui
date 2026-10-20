@@ -17,6 +17,7 @@ import {
   EmptyStateActions,
   EmptyStateDescription,
   EmptyStateTitle,
+  Link,
   SummaryList,
   SummaryListRow,
   Tag,
@@ -133,7 +134,7 @@ export default function TilesExample({
             </>
           }
         >
-          <TileContent scroll className="preview-tile">
+          <TileContent scroll>
             {id === "application" && (
               <SummaryList>
                 <SummaryListRow label="Applicant">David Lloyd George</SummaryListRow>
@@ -144,6 +145,7 @@ export default function TilesExample({
                 <SummaryListRow label="Concession">Senior</SummaryListRow>
               </SummaryList>
             )}
+            {id === "application" && <Link href="#application">View the whole application</Link>}
             {id === "evidence" && (
               <ul className="preview-tile-list">
                 <li>Passport, photo page (JPEG, 1.2 MB)</li>

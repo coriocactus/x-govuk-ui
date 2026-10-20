@@ -17,11 +17,10 @@
   pointer-events: none;
 }
 .x-govuk-ui-sheet {
+  --x-govuk-ui-stack-gap: var(--x-govuk-ui-space-surface);
   position: fixed;
   z-index: var(--x-govuk-ui-layer-overlay);
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
   /* Space for a title, text and controls. A Sidebar or a Scroll area that fills the sheet removes
      the padding. */
   padding: 26px 24px 24px;
@@ -83,15 +82,20 @@
   line-height: 1.25;
 }
 .x-govuk-ui-sheet-description {
-  margin: 8px 0 24px;
+  margin: 0;
   color: var(--x-govuk-ui-muted);
   font-size: 16px;
   line-height: 1.5;
 }
-/* Buttons sit at the foot of a sheet from the side. */
-.x-govuk-ui-sheet .x-govuk-ui-button-group {
+/* Its description is a line 8 pixels beneath its title, as a subtitle is. The sheet stacks its parts,
+   and its title is a heading, which keeps at most 20 pixels beneath it in a stack. The line takes
+   back the rest. */
+.x-govuk-ui-sheet > .x-govuk-ui-sheet-title + .x-govuk-ui-sheet-description {
+  margin-top: calc(8px - min(20px, var(--x-govuk-ui-stack-gap)));
+}
+/* Its own buttons sit at its foot, at least a surface's space below what is above them. */
+.x-govuk-ui-sheet > .x-govuk-ui-button-group {
   margin-top: auto;
-  padding-top: 24px;
 }
 .x-govuk-ui-sheet-close {
   position: absolute;

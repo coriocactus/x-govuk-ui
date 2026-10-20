@@ -71,6 +71,18 @@ export const boxed = [
 ] as const;
 
 /**
+ * Parts that may set space outside their own box, each with its reason. The sweep,
+ * `tests/browser/sweep.spec.ts`, fails on any other part with a margin above or below of its own,
+ * because the box a part sits in sets the space around it.
+ */
+export const spaced = {
+  Separator:
+    "Its `spacing` asks for space above and below it, as GOV.UK's section break does. A vertical one is inset a little from the top and foot of its row.",
+  Label: "It keeps GOV.UK's space beneath it, above the control it names, in any field.",
+  Hint: "It keeps GOV.UK's space beneath it, above the control it describes, in any field.",
+} as const;
+
+/**
  * Links to a place on the same page, or away from the service, which no router follows. FormSteps'
  * Back goes to the step before, on the same page. Every other part that renders a link takes
  * `render`, for a router's link.

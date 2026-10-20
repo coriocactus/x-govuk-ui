@@ -84,7 +84,11 @@ export type SheetContentProps = ComponentPropsWithRef<"div"> & {
   finalFocus?: Primitive.Popup.Props["finalFocus"];
 };
 
-/** The sheet itself, at its edge over a dimmed page, which fades as the sheet is swiped away. */
+/**
+ * The sheet itself, at its edge over a dimmed page, which fades as the sheet is swiped away. It
+ * stacks its parts as a Stack does, with `--x-govuk-ui-space-surface` between them. Its description
+ * sits close beneath its title, and a ButtonGroup among its parts sits at its foot.
+ */
 export function SheetContent({
   label,
   closeButton = false,
@@ -102,7 +106,7 @@ export function SheetContent({
       <Primitive.Viewport className="x-govuk-ui-sheet-viewport">
         <Primitive.Popup
           {...props}
-          className={`x-govuk-ui-sheet ${className}`.trim()}
+          className={`x-govuk-ui-sheet x-govuk-ui-stack ${className}`.trim()}
           data-side={side}
           aria-label={label}
           initialFocus={initialFocus}

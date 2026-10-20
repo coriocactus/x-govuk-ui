@@ -102,12 +102,15 @@ export function TabsTrigger({
 
 export type TabsPanelProps = ComponentPropsWithRef<"div"> & { value: string; children: ReactNode };
 
-/** The content of one tab. It replaces the previous tab's content at once. */
+/**
+ * The content of one tab. It replaces the previous tab's content at once. It stacks its parts as a
+ * Stack does, with `--x-govuk-ui-space-surface` between them, so put running text in a paragraph.
+ */
 export function TabsPanel({ value, children, className = "", ...props }: TabsPanelProps) {
   return (
     <Primitive.Panel
       {...props}
-      className={`x-govuk-ui-tabs-panel ${className}`.trim()}
+      className={`x-govuk-ui-tabs-panel x-govuk-ui-stack ${className}`.trim()}
       value={value}
     >
       {children}

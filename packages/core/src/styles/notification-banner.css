@@ -2,7 +2,6 @@
    important and green for success. A success banner arrives from a little above. */
 .x-govuk-ui-notification-banner {
   --x-govuk-ui-banner-colour: var(--x-govuk-ui-brand);
-  margin-bottom: 30px;
   overflow: hidden;
   border: 4px solid var(--x-govuk-ui-banner-colour);
   border-radius: var(--x-govuk-ui-radius-surface);

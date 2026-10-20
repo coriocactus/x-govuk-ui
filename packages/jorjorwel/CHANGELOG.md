@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Changed
 
+- Changed the Base UI peer dependency to `~1.8.0 || ~1.9.0`, from `~1.8.0`, so a service can install Base UI 1.9 too.
 - Changed the Motion peer dependency to `^14.0.0`, from `~14.0.0`, so a service can install any Motion 14 from 14.0.0, such as the one another of its dependencies needs.
 
 ## [0.4.0] - 2026-10-14

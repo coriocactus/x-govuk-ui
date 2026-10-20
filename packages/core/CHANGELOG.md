@@ -49,6 +49,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Changed SidebarText to take its place last in SidebarContent too, at the foot of the rows, where it lines up with the groups' labels. In a sidebar that narrows to its icons, it keeps its width there as it does in SidebarHeader and SidebarFooter, so its words do not reflow.
 - Changed Timeline to open events added beneath the others quietly. Only an event that arrives above the others draws out its tick and plays the notification sound.
+- Changed the Base UI peer dependency to `~1.8.0 || ~1.9.0`, from `~1.8.0`, so a service can install Base UI 1.9 too.
 - Changed the Motion peer dependency to `^14.0.0`, from `~14.0.0`, so a service can install any Motion 14 from 14.0.0, such as the one another of its dependencies needs.
 
 ### Fixed

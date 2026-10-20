@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Button, Input } from "x-govuk-ui";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { Button, Input, Stack } from "x-govuk-ui";
 
 type Props = {
   label?: string;
@@ -35,35 +35,34 @@ export default function InputExample({
   const [status, setStatus] = useState("");
   useEffect(() => setProblem(errorMessage), [errorMessage]);
 
+  const send = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!field.current?.validity.valid) {
+      setProblem(
+        field.current?.validity.valueMissing
+          ? "Enter your email address."
+          : "Enter an email address in the correct format.",
+      );
+      setStatus("");
+      field.current?.focus();
+      return;
+    }
+    if (password !== "off" && (secret.current?.value.length ?? 0) < 8) {
+      setPasswordProblem("Enter a password that is at least 8 characters long.");
+      setStatus("");
+      secret.current?.focus();
+      return;
+    }
+    setProblem("");
+    setStatus(
+      password === "off"
+        ? "Your email address is ready to use. No information was sent."
+        : "Your account details are ready to use. No information was sent.",
+    );
+  };
+
   return (
-    <form
-      noValidate
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!field.current?.validity.valid) {
-          setProblem(
-            field.current?.validity.valueMissing
-              ? "Enter your email address."
-              : "Enter an email address in the correct format.",
-          );
-          setStatus("");
-          field.current?.focus();
-          return;
-        }
-        if (password !== "off" && (secret.current?.value.length ?? 0) < 8) {
-          setPasswordProblem("Enter a password that is at least 8 characters long.");
-          setStatus("");
-          secret.current?.focus();
-          return;
-        }
-        setProblem("");
-        setStatus(
-          password === "off"
-            ? "Your email address is ready to use. No information was sent."
-            : "Your account details are ready to use. No information was sent.",
-        );
-      }}
-    >
+    <Stack render={<form noValidate onSubmit={send} />}>
       <Input
         ref={field}
         id="email"
@@ -88,33 +87,29 @@ export default function InputExample({
         readOnly={readOnly}
       />
       {password !== "off" && (
-        <div className="preview-field-gap">
-          <Input
-            ref={secret}
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            label="Create a password"
-            hint="It must be at least 8 characters long."
-            strength={password === "strength"}
-            onChange={() => {
-              setPasswordProblem("");
-              setStatus("");
-            }}
-            errorMessage={passwordProblem}
-            disabled={disabled}
-          />
-        </div>
+        <Input
+          ref={secret}
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          label="Create a password"
+          hint="It must be at least 8 characters long."
+          strength={password === "strength"}
+          onChange={() => {
+            setPasswordProblem("");
+            setStatus("");
+          }}
+          errorMessage={passwordProblem}
+          disabled={disabled}
+        />
       )}
-      <div className="preview-actions">
-        <Button type="submit" disabled={disabled}>
-          Continue
-        </Button>
-      </div>
+      <Button type="submit" disabled={disabled}>
+        Continue
+      </Button>
       <p className="preview-message" role="status" data-success={status ? "" : undefined}>
         {status}
       </p>
-    </form>
+    </Stack>
   );
 }

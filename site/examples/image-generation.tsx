@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, ImageGeneration } from "x-govuk-ui";
+import { Button, ImageGeneration, Stack } from "x-govuk-ui";
 
 type Props = { seconds?: number; progress?: boolean; preview?: boolean };
 
@@ -36,7 +36,7 @@ export default function ImageGenerationExample({
 
   const working = run > 0 && !made;
   return (
-    <div className="preview-image-generation">
+    <Stack gap={3}>
       <p className="preview-image-prompt">
         “A poster of Battersea Power Station at dusk, for a walking tour.”
       </p>
@@ -55,6 +55,6 @@ export default function ImageGenerationExample({
         </Button>
         <span className="preview-image-credit">Photo by Alberto Pascual</span>
       </div>
-    </div>
+    </Stack>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Progress } from "x-govuk-ui";
+import { Button, Progress, Stack } from "x-govuk-ui";
 
 type Props = {
   showValue?: boolean;
@@ -20,7 +20,7 @@ export default function ProgressExample({ showValue = true, indeterminate = fals
     return () => clearTimeout(timer);
   }, [running, value]);
   return (
-    <div className="preview-progress">
+    <Stack gap={4}>
       <Progress
         label="Uploading floor-plan.pdf"
         value={indeterminate ? null : value}
@@ -37,6 +37,6 @@ export default function ProgressExample({ showValue = true, indeterminate = fals
       >
         {value === 100 ? "Upload again" : "Upload"}
       </Button>
-    </div>
+    </Stack>
   );
 }

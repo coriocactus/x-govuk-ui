@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Tag, type TagColour } from "x-govuk-ui";
+import { Button, Stack, Tag, type TagColour } from "x-govuk-ui";
 
 const stages: [string, TagColour][] = [
   ["Received", "blue"],
@@ -19,7 +19,7 @@ export default function TagExample({ outline = false }: { outline?: boolean }) {
   const [stage, setStage] = useState(0);
   const [status, colour] = stages[stage]!;
   return (
-    <div className="preview-statuses">
+    <Stack gap={4}>
       <ul className="preview-pairs-list">
         <li>
           <span>Liz Truss</span>
@@ -43,6 +43,6 @@ export default function TagExample({ outline = false }: { outline?: boolean }) {
       >
         Move Liz’s application on
       </Button>
-    </div>
+    </Stack>
   );
 }

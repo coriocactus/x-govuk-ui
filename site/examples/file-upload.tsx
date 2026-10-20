@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Button, FileUpload } from "x-govuk-ui";
+import { type FormEvent, useEffect, useState } from "react";
+import { Button, FileUpload, Stack } from "x-govuk-ui";
 
 type Props = {
   label?: string;
@@ -23,26 +23,23 @@ export default function FileUploadExample({
   const [problem, setProblem] = useState(errorMessage);
   const [status, setStatus] = useState("");
   useEffect(() => setProblem(errorMessage), [errorMessage]);
+  const send = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!files.length) {
+      setProblem(multiple ? "Select at least one file." : "Select a file.");
+      setStatus("");
+      return;
+    }
+    if (files.some((file) => file.size > 10 * 1024 * 1024)) {
+      setProblem("The file must be smaller than 10 MB.");
+      return;
+    }
+    setProblem("");
+    setStatus(`${files.length === 1 ? "Your file is" : "Your files are"} ready. Nothing was sent.`);
+  };
+
   return (
-    <form
-      noValidate
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!files.length) {
-          setProblem(multiple ? "Select at least one file." : "Select a file.");
-          setStatus("");
-          return;
-        }
-        if (files.some((file) => file.size > 10 * 1024 * 1024)) {
-          setProblem("The file must be smaller than 10 MB.");
-          return;
-        }
-        setProblem("");
-        setStatus(
-          `${files.length === 1 ? "Your file is" : "Your files are"} ready. Nothing was sent.`,
-        );
-      }}
-    >
+    <Stack render={<form noValidate onSubmit={send} />}>
       <FileUpload
         id="passport"
         name="passport"
@@ -62,14 +59,12 @@ export default function FileUploadExample({
           setProblem("");
         }}
       />
-      <div className="preview-actions">
-        <Button type="submit" disabled={disabled}>
-          Continue
-        </Button>
-      </div>
+      <Button type="submit" disabled={disabled}>
+        Continue
+      </Button>
       <p className="preview-message" role="status">
         {status}
       </p>
-    </form>
+    </Stack>
   );
 }

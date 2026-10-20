@@ -161,9 +161,12 @@
   margin-top: 6px;
 }
 /* Headings and paragraphs, for examples that divide or reveal text. */
+.preview-prose h2 {
+  margin: 0 0 10px;
+}
+/* A tab's panel spaces its own parts, so its heading has no margin of its own. */
 .preview-prose h2,
 .preview-panel-heading {
-  margin: 0 0 10px;
   font-size: 24px;
   line-height: 1.25;
 }
@@ -282,19 +285,6 @@
 }
 .preview-example--notification-banner > .x-govuk-ui-button {
   width: auto;
-}
-.preview-stack {
-  display: grid;
-  justify-items: start;
-}
-.preview-statuses,
-.preview-progress {
-  display: grid;
-  justify-items: start;
-  gap: 20px;
-}
-.preview-progress > .x-govuk-ui-progress {
-  width: 100%;
 }
 .preview-pairs-list {
   width: 100%;
@@ -426,9 +416,6 @@
 .preview-exit .preview-hint {
   margin: 0;
 }
-.preview-field-gap {
-  margin-top: 24px;
-}
 .preview-calendar {
   display: grid;
   justify-items: center;
@@ -455,11 +442,6 @@
   right: auto;
   width: max-content;
   max-width: min(460px, 90vw);
-}
-/* Fields in a column, as a form sets them. */
-.preview-stack {
-  display: grid;
-  gap: 24px;
 }
 .preview-postcode {
   max-width: 10em;
@@ -512,11 +494,6 @@
 }
 .preview-chat-input {
   position: relative;
-}
-.preview-streaming {
-  display: grid;
-  justify-items: start;
-  gap: 20px;
 }
 .preview-streaming-text,
 .preview-citation-text {
@@ -631,10 +608,6 @@
 .preview-card-media {
   height: 140px;
 }
-.preview-items {
-  display: grid;
-  gap: 12px;
-}
 .preview-avatars {
   display: flex;
   align-items: center;
@@ -717,17 +690,6 @@
 }
 .preview-service-card .x-govuk-ui-card-media {
   height: 180px;
-}
-.preview-actions {
-  margin-top: 24px;
-}
-.preview-actions .x-govuk-ui-button {
-  gap: 28px;
-}
-.preview-actions .x-govuk-ui-button-label {
-  display: flex;
-  align-items: center;
-  gap: 30px;
 }
 /* Status text sits below the example without taking up space, so nothing above it moves. */
 .preview-example {
@@ -1054,22 +1016,11 @@
   border-radius: inherit;
   background: var(--x-govuk-ui-brand);
 }
-/* Timeline. The button that adds the next update sits above the history. */
-.preview-timeline {
-  display: grid;
-  justify-items: start;
-  gap: 24px;
-}
 /* QR code. The code above the address it contains. */
 .preview-qr {
   display: grid;
   justify-items: center;
   gap: 24px;
-}
-/* Image generation. The prompt above the frame, and the button and credit beneath it. */
-.preview-image-generation {
-  display: grid;
-  gap: 14px;
 }
 .preview-image-prompt {
   margin: 0;
@@ -1404,16 +1355,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 20px;
-}
-
-/* Form in stages. A short survey set into a page, with a way to start again beneath it. */
-.preview-survey {
-  display: grid;
-  justify-items: start;
-  gap: 16px;
-}
-.preview-survey > .x-govuk-ui-form-steps {
-  justify-self: stretch;
 }
 
 /* The workbench's own page, with how many components there are, how to find one, and every

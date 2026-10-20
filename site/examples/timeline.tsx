@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Link, Timeline, TimelineItem, TimelineMore } from "x-govuk-ui";
+import { Button, Link, Stack, Timeline, TimelineItem, TimelineMore } from "x-govuk-ui";
 
 type Event = { id: string; title: string; by: string; date: Date; description: string };
 
@@ -96,7 +96,7 @@ export default function TimelineExample() {
     }, 400);
   };
   return (
-    <div className="preview-timeline">
+    <Stack gap={5}>
       <Button
         variant="outline"
         size="small"
@@ -132,6 +132,6 @@ export default function TimelineExample() {
         ))}
         {loaded < history.length && <TimelineMore loading={loading} onClick={loadEarlier} />}
       </Timeline>
-    </div>
+    </Stack>
   );
 }

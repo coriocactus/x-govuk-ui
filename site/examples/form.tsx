@@ -19,6 +19,7 @@ import {
   SelectItem,
   ServicePage,
   Slider,
+  Stack,
   Switch,
   Textarea,
   ToggleGroup,
@@ -444,7 +445,7 @@ function FeedbackInStages({
   const [run, setRun] = useState(0);
   const failed = useRef(false);
   return (
-    <div className="preview-survey">
+    <Stack gap={3}>
       <FormSteps
         // Start again begins a new survey.
         key={run}
@@ -512,6 +513,6 @@ function FeedbackInStages({
       >
         Start again
       </Button>
-    </div>
+    </Stack>
   );
 }

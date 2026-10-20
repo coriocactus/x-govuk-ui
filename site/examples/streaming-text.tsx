@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, StreamingText } from "x-govuk-ui";
+import { Button, Stack, StreamingText } from "x-govuk-ui";
 
 type Props = { speed?: number; instant?: boolean };
 
@@ -11,7 +11,7 @@ export default function StreamingTextExample({ speed = 30, instant = false }: Pr
   const [run, setRun] = useState(0);
   const [complete, setComplete] = useState(false);
   return (
-    <div className="preview-streaming">
+    <Stack gap={4}>
       <p className="preview-streaming-text">
         <StreamingText
           key={`${run}-${speed}-${instant}`}
@@ -35,6 +35,6 @@ export default function StreamingTextExample({ speed = 30, instant = false }: Pr
       >
         Replay
       </Button>
-    </div>
+    </Stack>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, ErrorSummary, ErrorSummaryItem, Input, Radio, Radios } from "x-govuk-ui";
+import { Button, ErrorSummary, ErrorSummaryItem, Input, Radio, Radios, Stack } from "x-govuk-ui";
 
 type Problems = { email?: string; contact?: string };
 
@@ -47,7 +47,7 @@ export default function ErrorSummaryExample({ title = "There is a problem", auto
           </ErrorSummary>
         </div>
       )}
-      <div className="preview-stack">
+      <Stack>
         <Input
           id="email"
           label="Email address"
@@ -76,10 +76,8 @@ export default function ErrorSummaryExample({ title = "There is a problem", auto
           <Radio value="email">Email</Radio>
           <Radio value="phone">Phone</Radio>
         </Radios>
-      </div>
-      <div className="preview-actions">
         <Button type="submit">Continue</Button>
-      </div>
+      </Stack>
       <p className="preview-message" role="status" data-success={status ? "" : undefined}>
         {status}
       </p>

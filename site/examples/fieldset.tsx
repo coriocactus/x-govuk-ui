@@ -1,4 +1,4 @@
-import { Fieldset, Input } from "x-govuk-ui";
+import { Fieldset, Input, Stack } from "x-govuk-ui";
 
 type Props = {
   legend?: string;
@@ -24,12 +24,12 @@ export default function FieldsetExample({
       hint={hint || undefined}
       errorMessage={errorMessage || undefined}
     >
-      <div className="preview-stack">
+      <Stack>
         <Input label="Address line 1" autoComplete="address-line1" />
         <Input label="Address line 2 (optional)" autoComplete="address-line2" />
         <Input label="Town or city" autoComplete="address-level2" />
         <Input label="Postcode" autoComplete="postal-code" className="preview-postcode" />
-      </div>
+      </Stack>
     </Fieldset>
   );
 }

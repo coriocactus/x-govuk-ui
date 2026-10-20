@@ -8,6 +8,7 @@ import {
   ItemGroup,
   ItemMedia,
   ItemTitle,
+  Stack,
 } from "x-govuk-ui";
 
 type Props = { outline?: boolean; actions?: boolean };
@@ -38,11 +39,11 @@ export default function ItemExample({ outline = false, actions = true }: Props) 
     </Item>
   );
   return outline ? (
-    <div className="preview-items">
+    <Stack gap={3}>
       {people.map((person) => (
         <div key={person.name}>{item(person)}</div>
       ))}
-    </div>
+    </Stack>
   ) : (
     <ItemGroup>
       {people.map((person) => (

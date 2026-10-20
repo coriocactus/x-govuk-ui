@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Button, Textarea } from "x-govuk-ui";
+import { type FormEvent, useEffect, useState } from "react";
+import { Button, Stack, Textarea } from "x-govuk-ui";
 
 export default function TextareaExample({
   label = "Can you provide more detail?",
@@ -30,25 +30,24 @@ export default function TextareaExample({
   const [status, setStatus] = useState("");
   useEffect(() => setProblem(errorMessage), [errorMessage]);
 
+  const send = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!detail.trim()) {
+      setProblem("Enter more detail.");
+      setStatus("");
+      return;
+    }
+    if (characterLimit && detail.length > characterLimit) {
+      setProblem(`Your answer must be ${characterLimit} characters or fewer.`);
+      setStatus("");
+      return;
+    }
+    setProblem("");
+    setStatus("Thank you. No information was sent.");
+  };
+
   return (
-    <form
-      noValidate
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!detail.trim()) {
-          setProblem("Enter more detail.");
-          setStatus("");
-          return;
-        }
-        if (characterLimit && detail.length > characterLimit) {
-          setProblem(`Your answer must be ${characterLimit} characters or fewer.`);
-          setStatus("");
-          return;
-        }
-        setProblem("");
-        setStatus("Thank you. No information was sent.");
-      }}
-    >
+    <Stack render={<form noValidate onSubmit={send} />}>
       <Textarea
         id="more-detail"
         name="more-detail"
@@ -69,14 +68,12 @@ export default function TextareaExample({
         disabled={disabled}
         characterLimit={characterLimit || undefined}
       />
-      <div className="preview-actions">
-        <Button type="submit" disabled={disabled}>
-          Continue
-        </Button>
-      </div>
+      <Button type="submit" disabled={disabled}>
+        Continue
+      </Button>
       <p className="preview-message" role="status" data-success={status ? "" : undefined}>
         {status}
       </p>
-    </form>
+    </Stack>
   );
 }

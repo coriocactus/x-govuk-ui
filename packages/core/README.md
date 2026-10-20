@@ -10,7 +10,7 @@ x-govuk-ui is a React component library based on the GOV.UK Design System, built
 npm install x-govuk-ui
 ```
 
-The library needs React 19. It is built on Base UI and Motion, and takes each as a peer dependency, at the patches of the version it is tested with, such as `~1.8.0`. A service that uses either one itself therefore shares the library's copy, and can take its patches without waiting for a release. npm installs them, unless `--legacy-peer-deps` tells it not to. In that case, install them yourself, at the versions in `package.json`.
+The library needs React 19. It is built on Base UI and Motion, and takes each as a peer dependency, so a service that uses either one itself shares the library's copy. The library takes any Motion 14 from 14.0.0, so it can share Motion with the service's other dependencies too. It takes Base UI only at the minor versions it is tested with, and their patches, because a new minor version of Base UI can change what the library relies on. `package.json` gives each range. npm installs them, unless `--legacy-peer-deps` tells it not to. In that case, install them yourself, within those ranges.
 
 ## Usage
 

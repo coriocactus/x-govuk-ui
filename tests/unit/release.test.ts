@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { notes, parse, SECTIONS, stamp } from "../../scripts/changelog";
-import { PEERS, patchRange } from "../../scripts/peers";
+import { floorOf, PEERS } from "../../scripts/peers";
 import { isPatch, releaseManifest, stalePeers } from "../../scripts/release";
 import { packages } from "../../scripts/stage";
 
@@ -35,26 +35,34 @@ test("each extension takes core at exactly core's version", async () => {
   ]);
 });
 
-test("each package takes Base UI and Motion as peers at the patches of the versions it is tested with", async () => {
+test("each package takes Base UI and Motion at core's range, whose lowest version every check tests", async () => {
   const { devDependencies: tested } = await Bun.file("package.json").json();
+  const core = await Bun.file("packages/core/package.json").json();
   const found: string[] = [];
+  // The lowest version a service may have is the one the repository pins, so every check runs
+  // with it. The Peers workflow tests the newest.
+  for (const name of PEERS) {
+    const range: string = core.peerDependencies[name];
+    const tests = floorOf(range) === tested[name] && Bun.semver.satisfies(tested[name], range);
+    found.push(`core's range ${name}@${tests}`);
+  }
   for (const directory of packages) {
     const manifest = await Bun.file(`${directory}/package.json`).json();
     for (const field of ["dependencies", "peerDependencies", "devDependencies"])
       for (const name of PEERS) {
         const version = manifest[field]?.[name];
-        const wanted = field === "peerDependencies" ? patchRange(tested[name]) : tested[name];
+        const wanted = field === "peerDependencies" ? core.peerDependencies[name] : tested[name];
         if (version) found.push(`${directory} ${field} ${name}@${version === wanted}`);
       }
   }
   expect(found.filter((entry) => entry.endsWith("@false"))).toEqual([]);
   // Core takes Base UI and Motion as peers, so a service that uses them has one copy of each,
   // whose contexts the library's parts and its own share.
-  const core = await Bun.file("packages/core/package.json").json();
-  for (const name of PEERS) {
-    expect(core.peerDependencies[name]).toBe(patchRange(tested[name]));
-    expect(core.dependencies[name]).toBeUndefined();
-  }
+  for (const name of PEERS) expect(core.dependencies[name]).toBeUndefined();
+  // A range's lowest version is read from a range that starts with one.
+  expect(
+    ["~1.8.0", "^14.0.0", "~1.8.0 || ~1.9.0", ">=1.8.0 <1.10.0", "1.8.0", ">1.8.0"].map(floorOf),
+  ).toEqual(["1.8.0", "14.0.0", "1.8.0", "1.8.0", undefined, undefined]);
 });
 
 test("each package keeps a changelog that ships with it, with a section for its version", async () => {

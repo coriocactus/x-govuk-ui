@@ -4,6 +4,14 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Removed the 30 pixels of margin beneath BarList, which came from x-govuk-ui's Table. The box it sits in now spaces it, as it spaces a Table. Put it in a box that stacks its parts, such as a GridColumn or a Stack.
+
+### Visual
+
+- Changed Chart's heat map to end at its table, without 30 pixels of margin beneath it. Its source is now 10 pixels beneath the table, as it is beneath any other chart's plot. Each heat map in a ChartSet ends at its table too.
+
 ### Fixed
 
 - Fixed the charts' styles depending on loading after x-govuk-ui's stylesheet to overrule its rules. They are now in the `x-govuk-ui-extensions` cascade layer, after x-govuk-ui's, as the Editor's are, so they overrule its rules whichever stylesheet loads first. A service's own rules still overrule both.

@@ -6,9 +6,9 @@ import { packages } from "./stage";
 // takes core at exactly that version, because `x-govuk-ui/internal` changes without a release
 // saying so. It first checks the version against the changes: anything that can break a service
 // needs a minor version. Then it stamps each changelog's unreleased entries with the version, and
-// refreshes bun.lock, from which `bun pm pack` reads the workspace's versions. It fails if bun.lock
-// still lists core as a peer at another version. Push main afterwards, and the release workflow
-// stages each package on npm for you to approve.
+// refreshes bun.lock, from which `bun pm pack` reads the workspace's versions. If a step after the
+// checks fails, every file it changed goes back as it was, so the release can run again. Push main
+// afterwards, and the release workflow stages each package on npm for you to approve.
 //
 //   bun run release 0.3.0
 
@@ -29,7 +29,8 @@ export function isPatch(from: string, to: string) {
 
 /**
  * The packages whose copy in bun.lock lists core as a peer at another version. bun.lock keeps a
- * copy of each package's dependencies, and `bun install` can leave that copy's peers as they were.
+ * copy of each package's dependencies. One `bun install` updates the copy's version, but leaves
+ * its peers as they were.
  */
 export function stalePeers(lock: string, version: string) {
   const { workspaces } = Bun.JSONC.parse(lock) as {
@@ -81,18 +82,34 @@ if (import.meta.main) {
   if (problems.length) throw new Error(`Not released:\n${problems.join("\n")}`);
 
   const date = new Date().toISOString().slice(0, 10);
-  for (const directory of packages) {
-    const manifest = Bun.file(`${directory}/package.json`);
-    await Bun.write(manifest, releaseManifest(await manifest.text(), version));
-    const changelog = Bun.file(`${directory}/CHANGELOG.md`);
-    await Bun.write(changelog, stamp(await changelog.text(), version, date));
+  const files = [
+    ...packages.flatMap((directory) => [`${directory}/package.json`, `${directory}/CHANGELOG.md`]),
+    "bun.lock",
+  ];
+  const before = new Map<string, string>();
+  for (const path of files) before.set(path, await Bun.file(path).text());
+  const original = (path: string) => before.get(path) ?? "";
+  try {
+    for (const directory of packages) {
+      const manifest = `${directory}/package.json`;
+      await Bun.write(manifest, releaseManifest(original(manifest), version));
+      const changelog = `${directory}/CHANGELOG.md`;
+      await Bun.write(changelog, stamp(original(changelog), version, date));
+    }
+    // The first install updates each package's version in bun.lock. Only the second updates the
+    // extensions' peer on core there.
+    run(["bun", "install"]);
+    run(["bun", "install"]);
+    const stale = stalePeers(await Bun.file("bun.lock").text(), version);
+    if (stale.length)
+      throw new Error(
+        `bun.lock still lists x-govuk-ui at another version as a peer of ${stale.join(", ")}.`,
+      );
+  } catch (error) {
+    for (const path of files) await Bun.write(path, original(path));
+    console.error("Not released. Every file the release changed is back as it was.");
+    throw error;
   }
-  run(["bun", "install"]);
-  const stale = stalePeers(await Bun.file("bun.lock").text(), version);
-  if (stale.length)
-    throw new Error(
-      `bun.lock lists x-govuk-ui at another version as a peer of ${stale.join(", ")}. Run bun install --force, check that bun.lock lists ${version}, and commit it with the release.`,
-    );
   console.log(
     `Every package is at ${version}, and each changelog is stamped. Push main: once its checks pass, the release workflow stages each package on npm for you to approve.`,
   );

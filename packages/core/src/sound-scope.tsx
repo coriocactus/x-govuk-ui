@@ -12,7 +12,7 @@ export type SoundScopeProps = {
 type Cue = [SoundCue, PlayOptions?];
 
 const CONTROL =
-  'button, a[href], summary, [role="button"], [role="option"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="tab"], [role="switch"], input[type="checkbox"], input[type="radio"]';
+  'button, a[href], summary, [role="button"], [role="option"], [role="treeitem"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="tab"], [role="switch"], input[type="checkbox"], input[type="radio"]';
 const TOGGLE =
   'input[type="checkbox"], input[type="radio"], [role="switch"], [aria-pressed], [role="menuitemcheckbox"], [role="menuitemradio"]';
 const LIST_ITEM = '[role="option"], [role="menuitem"], [role="tab"], nav a[href], [data-sound-row]';

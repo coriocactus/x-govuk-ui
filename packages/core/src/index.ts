@@ -942,6 +942,18 @@ export {
   useTour,
 } from "./tour";
 export {
+  defaultTreeLabels,
+  Tree,
+  TreeControl,
+  type TreeControlProps,
+  TreeItem,
+  type TreeItemProps,
+  type TreeItemState,
+  type TreeLabels,
+  type TreeProps,
+} from "./tree";
+export { type TreeNode, treeBranches } from "./tree-data";
+export {
   VisuallyHidden,
   type VisuallyHiddenProps,
 } from "./visually-hidden";

@@ -393,6 +393,47 @@ const entries = {
       reference("name / errorMessage", "string"),
     ],
   },
+  tree: {
+    name: "Tree",
+    width: 460,
+    anchor: "top",
+    experimental: true,
+    description:
+      "Let users choose one item from a hierarchy, such as a river within its river basin district.",
+    upstream: "",
+    dependencies: "React · Base UI",
+    changes:
+      "GOV.UK has no tree. This one follows WAI-ARIA's tree view pattern, with GOV.UK's label, hint and error message, and its yellow focus on the row. The arrow keys move through the rows and open and close branches, Home and End go to the ends, an asterisk opens every branch beside the row, and typing a name's first letters moves to it. Each branch opens smoothly beneath its row, along a guide line, and stays in the page while closed, so find in page reaches it. The chosen row has a tint of brand blue and a tick. In the example, each river basin district is a heading for its rivers, with a count beside it, and only a river can be chosen. It submits the chosen value with a form.",
+    props: [
+      text("label", "Which river did you fish?", { type: "ReactNode", default: "Required" }),
+      text("hint", "Rivers are listed under the river basin district they flow through.", {
+        type: "ReactNode",
+        rows: 2,
+      }),
+      toggle("hideLabel"),
+      text("errorMessage", ""),
+      toggle("disabled"),
+      reference(
+        "items",
+        "TreeNode[], each { value, label, description?, disabled?, children? }",
+        "Required",
+      ),
+      reference("value / defaultValue / onValueChange", "string | null / (value: string) => void"),
+      reference(
+        "expanded / defaultExpanded / onExpandedChange",
+        "string[] / (expanded: string[]) => void",
+        "The chosen node's branches",
+      ),
+      reference("choose", '"any" | "leaves"', "any"),
+      reference("search / filter", "string / (search, node) => boolean", "Label contains search"),
+      reference("children", "(node, state) => TreeItem", "<TreeItem />"),
+      reference("labels", "Partial<TreeLabels>", "Expand and Collapse"),
+      reference("name", "string"),
+    ],
+    example: [
+      toggle("counts", true, { note: "Shows how many rivers each district has, as its badge." }),
+    ],
+  },
   "search-box": {
     name: "Search box",
     width: 460,
@@ -4051,6 +4092,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "file-upload",
     "combobox",
     "multi-select",
+    "tree",
     "search-box",
     "switch",
     "slider",

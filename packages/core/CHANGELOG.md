@@ -13,6 +13,13 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Added `defaultValues` to FormSteps and QuestionCard. It gives the fields their answers to start with, by the names they send under, as Form's does.
 - Added `defaultSettled` to FormSteps and QuestionCard, and `answered` and `skipped` to what `useFormSteps` gives. A service that keeps users' progress gives back the steps they answered and skipped. Check your answers then lists a skipped step as skipped, not as not answered, and Change comes back to Check your answers, as it did before users left.
+- Added Tree, which lets users choose one item from a hierarchy, such as a river within its river basin district. It is a field, built from a Label with `htmlFor={null}`, a Hint, an ErrorMessage and TreeControl, the tree on its own. It takes its nodes as `items`, each a `TreeNode` with a `value`, a `label` and optionally a `description`, `disabled` and `children`. Its `children` function draws each node as a TreeItem, which takes an `icon` and a `badge`. The arrow keys, Home, End, an asterisk and typing move through it, as WAI-ARIA's tree view pattern says. `value` is the chosen node, `expanded` the open branches, and `choose="leaves"` makes each branch a heading that opens instead of a choice. `search` shows only the nodes that match, with the matching text in bold, and `filter` decides what matches. It is experimental, so its API may change in a minor version.
+- Added `treeBranches`, which lists every branch of a tree's nodes, such as to open them all through Tree's `expanded`.
+- Added the `tree` map of words to LabelsProvider, with its defaults in `defaultTreeLabels`.
+
+### Changed
+
+- Changed SoundScope to play a cue for a press on an element with the treeitem role, as it does for an option. An element's own `data-sound` names its cue.
 
 ### Fixed
 

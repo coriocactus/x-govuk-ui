@@ -115,6 +115,7 @@ import toast from "./toast";
 import toggleGroup from "./toggle-group";
 import tooltip from "./tooltip";
 import tour from "./tour";
+import tree from "./tree";
 import treemap from "./treemap";
 import visuallyHidden from "./visually-hidden";
 import waffle from "./waffle";
@@ -194,6 +195,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   "file-upload": fileUpload,
   combobox,
   "multi-select": multiSelect,
+  tree,
   "search-box": searchBox,
   "summary-list": summaryList,
   "task-list": taskList,

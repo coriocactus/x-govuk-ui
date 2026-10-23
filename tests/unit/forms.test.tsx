@@ -29,6 +29,8 @@ import {
   ChoiceRoot,
   Combobox,
   ComboboxControl,
+  ContextMenu,
+  ContextMenuTrigger,
   CookieBanner,
   DateInput,
   DateInputControl,
@@ -84,6 +86,11 @@ import {
   TimeInputControl,
   ToggleGroup,
   ToggleGroupItem,
+  Tree,
+  TreeControl,
+  TreeItem,
+  type TreeNode,
+  treeBranches,
   useBoundField,
   useControllableState,
   useControlProps,
@@ -94,6 +101,13 @@ import {
 import { z } from "zod";
 import { fieldOf } from "../../packages/core/src/form";
 import { browserStorage } from "../../packages/core/src/stored-state";
+import {
+  ancestorsOf,
+  indexTree,
+  labelHas,
+  searchTree,
+  visibleValues,
+} from "../../packages/core/src/tree-data";
 import { controlIcons } from "../../packages/jorjorwel/src/editor-controls";
 import { matchPosition } from "../../packages/jorjorwel/src/editor-prompt";
 
@@ -1316,4 +1330,165 @@ test("a file upload starts from files given to it, and can leave their list to a
   );
   expect(unlisted).not.toContain("x-govuk-ui-file-upload-files");
   expect(unlisted).not.toContain("-files");
+});
+
+/** Rivers by river basin district, as Tree's example has them, with a third level for the tests. */
+const rivers: TreeNode[] = [
+  {
+    value: "thames-district",
+    label: "Thames",
+    children: [
+      {
+        value: "thames",
+        label: "Thames",
+        children: [
+          { value: "kennet", label: "Kennet" },
+          { value: "lambourn", label: "Lambourn", disabled: true },
+        ],
+      },
+      { value: "wey", label: "Wey" },
+    ],
+  },
+  { value: "severn-district", label: "Severn", children: [{ value: "wye", label: "Wye" }] },
+  { value: "dee", label: "Dee" },
+];
+
+test("a tree's model lists what shows, finds a node's ancestors, and searches keeping where each match is", () => {
+  const index = indexTree(rivers);
+  expect(index.get("kennet")).toMatchObject({ parent: "thames", level: 3 });
+  expect(ancestorsOf(index, "kennet")).toEqual(["thames", "thames-district"]);
+  expect(ancestorsOf(index, "unknown")).toEqual([]);
+  expect(treeBranches(rivers)).toEqual(["thames-district", "thames", "severn-district"]);
+  // A closed branch hides its children, however many of them are open.
+  expect(visibleValues(rivers, new Set(["thames"]))).toEqual([
+    "thames-district",
+    "severn-district",
+    "dee",
+  ]);
+  expect(visibleValues(rivers, new Set(["thames-district", "thames"]))).toEqual([
+    "thames-district",
+    "thames",
+    "kennet",
+    "lambourn",
+    "wey",
+    "severn-district",
+    "dee",
+  ]);
+  // A match shows with its ancestors, which open but are no matches themselves.
+  const kennet = searchTree(rivers, " KEN ", labelHas);
+  expect(kennet.items).toEqual([
+    {
+      value: "thames-district",
+      label: "Thames",
+      children: [
+        { value: "thames", label: "Thames", children: [{ value: "kennet", label: "Kennet" }] },
+      ],
+    },
+  ]);
+  expect([...kennet.matched]).toEqual(["kennet"]);
+  expect([...kennet.open].sort()).toEqual(["thames", "thames-district"]);
+  // A branch that matches keeps all its children, closed unless one matches too.
+  const thames = searchTree(rivers, "thames", labelHas);
+  expect(thames.items[0]?.children?.[0]?.children).toHaveLength(2);
+  expect(thames.items[0]?.children?.map((node) => node.value)).toEqual(["thames", "wey"]);
+  expect([...thames.matched].sort()).toEqual(["thames", "thames-district"]);
+  expect([...thames.open]).toEqual(["thames-district"]);
+  expect(searchTree(rivers, "tweed", labelHas).items).toEqual([]);
+  // A branch that matches keeps every node inside it, even within a branch that holds another match.
+  const thamesAndKennet = searchTree(rivers, "e", (_, node) =>
+    ["Thames", "Kennet"].includes(node.label),
+  );
+  expect(thamesAndKennet.items[0]).toBe(rivers[0]);
+  expect([...thamesAndKennet.open].sort()).toEqual(["thames", "thames-district"]);
+});
+
+test("a tree is WAI-ARIA's tree: named by its label, with one tab stop, open around its choice, and sent with a form", () => {
+  const html = renderToStaticMarkup(
+    <Tree
+      id="river"
+      name="river"
+      label="Which river did you fish?"
+      hint="By district"
+      items={rivers}
+      defaultValue="kennet"
+      choose="leaves"
+    />,
+  );
+  const items = [...html.matchAll(/<li ([^>]*)>/g)].map((match) => match[1] ?? "");
+  const item = (label: string) => {
+    const id = html.match(new RegExp(`id="([^"]+)" class="x-govuk-ui-tree-label">${label}<`))?.[1];
+    return items.find((attributes) => attributes.includes(`aria-labelledby="${id}"`)) ?? "";
+  };
+  expect(html).toContain('<label id="river-label" class="x-govuk-ui-label">');
+  const tree = html.match(/<ul [^>]*role="tree"[^>]*>/)?.[0] ?? "";
+  expect(tree).toContain('id="river"');
+  expect(tree).toContain('aria-labelledby="river-label"');
+  expect(tree).toContain('aria-describedby="river-hint"');
+  // The branches around the chosen river are open, and it alone is the tab stop.
+  expect(items.filter((attributes) => attributes.includes('tabindex="0"'))).toEqual([
+    item("Kennet"),
+  ]);
+  expect(item("Kennet")).toContain('aria-selected="true"');
+  expect(item("Kennet")).not.toContain("aria-expanded");
+  expect(html.match(/aria-expanded="true"/g)).toHaveLength(2);
+  expect(item("Severn")).toContain('aria-expanded="false"');
+  // A district is a heading for its rivers, so it cannot be chosen, and a press opens it.
+  expect(item("Severn")).not.toContain("aria-selected");
+  expect(item("Severn")).toContain('data-sound="open"');
+  expect(item("Dee")).toContain('aria-selected="false"');
+  expect(item("Lambourn")).toContain('aria-disabled="true"');
+  // The button that opens a branch is out of the tab order, and named for a touch screen.
+  expect(html).toContain('tabindex="-1" class="x-govuk-ui-tree-toggle" aria-label="Expand Severn"');
+  expect(html).toContain('<input type="hidden" name="river" value="kennet"/>');
+  // Composed from its parts, it matches.
+  expect(
+    renderToStaticMarkup(
+      <Field controlId="river" name="river" hasHint>
+        <Label htmlFor={null}>Which river did you fish?</Label>
+        <Hint>By district</Hint>
+        <ErrorMessage />
+        <TreeControl items={rivers} defaultValue="kennet" choose="leaves" />
+      </Field>,
+    ).replace(/ (?:id|aria-labelledby|aria-describedby)="(?:_|base-ui-)[^"]*"/g, ""),
+  ).toBe(html.replace(/ (?:id|aria-labelledby|aria-describedby)="(?:_|base-ui-)[^"]*"/g, ""));
+  // With nothing chosen, Tab reaches the first node.
+  const fresh = renderToStaticMarkup(<TreeControl aria-label="Rivers" items={rivers} />);
+  expect(fresh.match(/tabindex="0"/g)).toHaveLength(1);
+  expect(fresh).toMatch(
+    /<li [^>]*tabindex="0"[^>]*><div class="x-govuk-ui-tree-row"><button[^>]*aria-label="Expand Thames"/,
+  );
+  expect(fresh).toContain('aria-label="Rivers"');
+  expect(fresh).not.toContain('aria-labelledby="undefined');
+});
+
+test("a tree's item takes a service's class and badge, and can be another part's element", () => {
+  const html = renderToStaticMarkup(
+    <TreeControl aria-label="Rivers" items={rivers.slice(1)}>
+      {(node, { branch }) => (
+        <ContextMenu>
+          <ContextMenuTrigger
+            render={
+              <TreeItem className="mine" badge={branch ? node.children?.length : undefined} />
+            }
+          />
+        </ContextMenu>
+      )}
+    </TreeControl>,
+  );
+  // The context menu's area is the item itself, with no element between it and its list.
+  expect(html).toMatch(/<ul [^>]*role="tree"[^>]*><li [^>]*role="treeitem"/);
+  expect(html).toMatch(
+    /<li [^>]*class="x-govuk-ui-tree-item mine x-govuk-ui-context-menu-trigger"/,
+  );
+  expect(html).toMatch(
+    /aria-describedby="([^"]+)"[^>]*>.*<span id="\1" class="x-govuk-ui-tree-badge">1<\/span>/,
+  );
+  // A name of the service's own takes the label's place.
+  const named = renderToStaticMarkup(
+    <TreeControl aria-label="Rivers" items={rivers.slice(2)}>
+      {() => <TreeItem aria-label="The River Dee" />}
+    </TreeControl>,
+  );
+  expect(named).toContain('aria-label="The River Dee"');
+  expect(named).not.toMatch(/<li [^>]*aria-labelledby/);
 });

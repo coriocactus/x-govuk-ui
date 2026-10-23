@@ -712,6 +712,23 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Words x={28} y={58.5} w={30} tone="ink" />
     </>
   ),
+  tree: (
+    <>
+      <Words x={14} y={6} w={30} h={4} tone="ink" />
+      <Chevron x={18} y={18} size={2.5} />
+      <Words x={25} y={16.5} w={28} tone="ink" />
+      <Area x={17.6} y={23} w={0.8} h={24} tone="line" />
+      <Words x={27} y={26.5} w={22} tone="ink" />
+      <Area x={23} y={33} w={58} h={9} tone="tint" r={1.5} />
+      <Words x={27} y={36} w={26} tone="ink" />
+      <Tick x={73} y={34.5} size={5} />
+      <Words x={27} y={46} w={18} tone="ink" />
+      <Chevron x={18} y={56} to="right" size={2.5} />
+      <Words x={25} y={54.5} w={34} tone="ink" />
+      <Chevron x={18} y={65} to="right" size={2.5} />
+      <Words x={25} y={63.5} w={24} tone="ink" />
+    </>
+  ),
   "search-box": (
     <>
       <Field x={10} y={28} w={62} h={16} />

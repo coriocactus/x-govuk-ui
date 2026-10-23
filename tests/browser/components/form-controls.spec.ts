@@ -1,4 +1,5 @@
-import type { Locator } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import type { Locator, Page } from "@playwright/test";
 import { expect, test } from "../fixtures";
 
 test("an input shows its error, keeps focus with the keyboard and sends", async ({
@@ -1568,6 +1569,109 @@ test("a multi-select adds chips, which can be removed", async ({ page, frame, op
   await expect(frame.locator(".x-govuk-ui-chip")).toHaveText(["English", "Welsh"]);
   await frame.getByRole("button", { name: "Remove English" }).click();
   await expect(frame.locator(".x-govuk-ui-chip")).toHaveText(["Welsh"]);
+});
+
+/**
+ * Checks a part of the page against WCAG in the light theme, and its colours in the dark theme, for
+ * a state the sweep does not see, such as an open popup.
+ */
+async function expectAccessible(page: Page, part: string) {
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((chosen) => {
+      document.documentElement.dataset.theme = chosen;
+    }, theme);
+    const axe = new AxeBuilder({ page }).include(part);
+    const { violations } = await (theme === "light"
+      ? axe.withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+      : axe.withRules(["color-contrast"])
+    ).analyze();
+    expect(violations, theme).toEqual([]);
+  }
+  await page.evaluate(() => {
+    document.documentElement.dataset.theme = "light";
+  });
+}
+
+test("a tree moves by its keys as WAI-ARIA's tree does, opens its districts, and chooses only a river", async ({
+  page,
+  frame,
+  open,
+}) => {
+  await open("tree");
+  const tree = frame.getByRole("tree", { name: "Which river did you fish?" });
+  // A district comes before its river of the same name, such as the Severn. WebKit lists the river
+  // while the district is closed, so the first is the district.
+  const item = (name: string) => tree.getByRole("treeitem", { name, exact: true }).first();
+  const voices = () => page.evaluate(() => (window as unknown as { voices: number }).voices);
+  // Tab reaches one item, the first.
+  await expect(tree.locator('[tabindex="0"]')).toHaveCount(1);
+  await expect(item("Anglian")).toHaveAttribute("tabindex", "0");
+  // The right arrow opens a district, with a sound, then moves into it. The left arrow goes back
+  // out, then closes it.
+  await page.getByRole("button", { name: "Mute sounds" }).click();
+  await item("Anglian").focus();
+  const before = await voices();
+  await page.keyboard.press("ArrowRight");
+  await expect(item("Anglian")).toHaveAttribute("aria-expanded", "true");
+  await expect(item("Anglian")).toBeFocused();
+  await expect.poll(voices).toBeGreaterThan(before);
+  await page.keyboard.press("ArrowRight");
+  await expect(item("Great Ouse")).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(item("Nene")).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await expect(item("Anglian")).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await expect(item("Anglian")).toHaveAttribute("aria-expanded", "false");
+  // Its rivers stay in the page, hidden until find in page reaches them.
+  await expect(item("Anglian").locator(".x-govuk-ui-tree-group")).toHaveAttribute(
+    "hidden",
+    "until-found",
+  );
+  // Home and End go to the first and last items on show.
+  await page.keyboard.press("End");
+  await expect(item("Thames")).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(item("Anglian")).toBeFocused();
+  // Typing a letter goes to the next name that starts with it, and again to the one after.
+  await page.keyboard.press("s");
+  await expect(item("Severn")).toBeFocused();
+  await page.keyboard.press("s");
+  await expect(item("Solway Tweed")).toBeFocused();
+  // Letters typed together find a name that starts with them all. A pause starts the search again.
+  await page.waitForTimeout(600);
+  await page.keyboard.type("sou", { delay: 20 });
+  await expect(item("South East")).toBeFocused();
+  // An asterisk opens every district beside the item.
+  await page.keyboard.press("*");
+  await expect(tree.locator('[aria-expanded="true"]')).toHaveCount(10);
+  // A district is a heading for its rivers, so Enter closes it, and chooses nothing.
+  await page.keyboard.press("Enter");
+  await expect(item("South East")).toHaveAttribute("aria-expanded", "false");
+  await expect(tree.locator('[aria-selected="true"]')).toHaveCount(0);
+  // Enter chooses a river.
+  await item("Kennet").focus();
+  await page.keyboard.press("Enter");
+  await expect(item("Kennet")).toHaveAttribute("aria-selected", "true");
+  await expect(frame.getByRole("status")).toHaveText("You chose the Kennet.");
+  await expect(frame.locator('input[name="river"]')).toHaveValue("kennet");
+  // A press on a district's row or on its chevron opens and closes it, and a press on a river's
+  // row chooses it. Tab then comes back to the item last pressed.
+  await item("Humber").locator(":scope > .x-govuk-ui-tree-row").click();
+  await expect(item("Humber")).toHaveAttribute("aria-expanded", "false");
+  await frame.getByRole("button", { name: "Expand Humber" }).click();
+  await expect(item("Humber")).toHaveAttribute("aria-expanded", "true");
+  await expect(item("Humber")).toBeFocused();
+  await item("Trent").locator(":scope > .x-govuk-ui-tree-row").click();
+  await expect(frame.getByRole("status")).toHaveText("You chose the Trent.");
+  await expect(item("Trent")).toBeFocused();
+  await expect(tree.locator('[tabindex="0"]')).toHaveText("Trent");
+  // A Form focuses a field by its id, which is the tree's. The tree passes focus to that item.
+  await item("Trent").evaluate((element) => (element as HTMLElement).blur());
+  await tree.focus();
+  await expect(item("Trent")).toBeFocused();
+  // The sweep sees the tree as it opens. Open, with a river chosen, it meets WCAG in both themes.
+  await expectAccessible(page, ".preview-frame .x-govuk-ui-tree");
 });
 
 test("filter chips filter, keep their width, and share one shape behind chosen neighbours", async ({

@@ -1,0 +1,178 @@
+/* Tree. Each row has a chevron, the node's label and what a service adds to it. A branch's children
+   open beneath it, indented along a guide line under its chevron, as the Sidebar's sub-items are.
+   The chosen row takes a tint of brand blue, as a Data table's chosen rows do, and a tick, so the
+   choice never shows by colour alone. */
+.x-govuk-ui-tree,
+.x-govuk-ui-tree-group {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-tree {
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 17px;
+  line-height: 1.4;
+}
+.x-govuk-ui-tree[aria-disabled="true"] {
+  opacity: 0.55;
+}
+/* The item holds its children's group too, so the row inside it shows its focus. */
+.x-govuk-ui-tree-item {
+  outline: none;
+}
+.x-govuk-ui-tree-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 10px 6px 4px;
+  border-radius: var(--x-govuk-ui-radius-small);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-tree-row:hover {
+  background: var(--x-govuk-ui-secondary);
+}
+.x-govuk-ui-tree-item[data-selected] > .x-govuk-ui-tree-row {
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 9%, var(--x-govuk-ui-paper));
+}
+.x-govuk-ui-tree-item[data-selected] > .x-govuk-ui-tree-row:hover {
+  background: color-mix(in srgb, var(--x-govuk-ui-brand) 15%, var(--x-govuk-ui-paper));
+}
+.x-govuk-ui-tree-item[data-disabled] > .x-govuk-ui-tree-row {
+  color: var(--x-govuk-ui-muted);
+  cursor: default;
+}
+.x-govuk-ui-tree[aria-disabled="true"] .x-govuk-ui-tree-row {
+  cursor: not-allowed;
+}
+/* GOV.UK's focus, with its dark edge inside the row, because a box that scrolls the tree would
+   clip an edge drawn beneath it. */
+.x-govuk-ui-tree-item:focus-visible > .x-govuk-ui-tree-row {
+  background: var(--x-govuk-ui-focus);
+  color: var(--x-govuk-ui-focus-text);
+  box-shadow: inset 0 -4px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-tree-item:focus-visible
+  > .x-govuk-ui-tree-row
+  :is(
+    .x-govuk-ui-tree-toggle,
+    .x-govuk-ui-tree-icon,
+    .x-govuk-ui-tree-description,
+    .x-govuk-ui-tree-badge
+  ) {
+  color: inherit;
+}
+/* The chevron, or the space of one beside a leaf, so every label at a level starts in line. It is
+   as tall as the label's first line, 17 pixels at 1.4, and a press target 24 pixels square. */
+.x-govuk-ui-tree-toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--x-govuk-ui-radius-small);
+  background: transparent;
+  color: var(--x-govuk-ui-muted);
+  cursor: pointer;
+}
+.x-govuk-ui-tree-toggle:hover {
+  color: var(--x-govuk-ui-text);
+}
+.x-govuk-ui-tree-toggle:disabled {
+  cursor: not-allowed;
+}
+.x-govuk-ui-tree-toggle[data-leaf] {
+  cursor: inherit;
+}
+.x-govuk-ui-tree-toggle svg {
+  transition: rotate var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-tree-item[aria-expanded="true"] > .x-govuk-ui-tree-row .x-govuk-ui-tree-toggle svg {
+  rotate: 90deg;
+}
+.x-govuk-ui-tree-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 24px;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-tree-icon svg {
+  width: 18px;
+  height: 18px;
+}
+/* A long label wraps beneath itself, never under the chevron. */
+.x-govuk-ui-tree-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.x-govuk-ui-tree-label {
+  display: block;
+}
+.x-govuk-ui-tree-description {
+  display: block;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+}
+.x-govuk-ui-tree-match {
+  background: none;
+  color: inherit;
+  font-weight: 700;
+}
+.x-govuk-ui-tree-badge {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-height: 24px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-tree-tick {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 24px;
+}
+/* A branch's children indent along a guide line beneath its chevron, 4 pixels in plus half the
+   chevron's 24. The group opens and closes in height, as Accordion's sections do. */
+.x-govuk-ui-tree-group {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  margin-left: 15px;
+  padding-left: 4px;
+  border-left: 1px solid var(--x-govuk-ui-line);
+  transition: height var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-tree-group[data-starting-style],
+.x-govuk-ui-tree-group[data-ending-style] {
+  height: 0;
+}
+/* A search opens branches with each letter typed, so they open at once. */
+.x-govuk-ui-tree[data-searching] .x-govuk-ui-tree-group {
+  transition: none;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-tree-item[data-selected] > .x-govuk-ui-tree-row {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+  .x-govuk-ui-tree-item[data-selected] > .x-govuk-ui-tree-row * {
+    color: inherit;
+  }
+  .x-govuk-ui-tree-item:focus-visible > .x-govuk-ui-tree-row {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+  }
+  .x-govuk-ui-tree-group {
+    border-color: CanvasText;
+  }
+}

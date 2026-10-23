@@ -24,6 +24,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed ErrorSummaryItem's link to a group of controls, such as a tree. It now focuses the first control in the group that Tab reaches, and passes over a control out of the tab order, such as a button with `tabindex="-1"`.
 - Fixed Form running `onSubmit` again when sent while the last `onSubmit` still runs, such as when users press Enter twice. A form sent meanwhile now sends nothing.
 
 ## [0.5.0] - 2026-10-20

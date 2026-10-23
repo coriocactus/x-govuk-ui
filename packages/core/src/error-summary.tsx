@@ -50,9 +50,12 @@ function captionFor(field: HTMLElement) {
   );
 }
 
-/** What can take focus, for a field whose link goes to an element around its control. */
+/**
+ * What Tab reaches, for a field whose link goes to an element around its control. A control out of
+ * the tab order, such as the button that opens a tree's branch, is passed over.
+ */
 const FOCUSABLE =
-  'input:not([type="hidden"]), select, textarea, button, a[href], [tabindex]:not([tabindex="-1"])';
+  ':is(input:not([type="hidden"]), select, textarea, button, a[href], [tabindex]):not([tabindex="-1"])';
 
 /** GOV.UK's summary of the errors on a page, above the form. Each error links to its field. */
 export function ErrorSummary({
@@ -97,7 +100,7 @@ export type ErrorSummaryItemProps = ComponentPropsWithRef<"a"> & {
 /**
  * One error. Use the same words as the error message beside the field. Pressing it scrolls the
  * field's label or legend into view and focuses the field. When the link goes to an element around
- * the field's control, such as a group, the first control inside takes focus.
+ * the field's control, such as a group, the first control inside that Tab reaches takes focus.
  */
 export function ErrorSummaryItem({
   href,

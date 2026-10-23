@@ -90,6 +90,8 @@ import {
   TreeControl,
   TreeItem,
   type TreeNode,
+  TreeSelect,
+  TreeSelectControl,
   treeBranches,
   useBoundField,
   useControllableState,
@@ -1491,4 +1493,36 @@ test("a tree's item takes a service's class and badge, and can be another part's
   );
   expect(named).toContain('aria-label="The River Dee"');
   expect(named).not.toMatch(/<li [^>]*aria-labelledby/);
+});
+
+test("a tree select is its parts in a bound field, and its button shows the chosen node's label", () => {
+  const html = renderToStaticMarkup(
+    <TreeSelect
+      id="river"
+      name="river"
+      label="Which river did you fish?"
+      items={rivers}
+      defaultValue="wye"
+      placeholder="Choose a river"
+    />,
+  );
+  expect(html).toContain('<label for="river" class="x-govuk-ui-label">');
+  expect(html).toMatch(
+    /<button [^>]*role="combobox"[^>]*id="river"|<button [^>]*id="river"[^>]*role="combobox"/,
+  );
+  expect(html).toContain('<span class="x-govuk-ui-select-value">Wye</span>');
+  expect(html).toContain('<input type="hidden" name="river" value="wye"/>');
+  expect(
+    renderToStaticMarkup(<TreeSelect label="River" items={rivers} placeholder="Choose a river" />),
+  ).toContain('<span class="x-govuk-ui-select-value" data-placeholder="">Choose a river</span>');
+  expect(html).toBe(
+    renderToStaticMarkup(
+      <Field controlId="river" name="river">
+        <Label>Which river did you fish?</Label>
+        <Hint />
+        <ErrorMessage />
+        <TreeSelectControl items={rivers} defaultValue="wye" placeholder="Choose a river" />
+      </Field>,
+    ),
+  );
 });

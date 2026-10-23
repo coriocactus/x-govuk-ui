@@ -1,12 +1,12 @@
 /*
- * The model behind Tree, as plain functions of a tree's nodes. The file has no "use client", so a
- * server can work out what a tree shows, such as every branch to open.
+ * The model behind Tree and Tree select, as plain functions of a tree's nodes. The file has no
+ * "use client", so a server can work out what a tree shows, such as every branch to open.
  *
  * A tree takes its nodes as data, in `items`. Typing, searching, Check your answers and the keys
  * all need every node before the tree draws, including the nodes in closed branches.
  */
 
-/** One node of a tree, as Tree takes its `items`. */
+/** One node of a tree, as Tree and Tree select take their `items`. */
 export type TreeNode = {
   /**
    * The node's value, which the tree sends with a form and names the node by. It must be unique in

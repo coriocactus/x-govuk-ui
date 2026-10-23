@@ -1674,6 +1674,85 @@ test("a tree moves by its keys as WAI-ARIA's tree does, opens its districts, and
   await expectAccessible(page, ".preview-frame .x-govuk-ui-tree");
 });
 
+test("a tree select finds an organisation by its name or abbreviation, and chooses it from its tree", async ({
+  page,
+  frame,
+  open,
+}) => {
+  await open("tree-select");
+  const field = frame.getByRole("combobox", { name: "Which organisation do you work for?" });
+  await expect(field).toHaveText("Choose an organisation");
+  await field.click();
+  // The popup is named after the question, and focus starts in its search.
+  const popup = page.getByRole("dialog", { name: "Which organisation do you work for?" });
+  const search = popup.getByRole("textbox", { name: "Search" });
+  const tree = popup.getByRole("tree");
+  const item = (name: string) => tree.getByRole("treeitem", { name, exact: true });
+  await expect(search).toBeFocused();
+  // A search shows each match where it is, with its department open around it, and screen readers
+  // hear how many match.
+  await search.fill("apha");
+  await expect(popup.getByRole("status")).toHaveText("1 result");
+  await expect(tree.getByRole("treeitem")).toHaveText([
+    /^Department for Environment/,
+    /^Animal and Plant Health Agency/,
+  ]);
+  const defra = item("Department for Environment, Food & Rural Affairs");
+  await expect(defra).toHaveAttribute("aria-expanded", "true");
+  await expect(item("Animal and Plant Health Agency").locator("mark")).toHaveCount(0);
+  await search.fill("agency");
+  await expect(item("Environment Agency").locator("mark")).toHaveText("Agency");
+  // The sweep sees the page with the popup closed. Open, with a search's matches, it meets WCAG in
+  // both themes.
+  await expectAccessible(page, ".x-govuk-ui-tree-select-popup");
+  // A press on a branch's chevron closes it, and chooses nothing. The same search typed again opens
+  // the branches around its matches again.
+  await popup.getByRole("button", { name: "Collapse Cabinet Office" }).click();
+  await expect(item("Cabinet Office")).toHaveAttribute("aria-expanded", "false");
+  await expect(popup).toHaveCount(1);
+  await expect(field).toHaveText("Choose an organisation");
+  await search.fill("agencyx");
+  await search.fill("agency");
+  await expect(item("Cabinet Office")).toHaveAttribute("aria-expanded", "true");
+  // The down arrow moves from the search into the tree, and the up arrow from its first item goes
+  // back.
+  await search.press("ArrowDown");
+  await expect(tree.getByRole("treeitem").first()).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(search).toBeFocused();
+  await search.fill("apha");
+  await search.press("ArrowDown");
+  await page.keyboard.press("ArrowDown");
+  await expect(item("Animal and Plant Health Agency")).toBeFocused();
+  // Choosing closes the popup, gives focus back to the field, and sends the organisation's slug.
+  await page.keyboard.press("Enter");
+  await expect(popup).toHaveCount(0);
+  await expect(field).toBeFocused();
+  await expect(field).toHaveText("Animal and Plant Health Agency");
+  await expect(frame.locator('input[name="organisation"]')).toHaveValue(
+    "animal-and-plant-health-agency",
+  );
+  await expect(frame.getByRole("status")).toHaveText("You chose Animal and Plant Health Agency.");
+  // Opened again by the down arrow, as a Select is, the search is empty and the tree is open to the
+  // choice, which the down arrow reaches.
+  await page.keyboard.press("ArrowDown");
+  await expect(search).toHaveValue("");
+  await search.press("ArrowDown");
+  await expect(item("Animal and Plant Health Agency")).toBeFocused();
+  await expect(item("Animal and Plant Health Agency")).toHaveAttribute("aria-selected", "true");
+  // A search that finds nothing says so. Escape closes the popup and keeps the choice.
+  await page.keyboard.press("Home");
+  await page.keyboard.press("ArrowUp");
+  await expect(search).toBeFocused();
+  await search.fill("nothing like this");
+  await expect(popup.getByRole("status")).toHaveText("No results found");
+  await expect(tree).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(popup).toHaveCount(0);
+  await expect(field).toBeFocused();
+  await expect(field).toHaveText("Animal and Plant Health Agency");
+});
+
 test("filter chips filter, keep their width, and share one shape behind chosen neighbours", async ({
   page,
   frame,

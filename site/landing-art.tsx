@@ -729,6 +729,26 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Words x={25} y={63.5} w={24} tone="ink" />
     </>
   ),
+  "tree-select": (
+    <>
+      <Words x={18} y={4} w={30} h={4} tone="ink" />
+      <Field x={18} y={11} w={60} h={13} />
+      <Words x={23} y={16} w={26} tone="ink" />
+      <Chevron x={70} y={17.5} />
+      <Popup x={18} y={27} w={60} h={40} />
+      <Ring x={24} y={33} r={2.5} edge="words" fill="none" weight={1} />
+      <Stroke d="M26 35L27.5 36.5" tone="words" weight={1} />
+      <Words x={31} y={31.5} w={20} tone="faint" />
+      <Area x={18} y={39} w={60} h={0.75} tone="line" />
+      <Chevron x={24} y={45} size={2} weight={1.25} />
+      <Words x={29} y={43.5} w={26} tone="ink" />
+      <Area x={23.6} y={49} w={0.8} h={14} tone="line" />
+      <Area x={27} y={50.5} w={48} h={7} tone="tint" r={1.5} />
+      <Words x={30} y={52.5} w={22} tone="ink" />
+      <Tick x={68} y={51.5} size={4.5} weight={1.25} />
+      <Words x={30} y={60} w={16} tone="ink" />
+    </>
+  ),
   "search-box": (
     <>
       <Field x={10} y={28} w={62} h={16} />

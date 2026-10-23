@@ -41,6 +41,7 @@
 @import "./styles/search-box.css" layer(x-govuk-ui);
 @import "./styles/select.css" layer(x-govuk-ui);
 @import "./styles/tree.css" layer(x-govuk-ui);
+@import "./styles/tree-select.css" layer(x-govuk-ui);
 @import "./styles/fieldset.css" layer(x-govuk-ui);
 @import "./styles/choice.css" layer(x-govuk-ui);
 @import "./styles/switch.css" layer(x-govuk-ui);

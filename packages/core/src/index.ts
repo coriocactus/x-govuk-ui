@@ -954,6 +954,14 @@ export {
 } from "./tree";
 export { type TreeNode, treeBranches } from "./tree-data";
 export {
+  defaultTreeSelectLabels,
+  TreeSelect,
+  TreeSelectControl,
+  type TreeSelectControlProps,
+  type TreeSelectLabels,
+  type TreeSelectProps,
+} from "./tree-select";
+export {
   VisuallyHidden,
   type VisuallyHiddenProps,
 } from "./visually-hidden";

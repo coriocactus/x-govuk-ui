@@ -62,6 +62,7 @@ import type { TimelineLabels } from "./timeline";
 import type { ToastLabels } from "./toast";
 import type { TourLabels } from "./tour";
 import type { TreeLabels } from "./tree";
+import type { TreeSelectLabels } from "./tree-select";
 
 /**
  * The words each component writes itself, by component, such as Pagination's Previous and Next.
@@ -133,6 +134,7 @@ export interface ComponentLabels {
   toast: ToastLabels;
   tour: TourLabels;
   tree: TreeLabels;
+  treeSelect: TreeSelectLabels;
 }
 
 /**

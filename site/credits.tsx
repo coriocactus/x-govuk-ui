@@ -40,8 +40,9 @@ const debts: Record<keyof typeof systems, Partial<Record<Debt, readonly Componen
       "logo-carousel",
     ],
   },
-  // The charts as a family, each set the same way, as Mantine's are, and a tree.
-  mantine: { inspired: [...charts, "tree"] },
+  // The charts as a family, each set the same way, as Mantine's are, and a tree and a field that
+  // chooses from one.
+  mantine: { inspired: [...charts, "tree", "tree-select"] },
   // Date input's and Time input's fields, which turn like dials.
   superlogical: { inspired: ["date-input", "time-input"] },
   lexxy: { adapted: ["editor"] },

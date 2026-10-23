@@ -434,6 +434,47 @@ const entries = {
       toggle("counts", true, { note: "Shows how many rivers each district has, as its badge." }),
     ],
   },
+  "tree-select": {
+    name: "Tree select",
+    width: 460,
+    anchor: "top",
+    experimental: true,
+    description:
+      "Let users choose one item from a long hierarchy, such as the organisation they work for.",
+    upstream: "",
+    dependencies: "React · Base UI",
+    changes:
+      "Select's field, whose popup holds a Tree, opened to the chosen item. A tree of more than eight items has a search field above it. A search shows the items that match, with the branches around them open, and the matching text in bold, and screen readers hear how many match. The tree takes focus, so its keys and its markup are the Tree's own. In the example, the organisations are GOV.UK's departments, with the agencies and public bodies they sponsor, and a search finds an organisation by its name or the start of its abbreviation. It submits the chosen value with a form.",
+    props: [
+      text("label", "Which organisation do you work for?", {
+        type: "ReactNode",
+        default: "Required",
+      }),
+      text(
+        "hint",
+        "Agencies and public bodies are listed under the department that sponsors them.",
+        {
+          type: "ReactNode",
+          rows: 2,
+        },
+      ),
+      toggle("hideLabel"),
+      text("placeholder", "Choose an organisation", { type: "ReactNode" }),
+      text("errorMessage", ""),
+      toggle("disabled"),
+      reference(
+        "items",
+        "TreeNode[], each { value, label, description?, disabled?, children? }",
+        "Required",
+      ),
+      reference("value / defaultValue / onValueChange", "string | null / (value: string) => void"),
+      reference("choose", '"any" | "leaves"', "any"),
+      reference("filter", "(search, node) => boolean", "Label contains search"),
+      reference("children", "(node, state) => TreeItem", "<TreeItem />"),
+      reference("labels", "Partial<TreeSelectLabels>", "Search and No results found"),
+      reference("name", "string"),
+    ],
+  },
   "search-box": {
     name: "Search box",
     width: 460,
@@ -4093,6 +4134,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "combobox",
     "multi-select",
     "tree",
+    "tree-select",
     "search-box",
     "switch",
     "slider",

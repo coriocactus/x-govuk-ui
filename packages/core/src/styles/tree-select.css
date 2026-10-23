@@ -1,0 +1,63 @@
+/* Tree select. Its button is Select's field, with the chosen node's label and a chevron. The popup
+   beneath it has a search row, as the Command menu's has, above the tree, which scrolls in a
+   Scroll area. The popup keeps one width as a search narrows the tree, so it never jumps. */
+.x-govuk-ui-tree-select-popup {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: max(var(--x-govuk-ui-tree-select-width, 0px), min(400px, calc(100vw - 16px)));
+  max-width: calc(100vw - 16px);
+  max-height: min(420px, var(--available-height));
+  overflow: hidden;
+}
+.x-govuk-ui-tree-select-search {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-tree-select-search:has(.x-govuk-ui-tree-select-input:focus) {
+  box-shadow:
+    inset 0 0 0 3px var(--x-govuk-ui-focus),
+    inset 0 0 0 5px var(--x-govuk-ui-focus-text);
+}
+.x-govuk-ui-tree-select-input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--x-govuk-ui-text);
+  font: 17px / 1.4 var(--x-govuk-ui-font);
+  outline: none;
+}
+.x-govuk-ui-tree-select-input::placeholder {
+  color: var(--x-govuk-ui-placeholder);
+}
+.x-govuk-ui-tree-select-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.x-govuk-ui-tree-select-scroll
+  > .x-govuk-ui-scroll-area-viewport
+  > .x-govuk-ui-scroll-area-content {
+  padding: 4px;
+}
+.x-govuk-ui-tree-select-empty {
+  margin: 0;
+  padding: 12px 14px;
+  color: var(--x-govuk-ui-muted);
+  font-size: 16px;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-tree-select-popup {
+    border-color: CanvasText;
+  }
+  .x-govuk-ui-tree-select-search:has(.x-govuk-ui-tree-select-input:focus) {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+  }
+}

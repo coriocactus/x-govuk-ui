@@ -116,6 +116,7 @@ import toggleGroup from "./toggle-group";
 import tooltip from "./tooltip";
 import tour from "./tour";
 import tree from "./tree";
+import treeSelect from "./tree-select";
 import treemap from "./treemap";
 import visuallyHidden from "./visually-hidden";
 import waffle from "./waffle";
@@ -196,6 +197,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   combobox,
   "multi-select": multiSelect,
   tree,
+  "tree-select": treeSelect,
   "search-box": searchBox,
   "summary-list": summaryList,
   "task-list": taskList,

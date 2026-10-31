@@ -217,6 +217,9 @@ export function Form({
   const fields = useRef(new Map<string, FormField>());
   // The answers when the errors were found, so the form can tell which have changed since.
   const found = useRef<FormData | null>(null);
+  // Whether `onSubmit` is running. A form sent again meanwhile, such as by Enter pressed twice,
+  // sends nothing.
+  const sending = useRef(false);
 
   const register = useCallback((name: string, field: FormField) => {
     fields.current.set(name, field);
@@ -332,6 +335,7 @@ export function Form({
         ref={mergedRef}
         className={`x-govuk-ui-form ${className}`.trim()}
         onSubmit={async (event) => {
+          if (sending.current) return event.preventDefault();
           const submitter = (event.nativeEvent as SubmitEvent).submitter;
           const data = new FormData(event.currentTarget, submitter);
           let checked: FormErrors;
@@ -346,8 +350,13 @@ export function Form({
           // A form without onSubmit is sent as any form is, such as to the server.
           if (!onSubmit) return;
           event.preventDefault();
-          const errors = await onSubmit(data, event);
-          if (errors) show(errors, data);
+          sending.current = true;
+          try {
+            const errors = await onSubmit(data, event);
+            if (errors) show(errors, data);
+          } finally {
+            sending.current = false;
+          }
         }}
         // The answers are checked again whatever a service's own handlers do, because a click
         // prevented for a reason of its own, such as a link's, can still change an answer.

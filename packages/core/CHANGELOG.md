@@ -8,6 +8,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Removed Sidebar's `animations` prop, with `sidebarAnimations` and `SidebarAnimation`. Every movement of the Sidebar now runs, unless users prefer reduced motion. Remove `animations` from your Sidebar. The sidebar no longer has a `data-animate` attribute, so select its parts by their classes.
 
+### Fixed
+
+- Fixed Form running `onSubmit` again when sent while the last `onSubmit` still runs, such as when users press Enter twice. A form sent meanwhile now sends nothing.
+
 ## [0.5.0] - 2026-10-20
 
 ### Breaking Changes

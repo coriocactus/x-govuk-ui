@@ -121,11 +121,13 @@ test("a message about the whole form shows in the summary without a link", async
   await frame.getByRole("textbox", { name: "Month" }).fill("3");
   await frame.getByRole("textbox", { name: "Year" }).fill("1985");
   await frame.getByRole("radio", { name: "8 days" }).check();
-  await frame.getByRole("button", { name: "Continue" }).click();
+  // The second press comes while the answers are being sent, so it sends nothing.
+  await frame.getByRole("button", { name: "Continue" }).dblclick();
   const summary = frame.locator(".x-govuk-ui-error-summary");
   await expect(summary).toBeFocused();
   await expect(summary).toContainText("We could not save your details. Try again.");
   await expect(summary.getByRole("link")).toHaveCount(0);
+  await expect(frame.getByRole("status")).toHaveText("");
   await frame.getByRole("button", { name: "Continue" }).click();
   await expect(frame.getByRole("status")).toHaveText("Your answers are ready. Nothing was sent.");
 });

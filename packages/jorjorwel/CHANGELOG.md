@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed code blocks in the Editor gaining a blank last line. Markdown renderers end a code block's HTML with a newline, and so does pasted Markdown. The Editor read that newline as a line of its own. A code block that ended in a blank line also grew by a line each time the Editor read its own value back, such as from Source.
 - Fixed Backspace in an empty list item between others in the Editor. It made the item an empty paragraph between two lists. It now removes the item, and puts the caret at the end of the item before.
 - Fixed an image added in the last item of a list in the Editor's quotation going before the list. It now goes after the list. Added in an empty item, it no longer leaves an empty quotation after it.
 - Fixed paragraphs pasted into a quotation in the Editor running together into one line. They now split the quotation's paragraph at the caret, as they do outside a quotation. A pasted list now stays whole there too.

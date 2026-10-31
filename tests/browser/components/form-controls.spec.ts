@@ -836,7 +836,7 @@ test("the editor's prompt mentions a member of the team, and pasted Markdown and
   await expect(written).toHaveValue(/<ul><li>First<\/li><li>Second<\/li><\/ul>$/);
 });
 
-test("the editor puts pasted blocks where they belong, inside quotations as outside", async ({
+test("the editor reads pasted and written HTML as meant, in quotations and code blocks", async ({
   browserName,
   page,
   frame,
@@ -886,6 +886,17 @@ test("the editor puts pasted blocks where they belong, inside quotations as outs
       "<p>One</p><p>Two</p><blockquote><p>QuotedOne</p><p>Two! words</p></blockquote>",
     );
   }
+  // A code block's HTML often ends with a newline, as Markdown renderers write it, which is no line
+  // of its own. Read from the source, or pasted as Markdown, it adds no blank last line. A blank
+  // last line of the code's own reads back as it was written.
+  await writeSource(frame, "<pre><code>one\ntwo\n</code></pre><p>After</p>");
+  await expect(written).toHaveValue("<pre>one\ntwo</pre><p>After</p>");
+  await writeSource(frame, "<pre>one\n\n</pre><p>After</p>");
+  await expect(written).toHaveValue("<pre>one\n\n</pre><p>After</p>");
+  await caretAtEnd(document, "p");
+  await page.keyboard.press("Enter");
+  await paste(document, { "text/plain": "```\nthree\n```" });
+  await expect(written).toHaveValue("<pre>one\n\n</pre><p>After</p><pre>three</pre>");
 });
 
 test("the editor offers a model's suggestions for selected text, held as it is written", async ({

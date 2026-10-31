@@ -208,7 +208,9 @@ export function parseHtml(html: string) {
  * put in paragraphs, because the root takes only blocks.
  */
 export function $nodesFromHtml(editor: LexicalEditor, html: string) {
-  const nodes = $generateNodesFromDOM(editor, parseHtml(html || "<p></p>"));
+  const doc = parseHtml(html || "<p></p>");
+  trimCodeBlockEnds(doc);
+  const nodes = $generateNodesFromDOM(editor, doc);
   return nodes
     .filter(
       (node) =>
@@ -219,6 +221,20 @@ export function $nodesFromHtml(editor: LexicalEditor, html: string) {
         ? $createParagraphNode().append(node)
         : node,
     );
+}
+
+/**
+ * Removes the newline that ends a code block's text. Markdown renderers end each `<pre>` with one,
+ * and Lexical would read it as a blank last line. The editor writes a blank last line of its own as
+ * two newlines, so one is left. A newline followed by a `<br>` is a line of its own, and stays.
+ */
+function trimCodeBlockEnds(doc: Document) {
+  for (const pre of doc.querySelectorAll("pre")) {
+    let last: Node = pre;
+    while (last.lastChild) last = last.lastChild;
+    if (last.nodeType === Node.TEXT_NODE && last.nodeValue?.endsWith("\n"))
+      last.nodeValue = last.nodeValue.slice(0, -1);
+  }
 }
 
 /** Replaces the document with the value, in its format. */
@@ -258,6 +274,7 @@ export function $getValue(
  * - Style sheets are dropped, after the paragraph spacing Word declares in them is copied onto its
  *   paragraphs.
  * - The browser's marker of a selection's last line break is removed.
+ * - A code block loses the newline that ends it.
  * - Placeholder links are unwrapped.
  * - Table cells lose their colours, so they take the theme.
  * - Word's and Outlook's paragraphs of bullets become lists again.
@@ -269,6 +286,7 @@ export function formatPastedHtml(doc: Document) {
   for (const style of doc.querySelectorAll("style")) style.remove();
   for (const lineBreak of doc.querySelectorAll("br.Apple-interchange-newline"))
     if (atEndOfBody(doc, lineBreak)) lineBreak.remove();
+  trimCodeBlockEnds(doc);
   for (const anchor of doc.querySelectorAll("a")) {
     const href = anchor.getAttribute("href") ?? "";
     if (href === "" || href === "#") anchor.replaceWith(...anchor.childNodes);

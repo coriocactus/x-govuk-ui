@@ -116,6 +116,29 @@ async function caretAtEnd(document: Locator, selector: string, nth = 0) {
   await settled(document);
 }
 
+/**
+ * Pastes into the document. Firefox gives a paste event made by a script an empty clipboard. In
+ * Firefox, the data is therefore written to the clipboard, and pasted from there.
+ */
+async function paste(document: Locator, data: Record<string, string>) {
+  const page = document.page();
+  if (page.context().browser()?.browserType().name() === "firefox") {
+    await page.evaluate(async (data) => {
+      const parts = Object.entries(data).map(([type, text]) => [type, new Blob([text], { type })]);
+      await navigator.clipboard.write([new ClipboardItem(Object.fromEntries(parts))]);
+    }, data);
+    await page.keyboard.press("ControlOrMeta+v");
+    return;
+  }
+  await document.evaluate((element, data) => {
+    const transfer = new DataTransfer();
+    for (const [type, text] of Object.entries(data)) transfer.setData(type, text);
+    element.dispatchEvent(
+      new ClipboardEvent("paste", { clipboardData: transfer, bubbles: true, cancelable: true }),
+    );
+  }, data);
+}
+
 /** Replaces the editor's document with HTML, written in its source as a user would write it. */
 async function writeSource(frame: Locator, html: string) {
   const toolbar = frame.getByRole("toolbar", { name: "Formatting" });
@@ -700,7 +723,6 @@ test("the editor takes part in a Form: its popovers send nothing, it waits for f
 });
 
 test("the editor's prompt mentions a member of the team, and pasted Markdown and links are made good", async ({
-  browserName,
   page,
   frame,
   open,
@@ -750,38 +772,16 @@ test("the editor's prompt mentions a member of the team, and pasted Markdown and
   ]);
   await page.keyboard.press("Enter");
   await expect(written).toHaveValue(/@ 👍 about it\./);
-  // Pasted plain text is read as Markdown, and a bare web address as a link. Firefox gives a paste
-  // event made by a script an empty clipboard. In Firefox, the test therefore writes to the
-  // clipboard itself and pastes from it.
-  const paste = async (data: Record<string, string>) => {
-    if (browserName === "firefox") {
-      await page.evaluate(async (data) => {
-        const parts = Object.entries(data).map(([type, text]) => [
-          type,
-          new Blob([text], { type }),
-        ]);
-        await navigator.clipboard.write([new ClipboardItem(Object.fromEntries(parts))]);
-      }, data);
-      await page.keyboard.press("ControlOrMeta+v");
-      return;
-    }
-    await document.evaluate((element, data) => {
-      const transfer = new DataTransfer();
-      for (const [type, text] of Object.entries(data)) transfer.setData(type, text);
-      element.dispatchEvent(
-        new ClipboardEvent("paste", { clipboardData: transfer, bubbles: true, cancelable: true }),
-      );
-    }, data);
-  };
+  // Pasted plain text is read as Markdown, and a bare web address as a link.
   await caretAtEnd(document, "p", 1);
   await page.keyboard.press("Enter");
-  await paste({ "text/plain": "## Next steps\n\n- one\n- **two**" });
+  await paste(document, { "text/plain": "## Next steps\n\n- one\n- **two**" });
   await expect(written).toHaveValue(
     /<h2>Next steps<\/h2><ul><li>one<\/li><li><strong>two<\/strong><\/li><\/ul>$/,
   );
   await page.keyboard.press("Enter");
   await page.keyboard.press("Enter");
-  await paste({ "text/plain": "https://www.gov.uk/browse" });
+  await paste(document, { "text/plain": "https://www.gov.uk/browse" });
   await expect(written).toHaveValue(
     /<p><a href="https:\/\/www\.gov\.uk\/browse">https:\/\/www\.gov\.uk\/browse<\/a><\/p>$/,
   );
@@ -793,13 +793,65 @@ test("the editor's prompt mentions a member of the team, and pasted Markdown and
     "text/plain": "First\nSecond",
   };
   await page.keyboard.press("Enter");
-  await paste(word);
+  await paste(document, word);
   await expect(written).toHaveValue(/<ul><li>First<\/li><li>Second<\/li><\/ul>$/);
   await playground.set("attachments", false);
   await caretAtEnd(document, "p", 1);
   await page.keyboard.press("Enter");
-  await paste(word);
+  await paste(document, word);
   await expect(written).toHaveValue(/<ul><li>First<\/li><li>Second<\/li><\/ul>$/);
+});
+
+test("the editor puts pasted blocks where they belong, inside quotations as outside", async ({
+  browserName,
+  page,
+  frame,
+  open,
+}) => {
+  await open("editor");
+  const document = frame.getByRole("textbox", { name: "Notes for the caseworker" });
+  const written = frame.locator('input[name="notes"]');
+  // Paragraphs pasted into a quotation's paragraph split it at the caret, as they would outside a
+  // quotation, and a list stays whole there.
+  await writeSource(frame, "<blockquote><p>Quoted words</p></blockquote>");
+  await selectText(document, "blockquote p", 6, 6);
+  await paste(document, { "text/html": "<p>One</p><p>Two</p>", "text/plain": "One\n\nTwo" });
+  await page.keyboard.type("!");
+  await expect(written).toHaveValue("<blockquote><p>QuotedOne</p><p>Two! words</p></blockquote>");
+  await caretAtEnd(document, "blockquote p", 1);
+  await paste(document, { "text/html": "<ul><li>a</li><li>b</li></ul>", "text/plain": "a\nb" });
+  await page.keyboard.type("!");
+  await expect(written).toHaveValue(
+    "<blockquote><p>QuotedOne</p><p>Two! words</p><ul><li>a</li><li>b!</li></ul></blockquote>",
+  );
+  // Lines copied in the editor go in the same way, from the editor's own data. Firefox gives a copy
+  // event made by a script no clipboard to write to.
+  if (browserName !== "firefox") {
+    await writeSource(frame, "<p>One</p><p>Two</p><blockquote><p>Quoted words</p></blockquote>");
+    await document.evaluate((element) => {
+      const [first, second] = element.querySelectorAll("p");
+      const range = window.document.createRange();
+      range.setStart(first!, 0);
+      range.setEnd(second!, second!.childNodes.length);
+      window.getSelection()!.removeAllRanges();
+      window.getSelection()!.addRange(range);
+    });
+    await settled(document);
+    const copied = await document.evaluate((element) => {
+      const transfer = new DataTransfer();
+      element.dispatchEvent(
+        new ClipboardEvent("copy", { clipboardData: transfer, bubbles: true, cancelable: true }),
+      );
+      return Object.fromEntries(transfer.types.map((type) => [type, transfer.getData(type)]));
+    });
+    expect(Object.keys(copied)).toContain("application/x-lexical-editor");
+    await selectText(document, "blockquote p", 6, 6);
+    await paste(document, copied);
+    await page.keyboard.type("!");
+    await expect(written).toHaveValue(
+      "<p>One</p><p>Two</p><blockquote><p>QuotedOne</p><p>Two! words</p></blockquote>",
+    );
+  }
 });
 
 test("the editor offers a model's suggestions for selected text, held as it is written", async ({

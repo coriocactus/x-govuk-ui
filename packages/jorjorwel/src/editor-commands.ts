@@ -340,14 +340,19 @@ function $blockRunsIn(selection: RangeSelection) {
   const runs: Set<ElementNode>[] = [new Set()];
   for (const node of selection.getNodes()) {
     if ($isRootOrShadowRoot(node)) continue;
-    const block = $findMatchingParent(
-      node,
-      (parent): parent is ElementNode => $isElementNode(parent) && !parent.isInline(),
-    );
+    const block = $blockOf(node);
     if (block) runs.at(-1)?.add(block);
     else if (runs.at(-1)?.size) runs.push(new Set());
   }
   return runs.filter((run) => run.size > 0).map((run) => [...run]);
+}
+
+/** The block a node is, or is in. The root is no block. */
+function $blockOf(node: LexicalNode) {
+  return $findMatchingParent(
+    node,
+    (parent): parent is ElementNode => $isElementNode(parent) && !parent.isInline(),
+  );
 }
 
 function $topLevelIn(selection: RangeSelection) {
@@ -804,6 +809,7 @@ export function $toggleColours(styles: {
  * - After a code block, they go when code cannot contain them.
  * - Around a list, they go by splitting it, when they are blocks that a list item cannot contain,
  *   such as an image.
+ * - Into a block inside another, such as a paragraph in a quotation, blocks go in beside it.
  */
 export function $insertAtCursor(nodes: LexicalNode[]) {
   let selection = $getSelection();
@@ -852,7 +858,95 @@ export function $insertAtCursor(nodes: LexicalNode[]) {
     return;
   }
   $normalizeBlockContainerSelection(selection);
-  selection.insertNodes(nodes);
+  if (!$insertBesideNestedBlock(selection, nodes)) selection.insertNodes(nodes);
+}
+
+/**
+ * Puts blocks in beside the block the caret is in, where that block is inside another, such as a
+ * paragraph in a quotation. Since Lexical 0.50, `insertNodes` turns blocks put in there into that
+ * block's text, so two pasted paragraphs would become one line. Here the block is split at the
+ * caret instead, as Lexical splits a block at the top of the document. The first block put in joins
+ * the words before the caret, and the words after the caret join the last.
+ *
+ * It returns false, and puts nothing in, where the caret is in no such block. A list item and a
+ * table cell's paragraph are left to Lexical, which keeps blocks whole there. @internal
+ */
+export function $insertBesideNestedBlock(selection: RangeSelection, nodes: LexicalNode[]) {
+  if (!$nestedBlockAt(selection)) return false;
+  if (!nodes.some($isBlock)) {
+    selection.insertNodes(nodes);
+    return true;
+  }
+  if (!selection.isCollapsed()) selection.removeText();
+  const target = $nestedBlockAt(selection);
+  if (!target) {
+    selection.insertNodes(nodes);
+    return true;
+  }
+  const blocks = $asBlocks(nodes);
+  const last = blocks.at(-1);
+  const end = $isElementNode(last) ? (last.getLastDescendant() ?? last) : last;
+  const trailing = target.isEmpty() ? null : selection.insertParagraph();
+  const rest = [...blocks];
+  const first = rest[0];
+  if ($holdsLine(first) && !first.isEmpty() && (!target.isEmpty() || target.canMergeWhenEmpty())) {
+    target.append(...first.getChildren());
+    rest.shift();
+  }
+  let previous: LexicalNode = target;
+  for (const block of rest) previous = previous.insertAfter(block);
+  // A list, a table or a quotation put in last stays whole, and the words after the caret stay in
+  // a line of their own after it. With no words after the caret, there is no line.
+  const lastLine = $holdsLine(last) && end ? $blockOf(end) : null;
+  if (trailing && lastLine) {
+    lastLine.append(...trailing.getChildren());
+    trailing.remove();
+  } else if (trailing?.isEmpty()) trailing.remove();
+  if (target.isEmpty()) target.remove();
+  end?.selectEnd();
+  // A line break just before the caret parted the words on each side of it. The words after the
+  // caret have moved on, so the break would only leave a blank line.
+  const lastChild = target.isAttached() ? target.getLastChild() : null;
+  if ($isLineBreakNode(lastChild) && !lastLine?.is(target)) lastChild.remove();
+  return true;
+}
+
+function $isBlock(node: LexicalNode) {
+  return ($isElementNode(node) || $isDecoratorNode(node)) && !node.isInline();
+}
+
+/** The block the caret is in, where that block is inside another block. */
+function $nestedBlockAt(selection: RangeSelection) {
+  const block = $blockOf(selection.anchor.getNode());
+  const parent = block?.getParent();
+  if (!block || block.isParentRequired() || !parent || $isRootOrShadowRoot(parent)) return null;
+  return block;
+}
+
+/** Whether a node is a block of words, such as a paragraph or a heading, and not of other blocks. */
+function $holdsLine(node: LexicalNode | undefined): node is ElementNode {
+  if (!$isElementNode(node) || node.isInline() || $isRootOrShadowRoot(node)) return false;
+  const child = node.getFirstChild();
+  return child === null || $isTextNode(child) || $isLineBreakNode(child) || child.isInline();
+}
+
+/** The nodes as blocks, with each run of words and other inline nodes in a paragraph. */
+function $asBlocks(nodes: LexicalNode[]) {
+  const blocks: LexicalNode[] = [];
+  let paragraph: ElementNode | null = null;
+  for (const node of nodes) {
+    if ($isBlock(node)) {
+      blocks.push(node);
+      paragraph = null;
+    } else {
+      if (!paragraph) {
+        paragraph = $createParagraphNode();
+        blocks.push(paragraph);
+      }
+      paragraph.append(node);
+    }
+  }
+  return blocks;
 }
 
 function $insertAroundList(selection: RangeSelection, nodes: LexicalNode[]) {

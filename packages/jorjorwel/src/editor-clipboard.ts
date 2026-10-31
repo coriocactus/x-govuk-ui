@@ -20,7 +20,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND,
 } from "lexical";
 import { EmbedNode } from "./editor-attachments";
-import { $insertAtCursor } from "./editor-commands";
+import { $insertAtCursor, $insertBesideNestedBlock } from "./editor-commands";
 import type { EditorLinkPaste, EditorMarkdownPaste } from "./editor-context";
 import {
   $inCodeBlock,
@@ -203,12 +203,14 @@ export function registerClipboard(editor: LexicalEditor, options: ClipboardOptio
       COMMAND_PRIORITY_NORMAL,
     ),
     // A link copied alone, such as from a page, goes in as a link to its address, with the address
-    // as its text. It tells the page, as a link typed as text does.
+    // as its text. It tells the page, as a link typed as text does. Blocks copied from an editor
+    // go in beside a paragraph in a quotation, as pasted HTML does.
     editor.registerCommand(
       SELECTION_INSERT_CLIPBOARD_NODES_COMMAND,
       ({ nodes, selection }) => {
+        if (!$isRangeSelection(selection)) return false;
         const url = bareUrl(nodes);
-        if (!url || !$isRangeSelection(selection)) return false;
+        if (!url) return $insertBesideNestedBlock(selection, nodes);
         const key = $linkSelection(url, url, selection);
         if (key) $onUpdate(() => linkPasted(key, url));
         return true;

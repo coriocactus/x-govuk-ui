@@ -37,6 +37,7 @@ import {
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
   KEY_ARROW_UP_COMMAND,
+  KEY_BACKSPACE_COMMAND,
   KEY_DOWN_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
@@ -257,6 +258,22 @@ export function registerDecoratorSelection(editor: LexicalEditor) {
         if ($isElementNode(anchor) && anchor.isEmpty() && !$isRootOrShadowRoot(anchor))
           anchor.remove();
         return $selectDecorator(node, false);
+      },
+      COMMAND_PRIORITY_LOW,
+    ),
+    // Lexical's list plugin takes Backspace at the start of an item before it becomes
+    // DELETE_CHARACTER_COMMAND, and makes the item a paragraph between two lists. An empty item
+    // among others is therefore removed here first. An empty item in a nested list is left to
+    // Lexical, which lifts it out of the nested list.
+    editor.registerCommand(
+      KEY_BACKSPACE_COMMAND,
+      (event) => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return false;
+        const item = $getNearestNodeOfType(selection.anchor.getNode(), ListItemNode);
+        if (!item || item.getIndent() > 0 || !$removeEmptyListItem()) return false;
+        event.preventDefault();
+        return true;
       },
       COMMAND_PRIORITY_LOW,
     ),

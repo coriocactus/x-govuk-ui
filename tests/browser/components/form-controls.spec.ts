@@ -387,6 +387,13 @@ test("the editor keeps dividers, tables and lists whole as blocks change around 
   await page.keyboard.press("Backspace");
   await page.keyboard.type("Instead");
   await expect(written).toHaveValue("<p>Before</p><p>Instead</p><p>After</p>");
+  // Backspace in an empty list item between others removes the item, and the caret goes to the end
+  // of the item before.
+  await writeSource(frame, "<ul><li>One</li><li>Two</li><li>Three</li></ul>");
+  await caretAtEnd(document, "li", 1);
+  for (let press = 0; press < 4; press++) await page.keyboard.press("Backspace");
+  await page.keyboard.type("!");
+  await expect(written).toHaveValue("<ul><li>One!</li><li>Three</li></ul>");
   // An image added in the last item of a list in a quotation goes after the list, which stays
   // whole. Added in an empty last item, it takes the item's place, and leaves no empty quotation.
   const addImage = async (name: string) => {

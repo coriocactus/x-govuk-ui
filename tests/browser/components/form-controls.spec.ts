@@ -216,11 +216,22 @@ test("the editor formats as Lexxy's toolbar and Markdown shortcuts say, and writ
   await page.getByRole("textbox", { name: "Web address" }).fill("www.gov.uk/notes");
   await page.keyboard.press("Enter");
   await expect(written).toHaveValue(/<a href="https:\/\/www\.gov\.uk\/notes"[^>]*>when<\/a>/);
+  // With the caret at the end of a link, Mod K changes that link, though Lexical puts the caret at
+  // the start of the words after it.
+  await caretAtEnd(document, 'a[href="https://www.gov.uk/notes"]');
+  await page.keyboard.press("ControlOrMeta+k");
+  const address = page.getByRole("textbox", { name: "Web address" });
+  await expect(address).toHaveValue("https://www.gov.uk/notes");
+  await address.fill("www.gov.uk/visits");
+  await page.keyboard.press("Enter");
+  await expect(written).toHaveValue(
+    /<li><a href="https:\/\/www\.gov\.uk\/visits"[^>]*>when<\/a> a decision will come<\/li>/,
+  );
   // A link shows its address and tools under it while the pointer rests on it, or while the caret
   // is in it, where Alt F10 reaches them.
   const linkTools = frame.getByRole("toolbar", { name: "Link", exact: true });
-  await document.locator('a[href="https://www.gov.uk/notes"]').hover();
-  await expect(linkTools.getByRole("link")).toHaveText("www.gov.uk/notes (opens in new tab)");
+  await document.locator('a[href="https://www.gov.uk/visits"]').hover();
+  await expect(linkTools.getByRole("link")).toHaveText("www.gov.uk/visits (opens in new tab)");
   await linkTools.getByRole("button", { name: "Unlink" }).click();
   await expect(written).toHaveValue(/<li>when a decision will come<\/li>/);
   await expect(linkTools).toHaveCount(0);

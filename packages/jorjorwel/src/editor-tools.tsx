@@ -50,6 +50,7 @@ import {
   useMergedRef,
 } from "x-govuk-ui";
 import { codeLanguage, codeLanguages } from "x-govuk-ui/internal";
+import { $linkAtCaret } from "./editor-commands";
 import { focusDocument, useEditorContext } from "./editor-context";
 import { controlIcons } from "./editor-controls";
 import { tableCommands } from "./editor-tables";
@@ -542,11 +543,11 @@ export function EditorTableTools(props: EditorToolPartProps) {
   );
 }
 
-/** The link the caret is in, while it is a caret, not a selection. */
+/** The link at the caret, while it is a caret, not a selection. */
 function $caretLink() {
   const selection = $getSelection();
   if (!$isRangeSelection(selection) || !selection.isCollapsed()) return null;
-  return $findMatchingParent(selection.anchor.getNode(), $isLinkNode)?.getKey() ?? null;
+  return $linkAtCaret(selection)?.getKey() ?? null;
 }
 
 /** How long the pointer rests on a link before its tools show, or is away before they go. */

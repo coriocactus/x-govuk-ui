@@ -1,5 +1,5 @@
 import { $createCodeNode, $isCodeNode, CodeNode } from "@lexical/code-core";
-import { $createAutoLinkNode, $isLinkNode, $toggleLink, LinkNode } from "@lexical/link";
+import { $createAutoLinkNode, $isLinkNode, $toggleLink } from "@lexical/link";
 import {
   $createListItemNode,
   $createListNode,
@@ -159,7 +159,7 @@ export function $readFormat(): EditorFormat {
   const top = $isRootNode(anchor) ? null : anchor.getTopLevelElement();
   const list = $listTypeOf(anchor);
   const listNode = $getNearestNodeOfType(anchor, ListNode);
-  const link = $getNearestNodeOfType(anchor, LinkNode);
+  const link = $linkAtCaret(selection);
   const styles = $selectionStyles(selection);
   return {
     bold: selection.hasFormat("bold"),
@@ -181,6 +181,20 @@ export function $readFormat(): EditorFormat {
     background: styles.background,
     href: link?.getURL() ?? null,
   };
+}
+
+/**
+ * The link the selection is in, or the link that ends at the caret. Lexical moves a caret at the
+ * end of a link onto the start of the text after it, though the browser draws it at the link's end.
+ * @internal
+ */
+export function $linkAtCaret(selection: RangeSelection) {
+  const { anchor } = selection;
+  const link = $findMatchingParent(anchor.getNode(), $isLinkNode);
+  if (link || !selection.isCollapsed() || anchor.type !== "text" || anchor.offset !== 0)
+    return link;
+  const previous = anchor.getNode().getPreviousSibling();
+  return $isLinkNode(previous) ? previous : null;
 }
 
 /** The colours where the caret is, from the selection's own style, or from the text it sits in. */
@@ -758,14 +772,12 @@ function $wrapInList(blocks: ElementNode[], type: ListType) {
 export function $insertLink(url: string) {
   const selection = $getSelection();
   if (!$isRangeSelection(selection)) return;
-  const anchor = selection.anchor.getNode();
-  if (selection.isCollapsed() && !$getNearestNodeOfType(anchor, LinkNode)) {
-    const link = $createAutoLinkNode(url).append($createTextNode(url));
-    selection.insertNodes([link]);
+  const link = $linkAtCaret(selection);
+  if (selection.isCollapsed() && !link) {
+    selection.insertNodes([$createAutoLinkNode(url).append($createTextNode(url))]);
     return;
   }
-  // A link the caret is in takes the new address, and a selection becomes one link.
-  const link = $findMatchingParent(anchor, $isLinkNode);
+  // A link at the caret takes the new address, and a selection becomes one link.
   if (selection.isCollapsed() && link) {
     link.setURL(url);
     return;
@@ -777,7 +789,7 @@ export function $insertLink(url: string) {
 export function $removeLink() {
   const selection = $getSelection();
   if (!$isRangeSelection(selection)) return;
-  const link = $findMatchingParent(selection.anchor.getNode(), $isLinkNode);
+  const link = $linkAtCaret(selection);
   if (selection.isCollapsed() && link) {
     for (const child of link.getChildren()) link.insertBefore(child);
     link.remove();

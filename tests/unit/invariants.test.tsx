@@ -175,6 +175,45 @@ test("each component lists each prop once, and each example setting once", () =>
   expect(twice).toEqual([]);
 });
 
+test("each part the catalogue lists by its props names every prop the part declares itself", async () => {
+  // The catalogue writes a part's props by hand, as `{ a, b }`, so a prop added to the part must
+  // be added there too. A prop the part takes from another type, such as Base UI's, is not read.
+  const own = new Map<string, string[]>();
+  for (const path of new Bun.Glob("packages/*/src/*.tsx").scanSync(".")) {
+    const lines = (await Bun.file(path).text()).split("\n");
+    lines.forEach((line, at) => {
+      const part = line.match(/^export type (\w+)Props =/)?.[1];
+      if (!part) return;
+      const keys: string[] = [];
+      let depth = 0;
+      for (const next of lines.slice(at)) {
+        const key = depth === 1 && next.match(/^ {2}(\w+)\??:/)?.[1];
+        if (key) keys.push(key);
+        for (const character of next) depth += character === "{" ? 1 : character === "}" ? -1 : 0;
+        if (depth === 0 && next.trimEnd().endsWith(";")) break;
+      }
+      own.set(part, keys);
+    });
+  }
+  const listed = new Map<string, Set<string>>();
+  for (const entry of Object.values(catalogue))
+    for (const { name, type, default: fallback } of entry.props)
+      if (fallback === "Part" && type.startsWith("{"))
+        for (const prop of type.slice(1, -1).split(/[,|]/))
+          listed.set(
+            name,
+            (listed.get(name) ?? new Set()).add(prop.trim().split(/[?:\s]/)[0] ?? ""),
+          );
+  const missing = [...listed].flatMap(([part, props]) =>
+    (own.get(part) ?? [])
+      .filter((prop) => !["children", "className", "style", "ref"].includes(prop))
+      .filter((prop) => !props.has(prop))
+      .map((prop) => `${part}: ${prop}`),
+  );
+  expect(listed.size).toBeGreaterThan(80);
+  expect(missing).toEqual([]);
+});
+
 test("every playground setting that needs another names one of its component's settings", () => {
   const wrong: string[] = [];
   for (const [key, entry] of Object.entries(catalogue)) {

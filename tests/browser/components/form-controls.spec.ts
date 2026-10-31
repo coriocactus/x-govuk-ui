@@ -387,6 +387,20 @@ test("the editor keeps dividers, tables and lists whole as blocks change around 
   await page.keyboard.press("Backspace");
   await page.keyboard.type("Instead");
   await expect(written).toHaveValue("<p>Before</p><p>Instead</p><p>After</p>");
+  // A triple press in a table cell selects the pressed line, as it does outside a table. WebKit
+  // selects nothing on a triple press that comes into a table from outside it, so the caret is put
+  // in the table first.
+  await writeSource(
+    frame,
+    "<table><tbody><tr><td><p>First cell</p></td><td><ul><li>Alpha beta</li><li>Gamma</li></ul></td></tr></tbody></table><p>After</p>",
+  );
+  const selected = () => page.evaluate(() => window.getSelection()?.toString().trim());
+  await document.locator("td li").last().click();
+  await settled(document);
+  await document.locator("td p").first().click({ clickCount: 3 });
+  await expect.poll(selected).toBe("First cell");
+  await document.locator("td li").first().click({ clickCount: 3 });
+  await expect.poll(selected).toBe("Alpha beta");
   // Backspace in an empty list item between others removes the item, and the caret goes to the end
   // of the item before.
   await writeSource(frame, "<ul><li>One</li><li>Two</li><li>Three</li></ul>");

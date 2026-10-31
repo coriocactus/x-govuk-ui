@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed a triple press in a table cell in the Editor selecting nothing. It now selects the pressed line, such as a paragraph or a list item, as it does outside a table.
 - Fixed pasted text that Markdown writes nothing for, such as an HTML comment or a link's reference, going missing in the Editor. It now goes in as the text it was.
 - Fixed code blocks in the Editor gaining a blank last line. Markdown renderers end a code block's HTML with a newline, and so does pasted Markdown. The Editor read that newline as a line of its own. A code block that ended in a blank line also grew by a line each time the Editor read its own value back, such as from Source.
 - Fixed Backspace in an empty list item between others in the Editor. It made the item an empty paragraph between two lists. It now removes the item, and puts the caret at the end of the item before.

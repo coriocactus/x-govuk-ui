@@ -2,6 +2,7 @@ import { $isCodeHighlightNode, CodeNode } from "@lexical/code-core";
 import { $isLinkNode } from "@lexical/link";
 import { $isListItemNode, ListItemNode, ListNode } from "@lexical/list";
 import { $isHeadingNode, $isQuoteNode, QuoteNode } from "@lexical/rich-text";
+import { $findCellNode, $isTableCellNode, $isTableNode, $isTableRowNode } from "@lexical/table";
 import { $getNearestNodeOfType, IS_APPLE, mergeRegister } from "@lexical/utils";
 import {
   $addUpdateTag,
@@ -770,16 +771,43 @@ export function registerLinkOpener(editor: LexicalEditor, box: () => HTMLElement
 }
 
 /**
- * Lexical selects a whole block on a triple press, which breaks headings and table cells. The
- * browser's own selection, of the pressed paragraph, is kept instead.
+ * Lexical selects a whole block on a triple press, which breaks headings. The browser's own
+ * selection, of the pressed paragraph, is kept instead. A table cell is the exception, because
+ * Lexical's table plugin cancels the browser's selection there. The plugin selects only a block
+ * that is the cell's own child, so the pressed block is selected here, such as a list item.
  */
 export function registerTripleClick(editor: LexicalEditor) {
-  return editor.registerRootListener((root) => {
-    if (!root) return;
-    const click = (event: MouseEvent) => {
-      if (event.detail === 3) event.stopPropagation();
-    };
-    root.addEventListener("click", click, true);
-    return () => root.removeEventListener("click", click, true);
-  });
+  return mergeRegister(
+    editor.registerRootListener((root) => {
+      if (!root) return;
+      const click = (event: MouseEvent) => {
+        if (event.detail !== 3) return;
+        // Only this editor's cells, as the editor can sit in a table of the page's own.
+        const cell = (event.target as Element | null)?.closest?.("td, th");
+        if (!cell || !root.contains(cell)) event.stopPropagation();
+      };
+      root.addEventListener("click", click, true);
+      return () => root.removeEventListener("click", click, true);
+    }),
+    editor.registerCommand(
+      CLICK_COMMAND,
+      (event) => {
+        // A selection of cells, or a press on an attachment, is left as it is.
+        if (event.detail < 3 || !$isRangeSelection($getSelection())) return false;
+        const node = isDOMNode(event.target) ? $getNearestNodeFromDOMNode(event.target) : null;
+        if (!node || $isDecoratorNode(node) || $isTablePart(node)) return false;
+        const cell = $findCellNode(node);
+        const block =
+          cell && $findMatchingParent(node, (each) => $isElementNode(each) && !each.isInline());
+        if (!$isElementNode(block) || block.is(cell)) return false;
+        block.select(0, block.getChildrenSize());
+        return true;
+      },
+      COMMAND_PRIORITY_LOW,
+    ),
+  );
+}
+
+function $isTablePart(node: LexicalNode) {
+  return $isTableNode(node) || $isTableRowNode(node) || $isTableCellNode(node);
 }

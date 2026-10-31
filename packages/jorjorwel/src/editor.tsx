@@ -4,7 +4,6 @@ import { CodeHighlightNode, CodeNode, registerCodeIndentation } from "@lexical/c
 import { createEmptyHistoryState, type HistoryState } from "@lexical/history";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
-import type { Transformer } from "@lexical/markdown";
 import { registerMarkdownShortcuts } from "@lexical/markdown";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -302,36 +301,41 @@ const richNodes: readonly (Klass<LexicalNode> | LexicalNodeReplacement)[] = [
 ];
 
 /** The props that set up an editor, which EditorRoot takes, beside its parts. */
-type RootKeys =
-  | "name"
-  | "value"
-  | "defaultValue"
-  | "onValueChange"
-  | "format"
-  | "placeholder"
-  | "disabled"
-  | "readOnly"
-  | "required"
-  | "characterLimit"
-  | "wordLimit"
-  | "threshold"
-  | "richText"
-  | "multiLine"
-  | "markdown"
-  | "headings"
-  | "colours"
-  | "permittedColours"
-  | "attachments"
-  | "onUpload"
-  | "permittedAttachmentTypes"
-  | "onFileAccept"
-  | "onLinkPaste"
-  | "onMarkdownPaste"
-  | "checkLists"
-  | "nodes"
-  | "labels"
-  | "editorRef"
-  | "autoFocus";
+const rootKeys = [
+  "name",
+  "value",
+  "defaultValue",
+  "onValueChange",
+  "format",
+  "placeholder",
+  "disabled",
+  "readOnly",
+  "required",
+  "characterLimit",
+  "wordLimit",
+  "threshold",
+  "richText",
+  "multiLine",
+  "markdown",
+  "headings",
+  "colours",
+  "permittedColours",
+  "attachments",
+  "onUpload",
+  "permittedAttachmentTypes",
+  "onFileAccept",
+  "onLinkPaste",
+  "onMarkdownPaste",
+  "checkLists",
+  "nodes",
+  "labels",
+  "editorRef",
+  "autoFocus",
+] as const satisfies readonly (keyof EditorProps)[];
+type RootKeys = (typeof rootKeys)[number];
+
+/** The headings the formatting menu offers and Markdown makes, unless `headings` gives others. */
+const defaultHeadings: readonly HeadingTagType[] = ["h2", "h3", "h4"];
 
 /**
  * A field for rich text, such as a caseworker's note or a letter, built on Lexical, after
@@ -357,73 +361,19 @@ export function Editor({
   errorMessage,
   id,
   "aria-describedby": describedBy,
-  name,
-  value,
-  defaultValue,
-  onValueChange,
-  format,
-  placeholder,
-  disabled,
-  readOnly,
-  required,
-  characterLimit,
-  wordLimit,
-  threshold,
-  richText,
-  multiLine,
-  markdown,
-  headings,
-  colours,
-  permittedColours,
-  attachments,
-  onUpload,
-  permittedAttachmentTypes,
-  onFileAccept,
-  onLinkPaste,
-  onMarkdownPaste,
-  checkLists,
-  nodes,
-  labels,
-  editorRef,
-  autoFocus,
-  ...box
+  ...props
 }: EditorProps) {
   const generated = useId();
+  // The editor's own props go to EditorRoot, and the rest, such as `rows` and `ref`, to its box.
+  const root: Pick<EditorProps, RootKeys> = {};
+  const box: EditorBoxProps = {};
+  for (const [key, value] of Object.entries(props))
+    Object.assign((rootKeys as readonly string[]).includes(key) ? root : box, { [key]: value });
   return (
-    <EditorRoot
-      name={name}
-      value={value}
-      defaultValue={defaultValue}
-      onValueChange={onValueChange}
-      format={format}
-      placeholder={placeholder}
-      disabled={disabled}
-      readOnly={readOnly}
-      required={required}
-      characterLimit={characterLimit}
-      wordLimit={wordLimit}
-      threshold={threshold}
-      richText={richText}
-      multiLine={multiLine}
-      markdown={markdown}
-      headings={headings}
-      colours={colours}
-      permittedColours={permittedColours}
-      attachments={attachments}
-      onUpload={onUpload}
-      permittedAttachmentTypes={permittedAttachmentTypes}
-      onFileAccept={onFileAccept}
-      onLinkPaste={onLinkPaste}
-      onMarkdownPaste={onMarkdownPaste}
-      checkLists={checkLists}
-      nodes={nodes}
-      labels={labels}
-      editorRef={editorRef}
-      autoFocus={autoFocus}
-    >
+    <EditorRoot {...root}>
       <EditorField
         controlId={id ?? `field-${generated}`}
-        name={name}
+        name={props.name}
         hasHint={present(hint)}
         errorMessage={errorMessage}
         describedBy={describedBy}
@@ -448,164 +398,64 @@ export type EditorRootProps = Pick<EditorProps, RootKeys> & {
  * `ErrorMessage` and an `EditorBox`, and anything else between them. It takes every prop of
  * Editor's that is not the field's words or the box's.
  */
-export function EditorRoot({
-  name,
-  value,
-  defaultValue,
-  onValueChange,
-  format = "html",
-  placeholder,
-  disabled = false,
-  readOnly = false,
-  required = false,
-  characterLimit,
-  wordLimit,
-  threshold = 0,
-  richText = true,
-  multiLine = true,
-  markdown = true,
-  headings = ["h2", "h3", "h4"],
-  colours,
-  permittedColours,
-  attachments,
-  onUpload,
-  permittedAttachmentTypes,
-  onFileAccept,
-  onLinkPaste,
-  onMarkdownPaste,
-  checkLists = false,
-  nodes = [],
-  labels: ownLabels,
-  editorRef,
-  autoFocus = false,
-  children,
-}: EditorRootProps) {
-  // A form sent while files are uploading is stopped, and the field says why.
-  const [waiting, setWaiting] = useState(false);
-  const labels = useLabels("editor", defaultEditorLabels, ownLabels);
-  const limit = wordLimit ?? characterLimit;
-  const unit = wordLimit ? "word" : "character";
-  const count = useMemo(
-    () => (limit === undefined ? null : { limit, unit, threshold }),
-    [limit, unit, threshold],
-  ) as EditorShared["count"];
-  const box = useRef<HTMLDivElement>(null);
-  // Kept as state, because the floating tools follow its scrolling once it is there.
-  const [body, setBody] = useState<HTMLDivElement | null>(null);
+export function EditorRoot(props: EditorRootProps) {
   // A Form can give the document to start with, such as one kept from an earlier visit.
-  const saved = useFormDefault(name)?.[0];
-  const startWith = value ?? saved ?? defaultValue ?? "";
-  // The document as written, which the hidden field submits. It is a store, so writing it renders
-  // only what shows it, instead of the whole editor at each key.
-  const [text] = useState(() => createStore(startWith));
-  // What the document has been written as since a `value` came from outside. A `value` that only
-  // echoes one of these, however late it comes, is then not set again.
-  const emitted = useRef([startWith]);
-  const change = useLatest(onValueChange);
-  const [source, setSource] = useState(false);
-
+  const saved = useFormDefault(props.name)?.[0];
+  const startWith = props.value ?? saved ?? props.defaultValue ?? "";
   // Read once, because Lexical creates the editor once with its nodes, and the nodes decide what it
   // can contain.
-  const [initial] = useState(() => {
-    const options = {
-      richText,
-      format,
-      attachments: richText && (attachments ?? Boolean(onUpload)),
-      checkLists: richText && checkLists,
-      // Plain text has no Markdown, so what would make a heading stays as it was typed.
-      transformers: richText ? markdownTransformers(headings, checkLists) : [],
-    };
-    return {
-      ...options,
-      config: {
-        namespace: "x-govuk-ui-editor",
-        theme,
-        nodes: richText ? [...richNodes, ...nodes] : [ProvisionalParagraphNode, ...nodes],
-        editable: !disabled && !readOnly,
-        onError: (error: Error) => {
-          throw error;
-        },
-        html: { export: htmlExports, import: htmlImports },
-        editorState: (editor: LexicalEditor) => {
-          // What the document takes is known before the value is read into it.
-          const state = attachmentState(editor);
-          state.enabled = options.attachments;
-          state.permitted = permittedAttachmentTypes ?? null;
-          $setValue(editor, startWith, options.format, options.transformers);
-        },
-      },
-    };
-  });
-  const transformers: Transformer[] = initial.transformers;
-
-  // Kept while their contents are the same, because lists given inline are new at each render.
-  const optionsKey = JSON.stringify([
-    multiLine,
-    markdown,
-    headings,
-    colours,
-    permittedColours,
-    permittedAttachmentTypes,
-  ]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: The key stands for the options' contents.
-  const options: EditorOptions = useMemo(
-    () => ({
-      richText: initial.richText,
-      multiLine,
-      markdown: initial.richText && markdown,
-      attachments: initial.attachments,
-      headings,
-      colours: {
-        text: colours?.text ?? editorColours,
-        background: colours?.background ?? editorBackgrounds,
-      },
-      permittedColours: {
-        text: permittedColours?.text ?? [],
-        background: permittedColours?.background ?? [],
-      },
-      permittedAttachmentTypes: permittedAttachmentTypes ?? null,
-      format: initial.format,
-    }),
-    [optionsKey, initial],
-  );
-
+  const [setup] = useState(() => editorSetup(props, startWith));
   return (
-    <LexicalComposer initialConfig={initial.config}>
-      <EditorCore
-        labels={labels}
-        options={options}
-        transformers={transformers}
-        nodes={initial.config.nodes}
-        checkLists={initial.checkLists}
-        box={box}
-        body={body}
-        setBody={setBody}
-        disabled={disabled}
-        readOnly={readOnly}
-        required={required}
-        placeholder={placeholder}
-        text={text}
-        waiting={waiting}
-        setWaiting={setWaiting}
-        emitted={emitted}
-        change={change}
-        value={value}
-        source={source}
-        setSource={setSource}
-        onUpload={onUpload}
-        onFileAccept={onFileAccept}
-        onLinkPaste={onLinkPaste}
-        onMarkdownPaste={onMarkdownPaste}
-        editorRef={editorRef}
-        autoFocus={autoFocus}
-        initialValue={startWith}
-        name={name}
-        count={count}
-      >
-        {children}
-      </EditorCore>
+    <LexicalComposer initialConfig={setup.config}>
+      <EditorCore {...props} setup={setup} initialValue={startWith} />
     </LexicalComposer>
   );
+}
+
+/** How Lexical creates the editor, and the options fixed as it does. @internal */
+function editorSetup(
+  {
+    format = "html",
+    disabled = false,
+    readOnly = false,
+    richText = true,
+    attachments,
+    onUpload,
+    permittedAttachmentTypes,
+    checkLists = false,
+    headings = defaultHeadings,
+    nodes = [],
+  }: EditorRootProps,
+  startWith: string,
+) {
+  const options = {
+    richText,
+    format,
+    attachments: richText && (attachments ?? Boolean(onUpload)),
+    checkLists: richText && checkLists,
+    // Plain text has no Markdown, so what would make a heading stays as it was typed.
+    transformers: richText ? markdownTransformers(headings, checkLists) : [],
+  };
+  return {
+    ...options,
+    config: {
+      namespace: "x-govuk-ui-editor",
+      theme,
+      nodes: richText ? [...richNodes, ...nodes] : [ProvisionalParagraphNode, ...nodes],
+      editable: !disabled && !readOnly,
+      onError: (error: Error) => {
+        throw error;
+      },
+      html: { export: htmlExports, import: htmlImports },
+      editorState: (editor: LexicalEditor) => {
+        // What the document takes is known before the value is read into it.
+        const state = attachmentState(editor);
+        state.enabled = options.attachments;
+        state.permitted = permittedAttachmentTypes ?? null;
+        $setValue(editor, startWith, options.format, options.transformers);
+      },
+    },
+  };
 }
 
 /** The Editor's bound Field, which says to wait while files upload. @internal */
@@ -720,41 +570,6 @@ export function EditorBox({
   );
 }
 
-type RootProps = {
-  labels: EditorLabels;
-  options: EditorOptions;
-  transformers: Transformer[];
-  nodes: EditorShared["nodes"];
-  checkLists: boolean;
-  box: RefObject<HTMLDivElement | null>;
-  body: HTMLDivElement | null;
-  setBody: (body: HTMLDivElement | null) => void;
-  disabled: boolean;
-  readOnly: boolean;
-  required: boolean;
-  placeholder: string | undefined;
-  text: ReturnType<typeof createStore<string>>;
-  waiting: boolean;
-  setWaiting: (waiting: boolean) => void;
-  emitted: RefObject<string[]>;
-  change: RefObject<((value: string) => void) | undefined>;
-  value: string | undefined;
-  source: boolean;
-  setSource: (source: boolean) => void;
-  onUpload: EditorProps["onUpload"];
-  onFileAccept: EditorProps["onFileAccept"];
-  onLinkPaste: EditorProps["onLinkPaste"];
-  onMarkdownPaste: EditorProps["onMarkdownPaste"];
-  editorRef: EditorProps["editorRef"];
-  autoFocus: boolean;
-  /** The document the editor started with, which a form's reset puts back. */
-  initialValue: string;
-  /** What the value is sent as. */
-  name: string | undefined;
-  count: EditorShared["count"];
-  children: ReactNode;
-};
-
 /**
  * Where the caret is on the page, for a popover opened from the document to be placed against. A
  * caret between elements has no size of its own, so the line or the document stands in for it.
@@ -798,37 +613,91 @@ function emit(emitted: RefObject<string[]>, next: string) {
  * behaviour registered on the editor. @internal
  */
 function EditorCore({
-  labels,
-  options,
-  transformers,
-  nodes,
-  checkLists,
-  box,
-  body,
-  setBody,
-  disabled,
-  readOnly,
-  required,
-  placeholder,
-  text,
-  waiting,
-  setWaiting,
-  emitted,
-  change,
+  setup,
+  initialValue,
+  name,
   value,
-  source,
-  setSource,
+  onValueChange,
+  placeholder,
+  disabled = false,
+  readOnly = false,
+  required = false,
+  characterLimit,
+  wordLimit,
+  threshold = 0,
+  multiLine: givenMultiLine = true,
+  markdown: givenMarkdown = true,
+  headings = defaultHeadings,
+  colours,
+  permittedColours,
+  permittedAttachmentTypes,
   onUpload,
   onFileAccept,
   onLinkPaste,
   onMarkdownPaste,
+  labels: ownLabels,
   editorRef,
-  autoFocus,
-  initialValue,
-  name,
-  count,
+  autoFocus = false,
   children,
-}: RootProps) {
+}: EditorRootProps & {
+  setup: ReturnType<typeof editorSetup>;
+  /** The document the editor started with, which a form's reset puts back. */
+  initialValue: string;
+}) {
+  // A form sent while files are uploading is stopped, and the field says why.
+  const [waiting, setWaiting] = useState(false);
+  const labels = useLabels("editor", defaultEditorLabels, ownLabels);
+  const limit = wordLimit ?? characterLimit;
+  const unit = wordLimit ? "word" : "character";
+  const count = useMemo(
+    () => (limit === undefined ? null : { limit, unit, threshold }),
+    [limit, unit, threshold],
+  ) as EditorShared["count"];
+  const box = useRef<HTMLDivElement>(null);
+  // Kept as state, because the floating tools follow its scrolling once it is there.
+  const [body, setBody] = useState<HTMLDivElement | null>(null);
+  // The document as written, which the hidden field submits. It is a store, so writing it renders
+  // only what shows it, instead of the whole editor at each key.
+  const [text] = useState(() => createStore(initialValue));
+  // What the document has been written as since a `value` came from outside. A `value` that only
+  // echoes one of these, however late it comes, is then not set again.
+  const emitted = useRef([initialValue]);
+  const change = useLatest(onValueChange);
+  const [source, setSource] = useState(false);
+  const { transformers, checkLists } = setup;
+  const nodes = setup.config.nodes;
+
+  // Kept while their contents are the same, because lists given inline are new at each render.
+  const optionsKey = JSON.stringify([
+    givenMultiLine,
+    givenMarkdown,
+    headings,
+    colours,
+    permittedColours,
+    permittedAttachmentTypes,
+  ]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: The key stands for the options' contents.
+  const options: EditorOptions = useMemo(
+    () => ({
+      richText: setup.richText,
+      multiLine: givenMultiLine,
+      markdown: setup.richText && givenMarkdown,
+      attachments: setup.attachments,
+      headings,
+      colours: {
+        text: colours?.text ?? editorColours,
+        background: colours?.background ?? editorBackgrounds,
+      },
+      permittedColours: {
+        text: permittedColours?.text ?? [],
+        background: permittedColours?.background ?? [],
+      },
+      permittedAttachmentTypes: permittedAttachmentTypes ?? null,
+      format: setup.format,
+    }),
+    [optionsKey, setup],
+  );
+
   const [editor] = useLexicalComposerContext();
   // The editor's own id, for a label and a box outside a bound Field, which then share it.
   const ownId = `editor-${useId()}`;
@@ -901,7 +770,7 @@ function EditorCore({
     };
     form.addEventListener("reset", onReset);
     return () => form.removeEventListener("reset", onReset);
-  }, [editor, box, emitted, text, options.format, transformers]);
+  }, [editor, text, options.format, transformers]);
 
   // Lexical keeps the editor's editability as it was created, so a change is passed to it.
   useEffect(() => {
@@ -923,7 +792,7 @@ function EditorCore({
     if (!emit(emitted, next)) return;
     text.set(next);
     change.current?.(next);
-  }, [editor, options.format, transformers, emitted, text, change]);
+  }, [editor, options.format, transformers, text]);
   useEffect(() => {
     const form = box.current?.closest("form");
     const doc = box.current?.ownerDocument;
@@ -953,7 +822,7 @@ function EditorCore({
       doc?.removeEventListener("visibilitychange", onHidden);
       flush();
     };
-  }, [editor, box, flush, text, setWaiting, name]);
+  }, [editor, flush, text, name]);
   const uploadsRef = useLatest(uploads.progress);
   // The field stops saying to wait once every file is stored.
   useEffect(
@@ -961,7 +830,7 @@ function EditorCore({
       uploads.progress.subscribe(() => {
         if (uploads.progress.get().size === 0) setWaiting(false);
       }),
-    [uploads.progress, setWaiting],
+    [uploads.progress],
   );
 
   // The toolbar follows the selection and history.
@@ -1034,7 +903,7 @@ function EditorCore({
       { tag: focused ? VALUE_TAG : [VALUE_TAG, SKIP_DOM_SELECTION_TAG] },
     );
     editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
-  }, [editor, value, options.format, transformers, emitted, text]);
+  }, [editor, value, options.format, transformers, text]);
 
   // The behaviour Lexxy adds to Lexical's, registered once the editor's options are known.
   const { richText, multiLine, markdown, attachments } = options;
@@ -1094,7 +963,7 @@ function EditorCore({
         registerLeadingTags(editor, transformers),
       );
     return mergeRegister(...registered);
-  }, [editor, richText, multiLine, markdown, attachments, allowedColours, transformers, box]);
+  }, [editor, richText, multiLine, markdown, attachments, allowedColours, transformers]);
 
   const toggleSource = useCallback(() => {
     if (source) {
@@ -1109,14 +978,14 @@ function EditorCore({
       flush();
       setSource(true);
     }
-  }, [editor, source, setSource, text, options.format, transformers, flush, readOnly]);
+  }, [editor, source, text, options.format, transformers, flush, readOnly]);
   const editSource = useCallback(
     (next: string) => {
       if (!emit(emitted, next)) return;
       text.set(next);
       change.current?.(next);
     },
-    [emitted, text, change],
+    [text],
   );
 
   // The parts render again only when what they share changes, not at every key. The field's ids
@@ -1172,9 +1041,7 @@ function EditorCore({
       transformers,
       disabled,
       readOnly,
-      box,
       body,
-      setBody,
       format,
       history,
       text,

@@ -115,8 +115,11 @@ export function registerClipboard(editor: LexicalEditor, options: ClipboardOptio
     );
 
   const pasteMarkdown = (text: string) => {
+    if (!text) return;
     const doc = parseHtml(pastedMarkdownToHtml(text));
-    if (isPlainParagraph(doc)) return pasteText(text);
+    // Markdown that writes nothing, such as a link's reference or a comment, goes in as its text.
+    const empty = doc.body.children.length === 0 && !doc.body.textContent?.trim();
+    if (empty || isPlainParagraph(doc)) return pasteText(text);
     options.onMarkdownPaste({
       markdown: text,
       document: doc,

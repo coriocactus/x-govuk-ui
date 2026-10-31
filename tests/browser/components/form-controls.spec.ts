@@ -897,6 +897,12 @@ test("the editor reads pasted and written HTML as meant, in quotations and code 
   await page.keyboard.press("Enter");
   await paste(document, { "text/plain": "```\nthree\n```" });
   await expect(written).toHaveValue("<pre>one\n\n</pre><p>After</p><pre>three</pre>");
+  // Markdown that writes nothing, such as a comment, goes in as its text.
+  await caretAtEnd(document, "p");
+  await paste(document, { "text/plain": " <!-- draft -->" });
+  await expect(written).toHaveValue(
+    "<pre>one\n\n</pre><p>After &lt;!-- draft --&gt;</p><pre>three</pre>",
+  );
 });
 
 test("the editor offers a model's suggestions for selected text, held as it is written", async ({

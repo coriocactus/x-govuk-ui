@@ -37,17 +37,6 @@ import { useScopeSound } from "./sound-scope";
 import { type StorageLike, useStoredState } from "./stored-state";
 import { Tooltip, TooltipGroup } from "./tooltip";
 
-/** Every movement a Sidebar can make, for `animations` to choose from. */
-export const sidebarAnimations = [
-  "collapse",
-  "highlight",
-  "active-line",
-  "press",
-  "tooltips",
-  "folding",
-] as const;
-export type SidebarAnimation = (typeof sidebarAnimations)[number];
-
 export type SidebarProviderProps = {
   children: ReactNode;
   defaultOpen?: boolean;
@@ -92,7 +81,6 @@ export type SidebarProps = ComponentPropsWithRef<"nav"> & {
    * it back. Turn it off when the page has its own SidebarTrigger.
    */
   collapsedTrigger?: boolean;
-  animations?: readonly SidebarAnimation[];
   /** What to focus when the sheet opens on a small screen, as for a Base UI drawer. */
   initialFocus?: SheetContentProps["initialFocus"];
 };
@@ -160,7 +148,6 @@ type Frame = {
   id: string;
   side: "left" | "right";
   iconsOnly: boolean;
-  animations: ReadonlySet<SidebarAnimation>;
   activeLine: boolean;
   /** Moves the hover highlight to a row, with the row's action riding it, or hides it. */
   hover: (row: HTMLElement | null, action?: HTMLElement | null) => void;
@@ -314,7 +301,6 @@ export function Sidebar({
   maxWidth = 360,
   activeLine = true,
   collapsedTrigger = true,
-  animations = sidebarAnimations,
   initialFocus,
   className = "",
   style,
@@ -341,8 +327,6 @@ export function Sidebar({
   // A remembered width still keeps within the current limits.
   const width = Math.min(maxWidth, Math.max(minWidth, storedWidth));
   const [resizing, setResizing] = useState(false);
-  // The list is a new array each render, so its words stand for it where a stable value is needed.
-  const animationList = animations.join(" ");
   const collapsed = !sidebar.isMobile && !sidebar.open && collapsible !== "none";
   const iconsOnly = collapsed && collapsible === "icon";
   const hasGutter = collapsible === "offcanvas" && collapsedTrigger;
@@ -426,7 +410,6 @@ export function Sidebar({
       id: sidebar.id,
       side,
       iconsOnly,
-      animations: new Set(animationList.split(" ") as SidebarAnimation[]),
       activeLine,
       hover,
       highlight,
@@ -435,22 +418,17 @@ export function Sidebar({
       lineFrom,
       scrollGlide,
     }),
-    [sidebar.id, side, iconsOnly, animationList, activeLine, hover],
+    [sidebar.id, side, iconsOnly, activeLine, hover],
   );
 
   const parts = (
     <FrameContext value={frame}>
-      {frame.animations.has("tooltips") ? (
-        <TooltipGroup side={side === "left" ? "right" : "left"}>{children}</TooltipGroup>
-      ) : (
-        children
-      )}
+      <TooltipGroup side={side === "left" ? "right" : "left"}>{children}</TooltipGroup>
     </FrameContext>
   );
   const attributes = {
     "data-side": side,
     "data-variant": variant,
-    "data-animate": animationList,
     style: { ...style, "--x-govuk-ui-sidebar-width": `${width}px` } as CSSProperties,
   };
 
@@ -621,11 +599,9 @@ export function SidebarContent({
     >
       {/* The highlight moves inside a layer clipped to the rows. Wherever it was left, such as
           below rows that a search has removed, it never makes the list taller or scrollable. */}
-      {frame.animations.has("highlight") && (
-        <span className="x-govuk-ui-sidebar-highlight-layer" aria-hidden="true">
-          <span ref={frame.highlight} className="x-govuk-ui-sidebar-highlight" />
-        </span>
-      )}
+      <span className="x-govuk-ui-sidebar-highlight-layer" aria-hidden="true">
+        <span ref={frame.highlight} className="x-govuk-ui-sidebar-highlight" />
+      </span>
       {children}
     </ScrollArea>
   );
@@ -815,7 +791,7 @@ export function SidebarItem({
   const element = useRef<HTMLButtonElement>(null);
   const line = useRef<HTMLSpanElement>(null);
   const actions = useRef<HTMLSpanElement>(null);
-  const glides = frame.animations.has("active-line") && !timing.reduced;
+  const glides = !timing.reduced;
 
   // The whole row takes the highlight, including its action. Moving onto the action from another
   // row therefore moves the highlight with the pointer, and the action rides the highlight there.

@@ -61,7 +61,7 @@
 .x-govuk-ui-sidebar[data-variant="floating"][data-collapsible="icon"][data-state="collapsed"] {
   width: calc(var(--x-govuk-ui-sidebar-icon-width) + 16px);
 }
-.x-govuk-ui-sidebar[data-animate~="collapse"]:not([data-resizing]) {
+.x-govuk-ui-sidebar:not([data-resizing]) {
   transition: width var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
 }
 
@@ -84,6 +84,7 @@
   left: 0;
   width: 100%;
   border-right: 1px solid var(--x-govuk-ui-line);
+  transition: translate var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
 }
 .x-govuk-ui-sidebar[data-side="right"] > .x-govuk-ui-sidebar-panel {
   right: 0;
@@ -101,9 +102,6 @@
 .x-govuk-ui-sidebar[data-side="right"][data-collapsible="offcanvas"][data-state="collapsed"]
   > .x-govuk-ui-sidebar-panel {
   translate: 100% 0;
-}
-.x-govuk-ui-sidebar[data-animate~="collapse"] > .x-govuk-ui-sidebar-panel {
-  transition: translate var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
 }
 .x-govuk-ui-sidebar[data-variant="floating"] > .x-govuk-ui-sidebar-panel {
   top: 8px;
@@ -274,8 +272,8 @@
    and while its menu is open. An action of your own in the tab order can take keyboard focus. A
    row whose link has focus, as the current row's does after a click, keeps its action out of sight.
    An action that its closed menu gives focus back to also stays out of sight. Where there is no
-   pointer to rest, the action always shows. With the gliding highlight, the action rides the
-   highlight between rows, so it appears and goes at once. */
+   pointer to rest, the action always shows. The action rides the gliding highlight between rows,
+   so it appears and goes at once. */
 .x-govuk-ui-sidebar-item-actions {
   position: absolute;
   /* A strip the row's full height, reaching over the gap to the next row. A pointer moving down the
@@ -288,11 +286,6 @@
   align-items: center;
   padding-inline: 4px;
   opacity: 0;
-  transition: opacity var(--x-govuk-ui-duration-fast) ease;
-}
-
-[data-animate~="highlight"] .x-govuk-ui-sidebar-item-actions {
-  transition: none;
 }
 .x-govuk-ui-sidebar-menu-item:hover > .x-govuk-ui-sidebar-item-actions,
 .x-govuk-ui-sidebar-item-actions:has(:focus-visible),
@@ -604,10 +597,6 @@
   opacity: 1;
 }
 /* A row's action is part of the row, so the row looks hovered while the pointer is on it. */
-[data-animate]:not([data-animate~="highlight"]) .x-govuk-ui-sidebar-item:hover,
-[data-animate]:not([data-animate~="highlight"])
-  .x-govuk-ui-sidebar-item:has(~ .x-govuk-ui-sidebar-item-actions:hover),
-[data-animate]:not([data-animate~="highlight"]) .x-govuk-ui-sidebar-group-trigger:hover,
 :is(.x-govuk-ui-sidebar-header, .x-govuk-ui-sidebar-footer) .x-govuk-ui-sidebar-item:hover {
   background: var(--x-govuk-ui-sidebar-hover);
 }
@@ -629,12 +618,12 @@
   /* It glides from another item by its top. */
   transform-origin: 0 0;
 }
-[data-animate~="press"] .x-govuk-ui-sidebar-item,
-[data-animate~="press"] .x-govuk-ui-sidebar-group-trigger {
+.x-govuk-ui-sidebar-panel .x-govuk-ui-sidebar-item,
+.x-govuk-ui-sidebar-panel .x-govuk-ui-sidebar-group-trigger {
   transition: scale var(--x-govuk-ui-duration-fast) ease-out;
 }
-[data-animate~="press"] .x-govuk-ui-sidebar-item:active,
-[data-animate~="press"] .x-govuk-ui-sidebar-group-trigger:active {
+.x-govuk-ui-sidebar-panel .x-govuk-ui-sidebar-item:active,
+.x-govuk-ui-sidebar-panel .x-govuk-ui-sidebar-group-trigger:active {
   scale: 0.97;
 }
 
@@ -680,8 +669,6 @@
 .x-govuk-ui-sidebar-group-panel {
   height: var(--collapsible-panel-height);
   overflow: hidden;
-}
-[data-animate~="folding"] .x-govuk-ui-sidebar-group-panel {
   transition: height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
 }
 .x-govuk-ui-sidebar-group-panel[data-starting-style],

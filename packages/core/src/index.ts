@@ -734,7 +734,6 @@ export { modifierKey, shortcutKeys } from "./shortcut";
 export {
   defaultSidebarLabels,
   Sidebar,
-  type SidebarAnimation,
   SidebarContent,
   type SidebarContentProps,
   SidebarFooter,
@@ -762,7 +761,6 @@ export {
   type SidebarSubmenuProps,
   SidebarText,
   SidebarTrigger,
-  sidebarAnimations,
   useSidebar,
 } from "./sidebar";
 export {

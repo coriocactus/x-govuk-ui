@@ -43,7 +43,6 @@ type Props = Pick<
   | "minWidth"
   | "maxWidth"
   | "activeLine"
-  | "animations"
 > & {
   /** A SidebarProvider prop. */
   defaultOpen?: boolean;
@@ -142,7 +141,6 @@ export default function SidebarExample({
   minWidth = 200,
   maxWidth = 360,
   activeLine = true,
-  animations,
   sections: layout = "grouped",
   show = ["separators", "badges", "icons", "submenus", "footer", "menus"],
   loading = false,
@@ -204,7 +202,6 @@ export default function SidebarExample({
           maxWidth={maxWidth}
           defaultWidth={240}
           activeLine={activeLine}
-          animations={animations}
         >
           <SidebarHeader data-theme={inverse ? "inverse" : undefined}>
             <SidebarTrigger />

@@ -3906,18 +3906,6 @@ const entries = {
       number("minWidth", 200, { min: 120, needs: [whenOn("resizable")] }),
       number("maxWidth", 360, { min: 120, needs: [whenOn("resizable")] }),
       toggle("activeLine", true),
-      checklist(
-        "animations",
-        [
-          ["collapse", "Collapse"],
-          ["highlight", "Highlight"],
-          ["active-line", "Active line"],
-          ["press", "Press"],
-          ["tooltips", "Tooltips"],
-          ["folding", "Folding"],
-        ],
-        ["collapse", "highlight", "active-line", "press", "tooltips", "folding"],
-      ),
       reference("SidebarGroup", "{ label, icon, collapsible, defaultOpen }", "Part"),
       reference("SidebarItem", "{ icon, badge, current, tooltip, render }", "Part"),
       reference("SidebarSubmenu", "{ label, icon, defaultOpen, tooltip, children }", "Part"),

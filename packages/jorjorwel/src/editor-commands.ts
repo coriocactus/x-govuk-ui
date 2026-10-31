@@ -328,12 +328,26 @@ function $outermost<T extends LexicalNode>(nodes: T[]) {
 }
 
 function $blocksIn(selection: RangeSelection) {
-  const blocks = new Set<ElementNode>();
+  return $blockRunsIn(selection).flat();
+}
+
+/**
+ * The selection's blocks, in runs. A divider or an attachment at the top of the document is in no
+ * block, so it ends a run. A command can then change the blocks on each side of it and leave it
+ * where it is.
+ */
+function $blockRunsIn(selection: RangeSelection) {
+  const runs: Set<ElementNode>[] = [new Set()];
   for (const node of selection.getNodes()) {
     if ($isRootOrShadowRoot(node)) continue;
-    blocks.add($getNearestBlockElementAncestorOrThrow(node));
+    const block = $findMatchingParent(
+      node,
+      (parent): parent is ElementNode => $isElementNode(parent) && !parent.isInline(),
+    );
+    if (block) runs.at(-1)?.add(block);
+    else if (runs.at(-1)?.size) runs.push(new Set());
   }
-  return [...blocks];
+  return runs.filter((run) => run.size > 0).map((run) => [...run]);
 }
 
 function $topLevelIn(selection: RangeSelection) {
@@ -580,12 +594,13 @@ export function $toggleQuote() {
   }
   for (const node of top.filter($isQuoteNode)) $unwrap(node);
   $expandSelectionToLines(selection);
-  const elements = $topLevelIn(selection);
-  const first = elements[0];
-  if (!first) return;
-  const quote = $createQuoteNode();
-  first.insertBefore(quote);
-  quote.append(...elements);
+  // Each run of blocks between dividers or attachments has a quotation of its own, so a divider
+  // stays where it was.
+  for (const run of $consecutive($topLevelIn(selection))) {
+    const quote = $createQuoteNode();
+    run[0]?.insertBefore(quote);
+    quote.append(...run);
+  }
 }
 
 /**
@@ -654,19 +669,24 @@ export function $toggleCodeBlock() {
     return;
   }
   $expandSelectionToLines(selection);
-  const elements = $outermost($blocksIn(selection));
-  const last = elements.at(-1);
-  if (!last) return;
-  const code = $createCodeNode();
-  last.insertAfter(code);
-  // The lines become the code's text, with a line break between blocks.
-  const lines = elements.map((element) => element.getTextContent());
-  lines.forEach((line, index) => {
-    if (index > 0) code.append($createLineBreakNode());
-    if (line) code.append($createTextNode(line));
-  });
-  for (const element of elements) element.remove();
-  code.selectEnd();
+  // Each run of blocks between dividers or attachments becomes a code block of its own, so a
+  // divider stays where it was.
+  let code: CodeNode | null = null;
+  for (const elements of $blockRunsIn(selection).map($outermost)) {
+    const last = elements.at(-1);
+    if (!last) continue;
+    const block = $createCodeNode();
+    last.insertAfter(block);
+    // The lines become the code's text, with a line break between blocks.
+    const lines = elements.map((element) => element.getTextContent());
+    lines.forEach((line, index) => {
+      if (index > 0) block.append($createLineBreakNode());
+      if (line) block.append($createTextNode(line));
+    });
+    for (const element of elements) element.remove();
+    code = block;
+  }
+  code?.selectEnd();
 }
 
 function $unwrapCodeBlock(code: CodeNode) {

@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the Editor's Code and Quotation controls on a selection across a divider or an attachment. Code threw an error, and Quotation moved the divider below the quotation. Each now puts the lines on each side in a block of their own, and the divider stays where it was.
+
 ## [0.5.0] - 2026-10-20
 
 ### Changed

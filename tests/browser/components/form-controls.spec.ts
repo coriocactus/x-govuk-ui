@@ -116,6 +116,16 @@ async function caretAtEnd(document: Locator, selector: string, nth = 0) {
   await settled(document);
 }
 
+/** Replaces the editor's document with HTML, written in its source as a user would write it. */
+async function writeSource(frame: Locator, html: string) {
+  const toolbar = frame.getByRole("toolbar", { name: "Formatting" });
+  await toolbar.getByRole("button", { name: "Source" }).click();
+  await frame
+    .getByRole("textbox", { name: "Notes for the caseworker The document's source" })
+    .fill(html);
+  await toolbar.getByRole("button", { name: "Source" }).click();
+}
+
 test("the editor formats as Lexxy's toolbar and Markdown shortcuts say, and writes HTML", async ({
   page,
   frame,
@@ -309,6 +319,33 @@ test("the editor holds tables, code coloured by its syntax and dividers, each wi
   );
   await page.keyboard.press("Shift+Tab");
   await expect(written).toHaveValue(/<li>when a decision will come<\/li><\/ul>/);
+});
+
+test("the editor keeps dividers, tables and lists whole as blocks change around them", async ({
+  page,
+  frame,
+  open,
+}) => {
+  await open("editor");
+  const document = frame.getByRole("textbox", { name: "Notes for the caseworker" });
+  const toolbar = frame.getByRole("toolbar", { name: "Formatting" });
+  const written = frame.locator('input[name="notes"]');
+  const code = toolbar.getByRole("button", { name: "Code", exact: true });
+  // Code and a quotation made across a divider leave the divider where it was, with the lines on
+  // each side in blocks of their own.
+  await writeSource(frame, "<p>Above</p><hr><p>Below</p>");
+  await document.locator("p").first().click();
+  await page.keyboard.press("ControlOrMeta+a");
+  await code.click();
+  await expect(written).toHaveValue("<pre>Above</pre><hr><pre>Below</pre>");
+  await page.keyboard.press("ControlOrMeta+a");
+  await code.click();
+  await expect(written).toHaveValue("<p>Above</p><hr><p>Below</p>");
+  await page.keyboard.press("ControlOrMeta+a");
+  await toolbar.getByRole("button", { name: "Quotation" }).click();
+  await expect(written).toHaveValue(
+    "<blockquote><p>Above</p></blockquote><hr><blockquote><p>Below</p></blockquote>",
+  );
 });
 
 test("the editor takes images and files: stored as they go in, in a gallery, with captions, descriptions and moves", async ({

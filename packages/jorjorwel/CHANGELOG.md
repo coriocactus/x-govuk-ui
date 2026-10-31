@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed Enter and Backspace throwing an error in the Editor when a table's only row is empty. Either key now removes the table. Enter puts the caret at the start of the paragraph after it, if there is one. Otherwise, and after Backspace, the caret is in a new paragraph in the table's place.
 - Fixed the Editor's Code and Quotation controls on a selection across a divider or an attachment. Code threw an error, and Quotation moved the divider below the quotation. Each now puts the lines on each side in a block of their own, and the divider stays where it was.
 
 ## [0.5.0] - 2026-10-20

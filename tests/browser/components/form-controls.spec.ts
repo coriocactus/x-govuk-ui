@@ -346,6 +346,20 @@ test("the editor keeps dividers, tables and lists whole as blocks change around 
   await expect(written).toHaveValue(
     "<blockquote><p>Above</p></blockquote><hr><blockquote><p>Below</p></blockquote>",
   );
+  // Enter or Backspace in a table's only row, when the row is empty, removes the table. Enter goes
+  // on to the paragraph after it, and Backspace leaves a paragraph in its place.
+  const table =
+    "<p>Before</p><table><tbody><tr><td><p><br></p></td><td><p><br></p></td></tr></tbody></table><p>After</p>";
+  await writeSource(frame, table);
+  await caretAtEnd(document, "td p");
+  await page.keyboard.press("Enter");
+  await page.keyboard.type("Then ");
+  await expect(written).toHaveValue("<p>Before</p><p>Then After</p>");
+  await writeSource(frame, table);
+  await caretAtEnd(document, "td p");
+  await page.keyboard.press("Backspace");
+  await page.keyboard.type("Instead");
+  await expect(written).toHaveValue("<p>Before</p><p>Instead</p><p>After</p>");
 });
 
 test("the editor takes images and files: stored as they go in, in a gallery, with captions, descriptions and moves", async ({

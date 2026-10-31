@@ -1,7 +1,7 @@
 import { $isCodeHighlightNode, CodeNode } from "@lexical/code-core";
 import { $isLinkNode } from "@lexical/link";
 import { $isListItemNode, ListItemNode, ListNode } from "@lexical/list";
-import { $isHeadingNode, $isQuoteNode, QuoteNode } from "@lexical/rich-text";
+import { $isHeadingNode, $isQuoteNode, HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { $findCellNode, $isTableCellNode, $isTableNode, $isTableRowNode } from "@lexical/table";
 import { $getNearestNodeOfType, IS_APPLE, mergeRegister } from "@lexical/utils";
 import {
@@ -29,6 +29,7 @@ import {
   COMMAND_PRIORITY_LOW,
   COMMAND_PRIORITY_NORMAL,
   DELETE_CHARACTER_COMMAND,
+  type ElementNode,
   HISTORY_MERGE_TAG,
   INDENT_CONTENT_COMMAND,
   INSERT_LINE_BREAK_COMMAND,
@@ -670,6 +671,22 @@ function $escapeBlankQuoteLine() {
     paragraph.selectStart();
   }
   return true;
+}
+
+/**
+ * Keeps paragraphs, headings and quotations flush with the text. The editor indents only list
+ * items, and the value writes no other indent. Lexical gives a paragraph an indent when it replaces
+ * an item of a nested list, and pasted HTML can give one, which the editor would draw but not keep.
+ */
+export function registerFlushBlocks(editor: LexicalEditor) {
+  const flush = (node: ElementNode) => {
+    if (node.getIndent() !== 0) node.setIndent(0);
+  };
+  return mergeRegister(
+    editor.registerNodeTransform(ParagraphNode, flush),
+    editor.registerNodeTransform(HeadingNode, flush),
+    editor.registerNodeTransform(QuoteNode, flush),
+  );
 }
 
 /** Puts in and takes out the provisional paragraphs the caret needs between blocks. */

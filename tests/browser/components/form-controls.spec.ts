@@ -419,6 +419,12 @@ test("the editor keeps dividers, tables and lists whole as blocks change around 
   for (let press = 0; press < 4; press++) await page.keyboard.press("Backspace");
   await page.keyboard.type("!");
   await expect(written).toHaveValue("<ul><li>One!</li><li>Three</li></ul>");
+  // An item of a nested list made a paragraph is drawn flush with the text, as the value writes it.
+  await writeSource(frame, "<ul><li>One<ul><li>Nested</li></ul></li></ul>");
+  await caretAtEnd(document, "li li");
+  await toolbar.getByRole("button", { name: "Bulleted list" }).click();
+  await expect(written).toHaveValue("<ul><li>One</li></ul><p>Nested</p>");
+  await expect(document.locator("p")).toHaveCSS("padding-inline-start", "0px");
   // An image added in the last item of a list in a quotation goes after the list, which stays
   // whole. Added in an empty last item, it takes the item's place, and leaves no empty quotation.
   const addImage = async (name: string) => {

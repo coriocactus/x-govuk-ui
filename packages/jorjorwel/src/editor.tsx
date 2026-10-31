@@ -63,6 +63,7 @@ import {
   registerDecoratorSelection,
   registerEnter,
   registerEscapes,
+  registerFlushBlocks,
   registerKeys,
   registerLineSeparators,
   registerLinkOpener,
@@ -933,6 +934,7 @@ function EditorCore({
     if (richText)
       registered.push(
         registerKeys(editor),
+        registerFlushBlocks(editor),
         registerEscapes(editor),
         registerDecoratorSelection(editor),
         registerSelectionLabel(editor, () => labelsRef.current),

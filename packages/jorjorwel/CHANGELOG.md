@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed paragraphs in the Editor drawn indented, though the value keeps no indent. An item of a nested list made a paragraph, and pasted HTML, could give one. Paragraphs, headings and quotations are now drawn flush with the text.
 - Fixed the Editor's link controls with the caret at the end of a link that has words after it. The toolbar showed no link there, and Mod K added a second link beside it. The link control, Mod K and the link's tools now act on the link the caret is at the end of.
 - Fixed a triple press in a table cell in the Editor selecting nothing. It now selects the pressed line, such as a paragraph or a list item, as it does outside a table.
 - Fixed pasted text that Markdown writes nothing for, such as an HTML comment or a link's reference, going missing in the Editor. It now goes in as the text it was.

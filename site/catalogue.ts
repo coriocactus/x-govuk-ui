@@ -972,7 +972,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Motion",
     changes:
-      "GOV.UK's way with a question page, as one component. FormSteps asks a form a step at a time, and the In stages example is a short survey asked that way. Each field takes part by its name, so Input, Textarea, Select, Radios, Checkboxes, Date input, Combobox, File upload and One-time code need nothing more. When the form is sent, one function checks every answer. If any need fixing, an Error summary opens above everything inside the Form as what is beneath eases down to make space, takes focus and lists the problems in the fields' order, each linking to its field, and every field shows its own message. Fixing an answer clears its message and its line at once, and the summary folds away when nothing is left. A failing answer that changes keeps its message until the form is sent again. While there are errors the page's title starts with Error, as GOV.UK asks. Messages that onSubmit returns, such as the server's, show in the same way. Continue with the form empty to see it. A form small enough to do without an Error summary can turn it off, and focus goes to the first field to fix instead. defaultValues gives the fields their answers to start with, such as ones kept from an earlier visit. FormSteps is a Form in steps, each a FormStep containing any fields. Continue checks only the step's answers and runs its own onContinue, such as saving a rating straight away, with a spinner on the button. Steps whose when says no are passed over, and their answers left out. It can end with Check your answers, worked out from the fields' labels and answers, with Change. It comes as GOV.UK question pages, or a card set into a page, such as a survey or an agent's questions, and Back, progress, the Error summary, the Command with Enter shortcut, the browser's history and remembering progress in local storage, or a storage of the service's own, can each be turned on or off. The One page example is a service's page, a ServicePage with its questions in a three-quarters column. Its heading is inside the Form, so the summary opens above it, as GOV.UK puts it. The In pages example is FormSteps in a ServicePage. Its Back link is a FormStepsBack in the page's own place for one, which a FormStepsProvider around both allows. Save and come back later sits beside Continue, and Check your answers lists the answers in two sections beneath a heading of the example's own, a FormStepsSummary and a sentence of the example's own from useFormStepsAnswers.",
+      "GOV.UK's way with a question page, as one component. FormSteps asks a form a step at a time, and the In stages example is a short survey asked that way. Each field takes part by its name, so Input, Textarea, Select, Radios, Checkboxes, Date input, Combobox, File upload and One-time code need nothing more. When the form is sent, one function checks every answer. If any need fixing, an Error summary opens above everything inside the Form as what is beneath eases down to make space, takes focus and lists the problems in the fields' order, each linking to its field, and every field shows its own message. Fixing an answer clears its message and its line at once, and the summary folds away when nothing is left. A failing answer that changes keeps its message until the form is sent again. While there are errors the page's title starts with Error, as GOV.UK asks. Messages that onSubmit returns, such as the server's, show in the same way. Continue with the form empty to see it. A form small enough to do without an Error summary can turn it off, and focus goes to the first field to fix instead. defaultValues gives the fields their answers to start with, such as ones kept from an earlier visit. FormSteps is a Form in steps, each a FormStep containing any fields. Continue checks only the step's answers and runs its own onContinue, such as saving a rating straight away, with a spinner on the button. Steps whose when says no are passed over, and their answers left out. It can end with Check your answers, worked out from the fields' labels and answers, with Change. It comes as GOV.UK question pages, or a card set into a page, such as a survey or an agent's questions, and Back, progress, the Error summary, the Command with Enter shortcut and the browser's history can each be turned on or off. The One page example is a service's page, a ServicePage with its questions in a three-quarters column. Its heading is inside the Form, so the summary opens above it, as GOV.UK puts it. The In pages example is FormSteps in a ServicePage. Its Back link is a FormStepsBack in the page's own place for one, which a FormStepsProvider around both allows. Save and come back later sits beside Continue, and Check your answers lists the answers in two sections beneath a heading of the example's own, a FormStepsSummary and a sentence of the example's own from useFormStepsAnswers.",
     props: [
       reference("validate", "(data: FormData) => FormErrors"),
       reference(
@@ -1005,7 +1005,7 @@ const entries = {
       reference("children", "Fields with a name, and a submit Button"),
       reference(
         "FormSteps",
-        '{ layout: "page" | "card", title, checkAnswers, back, progress, errorSummary, keyboardShortcut, actions, history, storageKey, storage, onComplete, step, defaultStep, onStepChange, done, labels }',
+        '{ layout: "page" | "card", title, checkAnswers, back, progress, errorSummary, keyboardShortcut, actions, history, defaultValues, onComplete, step, defaultStep, onStepChange, done, labels }',
         "Part",
       ),
       reference(
@@ -1059,11 +1059,6 @@ const entries = {
         needs: [when("example", "stages")],
         restart: true,
       }),
-      toggle("remember", false, {
-        note: "Keeps the answers in local storage until they are sent.",
-        needs: [when("example", "stages")],
-        restart: true,
-      }),
       toggle("history", false, {
         note: "The browser's Back goes back a step.",
         needs: [when("example", "stages")],
@@ -1101,7 +1096,6 @@ const entries = {
         args: { example: "stages", back: true, checkAnswers: true },
       },
       { name: "Saving fails once", args: { example: "stages", fail: true } },
-      { name: "Remembers the answers", args: { example: "stages", remember: true } },
     ],
   },
   dialog: {
@@ -2763,7 +2757,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Motion",
     changes:
-      "A card that asks questions one at a time, with the steps of shadcn's Questionnaire. It is Form steps in its card layout, made from a list of questions as an agent sends them. A question can ask for a choice from Choices, with a letter or number for each answer that pressing chooses, one answer or several, and a last row that takes any words, or for some words, a number, a date, or one answer from a list. The questions come under a header whose ring fills as they are answered. Next, or Command with Enter, moves on, Previous goes back, and Skip passes over a question that need not be answered. Pressing Next without an answer shows GOV.UK's error message beside the question. The words change at once and the card eases to each question's height, while the footer stays put. Once done, the card lists the answers in a Summary list, each with Change to ask that question again. With a storageKey, the answers are kept until they are sent. A date question can take a min and max, such as today for a date in the past, and a date outside them has GOV.UK's message, such as “The date must be today or in the past”. With calendar, it offers a Calendar beside its fields, which offers only the days between them.",
+      "A card that asks questions one at a time, with the steps of shadcn's Questionnaire. It is Form steps in its card layout, made from a list of questions as an agent sends them. A question can ask for a choice from Choices, with a letter or number for each answer that pressing chooses, one answer or several, and a last row that takes any words, or for some words, a number, a date, or one answer from a list. The questions come under a header whose ring fills as they are answered. Next, or Command with Enter, moves on, Previous goes back, and Skip passes over a question that need not be answered. Pressing Next without an answer shows GOV.UK's error message beside the question. The words change at once and the card eases to each question's height, while the footer stays put. Once done, the card lists the answers in a Summary list, each with Change to ask that question again. A date question can take a min and max, such as today for a date in the past, and a date outside them has GOV.UK's message, such as “The date must be today or in the past”. With calendar, it offers a Calendar beside its fields, which offers only the days between them.",
     props: [
       reference(
         "questions",
@@ -2782,7 +2776,7 @@ const entries = {
       reference("title", "ReactNode", "Questions"),
       reference("onComplete", "(answers: Record<string, string | string[] | null>) => void"),
       reference("labels", "Partial<QuestionCardLabels>", "Next, Previous, Continue"),
-      reference("storageKey", "string", "None"),
+      reference("defaultValues", "Record<string, string | string[]>", "None"),
     ],
   },
   "file-diff": {

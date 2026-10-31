@@ -30,8 +30,6 @@ import { useLabels } from "./labels";
 import { Panel } from "./panel";
 import { useLatest, useMergedRef } from "./refs";
 import { inPageOrder, type Registry, useRegister, useRegistry } from "./registry";
-import { stepAnswers } from "./step-answers";
-import { browserStorage, type StorageLike } from "./stored-state";
 import { SummaryList, SummaryListAction, SummaryListRow } from "./summary-list";
 import { Tag } from "./tag";
 
@@ -184,10 +182,7 @@ function numberSteps(children: ReactNode) {
   );
 }
 
-export type FormStepsProps = Omit<
-  FormProps,
-  "onSubmit" | "validate" | "children" | "title" | "defaultValues"
-> & {
+export type FormStepsProps = Omit<FormProps, "onSubmit" | "validate" | "children" | "title"> & {
   /** The steps, as FormStep elements, in order. */
   children: ReactNode;
   /**
@@ -234,21 +229,6 @@ export type FormStepsProps = Omit<
   /** Each step is a place in the browser's history, so Back in the browser goes back a step. */
   history?: boolean;
   /**
-   * Keeps the answers and the step in `storage` under this key, so users continue where they left
-   * off. They come back once the page has loaded, and `onStepChange` is told the step. They are
-   * cleared once the form is sent. Answers stay in the browser, so leave out anything sensitive, or
-   * keep them only while the tab is open, in `sessionStorage`.
-   *
-   * Each field comes back through `useFormDefault`, so a field that is controlled keeps its own
-   * `value`. A controlled field of your own can read `useFormDefault` to start from its answer.
-   */
-  storageKey?: string;
-  /**
-   * Where `storageKey` keeps the answers. By default, local storage. On a page that also renders
-   * on the server, give the browser's storage only in the browser, as StorageLike says.
-   */
-  storage?: StorageLike;
-  /**
    * Called with every answer once the last step, or Check your answers, is sent. Answers to steps
    * skipped or not asked are left out. If it returns messages, such as the server's, the form goes
    * back to the first step that has one. Without it, the form is sent as any form is.
@@ -259,7 +239,7 @@ export type FormStepsProps = Omit<
    * form keep track.
    */
   step?: number;
-  /** The step it starts on, unless it remembers another under `storageKey`. */
+  /** The step it starts on. */
   defaultStep?: number;
   onStepChange?: (step: number) => void;
   /**
@@ -318,29 +298,6 @@ export const defaultFormStepsLabels: FormStepsLabels = {
   changeAnswer: (question) => <>your answer to {question}</>,
 };
 
-/**
- * What the form keeps under its key. `empty` names each field that sent nothing, such as a switch
- * that is off or a group with no box ticked, so it comes back empty, not at its own default.
- */
-type Saved = {
-  at: number;
-  passed: number[];
-  skipped: number[];
-  answers: [string, string][];
-  empty: string[];
-};
-
-const isNumbers = (value: unknown): value is number[] =>
-  Array.isArray(value) && value.every((each) => Number.isInteger(each) && each >= 0);
-const isAnswers = (value: unknown): value is [string, string][] =>
-  Array.isArray(value) &&
-  value.every(
-    (each) =>
-      Array.isArray(each) &&
-      each.length === 2 &&
-      typeof each[0] === "string" &&
-      typeof each[1] === "string",
-  );
 /** An answer as Check your answers lists it. */
 export type FormStepsAnswer = {
   /** The step that asks it, by its place among the steps, from 0. */
@@ -403,31 +360,6 @@ export type UseFormStepsAnswersResult = {
 };
 
 const noAnswers: FormStepsAnswer[] = [];
-
-/** What was kept under the key, or null when there is nothing, or nothing this form wrote. */
-function readSaved(key: string | undefined, storage: StorageLike | null): Saved | null {
-  if (!key || !storage) return null;
-  try {
-    const saved: unknown = JSON.parse(storage.getItem(key) ?? "null");
-    if (typeof saved !== "object" || saved === null) return null;
-    const { at, passed, skipped, answers, empty = [] } = saved as Record<string, unknown>;
-    if (typeof at !== "number" || !Number.isInteger(at) || at < 0) return null;
-    if (!isNumbers(passed) || !isNumbers(skipped) || !isAnswers(answers)) return null;
-    if (!Array.isArray(empty) || !empty.every((name) => typeof name === "string")) return null;
-    return { at, passed, skipped, answers, empty };
-  } catch {
-    return null;
-  }
-}
-function writeSaved(key: string | undefined, storage: StorageLike | null, saved: Saved | null) {
-  if (!key || !storage) return;
-  try {
-    if (saved) storage.setItem(key, JSON.stringify(saved));
-    else storage.removeItem(key);
-  } catch {
-    // Storage can be full or blocked. The form still works for this visit.
-  }
-}
 
 /**
  * A field's answer as Check your answers lists it, one answer to a line. A field that says how to
@@ -517,9 +449,10 @@ function StepFields({
  * as they were. The form can end with Check your answers, worked out from the fields' labels and
  * answers. There, Change asks a question again and then returns.
  *
- * Its progress, its Back, its errors, its keys and its history can each be turned on or off. With
- * a `storageKey`, it remembers how far users got. Focus moves to each step as it comes, and a card
- * eases to each step's height.
+ * Its progress, its Back, its errors, its keys and its history can each be turned on or off. To
+ * continue where users left off, such as with answers the service kept on its server, give
+ * `defaultValues` and `defaultStep`. Focus moves to each step as it comes, and a card eases to each
+ * step's height.
  *
  * Its Back link, its progress and its list of answers are parts too: FormStepsBack,
  * FormStepsProgress and FormStepsSummary. Each one you place takes the place of the form's own. A
@@ -544,8 +477,6 @@ export function FormSteps({
   keyboardShortcut = true,
   actions,
   history: historyOn = false,
-  storageKey,
-  storage: ownStorage,
   onComplete,
   step: controlledStep,
   defaultStep = 0,
@@ -573,13 +504,6 @@ export function FormSteps({
     .map((child) => child.props as FormStepProps);
   const steps = registered.length > 0 ? registered.map((entry) => entry.props) : direct;
   const count = steps.length;
-  // The first HTML is the same on the server and in the browser, so answers kept in the browser
-  // are restored once the page has loaded. The form then starts again with them, before the
-  // browser paints.
-  const [restored, setRestored] = useState<{ answers: Record<string, string[]>; round: number }>({
-    answers: {},
-    round: 0,
-  });
   // Where the form is, as a step's index, or `count` for Check your answers. It is kept as asked
   // for, and kept within the steps as it is read, because steps in a wrapper of your own are not
   // all known until they register.
@@ -589,15 +513,6 @@ export function FormSteps({
   const [skipped, setSkipped] = useState(() => new Set<number>());
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
   const [rows, setRows] = useState<FormStepsAnswer[]>([]);
-  const rememberSoon = useRef(0);
-  const cancelKeepSoon = () => {
-    window.clearTimeout(rememberSoon.current);
-    rememberSoon.current = 0;
-  };
-  // Where the answers are kept: a storage of the service's own, or else the browser's.
-  const storage = ownStorage ?? browserStorage();
-  // Whether the answers are kept, which they are not while they are sent or once they are.
-  const keeping = useRef(true);
   // Whether the answers are being sent, read as a press comes, before the form draws itself busy.
   const sending = useRef(false);
   // The fields each step asks, by the step's id and the field's name, as they register.
@@ -609,32 +524,18 @@ export function FormSteps({
   const formRef = useMergedRef(form, ref);
   const focusNext = useRef<string | null>(null);
   const titleId = useId();
-  const historyKey = `x-govuk-ui-form-steps:${storageKey ?? titleId}`;
+  const historyKey = `x-govuk-ui-form-steps:${titleId}`;
   // Before any step is known, as when every step is in a wrapper of your own, nothing shows.
   const ready = count > 0;
   // At Check your answers, before the answers are sent and after.
   const atReview = ready && at >= count;
   const step = steps[at];
   // Check your answers lists the answers again when a field's question or answer changes while it
-  // shows, such as when a Select's labels arrive from items in a wrapper after a restore.
+  // shows, such as when a Select's labels arrive from items in a wrapper.
   const [summaries, setSummaries] = useState(0);
   const listing = useLatest(atReview && !sent);
   const fieldChanged = useCallback(() => {
     if (listing.current) setSummaries((count) => count + 1);
-  }, []);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: answers are restored once, as the form first mounts.
-  useLayoutEffect(() => {
-    const saved = readSaved(storageKey, storage);
-    if (!saved) return;
-    const answers: Record<string, string[]> = {};
-    for (const name of saved.empty) answers[name] = [];
-    for (const [name, value] of saved.answers) answers[name] = [...(answers[name] ?? []), value];
-    setPassed(new Set(saved.passed));
-    setSkipped(new Set(saved.skipped));
-    // A form whose step is controlled is told the kept step, so it can take it.
-    setAt(saved.at);
-    setRestored({ answers, round: 1 });
   }, []);
 
   /** The steps that apply to the answers so far, in order, leaving out a step being skipped. */
@@ -649,69 +550,21 @@ export function FormSteps({
     setPlan((current) => (current.join() === next.join() ? current : next));
     return next;
   };
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the plan is worked out once mounted, again as steps come and go, and again with restored answers.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the plan is worked out once mounted, and again as steps come and go.
   useLayoutEffect(() => {
     replan();
-  }, [count, restored.round]);
+  }, [count]);
 
-  /**
-   * Keeps the answers and the step, when there is a key. Keeping them now cancels keeping them a
-   * moment after a change. Answers being sent, or sent, are not kept, so a reload never brings back
-   * a form that has gone.
-   */
-  const remember = (where = at, passing = passed, skipping = skipped) => {
-    cancelKeepSoon();
-    const element = form.current;
-    if (!keeping.current || !storageKey || !element) return;
-    // The answers of the steps that apply now, even before the page shows them so.
-    const applies = planFor().filter((index) => !skipping.has(index));
-    const sent = stepAnswers(element, applies);
-    const answers = sent.flatMap(([name, value]) =>
-      typeof value === "string" ? [[name, value] as [string, string]] : [],
-    );
-    // A field that sends nothing is kept as empty, so it comes back empty. A field on a step that
-    // was skipped or does not apply sends nothing because its answers are left out, so it is not
-    // kept, and comes back at its own default.
-    const live = new Set(applies.map((index) => registered[index]?.id));
-    const names = new Set(
-      [...stepFields.current]
-        .filter(([id]) => live.has(id))
-        .flatMap(([, fields]) => [...fields.keys()]),
-    );
-    const given = new Set(sent.map(([name]) => name));
-    const empty = [...names].filter((name) => !given.has(name));
-    writeSaved(storageKey, storage, {
-      at: where,
-      passed: [...passing],
-      skipped: [...skipping],
-      answers,
-      empty,
-    });
+  // The steps that apply are worked out again a frame after each change, once React has drawn it,
+  // such as in a hidden input that a control fills from its state. A slider or a toggle group
+  // changes its answer with a key or a press, not with typing.
+  const planning = useRef(0);
+  const replanNow = useLatest(() => replan());
+  const replanSoon = () => {
+    cancelAnimationFrame(planning.current);
+    planning.current = requestAnimationFrame(() => replanNow.current());
   };
-
-  // Answers are kept a moment after the last change, once React has drawn it, such as in a hidden
-  // input that a control fills from its state. They are kept with the form as it is then, not as
-  // it was at the change. A page that closes or reloads within that moment, or a form that leaves
-  // it, keeps them at once.
-  const later = useLatest(() => {
-    replan();
-    remember();
-  });
-  const keepSoon = () => {
-    if (!keeping.current) return;
-    cancelKeepSoon();
-    rememberSoon.current = window.setTimeout(() => later.current(), 300);
-  };
-  useLayoutEffect(() => {
-    const flush = () => {
-      if (rememberSoon.current) later.current();
-    };
-    window.addEventListener("pagehide", flush);
-    return () => {
-      window.removeEventListener("pagehide", flush);
-      flush();
-    };
-  }, []);
+  useEffect(() => () => cancelAnimationFrame(planning.current), []);
 
   /** Shows a step, or Check your answers, and moves focus to it, with its place in history. */
   const moveTo = (where: number, push = true) => {
@@ -834,17 +687,16 @@ export function FormSteps({
   }, [at, sent]);
 
   // Check your answers lists the answers each time the form comes to it, however it does, such as
-  // by Continue, by a `step` given by the page, or by answers restored from an earlier visit. It
-  // lists them again as the steps register, because restored answers start the form again, and the
-  // steps register anew after it.
+  // by Continue or by a `step` given by the page. It lists them again as the steps register, such
+  // as steps in a wrapper of your own that a `defaultStep` starts after.
   // biome-ignore lint/correctness/useExhaustiveDependencies: the answers are listed as the form arrives, and as its steps register.
   useLayoutEffect(() => {
     if (atReview && !sent) setRows(planFor().flatMap((index) => summaryRows(index, skipped)));
-  }, [atReview, sent, restored.round, registered, summaries]);
+  }, [atReview, sent, registered, summaries]);
 
   // With history, the browser's current entry always records the step the form is on. Continue and
   // Back add an entry first. Otherwise the step changes in place, such as when the steps in a
-  // wrapper of your own register and the step asked for is known, or answers are restored.
+  // wrapper of your own register and the step asked for is known.
   useEffect(() => {
     if (historyOn) window.history.replaceState({ ...window.history.state, [historyKey]: at }, "");
   }, [historyOn, historyKey, at]);
@@ -863,10 +715,7 @@ export function FormSteps({
 
   const finish = async (data: FormData, skipping = skipped) => {
     const element = form.current;
-    cancelKeepSoon();
-    keeping.current = false;
     if (!onComplete) {
-      writeSaved(storageKey, storage, null);
       element?.submit();
       return;
     }
@@ -877,10 +726,6 @@ export function FormSteps({
     setBusy(false);
     const wrong = Object.entries(errors ?? {}).filter(([, message]) => present(message));
     if (wrong.length > 0) {
-      // The answers are kept again, as the form goes back to them, including any change that was
-      // waiting to be kept as they were sent.
-      keeping.current = true;
-      keepSoon();
       // The form goes back to the first step with something to fix.
       const first = plan.find((index) =>
         wrong.some(([name]) =>
@@ -896,10 +741,6 @@ export function FormSteps({
       }
       return errors;
     }
-    // Anything that asked to keep the answers while they were sent, such as a press, keeps nothing.
-    cancelKeepSoon();
-    keeping.current = false;
-    writeSaved(storageKey, storage, null);
     // The answers stay on show once sent, unless something else takes their place.
     setRows(planFor().flatMap((index) => summaryRows(index, skipping)));
     setSent(true);
@@ -929,7 +770,6 @@ export function FormSteps({
     }
     // The plan is worked out already, just above.
     moveTo(next);
-    remember(next, passing, skipping);
   };
 
   const skip = () => {
@@ -948,7 +788,6 @@ export function FormSteps({
     // The skipped step is disabled once the form renders again, so its answers stay out of the
     // plan and Check your answers. The plan already leaves them out, so it is not worked out again.
     moveTo(next);
-    remember(next, passing, skipping);
   };
 
   const previous = plan.filter((index) => index < at).at(-1);
@@ -961,7 +800,6 @@ export function FormSteps({
     // While the answers are sent, they cannot change.
     if (sending.current) return;
     returning.current = true;
-    keeping.current = true;
     setSent(false);
     go(row.step);
     if (row.id) focusNext.current = `#${row.id}`;
@@ -1200,30 +1038,21 @@ export function FormSteps({
                 {!card && backControl}
                 <Form
                   {...formProps}
-                  // Restored answers start the form again, because each field reads its answer
-                  // once.
-                  key={restored.round}
                   ref={formRef}
                   className="x-govuk-ui-form-steps-form"
                   // Pressing anywhere in it that is not a control puts focus in the form, so keys
                   // that work across it, such as Choices' letters, reach it.
                   tabIndex={-1}
                   errorSummary={errorSummary}
-                  defaultValues={restored.answers}
                   validate={(data) => (atReview || !step?.validate ? {} : step.validate(data))}
                   onSubmit={(data) => onSubmit(data)}
                   onKeyDown={chain(givenKeyDown, onKeyDown)}
-                  // Keeping the answers and working out the steps again follow every change,
-                  // whatever a service's own handlers do. A control that sends its value from a
-                  // hidden input, such as a slider or a toggle group, changes it with a key or a
-                  // press, not with typing.
-                  onInput={both(givenInput, keepSoon)}
-                  onChange={both(givenChange, () => {
-                    replan();
-                    keepSoon();
-                  })}
-                  onClick={both(givenClick, keepSoon)}
-                  onKeyUp={both(givenKeyUp, keepSoon)}
+                  // The steps that apply follow every change, whatever a service's own handlers
+                  // do.
+                  onInput={both(givenInput, replanSoon)}
+                  onChange={both(givenChange, replanSoon)}
+                  onClick={both(givenClick, replanSoon)}
+                  onKeyUp={both(givenKeyUp, replanSoon)}
                 >
                   {card ? <AutoHeight>{body}</AutoHeight> : body}
                   {card ? (

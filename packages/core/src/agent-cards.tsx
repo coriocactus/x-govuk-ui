@@ -150,7 +150,7 @@ export const defaultQuestionCardLabels: QuestionCardLabels = {
 // Question card is FormSteps in its card layout, so it takes FormSteps' other props.
 export type QuestionCardProps = Omit<
   FormStepsProps,
-  "children" | "title" | "onComplete" | "storageKey" | "layout" | "labels"
+  "children" | "title" | "onComplete" | "layout" | "labels"
 > & {
   /** The questions, asked one at a time. */
   questions: readonly Question[];
@@ -167,8 +167,6 @@ export type QuestionCardProps = Omit<
   labels?: Partial<QuestionCardLabels>;
   /** What marks each answer to a choice, which is a letter, a number or nothing. */
   markers?: "letters" | "numbers" | "none";
-  /** Keeps the answers in `storage` under this key until they are sent. */
-  storageKey?: string;
 };
 
 const ask = (question: Question) => question.type ?? "choice";
@@ -345,7 +343,6 @@ export function QuestionCard({
   onComplete,
   labels: ownLabels,
   markers = "letters",
-  storageKey,
   className = "",
   ...props
 }: QuestionCardProps) {
@@ -360,7 +357,6 @@ export function QuestionCard({
       className={`x-govuk-ui-question-card ${className}`.trim()}
       checkAnswers={false}
       labels={labels}
-      storageKey={storageKey}
       onComplete={(data) =>
         onComplete?.(
           Object.fromEntries(

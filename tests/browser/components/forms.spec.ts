@@ -1,4 +1,3 @@
-import { stepAnswers } from "../../../packages/core/src/step-answers";
 import { expect, test } from "../fixtures";
 
 test("the error summary takes focus and its links focus their fields", async ({ frame, open }) => {
@@ -221,49 +220,28 @@ test("a form in stages saves as it goes, shows server errors, reveals follow-ups
     "Very satisfied",
   );
 
-  // Remembered, it continues from the same step with its answers after the page loads again.
-  await frame.getByRole("button", { name: "Start again" }).click();
-  await playground.set("remember", true);
+  // In the card, Back is a button in its footer.
+  await playground.set("layout", "Card");
   await frame.getByRole("radio", { name: "Neither satisfied nor dissatisfied" }).check();
   await frame.getByRole("button", { name: "Submit and continue" }).click();
-  // The step's first answer takes focus a frame after the step comes, so typing waits for it, as
-  // a person's would. Typing before then would go to the answer that takes focus.
+  // The step's first answer takes focus a frame after the step comes.
   await expect(frame.getByRole("radio", { name: "Yes" })).toBeFocused();
-  await frame.getByLabel("How could we improve this service?").fill("Keep it short.");
-  await expect
-    .poll(() => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? ""))
-    .toContain("Keep it short.");
-  // The playground starts again after a reload, so the survey is chosen again.
-  await page.reload();
-  await playground.set("example", /In stages/);
-  for (const name of ["back", "remember"]) await playground.set(name, true);
-  // The step it continues from is the service's own component, which shows once the answers are
-  // restored after the page loads.
-  await expect(frame.getByLabel("How could we improve this service?")).toBeVisible();
-  await expect(frame.getByLabel("How could we improve this service?")).toHaveValue(
-    "Keep it short.",
-  );
-  // In the card, Back is a button in its footer.
   await frame.getByRole("button", { name: "Back", exact: true }).click();
   await expect(
     frame.getByRole("radio", { name: "Neither satisfied nor dissatisfied" }),
   ).toBeChecked();
 });
 
-test("check your answers lists every kind of field, links an error to an answer in a wrapper, and comes back after a reload", async ({
+test("check your answers lists every kind of field, links an error to an answer in a wrapper, and follows the browser's history", async ({
   page,
   frame,
   open,
   playground,
 }) => {
   await open("form");
-  const choose = async () => {
-    await playground.set("example", /In stages/);
-    await playground.set("layout", "Page");
-    for (const name of ["checkAnswers", "history", "moreKinds", "remember"])
-      await playground.set(name, true);
-  };
-  await choose();
+  await playground.set("example", /In stages/);
+  await playground.set("layout", "Page");
+  for (const name of ["checkAnswers", "history", "moreKinds"]) await playground.set(name, true);
   await frame.getByRole("radio", { name: "Satisfied", exact: true }).check();
   await frame.getByRole("button", { name: "Submit and continue" }).click();
   await frame.getByRole("radio", { name: "No", exact: true }).check();
@@ -282,7 +260,7 @@ test("check your answers lists every kind of field, links an error to an answer 
   // The select's options come from a component of the survey's own too.
   await frame.getByRole("combobox", { name: "Which part did you use most?" }).click();
   await page.getByRole("option", { name: "Reporting a catch" }).click();
-  // The switch starts on. Turned off, it sends nothing, and comes back off all the same.
+  // The switch starts on. Turned off, it sends nothing, and Check your answers lists it as off.
   const research = frame.getByRole("switch", { name: "Take part in research about this service" });
   await expect(research).toBeChecked();
   await research.uncheck();
@@ -305,30 +283,19 @@ test("check your answers lists every kind of field, links an error to an answer 
     "How easy was it, from 1 to 5?",
     "Take part in research about this service",
   ]);
-  // Reloaded on Check your answers, the survey comes back to it, with every answer listed, the
-  // select's by its label and the switch still off. The playground starts again after a reload, so
-  // the survey is chosen again.
-  await expect
-    .poll(() => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? ""))
-    .toContain('"at":5');
-  await page.reload();
-  await choose();
-  await expect(review.locator(".x-govuk-ui-summary-list-value")).toHaveText(answers);
   // The browser's Back goes to the last question, and Forward comes back to Check your answers.
   await page.goBack();
   await expect(frame.getByRole("heading", { name: "About your visit" })).toBeVisible();
   await page.goForward();
   await expect(review.locator(".x-govuk-ui-summary-list-value")).toHaveText(answers);
-  // While the answers are sent, Change does nothing, so nothing keeps them once they are sent. The
-  // two presses come one after the other, before the answers are sent.
+  // While the answers are sent, Change does nothing, so the answers stay sent. The two presses come
+  // one after the other, before the answers are sent.
   await frame.evaluate((element) => {
     const buttons = [...element.querySelectorAll<HTMLButtonElement>("button")];
     buttons.find((button) => button.textContent === "Send feedback")?.click();
     element.querySelector<HTMLButtonElement>(".x-govuk-ui-summary-list-action")?.click();
   });
   await expect(frame.getByText("Thank you for your feedback.")).toBeVisible();
-  await page.waitForTimeout(600);
-  expect(await page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback"))).toBeNull();
 });
 
 test("a survey that starts on a step in a wrapper goes back to it from Check your answers", async ({
@@ -354,122 +321,49 @@ test("a survey that starts on a step in a wrapper goes back to it from Check you
   await expect(frame.getByRole("radio", { name: "GOV.UK" })).toBeChecked();
 });
 
-test("a remembered survey keeps a slider's value as it shows, and an answer given just before the page reloads, and forgets them once sent", async ({
-  page,
+test("in a card, a step's chosen answer takes focus as it comes, such as a switch that starts on", async ({
   frame,
   open,
   playground,
 }) => {
   await open("form");
-  const choose = async () => {
-    await playground.set("example", /In stages/);
-    for (const name of ["moreKinds", "remember"]) await playground.set(name, true);
-  };
-  await choose();
+  await playground.set("example", /In stages/);
+  await playground.set("moreKinds", true);
   await frame.getByRole("radio", { name: "Satisfied", exact: true }).check();
   await frame.getByRole("button", { name: "Submit and continue" }).click();
   await expect(frame.getByRole("radio", { name: "Yes" })).toBeFocused();
   await frame.getByRole("radio", { name: "No", exact: true }).check();
   await frame.getByRole("button", { name: "Continue" }).click();
-  // The step's chosen answer takes focus as it comes, here the switch that starts on.
   await expect(
     frame.getByRole("switch", { name: "Take part in research about this service" }),
   ).toBeFocused();
-  // The slider sends its value from an input that follows its state, so the value is kept once
-  // React has drawn it, not as the key is pressed.
-  const ease = frame.getByRole("slider", { name: "How easy was it, from 1 to 5?" });
-  await ease.focus();
-  await ease.press("ArrowRight");
-  await expect
-    .poll(() => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? ""))
-    .toContain('["ease","4"]');
-  // An answer given just before the page reloads is kept as the page goes.
-  await frame.getByRole("radio", { name: "GOV.UK" }).check();
-  await page.reload();
-  await choose();
-  await expect(
-    frame.getByRole("slider", { name: "How easy was it, from 1 to 5?" }),
-  ).toHaveAttribute("aria-valuenow", "4");
-  await expect(frame.getByRole("radio", { name: "GOV.UK" })).toBeChecked();
-  // Once sent, the answers are gone from the browser, and the press that sent them, which would
-  // otherwise keep them a moment later, keeps nothing. The survey sends in less than that moment.
-  await frame.getByRole("button", { name: "Send feedback" }).click();
-  await expect(frame.getByText("Thank you for your feedback.")).toBeVisible();
-  await page.waitForTimeout(600);
-  expect(await page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback"))).toBeNull();
 });
 
-test("a remembered survey keeps the answers of a step that applies again, however soon the page reloads", async ({
-  page,
+test("check your answers leaves out the answers of a step that applies no longer", async ({
   frame,
   open,
   playground,
 }) => {
   await open("form");
-  const choose = async () => {
-    await playground.set("example", /In stages/);
-    for (const name of ["back", "moreKinds", "remember", "fromVisit"])
-      await playground.set(name, true);
-  };
-  await choose();
-  const kept = () => page.evaluate(() => localStorage.getItem("x-govuk-ui-example-feedback") ?? "");
+  await playground.set("example", /In stages/);
+  await playground.set("layout", "Page");
+  for (const name of ["checkAnswers", "moreKinds", "fromVisit"]) await playground.set(name, true);
   // The tablet step applies only to those who used a tablet.
   await frame.getByRole("radio", { name: "GOV.UK" }).check();
   await frame.getByRole("button", { name: "Tablet" }).click();
   await frame.getByRole("button", { name: "Continue" }).click();
   await frame.getByLabel("Which tablet did you use?").fill("A small one");
-  // The step for something else asks under the same name, and never applies with this one, so
-  // the answer is kept.
-  await expect.poll(kept).toContain('["model","A small one"]');
-  await frame.getByRole("button", { name: "Back", exact: true }).click();
-  await expect(frame.getByRole("heading", { name: "About your visit" })).toBeVisible();
+  await frame.getByRole("button", { name: "Continue" }).click();
+  const review = frame.locator(".x-govuk-ui-form-steps-summary");
+  await expect(review.locator(".x-govuk-ui-summary-list-value")).toContainText(["A small one"]);
   // Once a phone is chosen, the step no longer applies, and its answer is left out.
+  await review.getByRole("button", { name: /Change your answer to What did you use\?/ }).click();
   await frame.getByRole("button", { name: "Phone" }).click();
-  await expect.poll(kept).toContain('["device","phone"]');
-  expect(await kept()).not.toContain("A small one");
-  // A tablet again brings the step back, and its answer with it, though the page reloads before
-  // the step is drawn as applying.
-  await frame.getByRole("button", { name: "Tablet" }).click();
-  await page.reload();
-  await choose();
-  await expect(frame.getByLabel("Which tablet did you use?")).toHaveValue("A small one");
-});
-
-test("the answers of a step that applies no longer are left out, and its field keeps its focus, name and form", async ({
-  page,
-}) => {
-  // A service can make the step on show apply no longer, such as by a `when` of its own, while
-  // another step under the same name applies in its place. Each engine reads the page its own way,
-  // so the read runs as it is, in each.
-  await page.setContent(`
-    <form>
-      <fieldset data-step="0">
-        <input name="model" value="From the step on show">
-        <input type="radio" name="pick" value="a" checked>
-      </fieldset>
-      <fieldset data-step="1" disabled><input name="model" value="From the step that applies"></fieldset>
-    </form>`);
-  const form = page.locator("form");
-  const shown = page.locator('input[value="From the step on show"]');
-  await shown.focus();
-  expect(await form.evaluate(stepAnswers, [1])).toEqual([["model", "From the step that applies"]]);
-  // The page is as it was.
-  await expect(shown).toBeFocused();
-  expect(
-    await form.evaluate((element: HTMLFormElement) => ({
-      names: [...element.querySelectorAll("input")].map((input) => input.getAttribute("name")),
-      owned: [...element.querySelectorAll("input")].every((input) => input.form === element),
-      disabled: element.querySelector("fieldset[data-step='1']")?.hasAttribute("disabled"),
-      checked: element.querySelector<HTMLInputElement>("input[type=radio]")?.checked,
-      sent: [...new FormData(element).entries()].map(([name]) => name),
-    })),
-  ).toEqual({
-    names: ["model", "pick", "model"],
-    owned: true,
-    disabled: true,
-    checked: true,
-    sent: ["model", "pick"],
-  });
+  await frame.getByRole("button", { name: "Continue" }).click();
+  await expect(review.locator(".x-govuk-ui-summary-list-key")).not.toContainText([
+    "Which tablet did you use?",
+  ]);
+  await expect(review).not.toContainText("A small one");
 });
 
 test("an application in pages takes its Back link, buttons and answers where it places them", async ({

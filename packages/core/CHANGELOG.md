@@ -7,6 +7,11 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 ### Breaking Changes
 
 - Removed Sidebar's `animations` prop, with `sidebarAnimations` and `SidebarAnimation`. Every movement of the Sidebar now runs, unless users prefer reduced motion. Remove `animations` from your Sidebar. The sidebar no longer has a `data-animate` attribute, so select its parts by their classes.
+- Removed `storageKey` and `storage` from FormSteps, and `storageKey` from QuestionCard. They kept users' answers in the browser, where the next person to use the device can read them. To let users continue where they left off, keep their answers on your server, such as from `useFormSteps().data()` in a Save and come back later button. Give them back as `defaultValues`, with `defaultStep`.
+
+### Added
+
+- Added `defaultValues` to FormSteps and QuestionCard. It gives the fields their answers to start with, by the names they send under, as Form's does.
 
 ### Fixed
 

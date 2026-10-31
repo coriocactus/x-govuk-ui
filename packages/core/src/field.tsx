@@ -122,9 +122,9 @@ export function ShownProvider({ shown, children }: ShownProviderProps) {
 }
 
 /**
- * The answer a field starts with when its Form has one for the field's `name`, such as an answer
- * FormSteps kept from an earlier visit. A field reads it once, as its default, before its own
- * `defaultValue`. A field of your own can use it the same way.
+ * The answer a field starts with when its Form's `defaultValues` has one for the field's `name`,
+ * such as an answer kept from an earlier visit. A field reads it once, as its default, before its
+ * own `defaultValue`. A field of your own can use it the same way.
  */
 export function useFormDefault(name: string | undefined): string[] | undefined {
   const form = useContext(FormContext);

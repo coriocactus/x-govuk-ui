@@ -41,7 +41,6 @@ type Props = {
   back?: boolean;
   progress?: boolean;
   checkAnswers?: boolean;
-  remember?: boolean;
   history?: boolean;
   /** The rating fails to save the first time, as a server error would. */
   fail?: boolean;
@@ -436,7 +435,6 @@ function FeedbackInStages({
   back = false,
   progress = false,
   checkAnswers = false,
-  remember = false,
   history = false,
   fail = false,
   moreKinds = false,
@@ -455,7 +453,6 @@ function FeedbackInStages({
         progress={progress}
         checkAnswers={checkAnswers}
         history={history}
-        storageKey={remember ? "x-govuk-ui-example-feedback" : undefined}
         defaultStep={moreKinds && fromVisit ? 2 : 0}
         labels={{ submit: "Send feedback" }}
         onComplete={async () => {
@@ -507,7 +504,6 @@ function FeedbackInStages({
         className="preview-survey-again"
         onClick={() => {
           failed.current = false;
-          if (remember) localStorage.removeItem("x-govuk-ui-example-feedback");
           setRun(run + 1);
         }}
       >

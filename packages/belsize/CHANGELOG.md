@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Changed
+
+- Changed the actions that `useTilesActions` gives to keep one identity while the Tiles are on the page, so an effect that depends on one runs only once.
+
 ## [0.5.0] - 2026-10-20
 
 ### Breaking Changes

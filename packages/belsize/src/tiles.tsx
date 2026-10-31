@@ -318,6 +318,24 @@ function useBlankPreview(preview: ConnectDragPreview) {
   }, [preview]);
 }
 
+/**
+ * Functions that keep one identity for the provider's life, each calling the latest render's
+ * function of its name, as an effect or a handler reads `useLatest`.
+ */
+function useStable<T extends Record<string, (...args: never[]) => unknown>>(functions: T): T {
+  const latest = useLatest(functions);
+  const [stable] = useState(() => {
+    const call =
+      (name: string) =>
+      (...args: never[]) =>
+        latest.current[name]?.(...args);
+    return Object.fromEntries(
+      Object.keys(functions).map((name) => [name, call(name)]),
+    ) as unknown as T;
+  });
+  return stable;
+}
+
 /** The grip of dots that says a tile, or a dock's chip, can be dragged. */
 const gripDots = (
   <svg className="x-govuk-ui-tile-grip-dots" viewBox="0 0 10 16" aria-hidden="true">
@@ -624,18 +642,14 @@ export function TilesProvider({
   const wantedActive = activeValue !== undefined ? activeValue : ownActive;
   const active = wantedActive !== null && ids.includes(wantedActive) ? wantedActive : null;
   const told = useRef<string | null>(null);
-  const activeNow = useLatest(active);
   // A user's change is told at once, and again each time, even if the service kept the tile it
   // gave.
-  const use = useCallback(
-    (id: string) => {
-      if (id === activeNow.current) return;
-      if (activeValue === undefined) setOwnActive(id);
-      told.current = id;
-      onActiveChange?.(id);
-    },
-    [activeValue, onActiveChange],
-  );
+  const use = (id: string) => {
+    if (id === active) return;
+    if (activeValue === undefined) setOwnActive(id);
+    told.current = id;
+    onActiveChange?.(id);
+  };
   // The tile in use can also change as it closes, or as the service gives one that is not open.
   useEffect(() => {
     if (told.current === active) return;
@@ -660,14 +674,11 @@ export function TilesProvider({
     };
   }, []);
 
-  const commit = useCallback(
-    (next: TilesLayout | null) => {
-      setLive(undefined);
-      if (value === undefined) setOwn(next);
-      onValueChange?.(next);
-    },
-    [value, setOwn, onValueChange],
-  );
+  const commit = (next: TilesLayout | null) => {
+    setLive(undefined);
+    if (value === undefined) setOwn(next);
+    onValueChange?.(next);
+  };
 
   // A tile's page id is its board's id with its own, encoded, so different ids stay different and
   // contain no spaces, because `aria-controls` lists them with spaces between.
@@ -691,26 +702,22 @@ export function TilesProvider({
   }, []);
   // Focus goes to a tile's first control that can take it, or else its heading. With no tiles
   // left, it goes to what the empty board shows.
-  const focus = useCallback(
-    (id: string) =>
-      requestAnimationFrame(() => {
-        const tile = document.getElementById(domId(id));
-        const control = firstControl(tile?.querySelector(".x-govuk-ui-tile-bar"));
-        if (control) control.focus();
-        else focusAside(tile?.querySelector<HTMLElement>(".x-govuk-ui-tile-heading"));
-      }),
-    [domId],
-  );
-  const focusEmpty = useCallback(
-    () =>
-      requestAnimationFrame(() => {
-        const empty = board.current?.querySelector<HTMLElement>(".x-govuk-ui-tiles-empty");
-        const control = firstControl(empty);
-        if (control) control.focus();
-        else focusAside(empty);
-      }),
-    [],
-  );
+  const focus = (id: string) => {
+    requestAnimationFrame(() => {
+      const tile = document.getElementById(domId(id));
+      const control = firstControl(tile?.querySelector(".x-govuk-ui-tile-bar"));
+      if (control) control.focus();
+      else focusAside(tile?.querySelector<HTMLElement>(".x-govuk-ui-tile-heading"));
+    });
+  };
+  const focusEmpty = () => {
+    requestAnimationFrame(() => {
+      const empty = board.current?.querySelector<HTMLElement>(".x-govuk-ui-tiles-empty");
+      const control = firstControl(empty);
+      if (control) control.focus();
+      else focusAside(empty);
+    });
+  };
 
   const register = useCallback((id: string, title: string, dom?: string) => {
     setRegistered((current) => {
@@ -727,195 +734,175 @@ export function TilesProvider({
       });
   }, []);
 
-  // The actions. Each reads the current arrangement, not the one when the action was created.
-  const closeTile = useCallback(
-    (id: string, { moveFocus = true } = {}) => {
-      const before = tileIds(latest.current.committed);
-      if (!before.includes(id)) return;
-      const at = before.indexOf(id);
-      // Focus goes to the tile beside it in reading order, so it is not lost with the tile.
-      const next = before[at + 1] ?? before[at - 1];
-      if (maximised === id) setMaximised(null);
-      commit(removeTile(latest.current.committed, id));
-      announce(labelsNow.current.closed(titleOf(id)));
-      if (!moveFocus) return;
-      if (next) focus(next);
-      else focusEmpty();
-    },
-    [commit, announce, titleOf, focus, focusEmpty, maximised, setMaximised],
-  );
-  const close = useCallback((id: string) => closeTile(id), [closeTile]);
-  const move = useCallback(
-    (id: string, place: TilePlace) => {
-      const now = latest.current.committed;
-      if (!tileIds(now).includes(id)) return;
-      commit(placeTile(now, id, place));
-      const words = labelsNow.current.sides[place.side];
-      // A missing tile to go beside sends it to the edge, as `placeTile` does.
-      const where =
-        place.beside && place.beside !== id && tileIds(now).includes(place.beside)
-          ? `${words.moved} ${titleOf(place.beside)}`
-          : words.edge.toLowerCase();
-      announce(labelsNow.current.moved(titleOf(id), where));
-    },
-    [commit, announce, titleOf],
-  );
-  const swap = useCallback(
-    (id: string, other: string) => {
-      const now = latest.current.committed;
-      if (!tileIds(now).includes(id) || !tileIds(now).includes(other)) return;
-      commit(swapTiles(now, id, other));
-      announce(labelsNow.current.swapped(titleOf(id), titleOf(other)));
-    },
-    [commit, announce, titleOf],
-  );
-  const showIn = useCallback(
-    (id: string, by: string, { moveFocus = true } = {}) => {
-      const now = latest.current.committed;
-      if (!tileIds(now).includes(id)) return;
-      // A maximised tile would hide the one shown, so it is restored first.
-      setMaximised(null);
-      commit(replaceTile(now, id, by));
-      announce(labelsNow.current.shownInPlace(titleOf(by), titleOf(id)));
-      if (moveFocus) focus(by);
-    },
-    [commit, announce, titleOf, focus, setMaximised],
-  );
-  const replace = useCallback((id: string, by: string) => showIn(id, by), [showIn]);
-  const openTile = useCallback(
-    (id: string, place: TilePlace = { side: "right" }, { moveFocus = true } = {}) => {
-      setMaximised(null);
-      commit(placeTile(latest.current.committed, id, place));
-      announce(labelsNow.current.opened(titleOf(id)));
-      if (moveFocus) focus(id);
-    },
-    [commit, announce, titleOf, focus, setMaximised],
-  );
-  const open = useCallback((id: string, place?: TilePlace) => openTile(id, place), [openTile]);
-  const split = useCallback(
-    async (id: string, direction: TileSplitDirection) => {
-      if (!createTile) return;
-      const pressed = document.activeElement;
-      let added: string | null;
-      try {
-        added = await createTile();
-      } catch {
-        return;
-      }
-      // A tile made after the split tile was closed, or after the Tiles went, has nowhere to go.
-      if (!added || !mounted.current || !tileIds(latest.current.committed).includes(id)) return;
-      setMaximised(null);
-      const side = direction === "across" ? "right" : "bottom";
-      commit(placeTile(latest.current.committed, added, { beside: id, side }));
-      announce(labelsNow.current.split(titleOf(id), direction));
-      // A tile made by a server can take a while. Focus moved elsewhere meanwhile is left there.
-      // Focus still where it was, which a press does not move in Safari, moves to the new tile, as
-      // does focus back in the split tile, where a menu returns it on closing.
-      const now = document.activeElement;
-      if (
-        !now ||
-        now === pressed ||
-        now === document.body ||
-        document.getElementById(domId(id))?.contains(now)
-      )
-        focus(added);
-    },
-    [createTile, commit, announce, titleOf, setMaximised, focus, domId],
-  );
-  const splitTile = useCallback(
-    (id: string, direction: TileSplitDirection) => void split(id, direction),
-    [split],
-  );
-  const expand = useCallback(
-    (id: string) => {
-      commit(expandTile(latest.current.committed, id));
-      announce(labelsNow.current.madeLarger(titleOf(id)));
-    },
-    [commit, announce, titleOf],
-  );
+  // The actions. Each reads the arrangement as it runs, through `latest`, so a change from elsewhere
+  // since the last render is kept.
+  const closeTile = (id: string, { moveFocus = true } = {}) => {
+    const before = tileIds(latest.current.committed);
+    if (!before.includes(id)) return;
+    const at = before.indexOf(id);
+    // Focus goes to the tile beside it in reading order, so it is not lost with the tile.
+    const next = before[at + 1] ?? before[at - 1];
+    if (maximised === id) setMaximised(null);
+    commit(removeTile(latest.current.committed, id));
+    announce(labelsNow.current.closed(titleOf(id)));
+    if (!moveFocus) return;
+    if (next) focus(next);
+    else focusEmpty();
+  };
+  const move = (id: string, place: TilePlace) => {
+    const now = latest.current.committed;
+    if (!tileIds(now).includes(id)) return;
+    commit(placeTile(now, id, place));
+    const words = labelsNow.current.sides[place.side];
+    // A missing tile to go beside sends it to the edge, as `placeTile` does.
+    const where =
+      place.beside && place.beside !== id && tileIds(now).includes(place.beside)
+        ? `${words.moved} ${titleOf(place.beside)}`
+        : words.edge.toLowerCase();
+    announce(labelsNow.current.moved(titleOf(id), where));
+  };
+  const swap = (id: string, other: string) => {
+    const now = latest.current.committed;
+    if (!tileIds(now).includes(id) || !tileIds(now).includes(other)) return;
+    commit(swapTiles(now, id, other));
+    announce(labelsNow.current.swapped(titleOf(id), titleOf(other)));
+  };
+  const showIn = (id: string, by: string, { moveFocus = true } = {}) => {
+    const now = latest.current.committed;
+    if (!tileIds(now).includes(id)) return;
+    // A maximised tile would hide the one shown, so it is restored first.
+    setMaximised(null);
+    commit(replaceTile(now, id, by));
+    announce(labelsNow.current.shownInPlace(titleOf(by), titleOf(id)));
+    if (moveFocus) focus(by);
+  };
+  const openTile = (
+    id: string,
+    place: TilePlace = { side: "right" },
+    { moveFocus = true } = {},
+  ) => {
+    setMaximised(null);
+    commit(placeTile(latest.current.committed, id, place));
+    announce(labelsNow.current.opened(titleOf(id)));
+    if (moveFocus) focus(id);
+  };
+  const splitTile = async (id: string, direction: TileSplitDirection) => {
+    if (!createTile) return;
+    const pressed = document.activeElement;
+    let added: string | null;
+    try {
+      added = await createTile();
+    } catch {
+      return;
+    }
+    // A tile made after the split tile was closed, or after the Tiles went, has nowhere to go.
+    if (!added || !mounted.current || !tileIds(latest.current.committed).includes(id)) return;
+    setMaximised(null);
+    const side = direction === "across" ? "right" : "bottom";
+    commit(placeTile(latest.current.committed, added, { beside: id, side }));
+    announce(labelsNow.current.split(titleOf(id), direction));
+    // A tile made by a server can take a while. Focus moved elsewhere meanwhile is left there.
+    // Focus still where it was, which a press does not move in Safari, moves to the new tile, as
+    // does focus back in the split tile, where a menu returns it on closing.
+    const now = document.activeElement;
+    if (
+      !now ||
+      now === pressed ||
+      now === document.body ||
+      document.getElementById(domId(id))?.contains(now)
+    )
+      focus(added);
+  };
+  const expand = (id: string) => {
+    commit(expandTile(latest.current.committed, id));
+    announce(labelsNow.current.madeLarger(titleOf(id)));
+  };
   // Even rows suit the board's own proportions, so each tile is as near square as it can be.
-  const tidy = useCallback(() => {
+  const tidy = () => {
     const box = board.current?.getBoundingClientRect();
     const aspect = box && box.height > 0 ? box.width / box.height : 1;
     commit(balanceTiles(latest.current.committed, aspect));
     announce(labelsNow.current.setOutEvenly);
-  }, [commit, announce]);
-  const maximise = useCallback((id: string) => setMaximised(id), [setMaximised]);
-  const restore = useCallback(() => setMaximised(null), [setMaximised]);
+  };
 
   // A tile's drag. The tile steps aside a moment after the drag begins, and the rest show where it
   // could go. It waits, because a browser cancels a drag whose element changes as it starts.
   const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const beginDrag = useCallback((id: string) => {
+  const beginDrag = (id: string) => {
     clearTimeout(hideTimer.current);
     hideTimer.current = setTimeout(() => setLive(hideTile(latest.current.committed, id)), 0);
-  }, []);
+  };
   // However it ends, the arrangement the drag was making is discarded. A drop is read against the
   // arrangement drawn while the drag lasted, where its path was. It is applied by ids to the
   // current arrangement, so a change from elsewhere meanwhile is kept.
-  const endDrag = useCallback(
-    (item: DragItem, result: DropResult | null) => {
-      clearTimeout(hideTimer.current);
-      supplyPointerDownAfterDrag();
-      try {
-        if (!result) return;
-        const target = result.path ? tileAt(latest.current.layout, result.path) : undefined;
-        if (item.tile) {
-          if (result.remove) closeTile(item.tile, { moveFocus: false });
-          else if (result.swap && target) swap(item.tile, target);
-          else if (result.position) move(item.tile, { beside: target, side: result.position });
-          else return;
-        } else if (item.dock) {
-          if (result.swap && target) showIn(target, item.dock, { moveFocus: false });
-          else if (result.position) {
-            openTile(item.dock, { beside: target, side: result.position }, { moveFocus: false });
-          } else return;
-        }
-        play(result.remove ? "close" : "swoosh");
-      } finally {
-        setLive(undefined);
+  const endDrag = (item: DragItem, result: DropResult | null) => {
+    clearTimeout(hideTimer.current);
+    supplyPointerDownAfterDrag();
+    try {
+      if (!result) return;
+      const target = result.path ? tileAt(latest.current.layout, result.path) : undefined;
+      if (item.tile) {
+        if (result.remove) closeTile(item.tile, { moveFocus: false });
+        else if (result.swap && target) swap(item.tile, target);
+        else if (result.position) move(item.tile, { beside: target, side: result.position });
+        else return;
+      } else if (item.dock) {
+        if (result.swap && target) showIn(target, item.dock, { moveFocus: false });
+        else if (result.position) {
+          openTile(item.dock, { beside: target, side: result.position }, { moveFocus: false });
+        } else return;
       }
-    },
-    [closeTile, swap, move, showIn, openTile, play],
-  );
+      play(result.remove ? "close" : "swoosh");
+    } finally {
+      setLive(undefined);
+    }
+  };
 
   // A divider's drag, which shows as it goes and is kept as it ends. Its path names a split in the
   // structure the drag began in, so a drag that ends in another structure is not kept.
   const resizeShape = useRef<string | undefined>(undefined);
-  const beginResize = useCallback(() => {
+  const beginResize = () => {
     resizeShape.current = shapeOf(latest.current.committed);
-  }, []);
-  const resize = useCallback((path: number[], index: number, share: number) => {
+  };
+  const resize = (path: number[], index: number, share: number) => {
     setLive(resizeTiles(latest.current.layout, path, index, share));
-  }, []);
-  const commitResize = useCallback(
-    (path: number[], index: number, share: number) => {
-      const began = resizeShape.current;
-      resizeShape.current = undefined;
-      const now = latest.current.committed;
-      if (began !== undefined && began !== shapeOf(now)) {
-        setLive(undefined);
-        return;
-      }
-      commit(resizeTiles(now, path, index, share));
-    },
-    [commit],
-  );
+  };
+  const commitResize = (path: number[], index: number, share: number) => {
+    const began = resizeShape.current;
+    resizeShape.current = undefined;
+    const now = latest.current.committed;
+    if (began !== undefined && began !== shapeOf(now)) {
+      setLive(undefined);
+      return;
+    }
+    commit(resizeTiles(now, path, index, share));
+  };
 
-  const getLayout = useCallback(() => latest.current.layout, []);
+  // Each action keeps one identity for the provider's life, and calls the latest render's, so the
+  // parts that take the actions render again only for what they show.
+  const actions = useStable({
+    open: (id: string, place?: TilePlace) => openTile(id, place),
+    close: (id: string) => closeTile(id),
+    move,
+    swap,
+    replace: (id: string, by: string) => showIn(id, by),
+    split: (id: string, direction: TileSplitDirection) => void splitTile(id, direction),
+    expand,
+    tidy,
+    maximise: (id: string) => setMaximised(id),
+    restore: () => setMaximised(null),
+    focus,
+    use,
+    getLayout: () => latest.current.layout,
+    beginDrag,
+    endDrag,
+    beginResize,
+    resize,
+    commitResize,
+  });
   const context = useMemo<TilesContextValue>(
     () => ({
-      open,
-      close,
-      move,
-      swap,
-      replace,
-      split: splitTile,
-      expand,
-      tidy,
-      maximise,
-      restore,
-      focus,
+      ...actions,
       boardId,
       domId,
       titleOf,
@@ -924,32 +911,15 @@ export function TilesProvider({
       shown,
       active,
       small,
-      use,
       announce,
       labels,
       canSplit: Boolean(createTile),
       message,
       register,
       board,
-      getLayout,
-      beginDrag,
-      endDrag,
-      beginResize,
-      resize,
-      commitResize,
     }),
     [
-      open,
-      close,
-      move,
-      swap,
-      replace,
-      splitTile,
-      expand,
-      tidy,
-      maximise,
-      restore,
-      focus,
+      actions,
       boardId,
       domId,
       titleOf,
@@ -958,18 +928,11 @@ export function TilesProvider({
       shown,
       active,
       small,
-      use,
       announce,
       labels,
       createTile,
       message,
       register,
-      getLayout,
-      beginDrag,
-      endDrag,
-      beginResize,
-      resize,
-      commitResize,
     ],
   );
 

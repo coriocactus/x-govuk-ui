@@ -1,8 +1,9 @@
 name: Commits
 
-# Each new commit's message, against the repository's rules for commit messages. jj runs no Git
-# hooks, so a message is first checked here, or by bun run commits before a push. It is a workflow
-# of its own, apart from Check, so a message that breaks the rules holds back no deploy or release.
+# Each new commit's message, against the repository's rules for commit messages, and each feat or
+# fix's entry in the changelog of each package it changes. jj runs no Git hooks, so a commit is
+# first checked here, or by bun run commits before a push. It is a workflow of its own, apart from
+# Check, so a commit that breaks the rules holds back no deploy or release.
 on:
   push:
     branches: [main]

@@ -556,7 +556,7 @@ const entries = {
       ),
       reference(
         "EditorPrompt",
-        "{ trigger, name, items | search, insert, spaceInSearch, onlyAt, placement, renderMention }",
+        "{ trigger, name, label, items | search, insert, spaceInSearch, onlyAt, placement, emptyMessage, renderMention }",
         "Part",
       ),
       reference(
@@ -690,9 +690,17 @@ const entries = {
       reference("value / onValueChange", "string[] / (value: string[]) => void"),
       reference("Checkbox", "{ value, hint, exclusive, conditional, controlId, children }", "Part"),
       reference("ChoiceDivider", '{ children = "or" }', "Part"),
-      reference("CheckboxesRoot", "{ controlId, name, value, onValueChange, disabled }", "Part"),
+      reference(
+        "CheckboxesRoot",
+        "{ controlId, name, value, defaultValue, onValueChange, disabled }",
+        "Part",
+      ),
       reference("ChoiceList", "{ inline, size }", "Part"),
-      reference("ChoiceRoot", "{ controlId, value, exclusive, hasHint, conditionalId }", "Part"),
+      reference(
+        "ChoiceRoot",
+        "{ controlId, value, disabled, exclusive, hasHint, conditionalId }",
+        "Part",
+      ),
       reference("ChoiceControl / ChoiceLabel / ChoiceHint", "input / label / hint", "Part"),
       reference("ChoiceConditional", "{ value, id, children }", "Part"),
     ],
@@ -758,9 +766,13 @@ const entries = {
       reference("value / onValueChange", "string / (value: string) => void"),
       reference("Radio", "{ value, hint, conditional, controlId, children }", "Part"),
       reference("ChoiceDivider", '{ children = "or" }', "Part"),
-      reference("RadiosRoot", "{ controlId, name, value, onValueChange, disabled }", "Part"),
+      reference(
+        "RadiosRoot",
+        "{ controlId, name, value, defaultValue, onValueChange, disabled }",
+        "Part",
+      ),
       reference("ChoiceList", "{ inline, size }", "Part"),
-      reference("ChoiceRoot", "{ controlId, value, hasHint, conditionalId }", "Part"),
+      reference("ChoiceRoot", "{ controlId, value, disabled, hasHint, conditionalId }", "Part"),
       reference("ChoiceControl / ChoiceLabel / ChoiceHint", "input / label / hint", "Part"),
       reference("ChoiceConditional", "{ value, id, children }", "Part"),
     ],
@@ -900,7 +912,7 @@ const entries = {
       text("errorMessage", "", { note: "Clearing the number shows an error too." }),
       reference(
         "Field",
-        "{ controlId, name, hasHint, errorMessage, linkTo, describedBy, invalid, children }",
+        "{ controlId, name, hasHint, errorMessage, linkTo, describedBy, invalid, label, answer, children }",
         "Part",
       ),
       reference("Label", "{ htmlFor, visuallyHidden }", "Part"),
@@ -1005,7 +1017,7 @@ const entries = {
       reference("children", "Fields with a name, and a submit Button"),
       reference(
         "FormSteps",
-        '{ layout: "page" | "card", title, checkAnswers, back, progress, errorSummary, keyboardShortcut, actions, history, defaultValues, onComplete, step, defaultStep, onStepChange, done, labels }',
+        '{ layout: "page" | "card", title, icon, checkAnswers, back, progress, errorSummary, keyboardShortcut, actions, history, defaultValues, onComplete, step, defaultStep, onStepChange, done, labels }',
         "Part",
       ),
       reference(
@@ -1146,7 +1158,7 @@ const entries = {
       reference("SheetTrigger", "Button props and { render }", "Part"),
       reference("SheetClose", "Button props", "Part"),
       reference("--x-govuk-ui-sheet-width", "CSS length, for a sheet at the side", "360px"),
-      reference("SheetContent", "{ label, closeButton, initialFocus, finalFocus }", "Part"),
+      reference("SheetContent", "{ label, closeButton, initialFocus, finalFocus, labels }", "Part"),
       reference("SheetTitle / SheetDescription", "ReactNode", "Part"),
     ],
   },
@@ -1317,13 +1329,17 @@ const entries = {
       "Built from parts on Base UI's Menu, shared with Context menu. One highlight glides between items, and each item sounds a step higher down the list. Items line up in columns of icon, label and shortcut. Ticks and dots grow in, submenus open beside their item, and an action that removes something is red. The Sidebar example's service switcher is a Dropdown menu.",
     props: [
       reference("DropdownMenuTrigger", "Button props and { chevron, render }", "Part"),
-      reference("MenuContent", "{ side, align }", "Part"),
+      reference("MenuContent", "{ side, align, anchor, finalFocus }", "Part"),
       reference(
         "MenuItem",
         "{ onSelect, icon, shortcut, destructive, disabled, keepOpen }",
         "Part",
       ),
-      reference("MenuCheckboxItem", "{ checked, onCheckedChange }", "Part"),
+      reference(
+        "MenuCheckboxItem",
+        "{ checked, defaultChecked, onCheckedChange, disabled }",
+        "Part",
+      ),
       reference(
         "MenuRadioGroup / MenuRadioItem",
         "{ label, value, onValueChange } / { value }",
@@ -1402,7 +1418,7 @@ const entries = {
       reference("TableRow", "<tr> props", "Part"),
       reference(
         "TableHead",
-        '{ numeric, sort: "ascending" | "descending" | "none", onSort }',
+        '{ numeric, sort: "ascending" | "descending" | "none", onSort, after }',
         "Part",
       ),
       reference("TableCell", "{ numeric }", "Part"),
@@ -1595,7 +1611,7 @@ const entries = {
       ),
       reference(
         "ResizableHandle",
-        '{ orientation, value, min, max, defaultValue, onValueChange, onValueCommit, panel: "before" | "after", snap, grip, disabled }',
+        '{ orientation, label, controls, value, min, max, step, defaultValue, onValueChange, onValueCommit, onDraggingChange, panel: "before" | "after", snap, grip, disabled }',
         "Part",
       ),
     ],
@@ -1701,7 +1717,7 @@ const entries = {
       toggle("loading"),
       toggle("disabled"),
       reference("ref", "HTMLButtonElement"),
-      reference("ButtonGroup", "{ children }", "Part"),
+      reference("ButtonGroup", "{ stack, children }", "Part"),
     ],
     example: [
       toggle("group", false, { note: "Puts a Cancel link button beside it in a ButtonGroup." }),
@@ -1908,7 +1924,7 @@ const entries = {
       reference("CommandMenuGroup", "{ label, children }", "Part"),
       reference(
         "CommandMenuItem",
-        "{ onSelect, page, description, shortcut, icon, keywords, disabled }",
+        "{ onSelect, page, description, shortcut, icon, keywords, textValue, disabled }",
         "Part",
       ),
       reference("CommandMenuPage", "{ id, label, placeholder, children }", "Part"),
@@ -1958,7 +1974,7 @@ const entries = {
       reference("BubbleReactions", '{ side: "top" | "bottom", align: "start" | "end" }', "Part"),
       reference(
         "BubbleReactionPicker",
-        "{ options: { emoji, label }[], value, onValueChange, label, hold = 300 }",
+        "{ options: { emoji, label }[], value, defaultValue, onValueChange, label, hold = 300 }",
         "Part",
       ),
       reference("BubbleGroup", "{ children }", "Part"),
@@ -2629,8 +2645,12 @@ const entries = {
     props: [
       reference("label", "string"),
       reference("headingLevel", "2 | 3 | 4 | 5 | 6", "3"),
-      reference("TimelineItem", "{ title, by, date, highlighted, children, actions }", "Part"),
-      reference("TimelineMore", "{ loading, onClick, children }", "Part"),
+      reference(
+        "TimelineItem",
+        "{ title, by, date, highlighted, children, actions, labels }",
+        "Part",
+      ),
+      reference("TimelineMore", "{ loading, onClick, children, labels }", "Part"),
       reference("formatDateTime", "(date: Date) => string", "Helper"),
       reference("formatDate", "(date: Date) => string", "Helper"),
       reference("formatTime", "(date: Date) => string", "Helper"),
@@ -2661,7 +2681,7 @@ const entries = {
     changes:
       "GOV.UK's task list, built from parts. Each task's link covers its row, which tints under the pointer, and screen readers hear the hint and status with the name. Statuses are GOV.UK's, as Tags or plain text, and each new status rises into place. It is also an agent's task list. The task an agent is on shows a spinner, and each task it completes ticks softly.",
     props: [
-      reference("TaskListItem", "{ href, hint, status, statusText, children }", "Part"),
+      reference("TaskListItem", "{ href, render, hint, status, statusText, children }", "Part"),
       reference(
         "status",
         '"completed" | "incomplete" | "not-started" | "in-progress" | "cannot-start" | "error" | "working"',
@@ -2991,7 +3011,7 @@ const entries = {
       "A keyline box built from parts. When its title is a link, the whole card is the link, and GOV.UK's focus rings the card. The card stays still under the pointer. The footer sits above the card's link, so its own links and buttons still work. The Carousel example's slides are Cards. A MediaCredit in the image's corner names its photographer as a small Tag, which rises into view when the pointer is over the card or it has focus.",
     props: [
       reference("CardMedia", "An image or video", "Part"),
-      reference("CardTitle", "{ href, headingLevel, children }", "Part"),
+      reference("CardTitle", "{ href, render, headingLevel, children }", "Part"),
       reference("CardDescription / CardFooter", "ReactNode", "Part"),
       reference("MediaCredit", "{ prefix, children }", "Part"),
     ],
@@ -3074,7 +3094,7 @@ const entries = {
         "medium",
       ),
       reference("src", "string"),
-      reference("AvatarGroup", "{ more, children }", "Part"),
+      reference("AvatarGroup", "{ more, children, labels }", "Part"),
     ],
     example: [toggle("group", true, { note: "Shows an AvatarGroup." })],
   },
@@ -3428,7 +3448,7 @@ const entries = {
     props: [
       reference(
         "ServicePage",
-        "{ serviceName, serviceUrl, navigation, phase, feedbackUrl, back, footerLinks, render, header, footer, column, labels }",
+        "{ serviceName, serviceUrl, homepageUrl, navigation, phase, phaseMessage, feedbackUrl, back, footerLinks, crest, render, header, footer, column, labels }",
         "Part",
       ),
       reference("header", "ReactNode"),
@@ -3863,7 +3883,11 @@ const entries = {
       ),
       reference("useSidebarArrangement", "({ entries, groups?, storageKey? }) => arranger", "Hook"),
       reference("SidebarItemMenu", "{ arranger, id, labels? }", "Part"),
-      reference("SidebarCustomise", "{ arranger, open, onOpenChange, labels? }", "Part"),
+      reference(
+        "SidebarCustomise",
+        "{ arranger, open, defaultOpen, onOpenChange, labels? }",
+        "Part",
+      ),
       toggle("defaultOpen", true, {
         restart: true,
         note: "A SidebarProvider prop. The example starts again when it changes.",
@@ -3901,7 +3925,7 @@ const entries = {
       number("maxWidth", 360, { min: 120, needs: [whenOn("resizable")] }),
       toggle("activeLine", true),
       reference("SidebarGroup", "{ label, icon, collapsible, defaultOpen }", "Part"),
-      reference("SidebarItem", "{ icon, badge, current, tooltip, render }", "Part"),
+      reference("SidebarItem", "{ icon, badge, current, tooltip, render, action }", "Part"),
       reference("SidebarSubmenu", "{ label, icon, defaultOpen, tooltip, children }", "Part"),
       reference("SidebarInput", "Input props, with a search icon", "Part"),
       reference("SidebarSkeleton", "{ rows, icons }", "Part"),

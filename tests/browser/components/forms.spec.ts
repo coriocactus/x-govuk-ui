@@ -471,7 +471,6 @@ test("the answers of a step that applies no longer are left out, and its field k
 });
 
 test("an application in pages takes its Back link, buttons and answers where it places them", async ({
-  page,
   frame,
   open,
   playground,

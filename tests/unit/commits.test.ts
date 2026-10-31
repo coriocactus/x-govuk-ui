@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { checkMessage } from "../../scripts/commits";
+import { checkChangelogs, checkMessage } from "../../scripts/commits";
 
 /** The messages of a commit's findings, at one level. */
 const found = (message: string, level: "error" | "warning" = "error") =>
@@ -63,6 +63,39 @@ test("a breaking change has both ! and a closing BREAKING CHANGE: footer", () =>
   expect(found("feat(tiles): rename active\n\nBREAKING CHANGE: use current.")).toEqual([
     "A message with a BREAKING CHANGE: footer has ! before the colon.",
   ]);
+});
+
+test("a feat or fix that changes a package's source changes its changelog", () => {
+  const source = ["packages/core/src/tabs.tsx", "packages/core/src/styles/tabs.css"];
+  const entry = [...source, "packages/core/CHANGELOG.md"];
+  expect(checkChangelogs("fix(tabs): keep focus", entry)).toEqual([]);
+  expect(checkChangelogs("feat(tabs): add a gap", source).map((f) => f.message)).toEqual([
+    "A feat changes packages/core/src but not packages/core/CHANGELOG.md. Add an entry, or end with the footer Changelog: none and say why in the body.",
+  ]);
+  // An entry in another package's changelog is not this package's entry.
+  expect(
+    checkChangelogs("fix: keep focus", ["mcp/src/server.ts", ...entry]).map((f) => f.message),
+  ).toEqual([
+    "A fix changes mcp/src but not mcp/CHANGELOG.md. Add an entry, or end with the footer Changelog: none and say why in the body.",
+  ]);
+  // Other types, and changes outside a package's source, need no entry.
+  expect(checkChangelogs("refactor(tabs): share a hook", source)).toEqual([]);
+  expect(checkChangelogs("fix(workbench): keep the toolbar", ["site/frame.tsx"])).toEqual([]);
+});
+
+test("a feat or fix that needs no entry ends with the footer Changelog: none", () => {
+  const source = ["packages/core/src/tour.tsx"];
+  expect(
+    checkChangelogs(
+      "fix(tour): wrap a step's own buttons\n\nTour's step actions are not released yet.\n\nChangelog: none",
+      source,
+    ),
+  ).toEqual([]);
+  // The footer is in the last paragraph, not the body or the first line.
+  expect(
+    checkChangelogs("fix(tour): wrap the buttons\n\nChangelog: none\n\nMore.", source),
+  ).toHaveLength(1);
+  expect(checkChangelogs("fix(tour): Changelog: none", source)).toHaveLength(1);
 });
 
 test("a revert names the commit it undoes", () => {

@@ -1,6 +1,12 @@
+import { packages } from "./stage";
+
 // Checks each commit's message against the repository's rules for commit messages, which follow
 // Conventional Commits 1.0.0 and the 50/72 rule. jj runs no Git hooks, so nothing checks a message
 // as it is written. This script checks the commits instead, before they are pushed and in CI.
+//
+// It also checks that a feat or fix that changes a package's source changes that package's
+// changelog too, so each change is recorded as it is made. A commit that needs no entry, such as a
+// fix to a part not yet released, ends with the footer Changelog: none, and its body says why.
 //
 //   bun run commits            checks each commit after origin/main, up to HEAD
 //   bun run commits <range>    checks the commits in a Git range, such as abc123..def456
@@ -29,6 +35,8 @@ const SCOPE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** A line that cannot be wrapped, so it may run past 72 characters. */
 const UNBREAKABLE = /^\S+$|https?:\/\/|^[\w-]+-by: /;
 const BREAKING_FOOTER = "BREAKING CHANGE: ";
+/** A footer that says a feat or fix needs no changelog entry. The message's body says why. */
+const NO_CHANGELOG = "Changelog: none";
 
 export type Finding = { level: "error" | "warning"; message: string };
 
@@ -80,6 +88,42 @@ export function checkMessage(text: string): Finding[] {
   return findings;
 }
 
+/** What is wrong with a commit's changelogs, given the message and the files the commit changes. */
+export function checkChangelogs(text: string, files: string[]): Finding[] {
+  // checkMessage reports a first line it cannot read.
+  const type = SUBJECT.exec(text.split("\n")[0] ?? "")?.groups?.type;
+  if (type !== "feat" && type !== "fix") return [];
+  const paragraphs = text.trim().split(/\n\s*\n/);
+  if (paragraphs.length > 1 && paragraphs.at(-1)?.split("\n").includes(NO_CHANGELOG)) return [];
+  return packages
+    .filter(
+      (directory) =>
+        files.some((file) => file.startsWith(`${directory}/src/`)) &&
+        !files.includes(`${directory}/CHANGELOG.md`),
+    )
+    .map(
+      (directory): Finding => ({
+        level: "error",
+        message: `A ${type} changes ${directory}/src but not ${directory}/CHANGELOG.md. Add an entry, or end with the footer ${NO_CHANGELOG} and say why in the body.`,
+      }),
+    );
+}
+
+/** The path of each file a commit changes. */
+function filesOf(id: string) {
+  const diff = Bun.spawnSync([
+    "git",
+    "diff-tree",
+    "--root",
+    "--no-commit-id",
+    "--name-only",
+    "-r",
+    id,
+  ]);
+  if (diff.exitCode !== 0) throw new Error(diff.stderr.toString().trim());
+  return diff.stdout.toString().split("\n").filter(Boolean);
+}
+
 type Commit = { id: string; author: string; message: string };
 
 /** The commits in a Git range, oldest first, without merges. */
@@ -109,7 +153,10 @@ if (import.meta.main) {
   const commits = commitsIn(range).filter((commit) => commit.author !== "dependabot[bot]");
   let errors = 0;
   for (const commit of commits) {
-    const findings = checkMessage(commit.message);
+    const findings = [
+      ...checkMessage(commit.message),
+      ...checkChangelogs(commit.message, filesOf(commit.id)),
+    ];
     if (findings.length === 0) continue;
     console.log(`${commit.id.slice(0, 8)} ${commit.message.split("\n")[0]}`);
     for (const finding of findings) console.log(`  ${finding.level}: ${finding.message}`);

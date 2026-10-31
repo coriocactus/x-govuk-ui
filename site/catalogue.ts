@@ -1017,7 +1017,7 @@ const entries = {
       reference("children", "Fields with a name, and a submit Button"),
       reference(
         "FormSteps",
-        '{ layout: "page" | "card", title, icon, checkAnswers, back, progress, errorSummary, keyboardShortcut, actions, history, defaultValues, onComplete, step, defaultStep, onStepChange, done, labels }',
+        '{ layout: "page" | "card", title, icon, checkAnswers, back, progress, errorSummary, keyboardShortcut, actions, history, defaultValues, onComplete, step, defaultStep, defaultSettled, onStepChange, done, labels }',
         "Part",
       ),
       reference(
@@ -1031,7 +1031,7 @@ const entries = {
       reference("FormStepsProvider", "{ children }", "Part"),
       reference(
         "useFormSteps",
-        "() => { step, count, position, total, settled, reviewing, sent, busy, back, skip, data }",
+        "() => { step, count, position, total, settled, answered, skipped, reviewing, sent, busy, back, skip, data }",
         "Hook",
       ),
       reference("useFormStepsAnswers", "({ summary? }) => { answers, change }", "Hook"),
@@ -2797,6 +2797,7 @@ const entries = {
       reference("onComplete", "(answers: Record<string, string | string[] | null>) => void"),
       reference("labels", "Partial<QuestionCardLabels>", "Next, Previous, Continue"),
       reference("defaultValues", "Record<string, string | string[]>", "None"),
+      reference("defaultSettled", "{ answered?: number[], skipped?: number[] }", "None"),
     ],
   },
   "file-diff": {

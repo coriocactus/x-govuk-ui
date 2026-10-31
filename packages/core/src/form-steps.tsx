@@ -241,6 +241,14 @@ export type FormStepsProps = Omit<FormProps, "onSubmit" | "validate" | "children
   step?: number;
   /** The step it starts on. */
   defaultStep?: number;
+  /**
+   * The steps users answered and the steps they skipped before, by their places among the steps,
+   * from 0, such as when they come back to answers your service kept. Give it with `defaultValues`
+   * and `defaultStep`. Check your answers then lists a skipped step as skipped, and Change comes
+   * back to Check your answers once the steps after the one changed are settled. `useFormSteps`
+   * gives both lists, to keep with the answers.
+   */
+  defaultSettled?: { answered?: readonly number[]; skipped?: readonly number[] };
   onStepChange?: (step: number) => void;
   /**
    * Shows in place of the steps once the answers are sent. Without it, the answers stay on show,
@@ -326,6 +334,10 @@ export type UseFormStepsResult = {
   total: number;
   /** How many of the steps that apply are answered or skipped. */
   settled: number;
+  /** The steps users have answered, by their places among the steps, from 0. */
+  answered: readonly number[];
+  /** The steps users have skipped, by their places among the steps, from 0. */
+  skipped: readonly number[];
   /** Whether Check your answers is on show, before the answers are sent. */
   reviewing: boolean;
   /** Whether the answers have been sent. */
@@ -480,6 +492,7 @@ export function FormSteps({
   onComplete,
   step: controlledStep,
   defaultStep = 0,
+  defaultSettled,
   onStepChange,
   done: doneContent,
   labels: ownLabels,
@@ -509,8 +522,8 @@ export function FormSteps({
   // all known until they register.
   const [wanted, setAt] = useControllableState(controlledStep, defaultStep, onStepChange);
   const at = Math.max(0, Math.min(wanted, count));
-  const [passed, setPassed] = useState(() => new Set<number>());
-  const [skipped, setSkipped] = useState(() => new Set<number>());
+  const [answered, setAnswered] = useState(() => new Set(defaultSettled?.answered));
+  const [skipped, setSkipped] = useState(() => new Set(defaultSettled?.skipped));
   const [plan, setPlan] = useState(() => steps.map((_, index) => index));
   const [rows, setRows] = useState<FormStepsAnswer[]>([]);
   // Whether the answers are being sent, read as a press comes, before the form draws itself busy.
@@ -617,12 +630,12 @@ export function FormSteps({
   const following = (
     from: number,
     route: number[],
-    passing: Set<number>,
+    answering: Set<number>,
     skipping: Set<number>,
   ) => {
     const later = route.filter((index) => index > from);
     if (returning.current) {
-      const missing = later.find((index) => !passing.has(index) && !skipping.has(index));
+      const missing = later.find((index) => !answering.has(index) && !skipping.has(index));
       if (missing !== undefined) return missing;
       returning.current = false;
       return count;
@@ -757,13 +770,13 @@ export function FormSteps({
       setBusy(false);
       if (errors && Object.values(errors).some(present)) return errors;
     }
-    const passing = new Set(passed).add(at);
+    const answering = new Set(answered).add(at);
     const skipping = new Set(skipped);
     skipping.delete(at);
-    setPassed(passing);
+    setAnswered(answering);
     setSkipped(skipping);
     const route = replan();
-    const next = following(at, route, passing, skipping);
+    const next = following(at, route, answering, skipping);
     if (next >= count && !checkAnswers) {
       // The last step sends the answers, without Check your answers.
       return finish(data, skipping);
@@ -774,13 +787,13 @@ export function FormSteps({
 
   const skip = () => {
     const skipping = new Set(skipped).add(at);
-    const passing = new Set(passed);
-    passing.delete(at);
+    const answering = new Set(answered);
+    answering.delete(at);
     setSkipped(skipping);
-    setPassed(passing);
+    setAnswered(answering);
     // The skipped step's answers are left out at once, so the steps after follow from the rest.
     const route = replan(at);
-    const next = following(at, route, passing, skipping);
+    const next = following(at, route, answering, skipping);
     if (next >= count && !checkAnswers) {
       if (form.current) void finish(answersLeaving(form.current, at), skipping);
       return;
@@ -812,7 +825,7 @@ export function FormSteps({
   };
 
   const position = atReview ? plan.length : plan.indexOf(at);
-  const settled = plan.filter((index) => passed.has(index) || skipped.has(index)).length;
+  const settled = plan.filter((index) => answered.has(index) || skipped.has(index)).length;
   const last = !checkAnswers && plan.at(-1) === at;
   const label = atReview || last ? labels.submit : (step?.labels?.continue ?? labels.continue);
   const card = layout === "card";
@@ -829,6 +842,8 @@ export function FormSteps({
   const canGoBack = !sent && previous !== undefined;
   const canSkip = Boolean(step?.optional) && !atReview && !sent;
   const listed = atReview || sent ? rows : noAnswers;
+  const answeredSteps = useMemo(() => [...answered].sort((a, b) => a - b), [answered]);
+  const skippedSteps = useMemo(() => [...skipped].sort((a, b) => a - b), [skipped]);
   const controls = useMemo<UseFormStepsResult>(
     () => ({
       step: at,
@@ -836,6 +851,8 @@ export function FormSteps({
       position,
       total: plan.length,
       settled,
+      answered: answeredSteps,
+      skipped: skippedSteps,
       reviewing: atReview && !sent,
       sent,
       busy,
@@ -849,6 +866,8 @@ export function FormSteps({
       position,
       plan.length,
       settled,
+      answeredSteps,
+      skippedSteps,
       atReview,
       sent,
       busy,

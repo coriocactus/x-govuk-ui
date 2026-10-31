@@ -88,6 +88,7 @@ import {
   useControllableState,
   useControlProps,
   useField,
+  useFormSteps,
   validateWith,
 } from "x-govuk-ui";
 import { z } from "zod";
@@ -1196,6 +1197,31 @@ test("a step takes a fieldset's props and the level of its title", () => {
     /<fieldset role="presentation" id="contact" style="margin-top:8px" data-step-name="contact" class="x-govuk-ui-form-step contact-step"/,
   );
   expect(html).toContain('<h2 class="x-govuk-ui-form-step-title">How can we contact you?</h2>');
+});
+
+test("a form in steps comes back with the steps users answered and skipped", () => {
+  // A part among the steps reads what a service keeps with the answers.
+  function Kept() {
+    const steps = useFormSteps();
+    return <output>{JSON.stringify([steps?.answered, steps?.skipped, steps?.settled])}</output>;
+  }
+  const html = renderToStaticMarkup(
+    <FormSteps layout="card" defaultStep={2} defaultSettled={{ answered: [0], skipped: [1] }}>
+      <Kept />
+      <FormStep optional>
+        <Input name="name" label="What is your name?" />
+      </FormStep>
+      <FormStep optional>
+        <Input name="email" label="Email address" />
+      </FormStep>
+      <FormStep optional>
+        <Input name="phone" label="Phone number" />
+      </FormStep>
+    </FormSteps>,
+  );
+  expect(html).toContain("<output>[[0],[1],2]</output>");
+  // The card's ring counts both as the form comes back.
+  expect(html).toMatch(/role="progressbar"[^>]*aria-valuenow="2"/);
 });
 
 test("a form in steps draws once each part a service places, and its buttons beside Continue", () => {

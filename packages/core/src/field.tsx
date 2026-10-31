@@ -461,34 +461,17 @@ export function Field({
       </FieldContext>
     );
   return (
-    <BoundField
-      {...props}
-      binding={{ id: controlId, name, linkTo, hasHint, errorMessage, describedBy, answer, label }}
-    />
-  );
-}
-
-type Binding = {
-  id: string;
-  name?: string;
-  linkTo?: string;
-  hasHint?: boolean;
-  errorMessage?: ReactNode;
-  describedBy?: string;
-  answer?: (data: FormData) => ReactNode;
-  label?: ReactNode;
-};
-
-/** A Field bound to its control's id, which ties its parts together through context. */
-function BoundField({
-  binding,
-  invalid,
-  ...props
-}: ComponentPropsWithRef<"div"> & { invalid?: boolean; binding: Binding }) {
-  const { id, ...rest } = binding;
-  return (
-    <FieldBinding controlId={id} {...rest}>
-      <BoundBox {...props} invalid={invalid} />
+    <FieldBinding
+      controlId={controlId}
+      name={name}
+      linkTo={linkTo}
+      hasHint={hasHint}
+      errorMessage={errorMessage}
+      describedBy={describedBy}
+      answer={answer}
+      label={label}
+    >
+      <BoundBox {...props} />
     </FieldBinding>
   );
 }

@@ -965,11 +965,30 @@ function $insertAroundList(selection: RangeSelection, nodes: LexicalNode[]) {
   const after = top && $isBlankNode(top) ? top.getPreviousSibling() : top;
   let index = selection.anchor.offset;
   if (top) index = after ? after.getIndexWithinParent() + 1 : 0;
-  const [before, rest] = $splitNode(outer, index);
+  const [before, rest] = $splitList(outer, index);
   if (top && $isBlankNode(top)) top.remove();
   let previous: LexicalNode = before ?? rest;
   for (const node of nodes) previous = previous.insertAfter(node);
-  if ($isListNode(before) && before.isEmpty()) before.remove();
-  if ($isListNode(rest) && rest.isEmpty()) rest.remove();
+  for (const half of [before, rest]) if (half) $removeEmptyLists(half);
   nodes.at(-1)?.selectNext();
+}
+
+/**
+ * Splits a list before the item at an index. Lexical's `$splitNode` splits every block up to the
+ * top of the document, so a list in a quotation splits the quotation too. Given an index past the
+ * list's last item, `$splitNode` would put the whole list in the second half, and what goes between
+ * would go before the list. The quotation is split after the list instead.
+ */
+function $splitList(list: ElementNode, index: number): [ElementNode | null, ElementNode] {
+  const parent = list.getParent();
+  if (index < list.getChildrenSize() || !parent || $isRootOrShadowRoot(parent))
+    return $splitNode(list, index);
+  return $splitList(parent, list.getIndexWithinParent() + 1);
+}
+
+/** Removes the lists a split left empty, and the quotations they leave empty. */
+function $removeEmptyLists(node: LexicalNode) {
+  if (!$isElementNode(node)) return;
+  for (const child of node.getChildren()) $removeEmptyLists(child);
+  if (($isListNode(node) || $isQuoteNode(node)) && node.isEmpty()) node.remove();
 }

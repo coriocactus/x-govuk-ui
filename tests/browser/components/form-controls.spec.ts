@@ -354,6 +354,10 @@ test("the editor keeps dividers, tables and lists whole as blocks change around 
   const toolbar = frame.getByRole("toolbar", { name: "Formatting" });
   const written = frame.locator('input[name="notes"]');
   const code = toolbar.getByRole("button", { name: "Code", exact: true });
+  const square = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII=",
+    "base64",
+  );
   // Code and a quotation made across a divider leave the divider where it was, with the lines on
   // each side in blocks of their own.
   await writeSource(frame, "<p>Above</p><hr><p>Below</p>");
@@ -383,6 +387,29 @@ test("the editor keeps dividers, tables and lists whole as blocks change around 
   await page.keyboard.press("Backspace");
   await page.keyboard.type("Instead");
   await expect(written).toHaveValue("<p>Before</p><p>Instead</p><p>After</p>");
+  // An image added in the last item of a list in a quotation goes after the list, which stays
+  // whole. Added in an empty last item, it takes the item's place, and leaves no empty quotation.
+  const addImage = async (name: string) => {
+    const chooser = page.waitForEvent("filechooser");
+    await toolbar.getByRole("button", { name: "Add an image or video" }).click();
+    await (await chooser).setFiles([{ name, mimeType: "image/png", buffer: square }]);
+  };
+  await writeSource(
+    frame,
+    "<blockquote><p>Lead</p><ul><li>One</li><li>Two</li></ul></blockquote><p>After</p>",
+  );
+  await caretAtEnd(document, "li", 1);
+  await addImage("first.png");
+  await expect(written).toHaveValue(
+    /^<blockquote><p>Lead<\/p><ul><li>One<\/li><li>Two<\/li><\/ul><\/blockquote><figure[^>]*data-filename="first\.png"[^>]*><img[^>]*><\/figure><p>After<\/p>$/,
+  );
+  await writeSource(frame, "<blockquote><ul><li>One</li></ul></blockquote><p>After</p>");
+  await caretAtEnd(document, "li");
+  await page.keyboard.press("Enter");
+  await addImage("second.png");
+  await expect(written).toHaveValue(
+    /^<blockquote><ul><li>One<\/li><\/ul><\/blockquote><figure[^>]*data-filename="second\.png"[^>]*><img[^>]*><\/figure><p>After<\/p>$/,
+  );
 });
 
 test("the editor takes images and files: stored as they go in, in a gallery, with captions, descriptions and moves", async ({

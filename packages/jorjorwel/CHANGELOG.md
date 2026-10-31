@@ -6,6 +6,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed an image added in the last item of a list in the Editor's quotation going before the list. It now goes after the list. Added in an empty item, it no longer leaves an empty quotation after it.
 - Fixed paragraphs pasted into a quotation in the Editor running together into one line. They now split the quotation's paragraph at the caret, as they do outside a quotation. A pasted list now stays whole there too.
 - Fixed Enter and Backspace throwing an error in the Editor when a table's only row is empty. Either key now removes the table. Enter puts the caret at the start of the paragraph after it, if there is one. Otherwise, and after Backspace, the caret is in a new paragraph in the table's place.
 - Fixed the Editor's Code and Quotation controls on a selection across a divider or an attachment. Code threw an error, and Quotation moved the divider below the quotation. Each now puts the lines on each side in a block of their own, and the divider stays where it was.

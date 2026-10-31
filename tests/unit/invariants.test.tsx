@@ -91,6 +91,22 @@ test("every file that uses React's client-only API says it is client code", asyn
   expect(unmarked).toEqual([]);
 });
 
+test("a part keeps a latest value with useLatest, not by writing a ref as it renders", async () => {
+  // React can render a part and throw the render away, so a ref written as it renders can hold a
+  // value the page never showed. useLatest writes the ref once React keeps the render. The check
+  // reads statements indented once, which are in the body of a part or a hook, not in a handler or
+  // an effect inside it. A cache written in a condition and read in the same render, such as
+  // useTilesLayout's, is left alone.
+  const written: string[] = [];
+  for (const path of new Bun.Glob("packages/*/src/*.{ts,tsx}").scanSync(".")) {
+    const lines = (await Bun.file(path).text()).split("\n");
+    lines.forEach((line, index) => {
+      if (/^ {2}[\w$]+\.current\s*=[^=]/.test(line)) written.push(`${path}:${index + 1}`);
+    });
+  }
+  expect(written).toEqual([]);
+});
+
 test("every custom property the library declares starts x-govuk-ui-", async () => {
   // Reading another library's property, such as GOV.UK Frontend's palette or Base UI's
   // --anchor-width, is fine. Declaring one, in a stylesheet or from a component, names it ours.

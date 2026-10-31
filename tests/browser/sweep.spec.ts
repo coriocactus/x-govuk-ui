@@ -397,32 +397,29 @@ for (const [name, path] of pages) {
     browserName,
   }) => {
     await page.addInitScript(() => localStorage.setItem("x-govuk-ui-theme", '"light"'));
+    // Every check on this page sees the example as it starts, on a fast machine or a slow one. An
+    // example that changes by itself, such as Task list working through its tasks or Logo carousel
+    // turning over, paces itself with intervals and long timeouts, which do nothing here. Axe would
+    // otherwise read a logo's colours part way through its fade. Stopping the clock instead would
+    // also stop CSS's transitions, which never finish.
+    await page.addInitScript(() => {
+      const timeout = window.setTimeout;
+      window.setInterval = (() => 0) as unknown as typeof window.setInterval;
+      window.setTimeout = ((handler: TimerHandler, delay?: number, ...rest: unknown[]) =>
+        (delay ?? 0) >= 500 ? 0 : timeout(handler, delay, ...rest)) as typeof window.setTimeout;
+    });
     await page.goto(path);
     await ready(page);
     await test.step("accessible in light", async () => {
       expect(await violations(page, undefined, sidebar)).toEqual([]);
     });
     if (browserName !== "chromium") return;
-    // Engines compute styles alike, so Chromium alone records them, in light. They are recorded in
-    // a page of their own, where an example that changes by itself, such as Task list working
-    // through its tasks, stays as it starts, on a fast machine or a slow one. Such an example paces
-    // itself with intervals and long timeouts, which do nothing there. Stopping the clock instead
-    // would also stop CSS's transitions, which never finish.
+    // Engines compute styles alike, so Chromium alone records them, in light.
     if (example)
       await test.step("looks as its style snapshot records", async () => {
-        const still = await page.context().newPage();
-        await still.addInitScript(() => {
-          const timeout = window.setTimeout;
-          window.setInterval = (() => 0) as unknown as typeof window.setInterval;
-          window.setTimeout = ((handler: TimerHandler, delay?: number, ...rest: unknown[]) =>
-            (delay ?? 0) >= 500 ? 0 : timeout(handler, delay, ...rest)) as typeof window.setTimeout;
-        });
-        await still.goto(path);
-        await ready(still);
-        expect(await styles(still, name)).toMatchSnapshot(`${name}.txt`);
-        expect(await rounded(still), "rounded with the corners' tokens at 0").toEqual([]);
-        expect(await spaced(still), "spaced by margins of their own").toEqual([]);
-        await still.close();
+        expect(await styles(page, name)).toMatchSnapshot(`${name}.txt`);
+        expect(await rounded(page), "rounded with the corners' tokens at 0").toEqual([]);
+        expect(await spaced(page), "spaced by margins of their own").toEqual([]);
       });
     await test.step("colours contrast in dark", async () => {
       // The theme is kept in the browser. A component's page follows it as it changes, such as when

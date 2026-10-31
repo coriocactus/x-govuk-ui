@@ -59,6 +59,33 @@ function choices(type: string) {
 }
 
 /**
+ * The props a part's type names, where it is written as a list of them, such as `{ href, render,
+ * children }`, or none. A prop written with its type, such as `side: "left" | "right"`, counts by
+ * its name. Each of two written as alternatives, such as `items | search`, counts too. A hook's
+ * type, such as `() => { step, data }`, names what the hook gives, and `head` keeps its arguments.
+ */
+function members(type: string) {
+  const text = type.trim();
+  const arrow = text.startsWith("{") ? -1 : text.indexOf("=> {");
+  if (!text.endsWith("}") || (arrow < 0 && !text.startsWith("{"))) return null;
+  const head = arrow < 0 ? "" : text.slice(0, arrow);
+  const names = new Set<string>();
+  let depth = 0;
+  let piece = "";
+  for (const character of `${text.slice(arrow < 0 ? 1 : arrow + 4, -1)},`) {
+    if ("{[(<".includes(character)) depth++;
+    // The > of an arrow, as in `(value) => void`, closes nothing.
+    if ("}])".includes(character) || (character === ">" && !piece.endsWith("="))) depth--;
+    if (depth === 0 && (character === "," || character === "|")) {
+      const name = piece.trim().match(/^[\w-]+/)?.[0];
+      if (name && !piece.trim().startsWith('"')) names.add(name);
+      piece = "";
+    } else piece += character;
+  }
+  return { head, names };
+}
+
+/**
  * A component's props, one for each name. The documentation lists some props together, such as
  * `value / defaultValue / onValueChange`, with one type for the group, so a grouped prop is
  * compared by its name alone.
@@ -82,7 +109,27 @@ function compareDocs(before: Doc, after: Doc | undefined, add: (change: ApiChang
   for (const prop of was.values()) {
     const now = props.get(prop.name);
     if (!now) breaking(`removed ${before.name}'s \`${prop.name}\` prop`);
-    else if (!prop.grouped && !now.grouped) {
+    else if (
+      !prop.grouped &&
+      !now.grouped &&
+      members(prop.type)?.head !== undefined &&
+      members(prop.type)?.head === members(now.type)?.head
+    ) {
+      const had = members(prop.type)?.names ?? new Set<string>();
+      const has = members(now.type)?.names ?? new Set<string>();
+      const lost = [...had].filter((name) => !has.has(name));
+      if (lost.length)
+        breaking(
+          `removed ${lost.map((name) => `\`${name}\``).join(", ")} from ${before.name}'s \`${prop.name}\``,
+        );
+      for (const name of has)
+        if (!had.has(name))
+          add({
+            package: where,
+            kind: "added",
+            what: `added \`${name}\` to ${after.name}'s \`${prop.name}\``,
+          });
+    } else if (!prop.grouped && !now.grouped) {
       const was = choices(prop.type);
       const is = choices(now.type);
       const lost = was && is ? was.filter((choice) => !is.includes(choice)) : [];

@@ -16,6 +16,7 @@ import {
   SKIP_SCROLL_INTO_VIEW_TAG,
 } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLatest } from "x-govuk-ui/internal";
 import {
   type AttachmentData,
   attachmentState,
@@ -65,12 +66,10 @@ export function useUploads({ editor, enabled, permitted, onUpload, onFileAccept 
   const state = attachmentState(editor);
   state.enabled = enabled;
   state.permitted = permitted;
-  const accept = useRef(onFileAccept);
-  accept.current = onFileAccept;
+  const accept = useLatest(onFileAccept);
   state.accept = (file) =>
     permits(state, file.type || "application/octet-stream") && accept.current?.(file) !== false;
-  const handler = useRef(onUpload);
-  handler.current = onUpload;
+  const handler = useLatest(onUpload);
   const input = useRef<HTMLInputElement>(null);
   const [accepting, setAccepting] = useState<string | undefined>(undefined);
   // An editor that is removed stops its uploads, because nothing is left to take their addresses.

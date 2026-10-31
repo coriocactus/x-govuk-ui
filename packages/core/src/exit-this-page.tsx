@@ -10,6 +10,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useLabels } from "./labels";
+import { useLatest } from "./refs";
 
 export type ExitThisPageProps = Omit<ComponentPropsWithRef<"div">, "onExit"> & {
   /** Where the page goes, which is a site that looks ordinary, such as a weather forecast. */
@@ -67,8 +68,7 @@ export function ExitThisPage({
 }: ExitThisPageProps) {
   const labels = useLabels("exitThisPage", defaultExitThisPageLabels, ownLabels);
   // The words are read as the keys are pressed, so a new object each render restarts nothing.
-  const words = useRef(labels);
-  words.current = labels;
+  const words = useLatest(labels);
   const [presses, setPresses] = useState(0);
   const [status, setStatus] = useState("");
   const [leaving, setLeaving] = useState(false);

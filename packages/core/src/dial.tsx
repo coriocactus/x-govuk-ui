@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { easeOut, useMotionTiming } from "./motion";
+import { useLatest } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
 /** The height of one value on the drum, and the angle between values as it turns. */
@@ -158,8 +159,7 @@ export function Dial({
   // Scrolling over a focused field turns it, a step at a time. The listener is the browser's own,
   // so it can keep the page from scrolling instead.
   const gathered = useRef(0);
-  const onWheel = useRef<(event: WheelEvent) => void>(() => {});
-  onWheel.current = (event) => {
+  const onWheel = useLatest((event: WheelEvent) => {
     if (document.activeElement !== input.current || disabled) return;
     event.preventDefault();
     gathered.current += event.deltaY;
@@ -167,12 +167,11 @@ export function Dial({
     if (!steps) return;
     gathered.current -= steps * 40;
     roll(from() + steps);
-  };
+  });
 
   // A drag ends however the press ends. It may be let go over the field or anywhere else, or
   // cancelled, or found to be over when the pointer next moves with no button held.
-  const finish = useRef<() => void>(() => {});
-  finish.current = () => {
+  const finish = useLatest(() => {
     const held = drag.current;
     if (!held) return;
     drag.current = null;
@@ -180,7 +179,7 @@ export function Dial({
     input.current?.focus();
     if (held.moved) settle();
     else input.current?.select();
-  };
+  });
   useEffect(() => {
     const element = input.current;
     const wheel = (event: WheelEvent) => onWheel.current(event);

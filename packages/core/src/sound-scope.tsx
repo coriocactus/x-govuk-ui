@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useRef } from "react";
+import { useLatest } from "./refs";
 import { isSoundCue, type PlayOptions, type PlaySound, type SoundCue } from "./sound";
 
 export type SoundScopeProps = {
@@ -78,10 +79,9 @@ export function useScopeSound() {
  */
 export function SoundScope({ children, play }: SoundScopeProps) {
   const scope = useRef<HTMLDivElement>(null);
-  const playRef = useRef(play);
+  const playRef = useLatest(play);
   const last = useRef({ at: -Infinity, tickAt: -Infinity });
   const values = useRef(new WeakMap<HTMLInputElement, string>());
-  playRef.current = play;
 
   const emit = useCallback(([cue, options]: Cue, gap = 30) => {
     const now = performance.now();

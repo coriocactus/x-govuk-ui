@@ -45,7 +45,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { ScrollArea, useMergedRef } from "x-govuk-ui";
-import { chain, trackHighlight } from "x-govuk-ui/internal";
+import { chain, trackHighlight, useLatest } from "x-govuk-ui/internal";
 import { $createNodeSelectionWith, $textBefore } from "./editor-commands";
 import { useEditorContext, useStore } from "./editor-context";
 import { parseHtml } from "./editor-html";
@@ -366,10 +366,8 @@ export function EditorPrompt({
   const viewport = useRef<HTMLDivElement>(null);
   const viewportRef = useMergedRef(viewport, followHighlight);
   const loaded = useRef<readonly EditorPromptItem[] | null>(null);
-  const state = useRef({ open, results, active, query });
-  state.current = { open, results, active, query };
-  const settings = useRef({ trigger, spaceInSearch, onlyAt, insert, name, items, search });
-  settings.current = { trigger, spaceInSearch, onlyAt, insert, name, items, search };
+  const state = useLatest({ open, results, active, query });
+  const settings = useLatest({ trigger, spaceInSearch, onlyAt, insert, name, items, search });
 
   useEffect(() => {
     if (!renderMention) return;

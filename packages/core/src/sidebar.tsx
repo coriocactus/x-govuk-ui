@@ -28,6 +28,7 @@ import { Input, type InputProps } from "./input";
 import { useLabels } from "./labels";
 import { useMediaQuery } from "./media-query";
 import { glideEasing, useMotionTiming } from "./motion";
+import { useLatest } from "./refs";
 import { ResizableHandle } from "./resizable";
 import { ScrollArea } from "./scroll-area";
 import { Sheet, SheetContent, type SheetContentProps } from "./sheet";
@@ -353,8 +354,7 @@ export function Sidebar({
   const highlight = useRef<HTMLSpanElement>(null);
   const highlightGlide = useRef<Animation | null>(null);
   const { reduced } = useMotionTiming();
-  const still = useRef(reduced);
-  still.current = reduced;
+  const still = useLatest(reduced);
   const hover = useCallback((row: HTMLElement | null, action?: HTMLElement | null) => {
     const mark = highlight.current;
     const scroller = content.current;

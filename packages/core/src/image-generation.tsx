@@ -11,6 +11,7 @@ import {
 import { Mosaic } from "./image-mosaic";
 import { useLabels } from "./labels";
 import { useMotionTiming } from "./motion";
+import { useLatest } from "./refs";
 import { TextShimmer } from "./text-shimmer";
 
 export type ImageGenerationProps = ComponentPropsWithRef<"figure"> & {
@@ -109,8 +110,7 @@ export function ImageGeneration({
   const share = progress === undefined ? null : Math.max(0, Math.min(1, progress));
 
   // The mosaic lasts as long as the frame, and starts again if motion preferences change.
-  const current = useRef(phase);
-  current.current = phase;
+  const current = useLatest(phase);
   useEffect(() => {
     if (!canvas.current || !tones.current) return;
     const drawing = new Mosaic(canvas.current, tones.current, reduced, current.current === "made");

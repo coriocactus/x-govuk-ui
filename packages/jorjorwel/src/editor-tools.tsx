@@ -138,8 +138,6 @@ export function useEditorRead<T>(
   deps: DependencyList = [],
 ) {
   const { editor } = useEditorContext("useEditorRead");
-  const reader = useRef(read);
-  reader.current = read;
   // What was last read, from which state and with which dependencies. React asks repeatedly, and
   // must get the same value while nothing has changed.
   const last = useRef<{ state: unknown; deps: DependencyList; value: T } | null>(null);
@@ -157,7 +155,7 @@ export function useEditorRead<T>(
       previous.deps.every((each, index) => Object.is(each, deps[index]))
     )
       return previous.value;
-    const next = state.read(() => reader.current(), { editor });
+    const next = state.read(read, { editor });
     const value = previous && equal(previous.value, next) ? previous.value : next;
     last.current = { state, deps, value };
     return value;

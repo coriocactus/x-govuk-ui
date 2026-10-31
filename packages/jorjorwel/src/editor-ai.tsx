@@ -51,7 +51,7 @@ import {
   useMotionTiming,
   useScopeSound,
 } from "x-govuk-ui";
-import { AutoHeight, chain, duration, Orb } from "x-govuk-ui/internal";
+import { AutoHeight, chain, duration, Orb, useLatest } from "x-govuk-ui/internal";
 import { type EditorShared, focusDocument, useEditorContext } from "./editor-context";
 import { $getValue, parseHtml, pastedMarkdownToHtml } from "./editor-html";
 
@@ -577,7 +577,6 @@ export function EditorAI({ onRequestEdit, disabled: off = false, children }: Edi
   const dismissed = useRef<Range | null>(null);
   const pending = useRef<AbortController | null>(null);
   const dragging = useRef(false);
-  const busy = useRef(false);
   // How the last selection was made, so a toolbar for a touch selection keeps clear of the
   // phone's own menu.
   const pointer = useRef("mouse");
@@ -585,7 +584,7 @@ export function EditorAI({ onRequestEdit, disabled: off = false, children }: Edi
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
   const [held, setHeld] = useState<Range | null>(null);
   const [inserted, setInserted] = useState<Range | null>(null);
-  busy.current = phase.kind !== "idle";
+  const busy = useLatest(phase.kind !== "idle");
   useHighlight(editor, "x-govuk-ui-editor-held", held);
   useHighlight(editor, "x-govuk-ui-editor-inserted", inserted);
 

@@ -16,6 +16,7 @@ import {
 } from "react";
 import { useLabels } from "./labels";
 import { duration, easeOut, MotionDiv, motionElementProps, useMotionTiming } from "./motion";
+import { useLatest } from "./refs";
 import { ScrollArea } from "./scroll-area";
 
 /** Moves a Message scroller from outside it, such as from search results or a list of turns. */
@@ -131,8 +132,7 @@ export function MessageScroller({
   const height = useRef(0);
   // Rows grow as the fonts arrive. Only growth after that counts as new content.
   const settled = useRef(false);
-  const settings = useRef({ autoScroll, peek });
-  settings.current = { autoScroll, peek };
+  const settings = useLatest({ autoScroll, peek });
   const [away, setAway] = useState(false);
   const [unseen, setUnseen] = useState(false);
 

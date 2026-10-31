@@ -17,7 +17,7 @@ import {
 } from "react";
 import { useLabels } from "./labels";
 import { duration, easeOut, useMotionTiming } from "./motion";
-import { useMergedRef } from "./refs";
+import { useLatest, useMergedRef } from "./refs";
 import { ResizableHandle } from "./resizable";
 import { ScrollArea } from "./scroll-area";
 
@@ -157,10 +157,8 @@ export function GroupedTable({
   const [appeared, setAppeared] = useState(0);
   const appear = useCallback(() => setAppeared((count) => count + 1), []);
   const step = steps[Math.min(index, steps.length - 1)]!;
-  const current = useRef(index);
-  current.current = index;
-  const last = useRef(steps.length - 1);
-  last.current = steps.length - 1;
+  const current = useLatest(index);
+  const last = useLatest(steps.length - 1);
   // The room each step needs, measured while it was showing, and the room there is.
   const needs = useRef(new Map<number, number>());
   // The columns each step was measured to want, each column's widest cell, and the widest title at

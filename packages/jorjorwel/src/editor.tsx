@@ -885,8 +885,7 @@ function EditorCore({
 
   // A form's reset puts back the document the editor started with, without a step to undo, as a
   // field's reset does. A controlled editor's owner resets its value.
-  const reset = useRef({ value, initialValue });
-  reset.current = { value, initialValue };
+  const reset = useLatest({ value, initialValue });
   useEffect(() => {
     const form = box.current?.closest("form");
     if (!form) return;
@@ -955,8 +954,7 @@ function EditorCore({
       flush();
     };
   }, [editor, box, flush, text, setWaiting, name]);
-  const uploadsRef = useRef(uploads.progress);
-  uploadsRef.current = uploads.progress;
+  const uploadsRef = useLatest(uploads.progress);
   // The field stops saying to wait once every file is stored.
   useEffect(
     () =>
@@ -1052,14 +1050,10 @@ function EditorCore({
     const [text = [], background = []] = JSON.parse(coloursKey) as string[][];
     return { text, background };
   }, [coloursKey]);
-  const paste = useRef({ onLinkPaste, onMarkdownPaste });
-  paste.current = { onLinkPaste, onMarkdownPaste };
-  const upload = useRef(uploads.uploadFiles);
-  upload.current = uploads.uploadFiles;
-  const announceRef = useRef(announce);
-  announceRef.current = announce;
-  const labelsRef = useRef(labels);
-  labelsRef.current = labels;
+  const paste = useLatest({ onLinkPaste, onMarkdownPaste });
+  const upload = useLatest(uploads.uploadFiles);
+  const announceRef = useLatest(announce);
+  const labelsRef = useLatest(labels);
   useEffect(() => {
     const registered = [
       registerEnter(editor, multiLine),

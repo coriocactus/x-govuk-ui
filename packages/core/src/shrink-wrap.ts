@@ -2,6 +2,7 @@
 
 import { clearCache, prepareWithSegments, walkLineRanges } from "@chenglou/pretext";
 import { type RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLatest } from "./refs";
 
 type Prepared = ReturnType<typeof prepareWithSegments>;
 const prepared = new Map<string, Prepared>();
@@ -60,13 +61,11 @@ export function useShrinkWrap(
   const [width, setWidth] = useState<number | null>(null);
   // The page renders again once the fonts load, and the text is measured again in its real font.
   const fonts = useFontsLoaded();
-  const settings = useRef(options);
-  settings.current = options;
+  const settings = useLatest(options);
   // The text last measured, so a render that leaves the text alone costs no measuring at all.
   const measured = useRef<string | null>(null);
 
-  const fit = useRef(() => {});
-  fit.current = () => {
+  const fit = useLatest(() => {
     const node = element.current;
     const container = settings.current.container
       ? settings.current.container()
@@ -114,7 +113,7 @@ export function useShrinkWrap(
     // Rounded up, and never past the widest allowed, so the browser breaks the lines the same way.
     const next = Math.min(most, Math.ceil(widest)) + sides;
     setWidth((current) => (current === next ? current : next));
-  };
+  });
 
   // After a render that changed the text, the text is measured again. Reading the text alone
   // costs no layout, so other renders cost nothing.

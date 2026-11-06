@@ -1413,7 +1413,6 @@ test("a tree is WAI-ARIA's tree: named by its label, with one tab stop, open aro
       hint="By district"
       items={rivers}
       defaultValue="kennet"
-      choose="leaves"
     />,
   );
   const items = [...html.matchAll(/<li ([^>]*)>/g)].map((match) => match[1] ?? "");
@@ -1439,8 +1438,14 @@ test("a tree is WAI-ARIA's tree: named by its label, with one tab stop, open aro
   expect(item("Severn")).toContain('data-sound="open"');
   expect(item("Dee")).toContain('aria-selected="false"');
   expect(item("Lambourn")).toContain('aria-disabled="true"');
-  // The button that opens a branch is out of the tab order, and named for a touch screen.
-  expect(html).toContain('tabindex="-1" class="x-govuk-ui-tree-toggle" aria-label="Expand Severn"');
+  // A press on a district opens it, so its chevron is only a picture of that, with no button.
+  expect(html).not.toContain("<button");
+  // A district given as the value is not chosen, because users cannot choose it.
+  expect(
+    renderToStaticMarkup(
+      <TreeControl aria-label="Rivers" items={rivers} defaultValue="severn-district" />,
+    ),
+  ).not.toMatch(/data-selected|aria-selected="true"|x-govuk-ui-tree-tick/);
   expect(html).toContain('<input type="hidden" name="river" value="kennet"/>');
   // Composed from its parts, it matches.
   expect(
@@ -1449,15 +1454,18 @@ test("a tree is WAI-ARIA's tree: named by its label, with one tab stop, open aro
         <Label htmlFor={null}>Which river did you fish?</Label>
         <Hint>By district</Hint>
         <ErrorMessage />
-        <TreeControl items={rivers} defaultValue="kennet" choose="leaves" />
+        <TreeControl items={rivers} defaultValue="kennet" />
       </Field>,
     ).replace(/ (?:id|aria-labelledby|aria-describedby)="(?:_|base-ui-)[^"]*"/g, ""),
   ).toBe(html.replace(/ (?:id|aria-labelledby|aria-describedby)="(?:_|base-ui-)[^"]*"/g, ""));
-  // With nothing chosen, Tab reaches the first node.
-  const fresh = renderToStaticMarkup(<TreeControl aria-label="Rivers" items={rivers} />);
+  // With nothing chosen, Tab reaches the first node. Where a branch can be chosen too, its chevron
+  // is a button out of the tab order, named for a screen reader on a touch screen.
+  const fresh = renderToStaticMarkup(
+    <TreeControl aria-label="Rivers" items={rivers} choose="any" />,
+  );
   expect(fresh.match(/tabindex="0"/g)).toHaveLength(1);
   expect(fresh).toMatch(
-    /<li [^>]*tabindex="0"[^>]*><div class="x-govuk-ui-tree-row"><button[^>]*aria-label="Expand Thames"/,
+    /<li [^>]*aria-selected="false" tabindex="0"[^>]*><div class="x-govuk-ui-tree-row"><button type="button" tabindex="-1" class="x-govuk-ui-tree-toggle" aria-label="Expand Thames"/,
   );
   expect(fresh).toContain('aria-label="Rivers"');
   expect(fresh).not.toContain('aria-labelledby="undefined');

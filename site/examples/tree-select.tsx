@@ -11,6 +11,23 @@ type Props = {
   disabled?: boolean;
 };
 
+/**
+ * The organisations as choices. An organisation with bodies of its own is a heading that opens,
+ * and users choose the organisation itself as the first node inside it, so each row does one thing.
+ * The heading has a value of its own, apart from the organisation's.
+ */
+const asChoices = (nodes: readonly TreeNode[]): TreeNode[] =>
+  nodes.map(({ children, ...organisation }) =>
+    children
+      ? {
+          value: `${organisation.value}-bodies`,
+          label: organisation.label,
+          children: [organisation, ...asChoices(children)],
+        }
+      : organisation,
+  );
+const choices = asChoices(organisations);
+
 /** Finds an organisation by its name, or by the start of its abbreviation, such as APHA. */
 const byNameOrAbbreviation = (search: string, node: TreeNode) => {
   const wanted = search.trim().toLowerCase();
@@ -49,7 +66,7 @@ export default function TreeSelectExample({
         placeholder={placeholder || undefined}
         errorMessage={errorMessage || undefined}
         disabled={disabled}
-        items={organisations}
+        items={choices}
         filter={byNameOrAbbreviation}
         value={organisation}
         onValueChange={setOrganisation}

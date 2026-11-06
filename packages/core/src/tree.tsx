@@ -61,8 +61,9 @@ import {
 /** The words Tree writes, which a LabelsProvider or its `labels` can change. */
 export type TreeLabels = {
   /**
-   * Names the button that opens a branch. Keys open a branch from the item itself, so the button is
-   * for a pointer and for a screen reader on a touch screen.
+   * Names the button that opens a branch users can also choose, with `choose="any"`. Keys open a
+   * branch from the item itself, so the button is for a pointer and for a screen reader on a touch
+   * screen. A branch users cannot choose has no button, because pressing it opens it.
    */
   expand: (label: string) => string;
   /** Names the button that closes a branch. */
@@ -147,8 +148,14 @@ export type TreeControlProps = Omit<
   /** Called with the open branches as users open and close them. */
   onExpandedChange?: (expanded: string[]) => void;
   /**
-   * Which nodes users can choose. With `leaves`, a branch is a heading for the nodes inside it, and
-   * pressing it opens or closes it.
+   * Which nodes users can choose. By default, only leaves. A branch is then a heading for the nodes
+   * inside it, and pressing it opens or closes it, so each row does one thing. Where a branch is an
+   * answer itself, such as a department with agencies of its own, list it again as the first node
+   * inside it, and give the branch a value of its own.
+   *
+   * With `any`, pressing a branch's row chooses it, and its chevron opens it, as in a file browser
+   * whose folders can be chosen. Inside a popup that closes as users choose, as Tree select's does,
+   * users would choose a branch when they meant to look inside it.
    */
   choose?: "any" | "leaves";
   /**
@@ -247,7 +254,7 @@ export function TreeControl(given: TreeControlProps) {
     expanded,
     defaultExpanded,
     onExpandedChange,
-    choose = "any",
+    choose = "leaves",
     search = "",
     filter,
     name,
@@ -461,8 +468,11 @@ export function TreeControl(given: TreeControlProps) {
     event.preventDefault();
   };
 
+  // Only a press on a row counts. The space beside a group of children, where its lines are, is
+  // inside the branch's item too, and a press there would open or close the branch.
   const press = (event: MouseEvent<HTMLUListElement>) => {
     if (event.defaultPrevented) return;
+    if (!(event.target instanceof Element) || !event.target.closest(".x-govuk-ui-tree-row")) return;
     const target = itemOf(event.target);
     if (target !== null) activate(target);
   };
@@ -628,11 +638,16 @@ export function TreeItem({ icon, badge, children, className = "", ref, ...props 
       aria-selected={choosable ? selected : undefined}
       aria-disabled={disabled || undefined}
       tabIndex={tree.tabStop === node.value ? 0 : -1}
-      data-selected={selected || undefined}
+      data-selected={(choosable && selected) || undefined}
       data-disabled={disabled || undefined}
     >
       <div className="x-govuk-ui-tree-row">
-        {branch ? (
+        {branch && !choosable ? (
+          // Pressing the branch opens it, so its chevron is only a picture of that.
+          <span className="x-govuk-ui-tree-toggle">
+            <ChevronIcon direction="right" size={16} />
+          </span>
+        ) : branch ? (
           <button
             type="button"
             // Keys open a branch from its item, so the button stays out of the tab order.

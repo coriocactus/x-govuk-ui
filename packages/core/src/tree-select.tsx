@@ -41,7 +41,7 @@ import { useMergedRef } from "./refs";
 import { ScrollArea } from "./scroll-area";
 import { useScopeSound } from "./sound-scope";
 import { TreeControl, type TreeItemState } from "./tree";
-import { indexTree, labelHas, searchTree, type TreeNode } from "./tree-data";
+import { indexTree, isBranch, labelHas, searchTree, type TreeNode } from "./tree-data";
 
 /** The words Tree select writes, which a LabelsProvider or its `labels` can change. */
 export type TreeSelectLabels = {
@@ -88,8 +88,8 @@ export type TreeSelectControlProps = Omit<
   defaultValue?: string | null;
   onValueChange?: (value: string) => void;
   /**
-   * Which nodes users can choose. With `leaves`, a branch is a heading for the nodes inside it, and
-   * pressing it opens or closes it.
+   * Which nodes users can choose, as Tree's `choose` says. By default, only leaves, so pressing a
+   * branch opens it and the popup stays open.
    */
   choose?: "any" | "leaves";
   /**
@@ -187,7 +187,7 @@ export function TreeSelectControl(given: TreeSelectControlProps) {
     value,
     defaultValue,
     onValueChange,
-    choose,
+    choose = "leaves",
     filter,
     placeholder,
     name,
@@ -231,10 +231,17 @@ export function TreeSelectControl(given: TreeSelectControlProps) {
   const play = useScopeSound();
 
   const searchable = index.size > SHORT_TREE;
-  const matches = useMemo(
-    () => (search.trim() ? searchTree(items, search, filter ?? labelHas).matched.size : null),
-    [items, search, filter],
-  );
+  // How many nodes match, for screen readers. Only the ones users can choose count, so a branch
+  // listed again inside itself counts once. A search that finds only branches counts them.
+  const matches = useMemo(() => {
+    if (!search.trim()) return null;
+    const matched = [...searchTree(items, search, filter ?? labelHas).matched];
+    const choosable = matched.filter((each) => {
+      const node = index.get(each)?.node;
+      return choose === "any" || (node !== undefined && !isBranch(node));
+    });
+    return choosable.length || matched.length;
+  }, [items, index, search, filter, choose]);
   const chosen = current === null ? undefined : index.get(current)?.node;
   // The node in the tree that Tab reaches, which the popup's keys move to.
   const tabStop = () =>

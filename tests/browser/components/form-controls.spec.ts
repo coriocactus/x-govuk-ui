@@ -1659,7 +1659,7 @@ test("a tree moves by its keys as WAI-ARIA's tree does, opens its districts, and
   // row chooses it. Tab then comes back to the item last pressed.
   await item("Humber").locator(":scope > .x-govuk-ui-tree-row").click();
   await expect(item("Humber")).toHaveAttribute("aria-expanded", "false");
-  await frame.getByRole("button", { name: "Expand Humber" }).click();
+  await item("Humber").locator(":scope > .x-govuk-ui-tree-row > .x-govuk-ui-tree-toggle").click();
   await expect(item("Humber")).toHaveAttribute("aria-expanded", "true");
   await expect(item("Humber")).toBeFocused();
   await item("Trent").locator(":scope > .x-govuk-ui-tree-row").click();
@@ -1701,16 +1701,24 @@ test("a tree select finds an organisation by its name or abbreviation, and choos
   await expect(defra).toHaveAttribute("aria-expanded", "true");
   await expect(item("Animal and Plant Health Agency").locator("mark")).toHaveCount(0);
   await search.fill("agency");
-  await expect(item("Environment Agency").locator("mark")).toHaveText("Agency");
+  await expect(item("Government Property Agency").locator("mark")).toHaveText("Agency");
   // The sweep sees the page with the popup closed. Open, with a search's matches, it meets WCAG in
   // both themes.
   await expectAccessible(page, ".x-govuk-ui-tree-select-popup");
-  // A press on a branch's chevron closes it, and chooses nothing. The same search typed again opens
-  // the branches around its matches again.
-  await popup.getByRole("button", { name: "Collapse Cabinet Office" }).click();
+  // A press on a department opens or closes it, and chooses nothing, so the popup stays open. The
+  // same search typed again opens the departments around its matches again.
+  await item("Cabinet Office").locator(":scope > .x-govuk-ui-tree-row").click();
   await expect(item("Cabinet Office")).toHaveAttribute("aria-expanded", "false");
   await expect(popup).toHaveCount(1);
   await expect(field).toHaveText("Choose an organisation");
+  // A department is chosen as the first item inside it. Found twice, it counts once.
+  await search.fill("department for transport");
+  await expect(popup.getByRole("status")).toHaveText("1 result");
+  const transport = tree.getByRole("treeitem", { name: "Department for Transport", exact: true });
+  await expect(transport).toHaveCount(2);
+  await expect(transport.first()).toHaveAttribute("aria-expanded", "true");
+  await expect(transport.first()).not.toHaveAttribute("aria-selected");
+  await expect(transport.last()).toHaveAttribute("aria-selected", "false");
   await search.fill("agencyx");
   await search.fill("agency");
   await expect(item("Cabinet Office")).toHaveAttribute("aria-expanded", "true");

@@ -424,7 +424,7 @@ const entries = {
         "string[] / (expanded: string[]) => void",
         "The chosen node's branches",
       ),
-      reference("choose", '"any" | "leaves"', "any"),
+      reference("choose", '"leaves" | "any"', "leaves"),
       reference("search / filter", "string / (search, node) => boolean", "Label contains search"),
       reference("children", "(node, state) => TreeItem", "<TreeItem />"),
       reference("labels", "Partial<TreeLabels>", "Expand and Collapse"),
@@ -444,7 +444,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "Select's field, whose popup holds a Tree, opened to the chosen item. A tree of more than eight items has a search field above it. A search shows the items that match, with the branches around them open, and the matching text in bold, and screen readers hear how many match. The tree takes focus, so its keys and its markup are the Tree's own. In the example, the organisations are GOV.UK's departments, with the agencies and public bodies they sponsor, and a search finds an organisation by its name or the start of its abbreviation. It submits the chosen value with a form.",
+      "Select's field, whose popup holds a Tree, opened to the chosen item. A tree of more than eight items has a search field above it. A search shows the items that match, with the branches around them open, and the matching text in bold, and screen readers hear how many match. The tree takes focus, so its keys and its markup are the Tree's own. Pressing a branch opens it, and the popup stays open, so users look inside before they choose. In the example, the organisations are GOV.UK's departments, with the agencies and public bodies they sponsor. A department opens to list itself first, then its bodies, and a search finds an organisation by its name or the start of its abbreviation. It submits the chosen value with a form.",
     props: [
       text("label", "Which organisation do you work for?", {
         type: "ReactNode",
@@ -468,7 +468,7 @@ const entries = {
         "Required",
       ),
       reference("value / defaultValue / onValueChange", "string | null / (value: string) => void"),
-      reference("choose", '"any" | "leaves"', "any"),
+      reference("choose", '"leaves" | "any"', "leaves"),
       reference("filter", "(search, node) => boolean", "Label contains search"),
       reference("children", "(node, state) => TreeItem", "<TreeItem />"),
       reference("labels", "Partial<TreeSelectLabels>", "Search and No results found"),

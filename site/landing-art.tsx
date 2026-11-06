@@ -717,11 +717,14 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Words x={14} y={6} w={30} h={4} tone="ink" />
       <Chevron x={18} y={18} size={2.5} />
       <Words x={25} y={16.5} w={28} tone="ink" />
-      <Area x={17.6} y={23} w={0.8} h={24} tone="line" />
+      <Area x={17.6} y={23} w={0.8} h={24.5} tone="line" />
+      <Area x={17.6} y={27.6} w={7} h={0.8} tone="line" />
       <Words x={27} y={26.5} w={22} tone="ink" />
+      <Area x={17.6} y={37.1} w={5.4} h={0.8} tone="line" />
       <Area x={23} y={33} w={58} h={9} tone="tint" r={1.5} />
       <Words x={27} y={36} w={26} tone="ink" />
       <Tick x={73} y={34.5} size={5} />
+      <Area x={17.6} y={47.1} w={7} h={0.8} tone="line" />
       <Words x={27} y={46} w={18} tone="ink" />
       <Chevron x={18} y={56} to="right" size={2.5} />
       <Words x={25} y={54.5} w={34} tone="ink" />
@@ -742,10 +745,12 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Area x={18} y={39} w={60} h={0.75} tone="line" />
       <Chevron x={24} y={45} size={2} weight={1.25} />
       <Words x={29} y={43.5} w={26} tone="ink" />
-      <Area x={23.6} y={49} w={0.8} h={14} tone="line" />
+      <Area x={23.6} y={49} w={0.8} h={12.5} tone="line" />
+      <Area x={23.6} y={53.6} w={3.4} h={0.8} tone="line" />
       <Area x={27} y={50.5} w={48} h={7} tone="tint" r={1.5} />
       <Words x={30} y={52.5} w={22} tone="ink" />
       <Tick x={68} y={51.5} size={4.5} weight={1.25} />
+      <Area x={23.6} y={61.1} w={5} h={0.8} tone="line" />
       <Words x={30} y={60} w={16} tone="ink" />
     </>
   ),

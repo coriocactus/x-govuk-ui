@@ -189,7 +189,7 @@ export type TreeProps = Omit<TreeControlProps, "id"> & FieldWords & { id?: strin
  * Lets users choose one node from a hierarchy, such as a river within its river basin district, or
  * a document within its folder. The arrow keys move through the nodes and open and close branches,
  * and typing a node's first letters moves to it, as WAI-ARIA's tree view pattern says. A branch
- * opens smoothly beneath its row, along a guide line.
+ * opens smoothly beneath its row, with a line from its chevron into each of its children.
  *
  * It is a bound Field with a Label, a Hint, an ErrorMessage and a TreeControl. Compose those parts
  * yourself to put something between them. Its props go to the control.
@@ -596,9 +596,10 @@ export type TreeItemProps = ComponentPropsWithRef<"li"> & {
  * `<ContextMenuTrigger render={<TreeItem />} />`. It must be the element the tree draws for the
  * node, with no element of your own around it.
  *
- * Its row shows a button to open a branch, the icon, the label, the node's description, the badge
- * and a tick on the chosen node. Beneath the row, a branch's children open in a group along a guide
- * line. Its `className`, `style` and every other prop go on the item, which takes focus.
+ * Its row shows a branch's chevron, the icon, the label, the node's description, the badge and a
+ * tick on the chosen node. Beneath the row, a branch's children open in a group, each joined to the
+ * branch by a line. Its `className`, `style` and every other prop go on the item, which takes
+ * focus.
  */
 export function TreeItem({ icon, badge, children, className = "", ref, ...props }: TreeItemProps) {
   const tree = useTree("TreeItem");
@@ -670,36 +671,38 @@ export function TreeItem({ icon, badge, children, className = "", ref, ...props 
         ) : (
           <span className="x-govuk-ui-tree-toggle" data-leaf="" />
         )}
-        {icon && (
-          <span className="x-govuk-ui-tree-icon" aria-hidden="true">
-            {icon}
-          </span>
-        )}
-        <span className="x-govuk-ui-tree-text">
-          <span id={`${id}-label`} className="x-govuk-ui-tree-label">
-            {children ??
-              (tree.matched?.has(node.value) ? (
-                <Match label={node.label} search={tree.search} />
-              ) : (
-                node.label
-              ))}
-          </span>
-          {node.description && (
-            <span id={`${id}-description`} className="x-govuk-ui-tree-description">
-              {node.description}
+        <div className="x-govuk-ui-tree-content">
+          {icon && (
+            <span className="x-govuk-ui-tree-icon" aria-hidden="true">
+              {icon}
             </span>
           )}
-        </span>
-        {present(badge) && (
-          <span id={`${id}-badge`} className="x-govuk-ui-tree-badge">
-            {badge}
+          <span className="x-govuk-ui-tree-text">
+            <span id={`${id}-label`} className="x-govuk-ui-tree-label">
+              {children ??
+                (tree.matched?.has(node.value) ? (
+                  <Match label={node.label} search={tree.search} />
+                ) : (
+                  node.label
+                ))}
+            </span>
+            {node.description && (
+              <span id={`${id}-description`} className="x-govuk-ui-tree-description">
+                {node.description}
+              </span>
+            )}
           </span>
-        )}
-        {choosable && selected && (
-          <span className="x-govuk-ui-tree-tick">
-            <TickIcon />
-          </span>
-        )}
+          {present(badge) && (
+            <span id={`${id}-badge`} className="x-govuk-ui-tree-badge">
+              {badge}
+            </span>
+          )}
+          {choosable && selected && (
+            <span className="x-govuk-ui-tree-tick">
+              <TickIcon />
+            </span>
+          )}
+        </div>
       </div>
       {branch && (
         <Collapsible.Root

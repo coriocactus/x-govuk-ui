@@ -117,7 +117,7 @@ export function searchTree(
 ): { items: readonly TreeNode[]; matched: ReadonlySet<string>; open: ReadonlySet<string> } {
   const matched = new Set<string>();
   const open = new Set<string>();
-  // Returns the nodes kept from `nodes`, and whether any of them is or holds a match.
+  // The nodes kept from `nodes`, which are those that match or contain a match.
   const walk = (nodes: readonly TreeNode[]): TreeNode[] => {
     const kept: TreeNode[] = [];
     for (const node of nodes) {

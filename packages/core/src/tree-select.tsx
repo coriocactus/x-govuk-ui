@@ -7,7 +7,7 @@
  *
  * Mantine's TreeSelect lists the nodes as a combobox's options instead, each with its level and
  * whether it is open. An option cannot say either, so screen readers would hear a flat list, and
- * axe fails the markup. Base UI's Combobox cannot hold a tree, which its maintainers say waits for
+ * axe fails the markup. Base UI's Combobox cannot show a tree, which its maintainers say waits for
  * a tree of Base UI's own.
  */
 
@@ -178,9 +178,10 @@ function nameOf(button: HTMLButtonElement | null) {
  *
  * The button is a combobox, as Select's is, so screen readers read its label and then its value.
  * A press or the up or down arrow opens its popup, which is a dialog. Focus starts in the search
- * field, or on the chosen node on a touch screen, where the keyboard would cover the tree. The down
- * arrow and Enter move from the search to the tree, and the up arrow from the tree's first node goes
- * back. Choosing a node closes the popup. Pressing a branch opens it, and the popup stays open.
+ * field, or on the chosen node on a touch screen, where the keyboard would cover the tree. The
+ * down arrow and Enter move from the search to the tree, and the up arrow from the tree's first
+ * node goes back. Choosing a node closes the popup. Pressing a branch opens it, and the popup stays
+ * open.
  */
 export function TreeSelectControl(given: TreeSelectControlProps) {
   const {

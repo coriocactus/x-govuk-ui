@@ -8,7 +8,7 @@ type Props = {
   errorMessage?: string;
   disabled?: boolean;
   choose?: "leaves" | "any";
-  /** Shows how many letters each folder holds, as its badge. */
+  /** Shows how many letters are in each folder, as its badge. */
   counts?: boolean;
 };
 
@@ -54,7 +54,7 @@ const letters: TreeNode[] = [
   ]),
 ];
 
-/** How many letters a folder holds, in its own folders too, in words. */
+/** How many letters are in a folder and the folders inside it, in words. */
 const countOf = (node: TreeNode) => {
   const count = (each: TreeNode): number =>
     (each.children ?? []).reduce((total, child) => total + (child.children ? count(child) : 1), 0);

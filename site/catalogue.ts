@@ -402,7 +402,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "GOV.UK has no tree. This one follows WAI-ARIA's tree view pattern, with GOV.UK's label, hint and error message, and its yellow focus on the row. The arrow keys move through the rows and open and close branches, Home and End go to the ends, an asterisk opens every branch beside the row, and typing a name's first letters moves to it. A press on a branch opens it, and only a leaf can be chosen, so each row does one thing. Each branch opens smoothly beneath its row, with a line from its chevron into each of its children, and stays in the page while closed, so find in page reaches it. The chosen row has a tint of brand blue and a tick. In the example, a caseworker chooses a letter from folders three and four deep, each folder with an icon that opens as it does and a count of its letters. With choose set to any, a folder can be chosen too, and its chevron opens it. It submits the chosen value with a form.",
+      "GOV.UK has no tree. This one follows WAI-ARIA's tree view pattern, with GOV.UK's label, hint and error message, and its yellow focus on the row. The arrow keys move through the rows and open and close branches, Home and End go to the ends, an asterisk opens every branch beside the row, and typing a name's first letters moves to it. A press on a branch opens it, and only a leaf can be chosen, so each row does one thing. Each branch opens smoothly beneath its row, with a line from its chevron into each of its children, and stays in the page while closed, so find in page reaches it. The chosen row has a tint of brand blue and a tick. In the example, a caseworker chooses a letter three or four levels down, from folders within folders. Each folder has an icon that opens as it does, and a count of its letters. With choose set to any, a folder can be chosen too, and its chevron opens it. It submits the chosen value with a form.",
     props: [
       text("label", "Which letter do you want to send?", {
         type: "ReactNode",
@@ -440,7 +440,7 @@ const entries = {
       reference("name", "string"),
     ],
     example: [
-      toggle("counts", true, { note: "Shows how many letters each folder holds, as its badge." }),
+      toggle("counts", true, { note: "Shows how many letters are in each folder, as its badge." }),
     ],
   },
   "tree-select": {
@@ -453,7 +453,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "Select's field, whose popup holds a Tree, opened to the chosen item. A tree of more than eight items has a search field above it. A search shows the items that match, with the branches around them open, and the matching text in bold, and screen readers hear how many match. The tree takes focus, so its keys and its markup are the Tree's own. Pressing a branch opens it, and the popup stays open, so users look inside before they choose. In the example, the organisations are GOV.UK's departments, with the agencies and public bodies they sponsor. A department opens to list itself first, then its bodies, and a search finds an organisation by its name or the start of its abbreviation. It submits the chosen value with a form.",
+      "Select's field, whose popup shows a Tree, opened to the chosen item. A tree of more than eight items has a search field above it. A search shows the items that match, with the branches around them open, and the matching text in bold, and screen readers hear how many match. The tree takes focus, so its keys and its markup are the Tree's own. Pressing a branch opens it, and the popup stays open, so users look inside before they choose. In the example, the organisations are GOV.UK's departments, with the agencies and public bodies they sponsor. A department opens to list itself first, then its bodies, and a search finds an organisation by its name or the start of its abbreviation. It submits the chosen value with a form.",
     props: [
       text("label", "Which organisation do you work for?", {
         type: "ReactNode",

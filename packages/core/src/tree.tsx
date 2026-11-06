@@ -352,7 +352,8 @@ export function TreeControl(given: TreeControlProps) {
       if (elements.current.get(target) === element) elements.current.delete(target);
     };
   }, []);
-  // The item holds its open children too, so the browser would scroll them all into view with it.
+  // The item contains its open children too, so the browser would scroll them all into view with
+  // it.
   // Only its row is brought into view.
   const focus = useCallback((target: string) => {
     setActive(target);
@@ -630,7 +631,7 @@ export function TreeItem({ icon, badge, children, className = "", ref, ...props 
       ref={merged}
       role="treeitem"
       className={`x-govuk-ui-tree-item ${className}`.trim()}
-      // The item holds its children, so its name is its label alone, unless it is given its own.
+      // The item contains its children, so its name is its label alone, unless it is given its own.
       aria-labelledby={
         props["aria-labelledby"] ?? (props["aria-label"] ? undefined : `${id}-label`)
       }

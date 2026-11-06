@@ -1,8 +1,8 @@
 /* Tree. Each row has a chevron and its content, which is the node's label and what a service adds
    to it. A branch's children open beneath it, joined to it by lines, as in a file browser. The
-   content takes the highlight, the focus and the choice, and the chevron and the lines sit beside
-   it. The chosen row takes a tint of brand blue, as a Data table's chosen rows do, and a tick, so
-   the choice never shows by colour alone. */
+   content takes the highlight, the focus and the choice, and the chevron and the lines are drawn
+   beside it. The chosen row takes a tint of brand blue, as a Data table's chosen rows do, and a
+   tick, so the choice never shows by colour alone. */
 .x-govuk-ui-tree,
 .x-govuk-ui-tree-group {
   margin: 0;
@@ -18,7 +18,7 @@
 .x-govuk-ui-tree[aria-disabled="true"] {
   opacity: 0.55;
 }
-/* The item holds its children's group too, so the content of its row shows its focus. */
+/* The item contains its children's group too, so the content of its row shows its focus. */
 .x-govuk-ui-tree-item {
   outline: none;
 }

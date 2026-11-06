@@ -177,9 +177,10 @@ function nameOf(button: HTMLButtonElement | null) {
  * `className`, `style` and `ref`, goes on the button.
  *
  * The button is a combobox, as Select's is, so screen readers read its label and then its value.
- * A press or the up or down arrow opens its popup, which is a dialog. Focus starts in the search field, or on the chosen node on a touch screen,
- * where the keyboard would cover the tree. The Down arrow and Enter move from the search to the
- * tree, and the Up arrow from the tree's first node goes back. Choosing closes the popup.
+ * A press or the up or down arrow opens its popup, which is a dialog. Focus starts in the search
+ * field, or on the chosen node on a touch screen, where the keyboard would cover the tree. The down
+ * arrow and Enter move from the search to the tree, and the up arrow from the tree's first node goes
+ * back. Choosing a node closes the popup. Pressing a branch opens it, and the popup stays open.
  */
 export function TreeSelectControl(given: TreeSelectControlProps) {
   const {

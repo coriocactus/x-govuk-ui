@@ -1580,6 +1580,20 @@ async function expectAccessible(page: Page, part: string) {
     await page.evaluate((chosen) => {
       document.documentElement.dataset.theme = chosen;
     }, theme);
+    // Colours ease to the new theme, and contrast is read once they have finished.
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            document
+              .getAnimations()
+              .filter(
+                (animation) =>
+                  animation instanceof CSSTransition && animation.playState !== "finished",
+              ).length,
+        ),
+      )
+      .toBe(0);
     const axe = new AxeBuilder({ page }).include(part);
     const { violations } = await (theme === "light"
       ? axe.withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
@@ -1592,86 +1606,115 @@ async function expectAccessible(page: Page, part: string) {
   });
 }
 
-test("a tree moves by its keys as WAI-ARIA's tree does, opens its districts, and chooses only a river", async ({
+test("a tree moves by its keys as WAI-ARIA's tree does, opens its folders, and chooses only a letter", async ({
   page,
   frame,
   open,
+  playground,
 }) => {
   await open("tree");
-  const tree = frame.getByRole("tree", { name: "Which river did you fish?" });
-  // A district comes before its river of the same name, such as the Severn. WebKit lists the river
-  // while the district is closed, so the first is the district.
-  const item = (name: string) => tree.getByRole("treeitem", { name, exact: true }).first();
+  const tree = frame.getByRole("tree", { name: "Which letter do you want to send?" });
+  const item = (name: string) => tree.getByRole("treeitem", { name, exact: true });
+  const row = (name: string) => item(name).locator(":scope > .x-govuk-ui-tree-row");
   const voices = () => page.evaluate(() => (window as unknown as { voices: number }).voices);
-  // Tab reaches one item, the first.
+  // It opens three deep, and Tab reaches one item, the first.
+  await expect(item("Licences")).toHaveAttribute("aria-expanded", "true");
+  await expect(item("Issued")).toHaveAttribute("aria-expanded", "true");
   await expect(tree.locator('[tabindex="0"]')).toHaveCount(1);
-  await expect(item("Anglian")).toHaveAttribute("tabindex", "0");
-  // The right arrow opens a district, with a sound, then moves into it. The left arrow goes back
+  await expect(item("Applications")).toHaveAttribute("tabindex", "0");
+  // The right arrow opens a folder, with a sound, then moves into it. The left arrow goes back
   // out, then closes it.
   await page.getByRole("button", { name: "Mute sounds" }).click();
-  await item("Anglian").focus();
+  await item("Applications").focus();
   const before = await voices();
   await page.keyboard.press("ArrowRight");
-  await expect(item("Anglian")).toHaveAttribute("aria-expanded", "true");
-  await expect(item("Anglian")).toBeFocused();
+  await expect(item("Applications")).toHaveAttribute("aria-expanded", "true");
+  await expect(item("Applications")).toBeFocused();
   await expect.poll(voices).toBeGreaterThan(before);
   await page.keyboard.press("ArrowRight");
-  await expect(item("Great Ouse")).toBeFocused();
+  await expect(item("Decisions")).toBeFocused();
   await page.keyboard.press("ArrowDown");
-  await expect(item("Nene")).toBeFocused();
+  await expect(item("Information needed")).toBeFocused();
   await page.keyboard.press("ArrowLeft");
-  await expect(item("Anglian")).toBeFocused();
+  await expect(item("Applications")).toBeFocused();
   await page.keyboard.press("ArrowLeft");
-  await expect(item("Anglian")).toHaveAttribute("aria-expanded", "false");
-  // Its rivers stay in the page, hidden until find in page reaches them.
-  await expect(item("Anglian").locator(".x-govuk-ui-tree-group")).toHaveAttribute(
+  await expect(item("Applications")).toHaveAttribute("aria-expanded", "false");
+  // Its letters stay in the page, hidden until find in page reaches them.
+  await expect(item("Applications").locator(".x-govuk-ui-tree-group").first()).toHaveAttribute(
     "hidden",
     "until-found",
   );
   // Home and End go to the first and last items on show.
   await page.keyboard.press("End");
-  await expect(item("Thames")).toBeFocused();
+  await expect(item("Payments")).toBeFocused();
   await page.keyboard.press("Home");
-  await expect(item("Anglian")).toBeFocused();
+  await expect(item("Applications")).toBeFocused();
   // Typing a letter goes to the next name that starts with it, and again to the one after.
-  await page.keyboard.press("s");
-  await expect(item("Severn")).toBeFocused();
-  await page.keyboard.press("s");
-  await expect(item("Solway Tweed")).toBeFocused();
+  await page.keyboard.press("l");
+  await expect(item("Licences")).toBeFocused();
+  await page.keyboard.press("l");
+  await expect(item("Licence issued")).toBeFocused();
   // Letters typed together find a name that starts with them all. A pause starts the search again.
   await page.waitForTimeout(600);
-  await page.keyboard.type("sou", { delay: 20 });
-  await expect(item("South East")).toBeFocused();
-  // An asterisk opens every district beside the item.
+  await page.keyboard.type("rep", { delay: 20 });
+  await expect(item("Replacement licence sent")).toBeFocused();
+  // An asterisk opens every folder beside the item.
   await page.keyboard.press("*");
-  await expect(tree.locator('[aria-expanded="true"]')).toHaveCount(10);
-  // A district is a heading for its rivers, so Enter closes it, and chooses nothing.
+  await expect(item("Renewals")).toHaveAttribute("aria-expanded", "true");
+  // A folder is a heading for its letters, so Enter closes it, and chooses nothing.
+  await item("Renewals").focus();
   await page.keyboard.press("Enter");
-  await expect(item("South East")).toHaveAttribute("aria-expanded", "false");
+  await expect(item("Renewals")).toHaveAttribute("aria-expanded", "false");
   await expect(tree.locator('[aria-selected="true"]')).toHaveCount(0);
-  // Enter chooses a river.
-  await item("Kennet").focus();
+  // Enter chooses a letter.
+  await item("Licence issued").focus();
   await page.keyboard.press("Enter");
-  await expect(item("Kennet")).toHaveAttribute("aria-selected", "true");
-  await expect(frame.getByRole("status")).toHaveText("You chose the Kennet.");
-  await expect(frame.locator('input[name="river"]')).toHaveValue("kennet");
-  // A press on a district's row or on its chevron opens and closes it, and a press on a river's
-  // row chooses it. Tab then comes back to the item last pressed.
-  await item("Humber").locator(":scope > .x-govuk-ui-tree-row").click();
-  await expect(item("Humber")).toHaveAttribute("aria-expanded", "false");
-  await item("Humber").locator(":scope > .x-govuk-ui-tree-row > .x-govuk-ui-tree-toggle").click();
-  await expect(item("Humber")).toHaveAttribute("aria-expanded", "true");
-  await expect(item("Humber")).toBeFocused();
-  await item("Trent").locator(":scope > .x-govuk-ui-tree-row").click();
-  await expect(frame.getByRole("status")).toHaveText("You chose the Trent.");
-  await expect(item("Trent")).toBeFocused();
-  await expect(tree.locator('[tabindex="0"]')).toHaveText("Trent");
+  await expect(item("Licence issued")).toHaveAttribute("aria-selected", "true");
+  await expect(frame.getByRole("status")).toHaveText("You chose ‘Licence issued’.");
+  await expect(frame.locator('input[name="letter"]')).toHaveValue("licence-issued");
+  // A press on a folder's row or its chevron opens and closes it, and a press on a letter's row
+  // chooses it. Tab then comes back to the item last pressed.
+  await row("Payments").click();
+  await expect(item("Payments")).toHaveAttribute("aria-expanded", "true");
+  await item("Payments").locator(":scope > .x-govuk-ui-tree-row > .x-govuk-ui-tree-toggle").click();
+  await expect(item("Payments")).toHaveAttribute("aria-expanded", "false");
+  await expect(item("Payments")).toBeFocused();
+  await row("Payments").click();
+  await row("Refunds").click();
+  await row("Part refunds").click();
+  await row("Part refund sent").click();
+  await expect(frame.getByRole("status")).toHaveText("You chose ‘Part refund sent’.");
+  await expect(item("Part refund sent")).toBeFocused();
+  await expect(tree.locator('[tabindex="0"]')).toHaveText("Part refund sent");
+  // A press beside a row, where the lines are, opens or closes nothing.
+  const sent = (await row("Part refund sent").boundingBox())!;
+  await page.mouse.click(sent.x - 6, sent.y + sent.height / 2);
+  await expect(item("Part refunds")).toHaveAttribute("aria-expanded", "true");
+  // GOV.UK's yellow focus shows on the row the keys reach, though the pointer rests on it.
+  await page.mouse.move(sent.x + sent.width / 2, sent.y + sent.height / 2);
+  await item("Part refund sent").focus();
+  await page.keyboard.press("ArrowUp");
+  await page.keyboard.press("ArrowDown");
+  await expect(row("Part refund sent").locator(".x-govuk-ui-tree-content")).toHaveCSS(
+    "background-color",
+    "rgb(255, 221, 0)",
+  );
   // A Form focuses a field by its id, which is the tree's. The tree passes focus to that item.
-  await item("Trent").evaluate((element) => (element as HTMLElement).blur());
+  await item("Part refund sent").evaluate((element) => (element as HTMLElement).blur());
   await tree.focus();
-  await expect(item("Trent")).toBeFocused();
-  // The sweep sees the tree as it opens. Open, with a river chosen, it meets WCAG in both themes.
+  await expect(item("Part refund sent")).toBeFocused();
+  // The sweep sees the tree as it opens. Open four deep, with a letter chosen, it meets WCAG in
+  // both themes.
   await expectAccessible(page, ".preview-frame .x-govuk-ui-tree");
+  // Where a folder can be chosen too, a press on its row chooses it. Its chevron is then a button
+  // of its own, which opens the folder and chooses nothing.
+  await playground.set("choose", "Any");
+  await frame.getByRole("button", { name: "Expand Applications" }).click();
+  await expect(item("Applications")).toHaveAttribute("aria-expanded", "true");
+  await expect(item("Applications")).toHaveAttribute("aria-selected", "false");
+  await row("Applications").click();
+  await expect(item("Applications")).toHaveAttribute("aria-selected", "true");
+  await expect(frame.getByRole("status")).toHaveText("You chose ‘Applications’.");
 });
 
 test("a tree select finds an organisation by its name or abbreviation, and chooses it from its tree", async ({

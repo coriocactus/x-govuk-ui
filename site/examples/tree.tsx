@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Tree, TreeItem, type TreeNode } from "x-govuk-ui";
+import { FileIcon, Tree, TreeItem, type TreeNode } from "x-govuk-ui";
 
 type Props = {
   label?: string;
@@ -7,75 +7,129 @@ type Props = {
   hideLabel?: boolean;
   errorMessage?: string;
   disabled?: boolean;
-  /** Shows how many rivers each district has, as each district's badge. */
+  choose?: "leaves" | "any";
+  /** Shows how many letters each folder holds, as its badge. */
   counts?: boolean;
 };
 
 const slug = (name: string) => name.toLowerCase().replaceAll(" ", "-");
 
-/**
- * A river basin district, with the rivers in it. Each river is sent as its name in lower case. A
- * district has a value of its own, apart from the river it may be named after, such as the Dee.
- */
-const district = (label: string, names: string[]): TreeNode => ({
-  value: `${slug(label)}-district`,
+/** A folder of letters and other folders. It has a value of its own, apart from every letter's. */
+const folder = (label: string, children: TreeNode[]): TreeNode => ({
+  value: `${slug(label)}-folder`,
   label,
-  children: names.map((name) => ({ value: slug(name), label: name })),
+  children,
 });
 
+/** A letter, sent as its name in lower case. */
+const letter = (label: string): TreeNode => ({ value: slug(label), label });
+
 /**
- * England's river basin districts, as the Environment Agency manages them, with some of their
- * rivers.
+ * The letters a caseworker sends about rod fishing licences, kept in folders by what they are
+ * about, as GOV.UK Notify keeps its templates.
  */
-const rivers: TreeNode[] = [
-  district("Anglian", ["Great Ouse", "Nene", "Welland", "Wensum", "Witham", "Yare"]),
-  district("Dee", ["Dee"]),
-  district("Humber", ["Aire", "Don", "Ouse", "Swale", "Trent", "Ure", "Wharfe"]),
-  district("North West", ["Kent", "Lune", "Mersey", "Ribble", "Wyre"]),
-  district("Northumbria", ["Aln", "Coquet", "Tees", "Tyne", "Wear"]),
-  district("Severn", ["Severn", "Teme", "Usk", "Warwickshire Avon", "Wye"]),
-  district("Solway Tweed", ["Eden", "Tweed"]),
-  district("South East", ["Adur", "Arun", "Itchen", "Medway", "Test"]),
-  district("South West", ["Camel", "Dart", "Exe", "Fowey", "Tamar", "Taw", "Torridge"]),
-  district("Thames", ["Cherwell", "Colne", "Kennet", "Lea", "Loddon", "Mole", "Thames", "Wey"]),
+const letters: TreeNode[] = [
+  folder("Applications", [
+    folder("Decisions", [letter("Application approved"), letter("Application refused")]),
+    letter("Information needed"),
+    letter("Application withdrawn"),
+  ]),
+  folder("Licences", [
+    folder("Issued", [
+      letter("Licence issued"),
+      letter("Senior licence issued"),
+      letter("Junior licence issued"),
+    ]),
+    folder("Renewals", [letter("Licence about to expire"), letter("Licence expired")]),
+    letter("Replacement licence sent"),
+  ]),
+  folder("Payments", [
+    folder("Refunds", [
+      folder("Part refunds", [letter("Part refund sent"), letter("Part refund explained")]),
+      letter("Refund sent"),
+      letter("Refund refused"),
+    ]),
+    letter("Payment received"),
+    letter("Payment failed"),
+  ]),
 ];
 
-/** How many rivers a district has, in words. */
-const countOf = (district: TreeNode) => {
-  const count = district.children?.length ?? 0;
-  return count === 1 ? "1 river" : `${count} rivers`;
+/** How many letters a folder holds, in its own folders too, in words. */
+const countOf = (node: TreeNode) => {
+  const count = (each: TreeNode): number =>
+    (each.children ?? []).reduce((total, child) => total + (child.children ? count(child) : 1), 0);
+  const letters = count(node);
+  return letters === 1 ? "1 letter" : `${letters} letters`;
 };
 
+/** A node's name, wherever it is in the tree. */
+function nameOf(value: string, nodes: readonly TreeNode[] = letters): string | undefined {
+  for (const node of nodes) {
+    if (node.value === value) return node.label;
+    const found = node.children && nameOf(value, node.children);
+    if (found) return found;
+  }
+}
+
+/** A folder, drawn open while its letters show. A service brings its own icons. */
+const folderIcon = (open: boolean) => (
+  <svg
+    viewBox="0 0 16 16"
+    width="16"
+    height="16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.4"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    {open ? (
+      <>
+        <path d="M1.5 12.5v-9h4l1.5 1.5h6v2" />
+        <path d="M1.5 12.5 3.5 7h11l-2 5.5z" />
+      </>
+    ) : (
+      <path d="M1.5 3.5h4l1.5 1.5h7.5v7.5h-13z" />
+    )}
+  </svg>
+);
+
 export default function TreeExample({
-  label = "Which river did you fish?",
-  hint = "Rivers are listed under the river basin district they flow through.",
+  label = "Which letter do you want to send?",
+  hint = "Letters are kept in folders by what they are about.",
   hideLabel = false,
   errorMessage = "",
   disabled = false,
+  choose = "leaves",
   counts = true,
 }: Props) {
-  const [river, setRiver] = useState<string | null>(null);
-  const chosen = rivers.flatMap((each) => each.children ?? []).find((each) => each.value === river);
+  const [chosen, setChosen] = useState<string | null>(null);
   return (
     <>
       <Tree
-        id="river"
-        name="river"
+        id="letter"
+        name="letter"
         label={label}
         hint={hint || undefined}
         hideLabel={hideLabel}
         errorMessage={errorMessage || undefined}
         disabled={disabled}
-        items={rivers}
-        // A district is a heading for its rivers, so pressing it opens it.
-        choose="leaves"
-        value={river}
-        onValueChange={setRiver}
+        items={letters}
+        choose={choose}
+        // The tree opens three deep, so users see how the folders nest.
+        defaultExpanded={["licences-folder", "issued-folder"]}
+        value={chosen}
+        onValueChange={setChosen}
       >
-        {(node, { branch }) => <TreeItem badge={counts && branch ? countOf(node) : undefined} />}
+        {(node, { branch, expanded }) => (
+          <TreeItem
+            icon={branch ? folderIcon(expanded) : <FileIcon size={16} />}
+            badge={counts && branch ? countOf(node) : undefined}
+          />
+        )}
       </Tree>
       <p className="preview-message" role="status">
-        {chosen ? `You chose the ${chosen.label}.` : ""}
+        {chosen ? `You chose ‘${nameOf(chosen)}’.` : ""}
       </p>
     </>
   );

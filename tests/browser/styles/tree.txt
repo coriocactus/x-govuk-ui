@@ -40,6 +40,12 @@
   line-height: 1.4
   color: rgb(11, 12, 12)
   margin-left: 12px
+.x-govuk-ui-tree-icon
+  display: flex
+  font-size: 17px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
 .x-govuk-ui-tree-item
   display: list-item
   font-size: 17px

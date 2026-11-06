@@ -398,21 +398,31 @@ const entries = {
     width: 460,
     anchor: "top",
     experimental: true,
-    description:
-      "Let users choose one item from a hierarchy, such as a river within its river basin district.",
+    description: "Let users choose one item from a hierarchy, such as a letter within its folder.",
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "GOV.UK has no tree. This one follows WAI-ARIA's tree view pattern, with GOV.UK's label, hint and error message, and its yellow focus on the row. The arrow keys move through the rows and open and close branches, Home and End go to the ends, an asterisk opens every branch beside the row, and typing a name's first letters moves to it. Each branch opens smoothly beneath its row, along a guide line, and stays in the page while closed, so find in page reaches it. The chosen row has a tint of brand blue and a tick. In the example, each river basin district is a heading for its rivers, with a count beside it, and only a river can be chosen. It submits the chosen value with a form.",
+      "GOV.UK has no tree. This one follows WAI-ARIA's tree view pattern, with GOV.UK's label, hint and error message, and its yellow focus on the row. The arrow keys move through the rows and open and close branches, Home and End go to the ends, an asterisk opens every branch beside the row, and typing a name's first letters moves to it. A press on a branch opens it, and only a leaf can be chosen, so each row does one thing. Each branch opens smoothly beneath its row, with a line from its chevron into each of its children, and stays in the page while closed, so find in page reaches it. The chosen row has a tint of brand blue and a tick. In the example, a caseworker chooses a letter from folders three and four deep, each folder with an icon that opens as it does and a count of its letters. With choose set to any, a folder can be chosen too, and its chevron opens it. It submits the chosen value with a form.",
     props: [
-      text("label", "Which river did you fish?", { type: "ReactNode", default: "Required" }),
-      text("hint", "Rivers are listed under the river basin district they flow through.", {
+      text("label", "Which letter do you want to send?", {
+        type: "ReactNode",
+        default: "Required",
+      }),
+      text("hint", "Letters are kept in folders by what they are about.", {
         type: "ReactNode",
         rows: 2,
       }),
       toggle("hideLabel"),
       text("errorMessage", ""),
       toggle("disabled"),
+      choice(
+        "choose",
+        [
+          ["leaves", "Leaves"],
+          ["any", "Any"],
+        ],
+        "leaves",
+      ),
       reference(
         "items",
         "TreeNode[], each { value, label, description?, disabled?, children? }",
@@ -424,14 +434,13 @@ const entries = {
         "string[] / (expanded: string[]) => void",
         "The chosen node's branches",
       ),
-      reference("choose", '"leaves" | "any"', "leaves"),
       reference("search / filter", "string / (search, node) => boolean", "Label contains search"),
       reference("children", "(node, state) => TreeItem", "<TreeItem />"),
       reference("labels", "Partial<TreeLabels>", "Expand and Collapse"),
       reference("name", "string"),
     ],
     example: [
-      toggle("counts", true, { note: "Shows how many rivers each district has, as its badge." }),
+      toggle("counts", true, { note: "Shows how many letters each folder holds, as its badge." }),
     ],
   },
   "tree-select": {

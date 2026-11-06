@@ -186,10 +186,10 @@ export type TreeControlProps = Omit<
 export type TreeProps = Omit<TreeControlProps, "id"> & FieldWords & { id?: string };
 
 /**
- * Lets users choose one node from a hierarchy, such as a river within its river basin district, or
- * a document within its folder. The arrow keys move through the nodes and open and close branches,
- * and typing a node's first letters moves to it, as WAI-ARIA's tree view pattern says. A branch
- * opens smoothly beneath its row, with a line from its chevron into each of its children.
+ * Lets users choose one node from a hierarchy, such as a letter within its folder, or a river
+ * within its river basin district. The arrow keys move through the nodes and open and close
+ * branches, and typing a node's first letters moves to it, as WAI-ARIA's tree view pattern says. A
+ * branch opens smoothly beneath its row, with a line from its chevron into each of its children.
  *
  * It is a bound Field with a Label, a Hint, an ErrorMessage and a TreeControl. Compose those parts
  * yourself to put something between them. Its props go to the control.
@@ -564,8 +564,8 @@ function Branch({ nodes, level }: { nodes: readonly TreeNode[]; level: number })
 function Match({ label, search }: { label: string; search: string }) {
   const wanted = search.trim().toLocaleLowerCase();
   const lower = label.toLocaleLowerCase();
-  // Lower case can change a label's length, as it does for "İ", so the bold would miss its letters.
-  // Such a label shows no bold.
+  // Lower case can change a label's length, as it does for "İ", so the bold would miss its
+  // letters. Such a label shows no bold.
   const at = wanted && lower.length === label.length ? lower.indexOf(wanted) : -1;
   if (at < 0) return label;
   const end = at + wanted.length;

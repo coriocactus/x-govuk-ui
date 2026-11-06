@@ -397,7 +397,6 @@ const entries = {
     name: "Tree",
     width: 460,
     anchor: "top",
-    experimental: true,
     description: "Let users choose one item from a hierarchy, such as a letter within its folder.",
     upstream: "",
     dependencies: "React · Base UI",
@@ -447,7 +446,6 @@ const entries = {
     name: "Tree select",
     width: 460,
     anchor: "top",
-    experimental: true,
     description:
       "Let users choose one item from a long hierarchy, such as the organisation they work for.",
     upstream: "",

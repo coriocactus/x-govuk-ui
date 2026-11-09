@@ -104,9 +104,11 @@ test("a data table's columns share the room their widths leave, and a resized co
 });
 
 test("a data table's rows scroll between its headings and its foot, with the scrollbar beside them", async ({
+  page,
   frame,
   open,
   playground,
+  browserName,
 }) => {
   await open("data-table");
   const scroll = frame.locator(".x-govuk-ui-data-table-scroll");
@@ -129,6 +131,27 @@ test("a data table's rows scroll between its headings and its foot, with the scr
   expect(await viewport.evaluate((element) => getComputedStyle(element).overscrollBehaviorY)).toBe(
     "none",
   );
+  // A row that takes focus from the keyboard scrolls clear of the foot, and back up, clear of the
+  // headings, never resting beneath either. The ninth row starts under the foot.
+  const tab = browserName === "webkit" ? "Alt+Tab" : "Tab";
+  const rows = viewport.locator("tbody tr");
+  const clear = () =>
+    page.evaluate(() => {
+      const focused = document.activeElement!.closest("tr")!.getBoundingClientRect();
+      const head = document.querySelector(".x-govuk-ui-data-table thead th")!;
+      const foot = document.querySelector(".x-govuk-ui-data-table tfoot td")!;
+      return (
+        focused.top >= head.getBoundingClientRect().bottom - 1 &&
+        focused.bottom <= foot.getBoundingClientRect().top + 1
+      );
+    });
+  await rows.nth(7).getByRole("checkbox").focus();
+  await page.keyboard.press(tab);
+  await expect(rows.nth(8).getByRole("checkbox")).toBeFocused();
+  await expect.poll(clear).toBe(true);
+  for (let step = 0; step < 8; step++) await page.keyboard.press(`Shift+${tab}`);
+  await expect(rows.nth(0).getByRole("checkbox")).toBeFocused();
+  await expect.poll(clear).toBe(true);
   // A thousand rows scroll in the same box.
   await playground.set("long", true);
   await expect(frame.getByText("1008 organisations")).toBeVisible();

@@ -46,6 +46,12 @@
   > .x-govuk-ui-scroll-area-viewport {
   overscroll-behavior-y: none;
 }
+/* A row that takes focus from the keyboard scrolls clear of the headings and the foot, rather
+   than resting beneath them, as WCAG 2.2's focus not obscured asks. A browser counts a row beneath
+   them as in view, so without the padding it would not scroll. */
+.x-govuk-ui-data-table-scroll > .x-govuk-ui-scroll-area-viewport {
+  scroll-padding-block: var(--x-govuk-ui-data-table-row);
+}
 .x-govuk-ui-table.x-govuk-ui-data-table-table {
   table-layout: fixed;
   border-collapse: separate;

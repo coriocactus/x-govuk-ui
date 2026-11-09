@@ -32,6 +32,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Fixed
 
+- Fixed DataTable so a row that takes focus from the keyboard scrolls clear of the headings and the foot. It used to rest beneath them, hidden, where they stick over the rows.
 - Fixed ErrorSummaryItem's link to a group of controls, such as a tree. It now focuses the first control in the group that Tab reaches, and passes over a control out of the tab order, such as a button with `tabindex="-1"`.
 - Fixed Form running `onSubmit` again when sent while the last `onSubmit` still runs, such as when users press Enter twice. A form sent meanwhile now sends nothing.
 

@@ -111,7 +111,8 @@ export const defaultDataTableLabels: DataTableLabels = {
  * column resized keeps the width users give it, and the others share what room is left.
  * Double-clicking the edge returns the column to its starting width, and to its share. Sortable
  * headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes. The
- * foot counts the rows, and offers each column's figure, such as a sum, on a button.
+ * foot counts the rows, and offers each column's figure, such as a sum, on a button. A row that
+ * takes focus from the keyboard scrolls clear of the headings and the foot.
  */
 export function DataTable<Row>({
   label,

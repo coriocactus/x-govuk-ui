@@ -5,10 +5,18 @@ import type { ComponentPropsWithRef } from "react";
 import { useLabels } from "./labels";
 
 export type AvatarProps = ComponentPropsWithRef<"span"> & {
-  /** The person's name. It names the avatar, and gives the initials when there is no image. */
+  /**
+   * The person's or organisation's name. It names the avatar, and gives the initials when there is
+   * no image.
+   */
   name: string;
   src?: string;
   size?: "small" | "medium" | "large";
+  /**
+   * `square` is for an organisation, such as a company, so it reads apart from a person, who is a
+   * circle. Its corners are softened, as a control's are.
+   */
+  shape?: "circle" | "square";
 };
 
 // Initials take one of GOV.UK's colours, the same one for a name every time.
@@ -23,10 +31,18 @@ const initialsOf = (name: string) =>
 
 /**
  * A person's photo, or their initials on one of GOV.UK's colours until the photo loads or if there
- * is none. The initials' colour stays the same for a name. It is built on Base UI's Avatar, so a
- * photo fades in only once it has loaded. Put several in an `AvatarGroup` to overlap them.
+ * is none. An organisation's logo or initials sit in a square. The initials' colour stays the same
+ * for a name. It is built on Base UI's Avatar, so a photo fades in only once it has loaded. Put
+ * several in an `AvatarGroup` to overlap them.
  */
-export function Avatar({ name, src, size = "medium", className = "", ...props }: AvatarProps) {
+export function Avatar({
+  name,
+  src,
+  size = "medium",
+  shape = "circle",
+  className = "",
+  ...props
+}: AvatarProps) {
   const tint =
     tints[[...name].reduce((sum, letter) => sum + letter.charCodeAt(0), 0) % tints.length];
   return (
@@ -34,6 +50,7 @@ export function Avatar({ name, src, size = "medium", className = "", ...props }:
       {...props}
       className={`x-govuk-ui-avatar ${className}`.trim()}
       data-size={size}
+      data-shape={shape === "square" ? "square" : undefined}
       data-tint={tint}
       role="img"
       aria-label={name}

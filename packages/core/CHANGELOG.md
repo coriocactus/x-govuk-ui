@@ -22,6 +22,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added `treeBranches`, which lists every branch of a tree's nodes, such as to open them all through Tree's `expanded`.
 - Added the `tree` and `treeSelect` maps of words to LabelsProvider, with their defaults in `defaultTreeLabels` and `defaultTreeSelectLabels`.
 - Added `--x-govuk-ui-ease-glide` and `--x-govuk-ui-duration-glide`, the glide that the Sidebar's highlight takes, which moves at once and settles softly, for a part's own CSS.
+- Added `shape="square"` to Avatar, for an organisation, such as a company. Its corners are a control's, from `--x-govuk-ui-radius-control`, so it reads apart from a person's circle. In an AvatarGroup of square avatars, the count is square too.
 
 ### Changed
 

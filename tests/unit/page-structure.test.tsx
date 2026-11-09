@@ -167,6 +167,11 @@ test("links, cards, avatars and page parts follow GOV.UK and name themselves", (
   expect(avatar).toContain('role="img"');
   expect(avatar).toContain('aria-label="Tony Blair"');
   expect(avatar).toContain(">TB<");
+  expect(avatar).not.toContain("data-shape");
+  // An organisation's avatar is square, and named by the organisation.
+  const organisation = renderToStaticMarkup(<Avatar name="Tamar Valley Foundry" shape="square" />);
+  expect(organisation).toContain('data-shape="square"');
+  expect(organisation).toContain('aria-label="Tamar Valley Foundry"');
   expect(renderToStaticMarkup(<AvatarGroup more={3} />)).toContain("and 3 more");
   expect(renderToStaticMarkup(<Aside title="Related content" />)).toMatch(
     /<aside class="x-govuk-ui-aside" aria-labelledby="([^"]+)"><h2 id="\1"/,

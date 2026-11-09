@@ -3171,7 +3171,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "A circle with a photo, which fades in once it has loaded, or the person's initials on one of GOV.UK's colours, the same colour for a name every time. It is named by the person's name. An AvatarGroup overlaps several, ringed in the page's colour, and counts any more. Under the pointer, the avatar there rises and grows a little over its neighbours, which rise less the further away they are, and they spring back into line with a bounce as the pointer leaves. Built on Base UI's Avatar.",
+      "A circle with a photo, which fades in once it has loaded, or the person's initials on one of GOV.UK's colours, the same colour for a name every time. It is named by the person's name. An organisation's avatar is a square with a control's corners, so it reads apart from a person's. An AvatarGroup overlaps several, ringed in the page's colour, and counts any more, in the shape of the avatars beside the count. Under the pointer, the avatar there rises and grows a little over its neighbours, which rise less the further away they are, and they spring back into line with a bounce as the pointer leaves. Built on Base UI's Avatar.",
     props: [
       text("name", "John Major", { default: "Required" }),
       choice(
@@ -3182,6 +3182,14 @@ const entries = {
           ["large", "Large"],
         ],
         "medium",
+      ),
+      choice(
+        "shape",
+        [
+          ["circle", "Circle"],
+          ["square", "Square"],
+        ],
+        "circle",
       ),
       reference("src", "string"),
       reference("AvatarGroup", "{ more, children, labels }", "Part"),

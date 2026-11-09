@@ -18,6 +18,10 @@
   user-select: none;
   vertical-align: middle;
 }
+/* An organisation's avatar is square, with a control's corners, so it reads apart from a person's. */
+.x-govuk-ui-avatar[data-shape="square"] {
+  border-radius: var(--x-govuk-ui-radius-control);
+}
 .x-govuk-ui-avatar[data-size="small"] {
   --x-govuk-ui-avatar-size: 28px;
 }
@@ -84,6 +88,10 @@
   background: var(--x-govuk-ui-secondary);
   color: var(--x-govuk-ui-text);
   font-size: 13px;
+}
+/* The count takes the shape of the avatars beside it, so a group of organisations is all square. */
+.x-govuk-ui-avatar-group:has(> .x-govuk-ui-avatar[data-shape="square"]) > .x-govuk-ui-avatar-more {
+  border-radius: var(--x-govuk-ui-radius-control);
 }
 @media (forced-colors: active) {
   .x-govuk-ui-avatar {

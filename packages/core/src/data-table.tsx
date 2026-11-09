@@ -5,6 +5,7 @@ import {
   type CSSProperties,
   type ReactNode,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -15,6 +16,7 @@ import { useLabels } from "./labels";
 import { useLatest } from "./refs";
 import { ResizableHandle } from "./resizable";
 import { ScrollArea } from "./scroll-area";
+import { useScopeSound } from "./sound-scope";
 import { TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "./table";
 
 export type DataTableColumn<Row> = {
@@ -28,7 +30,10 @@ export type DataTableColumn<Row> = {
   sortBy?: (row: Row) => string | number;
   /** Aligns numbers to the right, so their digits line up. */
   numeric?: boolean;
-  /** The column's starting width, in pixels. */
+  /**
+   * The column's starting width, in pixels. Where the table has more room than its columns need,
+   * each column takes a share of the rest, in proportion to this width.
+   */
   width: number;
   /** The narrowest the column can be dragged, in pixels. */
   minWidth?: number;
@@ -98,10 +103,13 @@ export const defaultDataTableLabels: DataTableLabels = {
  * Scroll area. As it scrolls, the headings stay at the top and the first columns stay at the side.
  * A shadow runs along their edge once the rest has moved under them.
  *
- * Each column's edge is a Resizable handle, dragged or moved with the arrow keys. Double-clicking
- * it returns the column to its starting width. Sortable headings sort the rows, which glide to
- * their new places. Rows can be chosen with checkboxes. The foot counts the rows, and offers each
- * column's figure, such as a sum, on a button.
+ * The columns fill the table's width. Where the table has more room than their widths add up to,
+ * each column takes a share of the rest, in proportion to its width, so no space is left empty at
+ * the side. Each column's edge is a Resizable handle, dragged or moved with the arrow keys. A
+ * column resized keeps the width users give it, and the others share what room is left.
+ * Double-clicking the edge returns the column to its starting width, and to its share. Sortable
+ * headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes. The
+ * foot counts the rows, and offers each column's figure, such as a sum, on a button.
  */
 export function DataTable<Row>({
   label,
@@ -122,9 +130,12 @@ export function DataTable<Row>({
   ...props
 }: DataTableProps<Row>) {
   const labels = useLabels("dataTable", defaultDataTableLabels);
-  const [widths, setWidths] = useState(() =>
-    Object.fromEntries(columns.map((column) => [column.id, column.width])),
-  );
+  const play = useScopeSound();
+  // The widths users have given columns by resizing them. A column not here takes its starting
+  // width and a share of any room left over.
+  const [widths, setWidths] = useState<Record<string, number>>({});
+  // The table's room, measured, so the columns can share what their widths leave over.
+  const [room, setRoom] = useState(0);
   const [sort, setSort] = useState<Sort>(null);
   const [summed, setSummed] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
@@ -160,18 +171,52 @@ export function DataTable<Row>({
   const all = keys.length > 0 && keys.every((key) => chosenKeys.has(key));
   const some = !all && keys.some((key) => chosenKeys.has(key));
 
+  // The room is the viewport's width, which a resize of the page or of a panel beside it changes.
+  // The first measure is taken before the page paints, so the columns fill the table from the
+  // first frame. The observer's first report comes after the paint.
+  useLayoutEffect(() => {
+    const element = viewport.current;
+    if (!element) return;
+    const measure = () => setRoom(Math.floor(element.clientWidth));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  // Each column's width as shown: a resized column's own, or its starting width and a share of
+  // the room left over, in proportion to its starting width. The last column that shares takes any
+  // pixel the rounding leaves, so the columns fill the room exactly and nothing scrolls sideways.
+  const checks = selectable ? CHECKS : 0;
+  const given = columns.reduce((sum, column) => sum + (widths[column.id] ?? column.width), checks);
+  const sharing = columns.filter((column) => widths[column.id] === undefined);
+  const weight = sharing.reduce((sum, column) => sum + column.width, 0);
+  const spare = weight > 0 ? Math.max(0, room - given) : 0;
+  const shown: Record<string, number> = {};
+  let shared = 0;
+  for (const column of columns) {
+    const own = widths[column.id];
+    if (own !== undefined) {
+      shown[column.id] = own;
+      continue;
+    }
+    const share = Math.floor((spare * column.width) / weight);
+    shared += share;
+    shown[column.id] = column.width + share;
+  }
+  const lastSharing = sharing.at(-1);
+  if (lastSharing) shown[lastSharing.id] = (shown[lastSharing.id] ?? 0) + spare - shared;
+
   // Where each pinned column sits from the left, past the checkboxes and the columns before it.
   // The places are custom properties on the table, so resizing a column changes them without
   // rendering the rows again.
   const lefts: Record<string, string> = {};
-  let edge = selectable ? CHECKS : 0;
+  let edge = checks;
   columns.slice(0, pinned).forEach((column, index) => {
     lefts[`--x-govuk-ui-pin-${index}`] = `${edge}px`;
-    edge += widths[column.id] ?? column.width;
+    edge += shown[column.id] ?? column.width;
   });
-  const total =
-    (selectable ? CHECKS : 0) +
-    columns.reduce((sum, column) => sum + (widths[column.id] ?? column.width), 0);
+  const total = columns.reduce((sum, column) => sum + (shown[column.id] ?? column.width), checks);
   const pin = (index: number) => {
     if (index >= pinned) return {};
     return {
@@ -293,7 +338,7 @@ export function DataTable<Row>({
           <colgroup>
             {selectable && <col style={{ width: CHECKS }} />}
             {columns.map((column) => (
-              <col key={column.id} style={{ width: widths[column.id] }} />
+              <col key={column.id} style={{ width: shown[column.id] }} />
             ))}
           </colgroup>
           <TableHeader>
@@ -335,13 +380,20 @@ export function DataTable<Row>({
                     <ResizableHandle
                       label={labels.columnWidth(column.header)}
                       panel="before"
-                      value={widths[column.id] ?? column.width}
+                      // The handle moves the edge users see, so it starts from the width shown,
+                      // which then becomes the column's own.
+                      value={shown[column.id] ?? column.width}
                       min={column.minWidth ?? 72}
-                      max={640}
-                      defaultValue={column.width}
+                      max={Math.max(640, shown[column.id] ?? 0)}
                       onValueChange={(next) =>
                         setWidths((current) => ({ ...current, [column.id]: next }))
                       }
+                      // Double-clicked, the column goes back to its starting width and its share,
+                      // with the tap the handle plays when it goes back to its default.
+                      onDoubleClick={() => {
+                        setWidths(({ [column.id]: _, ...rest }) => rest);
+                        play("tap", { velocity: 0.7 });
+                      }}
                       className="x-govuk-ui-data-table-resize"
                     />
                   }

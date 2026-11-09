@@ -11,6 +11,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Visual
 
+- Changed DataTable to fill its width. Where the table has more room than its columns' widths add up to, each column takes a share of the rest, in proportion to its `width`, instead of the room being left empty beside the last column. A column users resize keeps the width they give it, and double-clicking its edge returns it to its width and its share.
 - Changed SidebarCustomise's rows to slide their pin and name in on the glide that the sidebar's highlight takes, which moves at once and settles softly, in place of a slower curve that started softly. The rows now answer the pointer as the rest of the sidebar does.
 
 ### Added

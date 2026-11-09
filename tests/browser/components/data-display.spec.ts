@@ -59,6 +59,50 @@ test("a data table sorts, chooses rows, resizes its columns and sums a column", 
   );
 });
 
+test("a data table's columns share the room their widths leave, and a resized column keeps its own", async ({
+  page,
+  frame,
+  open,
+}) => {
+  // In a window this wide, the columns' widths leave room over.
+  await page.setViewportSize({ width: 1920, height: 1000 });
+  await open("data-table");
+  const viewport = frame.locator(
+    ".x-govuk-ui-data-table-scroll > .x-govuk-ui-scroll-area-viewport",
+  );
+  const table = frame.locator(".x-govuk-ui-data-table-table");
+  // The columns fill the table's width, so none is left empty at the side, and nothing scrolls.
+  const fills = () =>
+    Promise.all([
+      viewport.evaluate((element) => element.clientWidth),
+      table.evaluate((element) => Math.round(element.getBoundingClientRect().width)),
+      viewport.evaluate((element) => element.scrollWidth - element.clientWidth),
+    ]);
+  await expect
+    .poll(async () => {
+      const [room, width, over] = await fills();
+      return width === room && over === 0;
+    })
+    .toBe(true);
+  // Each column has a share, in proportion to its width, so Organisation is wider than it starts.
+  const edge = frame.getByRole("separator", { name: "Width of Organisation" });
+  const shown = Number(await edge.getAttribute("aria-valuenow"));
+  expect(shown).toBeGreaterThan(240);
+  // Resized, it keeps the width given, and the others share what is left, so the table still fills.
+  await edge.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(edge).toHaveAttribute("aria-valuenow", String(shown + 10));
+  await expect
+    .poll(async () => {
+      const [room, width, over] = await fills();
+      return width === room && over === 0;
+    })
+    .toBe(true);
+  // Double-clicked, it takes its share again.
+  await edge.dblclick();
+  await expect(edge).toHaveAttribute("aria-valuenow", String(shown));
+});
+
 test("a data table's rows scroll between its headings and its foot, with the scrollbar beside them", async ({
   frame,
   open,

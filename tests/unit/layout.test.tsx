@@ -35,6 +35,14 @@ import {
   ResizableHandle,
   ScrollArea,
   Separator,
+  SidePanel,
+  SidePanelBody,
+  SidePanelClose,
+  SidePanelHeader,
+  SidePanelLayout,
+  SidePanelProvider,
+  SidePanelTitle,
+  SidePanelTrigger,
   Tabs,
   TabsList,
   TabsPanel,
@@ -508,4 +516,53 @@ test("tiles take their words from a labels provider, and their own labels come f
   expect(html).toContain("Tacluso");
   expect(html).toContain("Ar gau");
   expect(html).not.toContain("Teils ar gau");
+});
+
+test("a side panel is named, resizable and closable, and its trigger names the panel it controls", () => {
+  const markup = renderToStaticMarkup(
+    <SidePanelProvider id="notes" defaultWidth={320}>
+      <SidePanelTrigger>Show notes</SidePanelTrigger>
+      <SidePanelLayout className="body">
+        <div>Work</div>
+        <SidePanel label="Case notes" className="notes">
+          <SidePanelHeader>
+            <SidePanelTitle>Case notes</SidePanelTitle>
+            <SidePanelClose />
+          </SidePanelHeader>
+          <SidePanelBody className="notes-body">Notes</SidePanelBody>
+        </SidePanel>
+      </SidePanelLayout>
+    </SidePanelProvider>,
+  );
+  // Its content scrolls beneath the head in a Scroll area, which takes the service's class.
+  expect(markup).toContain('class="x-govuk-ui-scroll-area x-govuk-ui-side-panel-body notes-body"');
+  // Open beside the work, as wide as it starts.
+  expect(markup).toContain('class="x-govuk-ui-side-panel-layout body" data-open="true"');
+  expect(markup).toContain('<div tabindex="-1" class="x-govuk-ui-side-panel-layout body"');
+  // The width is the panel's own, so a drag restyles the panel, not the work beside it.
+  expect(markup).toMatch(/<aside [^>]*style="--x-govuk-ui-side-panel-width:320px"/);
+  expect(markup).toContain('aria-label="Resize Case notes"');
+  expect(markup).toContain(
+    '<aside aria-label="Case notes" tabindex="-1" id="notes" class="x-govuk-ui-side-panel notes"',
+  );
+  expect(markup).toContain('<h2 class="x-govuk-ui-side-panel-title">Case notes</h2>');
+  expect(markup).toContain('aria-label="Close Case notes"');
+  // The handle and the trigger name the panel by the id the service gave its provider.
+  expect(markup).toContain('aria-controls="notes"');
+  expect(markup).toContain('<button type="button" aria-controls="notes">Show notes</button>');
+  // Closed, the panel is out of reach, and the layout gives its space to the work.
+  const closed = renderToStaticMarkup(
+    <SidePanelProvider defaultOpen={false}>
+      <SidePanelTrigger>Show notes</SidePanelTrigger>
+      <SidePanelLayout>
+        <div>Work</div>
+        <SidePanel label="Case notes">Notes</SidePanel>
+      </SidePanelLayout>
+    </SidePanelProvider>,
+  );
+  expect(closed).not.toContain("data-open");
+  expect(closed).toContain('inert=""');
+  // The trigger is a button that names the panel it controls.
+  const id = closed.match(/<aside aria-label="Case notes" tabindex="-1" id="([^"]+)"/)?.[1];
+  expect(closed).toContain(`<button type="button" aria-controls="${id}">Show notes</button>`);
 });

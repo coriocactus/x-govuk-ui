@@ -53,6 +53,7 @@ import type { RelativeTimeLabels } from "./relative-time";
 import type { ResizableLabels } from "./resizable";
 import type { SearchBoxLabels } from "./search-box";
 import type { ServiceNavigationLabels } from "./service-navigation";
+import type { SidePanelLabels } from "./side-panel";
 import type { SidebarLabels } from "./sidebar";
 import type { SidebarCustomiseLabels, SidebarItemMenuLabels } from "./sidebar-arrangement";
 import type { SkipLinkLabels } from "./skip-link";
@@ -127,6 +128,7 @@ export interface ComponentLabels {
   searchBox: SearchBoxLabels;
   serviceNavigation: ServiceNavigationLabels;
   servicePage: ServicePageLabels;
+  sidePanel: SidePanelLabels;
   sidebar: SidebarLabels;
   sidebarCustomise: SidebarCustomiseLabels;
   sidebarItemMenu: SidebarItemMenuLabels;

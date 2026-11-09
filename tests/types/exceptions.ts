@@ -25,6 +25,7 @@ export const elementless = [
   "ContextMenu",
   "MenuSubmenu",
   "SidebarProvider",
+  "SidePanelProvider",
   "TilesProvider",
   "ToastProvider",
   "CommandMenu",

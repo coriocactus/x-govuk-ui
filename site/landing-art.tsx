@@ -1494,6 +1494,25 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       ))}
     </>
   ),
+  "side-panel": (
+    <>
+      <Frame x={6} y={8} w={84} h={56} r={3} fill="paper" edge="line" />
+      <Words x={12} y={16} w={26} h={3.5} tone="ink" />
+      {[26, 34, 42].map((y, index) => (
+        <g key={y}>
+          <Words x={12} y={y} w={12} h={2.5} />
+          <Words x={28} y={y} w={[18, 22, 14][index] ?? 18} h={2.5} tone="ink" />
+        </g>
+      ))}
+      <Area x={57} y={8.5} w={1} h={55} tone="border" />
+      <Area x={58} y={8.5} w={31.5} h={55} tone="surface" />
+      <Words x={62} y={14} w={16} h={3} tone="ink" />
+      <Stroke d="M83 13.5l3 3m0-3l-3 3" weight={1} />
+      <Area x={58} y={21} w={31.5} h={0.75} tone="line" />
+      <Frame x={62} y={27} w={24} h={14} r={1} fill="paper" edge="border" />
+      <Area x={62} y={46} w={14} h={6} tone="go" r={1} />
+    </>
+  ),
   "change-summary": (
     <>
       {[20, 36, 52].map((y, index) => (

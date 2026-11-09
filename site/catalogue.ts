@@ -4124,6 +4124,40 @@ const entries = {
       number("more", 2, { min: 0, note: "Counts the contacts not shown." }),
     ],
   },
+  "side-panel": {
+    name: "Side panel",
+    experimental: true,
+    width: 720,
+    anchor: "top",
+    description:
+      "Keep a panel beside the work, such as an assistant or notes, as wide as users leave it.",
+    upstream: "",
+    dependencies: "React · Base UI",
+    changes:
+      "Not in GOV.UK. A panel that stays beside the work while users move around it, such as Piscine Assist in the workspace. A handle on its edge resizes it with a drag or the arrow keys, between its least and greatest widths. Closed, it slides away over the edge, out of reach of the keyboard and screen readers. The work takes its space at once, and the panel slides by a transform, so the work lays out once, not at every frame of the slide. Opened, it takes its space and slides in over it the same way. Its trigger gives it focus as it opens, and takes focus back as it closes. SidePanelLayout measures its own width, not the window's, so a sidebar beside it leaves it less room. Where it has no room for the panel beside the work, the panel opens as a Sheet over the work, which a swipe closes. A storageKey keeps whether it is open, and its width, for the next visit. The panel's head, SidePanelHeader, is as tall as a tile's bar, so their keylines meet beside Tiles. Its content, SidePanelBody, fills the rest of the panel with its padding, stacks its parts a surface's space apart, and scrolls in a Scroll area where it is taller, so the head stays in place. useSidePanel opens and closes it from anywhere inside its SidePanelProvider, such as a command menu. The example is an application, with its case notes beside it, and a button in its bar that shows or hides them, so the bar keeps its height.",
+    props: [
+      reference(
+        "label",
+        "string, which names the panel, its handle and its close button",
+        "Required",
+      ),
+      reference("initialFocus", "() => HTMLElement, where focus goes as it opens"),
+      reference("labels", "Partial<SidePanelLabels>", "English"),
+      reference(
+        "SidePanelProvider",
+        "{ id, open, defaultOpen, onOpenChange, defaultWidth, minWidth, maxWidth, besideFrom, storageKey, storage }",
+        "Part",
+      ),
+      reference("SidePanelLayout", "{ children }", "Part"),
+      reference("SidePanelHeader", "{ children }", "Part"),
+      reference("SidePanelTitle", "{ children }", "Part"),
+      reference("SidePanelClose", "{ labels }", "Part"),
+      reference("SidePanelBody", "{ children }", "Part"),
+      reference("SidePanelTrigger", "{ render, children }", "Part"),
+      reference("useSidePanel", "() => { shown, beside, show, close }", "Hook"),
+    ],
+    example: [toggle("open", true, { note: "Starts with the case notes open." })],
+  },
   "change-summary": {
     name: "Change summary",
     experimental: true,
@@ -4241,6 +4275,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "separator",
     "scroll-area",
     "tiles",
+    "side-panel",
     "aspect-ratio",
   ],
   // Messages from the strongest to the quietest, then status, then the absence of content.

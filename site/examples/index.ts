@@ -92,6 +92,7 @@ import select from "./select";
 import separator from "./separator";
 import serviceNavigation from "./service-navigation";
 import sheet from "./sheet";
+import sidePanel from "./side-panel";
 import sidebar from "./sidebar";
 import skeleton from "./skeleton";
 import skipLink from "./skip-link";
@@ -195,6 +196,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   "date-input": dateInput,
   calendar,
   tiles,
+  "side-panel": sidePanel,
   "time-input": timeInput,
   "file-upload": fileUpload,
   combobox,

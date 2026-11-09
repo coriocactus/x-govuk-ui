@@ -1,0 +1,99 @@
+/* Side panel. The work, then the panel beside it, as wide as its handle is dragged.
+
+   Closed, the panel leaves the grid at once, so the work takes its space in one layout, and slides
+   away over the right edge by a transform, which the compositor runs, so nothing lays out again at
+   each frame of the slide. Opened, it takes its space at once, and slides in over it the same way.
+   A drag follows the pointer at once. */
+.x-govuk-ui-side-panel-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.x-govuk-ui-side-panel-layout > * {
+  min-width: 0;
+  min-height: 0;
+}
+/* Focus comes to the layout and the panel only from a script, as the panel closes or opens, so
+   they show no ring of their own. What users then press shows GOV.UK's focus. */
+.x-govuk-ui-side-panel-layout:focus,
+.x-govuk-ui-side-panel:focus {
+  outline: none;
+}
+/* The panel's width is set on the panel at each step of a drag. It does not pass to what the panel
+   holds, so a step restyles the panel alone. */
+@property --x-govuk-ui-side-panel-width {
+  syntax: "*";
+  inherits: false;
+}
+.x-govuk-ui-side-panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: var(--x-govuk-ui-side-panel-width);
+  background: var(--x-govuk-ui-paper);
+}
+/* Beside the work, the panel slides by a transform. As a sheet, it keeps the Sheet's own slide. */
+.x-govuk-ui-side-panel-layout > .x-govuk-ui-side-panel {
+  transition: transform var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
+}
+.x-govuk-ui-side-panel-layout:not([data-open]) > .x-govuk-ui-side-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateX(calc(100% + 1px));
+}
+.x-govuk-ui-side-panel-layout:not([data-open]) > .x-govuk-ui-side-panel-handle {
+  display: none;
+}
+.x-govuk-ui-side-panel-layout[data-resizing] > .x-govuk-ui-side-panel {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-side-panel-layout > .x-govuk-ui-side-panel {
+    transition: none;
+  }
+}
+/* Where there is no room beside the work, the panel is a sheet over it, as wide as it is beside
+   it, and no wider than the screen. A sheet stacks its parts a surface's space apart, but the
+   panel's head meets what it holds at its keyline, as it does beside the work. */
+.x-govuk-ui-side-panel-sheet.x-govuk-ui-sheet {
+  --x-govuk-ui-stack-gap: 0px;
+  width: min(var(--x-govuk-ui-side-panel-width), 100%);
+  padding: 0;
+  overflow: hidden;
+}
+/* The head is as tall as a tile's bar, so their keylines meet when the panel sits beside Tiles. */
+.x-govuk-ui-side-panel-header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 6px 0 20px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+/* The content fills the panel beneath the head. Its padding is inside the scrolling region, so
+   the content scrolls to the panel's edges, under nothing. It stacks its parts a surface's space
+   apart, as a dialog does, and sets the gap itself, because a sheet's is 0. */
+.x-govuk-ui-side-panel-body {
+  flex: 1;
+  min-height: 0;
+}
+.x-govuk-ui-side-panel-content {
+  --x-govuk-ui-stack-gap: var(--x-govuk-ui-space-surface);
+  box-sizing: border-box;
+  padding: 16px 20px 24px;
+}
+.x-govuk-ui-side-panel-title {
+  margin: 0;
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+}

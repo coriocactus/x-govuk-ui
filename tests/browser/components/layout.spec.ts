@@ -409,3 +409,53 @@ test("a tile dropped on the dock closes, one dragged from it opens where it land
   await page.mouse.up();
   await expect.poll(sizeOf).toBeGreaterThan(start + 40);
 });
+
+test("a side panel resizes, closes out of reach, and its trigger opens it beside the work or as a sheet", async ({
+  page,
+  frame,
+  open,
+}) => {
+  await open("side-panel");
+  const panel = frame.getByRole("complementary", { name: "Case notes" });
+  await expect(panel).toBeVisible();
+  // Open, its button in the bar hides it, and its handle widens it from the keyboard.
+  const show = frame.getByRole("button", { name: "Show case notes" });
+  const hide = frame.getByRole("button", { name: "Hide case notes" });
+  await expect(show).toHaveCount(0);
+  const bar = frame.locator(".preview-side-panel-bar");
+  const height = () => bar.evaluate((element) => element.getBoundingClientRect().height);
+  const tall = await height();
+  const handle = frame.getByRole("separator", { name: "Resize Case notes" });
+  await expect(handle).toHaveAttribute("aria-valuenow", "300");
+  await handle.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect
+    .poll(async () => Number(await handle.getAttribute("aria-valuenow")))
+    .toBeGreaterThan(300);
+  // Its cross slides it away out of reach, and focus goes to the trigger, which now shows it. The
+  // bar above the work keeps its height.
+  await panel.getByRole("button", { name: "Close Case notes" }).click();
+  await expect(frame.locator(".x-govuk-ui-side-panel")).toHaveAttribute("inert", "");
+  await expect(show).toBeFocused();
+  expect(await height()).toBe(tall);
+  // The trigger opens it again, with focus in its note, and hides it again, keeping focus.
+  await show.click();
+  await expect(panel.getByRole("textbox", { name: "Add a note" })).toBeFocused();
+  await hide.click();
+  await expect(frame.locator(".x-govuk-ui-side-panel")).toHaveAttribute("inert", "");
+  await expect(show).toBeFocused();
+  await show.click();
+  await expect(hide).toBeVisible();
+  // Where there is no room beside the work, the trigger opens it as a sheet, which gives focus back.
+  await page.setViewportSize({ width: 420, height: 800 });
+  await expect(show).toBeVisible();
+  await show.click();
+  // The sheet is portalled to the page, outside the preview.
+  const sheet = page.getByRole("dialog", { name: "Case notes" });
+  await expect(sheet.getByRole("textbox", { name: "Add a note" })).toBeFocused();
+  // It slides as a Sheet does, by its translate, not by the transform it slides by beside the work.
+  await expect(sheet).toHaveCSS("transition-property", "translate");
+  await page.keyboard.press("Escape");
+  await expect(sheet).toBeHidden();
+  await expect(show).toBeFocused();
+});

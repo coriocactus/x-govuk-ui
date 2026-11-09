@@ -2062,3 +2062,32 @@
     fill: Highlight;
   }
 }
+/* Side panel: an application's details, with its case notes in a panel beside them. */
+.preview-side-panel {
+  display: flex;
+  flex-direction: column;
+  height: 360px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: var(--x-govuk-ui-radius-surface);
+  overflow: hidden;
+}
+.preview-side-panel-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--x-govuk-ui-line);
+}
+.preview-side-panel-bar h2 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.3;
+}
+.preview-side-panel-layout {
+  flex: 1;
+}
+.preview-side-panel-work .x-govuk-ui-scroll-area-content {
+  padding: 8px 20px;
+}

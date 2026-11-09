@@ -754,6 +754,28 @@ export {
 } from "./sheet";
 export { modifierKey, shortcutKeys } from "./shortcut";
 export {
+  defaultSidePanelLabels,
+  SidePanel,
+  SidePanelBody,
+  type SidePanelBodyProps,
+  SidePanelClose,
+  type SidePanelCloseProps,
+  SidePanelHeader,
+  type SidePanelHeaderProps,
+  type SidePanelLabels,
+  SidePanelLayout,
+  type SidePanelLayoutProps,
+  type SidePanelProps,
+  SidePanelProvider,
+  type SidePanelProviderProps,
+  type SidePanelState,
+  SidePanelTitle,
+  type SidePanelTitleProps,
+  SidePanelTrigger,
+  type SidePanelTriggerProps,
+  useSidePanel,
+} from "./side-panel";
+export {
   defaultSidebarLabels,
   Sidebar,
   SidebarContent,

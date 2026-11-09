@@ -12,9 +12,13 @@ export function dateFromParts({ day, month, year }: DateParts) {
   return date.getDate() === d && date.getMonth() === m - 1 ? date : null;
 }
 
+// Made once, because a formatter given options is built again at every call of toLocaleDateString,
+// and a page can write hundreds of dates at each minute's tick.
+const dates = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
 /** A date as GOV.UK writes it, in English, such as 15 March 2026. */
 export function formatDate(date: Date) {
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  return dates.format(date);
 }
 
 /**

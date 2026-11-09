@@ -350,18 +350,19 @@
 }
 /* The pin waits out of sight, just past the left edge of the row's lead, which clips it. When the
    row is under the pointer or has keyboard focus, the pin and name move right together after a
-   moment, on a curve that starts softly. The pin comes in from the left as the name makes space.
-   The delay means a pointer passing over the list sets nothing moving. A pinned row keeps its pin,
-   and its space, in view. A button pressed with the pointer keeps focus without keeping its row
-   open, so a row just unpinned closes once the pointer leaves it. The name keeps space at its end
-   for when it moves aside, so it never runs under Move. The space, the timings and the curve are
-   custom properties. */
+   moment, on the glide that the sidebar's highlight and the rows' moves take, so the sheet moves
+   as one. The glide moves at once and settles softly. The pin comes in from the left as the name
+   makes space. The delay means a pointer passing over the list sets nothing moving. A pinned row
+   keeps its pin, and its space, in view. A button pressed with the pointer keeps focus without
+   keeping its row open, so a row just unpinned closes once the pointer leaves it. The name keeps
+   space at its end for when it moves aside, so it never runs under Move. The space, the timings
+   and the curve are custom properties. */
 .x-govuk-ui-sidebar-customise-groups {
   --x-govuk-ui-pin-room: 42px;
-  --x-govuk-ui-pin-duration: 450ms;
-  --x-govuk-ui-pin-leave: 350ms;
+  --x-govuk-ui-pin-duration: var(--x-govuk-ui-duration-glide);
+  --x-govuk-ui-pin-leave: var(--x-govuk-ui-duration-glide);
   --x-govuk-ui-pin-delay: 60ms;
-  --x-govuk-ui-pin-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --x-govuk-ui-pin-ease: var(--x-govuk-ui-ease-glide);
 }
 .x-govuk-ui-sidebar-customise-lead {
   position: relative;

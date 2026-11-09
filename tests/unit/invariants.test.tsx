@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Button, Input, InsetText } from "x-govuk-ui";
+import { glideEasing } from "../../packages/core/src/motion";
 import { type ComponentName, catalogue, componentNames } from "../../site/catalogue";
 import { Credits, everySystem } from "../../site/credits";
 import { componentDocs, llmsDocuments } from "../../site/llms";
@@ -156,6 +157,17 @@ test("each extension declares the cascade layers in core's order, and puts its s
 // Each component's props keep the library's conventions, such as taking `className` and `ref`, and
 // giving each idea one name. `tests/types/conventions.ts` checks them against the exported types,
 // as part of `bun run typecheck`.
+
+test("the glide in CSS is the glide that Motion runs", async () => {
+  const css = await Bun.file("packages/core/src/styles/base.css").text();
+  // The curve's points, as numbers, since the formatter writes them its own way.
+  const points = (curve: string) =>
+    (curve.match(/linear\(([^)]*)\)/)?.[1] ?? "").split(",").map((point) => Number(point));
+  const written = css.match(/--x-govuk-ui-ease-glide:\s*(linear\([^)]*\))/)?.[1] ?? "";
+  expect(points(written)).toEqual(points(glideEasing.easing));
+  expect(points(written).length).toBeGreaterThan(10);
+  expect(css).toContain(`--x-govuk-ui-duration-glide: ${glideEasing.duration}ms;`);
+});
 
 test("each component lists each prop once, and each example setting once", () => {
   // The playground keys each row by its name. A name listed twice, such as a prop left behind when

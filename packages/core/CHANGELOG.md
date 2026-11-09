@@ -9,6 +9,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Removed Sidebar's `animations` prop, with `sidebarAnimations` and `SidebarAnimation`. Every movement of the Sidebar now runs, unless users prefer reduced motion. Remove `animations` from your Sidebar. The sidebar no longer has a `data-animate` attribute, so select its parts by their classes.
 - Removed `storageKey` and `storage` from FormSteps, and `storageKey` from QuestionCard. They kept users' answers in the browser, where the next person to use the device can read them. To let users continue where they left off, keep their answers on your server, such as from `useFormSteps().data()` in a Save and come back later button, with the step and the steps they settled. Give them back as `defaultValues`, `defaultStep` and `defaultSettled`.
 
+### Visual
+
+- Changed SidebarCustomise's rows to slide their pin and name in on the glide that the sidebar's highlight takes, which moves at once and settles softly, in place of a slower curve that started softly. The rows now answer the pointer as the rest of the sidebar does.
+
 ### Added
 
 - Added `defaultValues` to FormSteps and QuestionCard. It gives the fields their answers to start with, by the names they send under, as Form's does.
@@ -17,6 +21,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added TreeSelect, a field that looks like a Select, whose popup shows a Tree to choose from. A tree of more than eight nodes has a search field above it. TreeSelectControl is its button and popup on their own.
 - Added `treeBranches`, which lists every branch of a tree's nodes, such as to open them all through Tree's `expanded`.
 - Added the `tree` and `treeSelect` maps of words to LabelsProvider, with their defaults in `defaultTreeLabels` and `defaultTreeSelectLabels`.
+- Added `--x-govuk-ui-ease-glide` and `--x-govuk-ui-duration-glide`, the glide that the Sidebar's highlight takes, which moves at once and settles softly, for a part's own CSS.
 
 ### Changed
 

@@ -76,7 +76,10 @@ export function springEasing({
   };
 }
 
-/** @internal The Sidebar's glide, for the browser to run. */
+/**
+ * @internal The Sidebar's glide, for the browser to run. `--x-govuk-ui-ease-glide` and
+ * `--x-govuk-ui-duration-glide` are the same, for CSS.
+ */
 export const glideEasing = springEasing(springs.glide);
 
 const none = { duration: 0 } as const;

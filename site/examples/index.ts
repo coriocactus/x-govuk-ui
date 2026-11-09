@@ -81,6 +81,7 @@ import qrCode from "./qr-code";
 import questionCard from "./question-card";
 import radios from "./radios";
 import reasoningSteps from "./reasoning-steps";
+import recordChip from "./record-chip";
 import relativeTime from "./relative-time";
 import richText from "./rich-text";
 import sankey from "./sankey";
@@ -213,6 +214,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   "aspect-ratio": aspectRatio,
   item,
   avatar,
+  "record-chip": recordChip,
   "relative-time": relativeTime,
   marker,
   attachment,

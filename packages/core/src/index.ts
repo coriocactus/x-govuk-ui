@@ -680,6 +680,14 @@ export {
   type ReasoningStepsLabels,
   type ReasoningStepsProps,
 } from "./reasoning-steps";
+export {
+  defaultRecordChipGroupLabels,
+  RecordChip,
+  RecordChipGroup,
+  type RecordChipGroupLabels,
+  type RecordChipGroupProps,
+  type RecordChipProps,
+} from "./record-chip";
 export { useMergedRef } from "./refs";
 export {
   defaultRelativeTimeLabels,

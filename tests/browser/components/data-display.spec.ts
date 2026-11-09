@@ -504,6 +504,31 @@ test("a relative time writes the time from now and keeps itself up to date", asy
   await expect(times.first()).toHaveText("4 hours ago");
 });
 
+test("chips link to their pages, named once, and the count of the rest is not a stop", async ({
+  page,
+  frame,
+  open,
+  browserName,
+}) => {
+  // WebKit on a Mac reaches links with Alt and Tab, as Safari does.
+  const tab = browserName === "webkit" ? "Alt+Tab" : "Tab";
+  await open("record-chip");
+  const company = frame.getByRole("link", { name: "Tamar Valley Foundry", exact: true });
+  await expect(company).toHaveAttribute("href", "#tamar-valley-foundry");
+  const contacts = frame.getByRole("list", { name: "Contacts at Tamar Valley Foundry" });
+  await expect(contacts.getByRole("listitem")).toHaveCount(4);
+  await expect(contacts.getByRole("listitem").last()).toHaveText(/^\+2\s*and 2 more$/);
+  // Tab goes from the company through each contact, and past the count, which is not a link.
+  await company.focus();
+  await expect(company).toHaveCSS("outline-style", "solid");
+  for (const name of ["Henry Campbell-Bannerman", "Arthur Balfour", "Lord Salisbury"]) {
+    await page.keyboard.press(tab);
+    await expect(frame.getByRole("link", { name, exact: true })).toBeFocused();
+  }
+  await page.keyboard.press(tab);
+  await expect(contacts.locator(":focus")).toHaveCount(0);
+});
+
 test("an avatar group lifts the avatar under the pointer most, and its neighbours less", async ({
   page,
   frame,

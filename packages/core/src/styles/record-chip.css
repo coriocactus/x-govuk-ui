@@ -1,0 +1,97 @@
+/* Record chip. A pill naming one thing, such as a company or a person, with its avatar or logo.
+   Its box and its avatar take their size from its text, so it fits any typeface, and its label
+   stays on one line while there is room, then wraps rather than clip. Each corner is as round as
+   a one-line chip's end: half its line, and the 2px of padding and border around it. A chip whose
+   label wraps keeps those corners, with its avatar on the first line, in the corner it rounds. A
+   corner of 999px would make a wrapped chip a capsule, with its avatar adrift in its middle. */
+.x-govuk-ui-record-chip {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 1px 10px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: calc(0.625em + 2px);
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.25;
+  text-decoration: none;
+  vertical-align: middle;
+}
+/* With an avatar, the pill hugs it, so the avatar's edge sits a pixel inside the pill's. */
+.x-govuk-ui-record-chip:has(> .x-govuk-ui-record-chip-media) {
+  padding-left: 1px;
+}
+/* Around an organisation's square avatar, the chip's corners follow the avatar's, 2px further
+   out, where the avatar's edge sits inside the chip's. With square corners, both are square. */
+.x-govuk-ui-record-chip:has(
+  > .x-govuk-ui-record-chip-media > .x-govuk-ui-avatar[data-shape="square"]
+) {
+  border-radius: calc(
+    var(--x-govuk-ui-radius-control) +
+    min(2px, var(--x-govuk-ui-radius-control))
+  );
+}
+/* The avatar is as tall as a line of the chip's text. The box sets the size from the chip's text,
+   because an em inside the avatar would be the avatar's own, which it sets from its size. */
+.x-govuk-ui-record-chip-media {
+  display: flex;
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+}
+.x-govuk-ui-record-chip-media > .x-govuk-ui-avatar {
+  --x-govuk-ui-avatar-size: 100%;
+  font-size: 0.5em;
+}
+/* Where its words cannot wrap, as in a Data table's cell, which keeps to one line, the label ends
+   with an ellipsis inside the chip, as the cell's own text does, so the chip keeps its edge. It
+   clips only sideways, so nothing cuts a letter's top or tail. Where they can wrap, nothing
+   reaches past the label's edge, and it shows every word. */
+.x-govuk-ui-record-chip-label {
+  min-width: 0;
+  overflow-x: clip;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+}
+/* A chip that links is GOV.UK's link blue, and its words underline under the pointer, as a link's
+   do. Its focus is the yellow ring of Filter chips, which are pills too. */
+.x-govuk-ui-record-chip[data-link] {
+  color: var(--x-govuk-ui-link);
+  transition: border-color var(--x-govuk-ui-duration-instant) ease;
+}
+.x-govuk-ui-record-chip[data-link]:hover {
+  border-color: var(--x-govuk-ui-link-hover);
+  color: var(--x-govuk-ui-link-hover);
+}
+.x-govuk-ui-record-chip[data-link]:hover .x-govuk-ui-record-chip-label {
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.15em;
+}
+.x-govuk-ui-record-chip[data-link]:focus-visible {
+  outline: 3px solid var(--x-govuk-ui-focus);
+  outline-offset: 0;
+  box-shadow: 0 0 0 5px var(--x-govuk-ui-focus-text);
+}
+/* The count of chips not shown is quieter than a chip, as it names nothing. */
+.x-govuk-ui-record-chip-more {
+  border-style: dashed;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-record-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.x-govuk-ui-record-chip-group > li {
+  display: flex;
+  max-width: 100%;
+}

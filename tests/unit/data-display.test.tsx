@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
+  Avatar,
   Choices,
   CodeBlock,
   CodeBlockCopy,
@@ -27,6 +28,8 @@ import {
   QrCode,
   QuestionCard,
   ReasoningStep,
+  RecordChip,
+  RecordChipGroup,
   RelativeTime,
   Sidebar,
   SidebarContent,
@@ -539,4 +542,53 @@ test("a relative time rounds to its largest whole unit, and a server writes the 
   expect(markup).toContain(">1 July 2026</time>");
   expect(markup).not.toContain("title=");
   expect(markup).toContain('class="x-govuk-ui-relative-time last-call"');
+});
+
+test("a record chip links only when given somewhere to go, and a record chip group counts any more", () => {
+  const link = renderToStaticMarkup(
+    <RecordChip
+      href="/companies/tamar"
+      media={<Avatar name="Tamar Valley Foundry" shape="square" />}
+    >
+      Tamar Valley Foundry
+    </RecordChip>,
+  );
+  expect(link).toMatch(
+    /^<a href="\/companies\/tamar" class="x-govuk-ui-record-chip" data-link="true">/,
+  );
+  expect(link).toContain('<span class="x-govuk-ui-record-chip-label">Tamar Valley Foundry</span>');
+  // The avatar is hidden, so the chip is named once, by its label.
+  expect(link).toContain('<span class="x-govuk-ui-record-chip-media" aria-hidden="true">');
+  const name = renderToStaticMarkup(<RecordChip className="owner">Arthur Balfour</RecordChip>);
+  expect(name).toMatch(/^<span class="x-govuk-ui-record-chip owner">/);
+  const group = renderToStaticMarkup(
+    <RecordChipGroup aria-label="Contacts" more={2}>
+      <RecordChip>Arthur Balfour</RecordChip>
+      {null}
+      <RecordChip>Lord Salisbury</RecordChip>
+    </RecordChipGroup>,
+  );
+  expect(group.match(/<li>/g)).toHaveLength(3);
+  expect(group).toContain('<span aria-hidden="true">+2</span>');
+  expect(group).toContain("and 2 more");
+  // Each chip is an item of its own, even among several that a component of the service's own
+  // draws, and one that draws none adds no item.
+  const Owners = () => (
+    <>
+      <RecordChip>Arthur Balfour</RecordChip>
+      <RecordChip>Lord Salisbury</RecordChip>
+    </>
+  );
+  const Nobody = () => null;
+  const drawn = renderToStaticMarkup(
+    <RecordChipGroup>
+      <Owners />
+      <Nobody />
+    </RecordChipGroup>,
+  );
+  expect(drawn.match(/<li><span class="x-govuk-ui-record-chip">/g)).toHaveLength(2);
+  expect(drawn.match(/<li>/g)).toHaveLength(2);
+  expect(renderToStaticMarkup(<RecordChipGroup />)).toBe(
+    '<ul class="x-govuk-ui-record-chip-group"></ul>',
+  );
 });

@@ -4103,6 +4103,27 @@ const entries = {
       }),
     ],
   },
+  "record-chip": {
+    name: "Record chip",
+    experimental: true,
+    width: 520,
+    description: "Name a thing, such as a company or a person, with its avatar, and link to it.",
+    upstream: "",
+    dependencies: "React · Base UI",
+    changes:
+      "Not in GOV.UK. A pill with a thing's avatar or logo and its name, sized by its text, so it fits any typeface, and its avatar with it. Given `href` or `render`, it links to the thing, in GOV.UK's link blue, and its words underline under the pointer. Its focus is the yellow ring of Filter chips. Without either, it only names the thing. A RecordChipGroup lists chips, wrapping onto as many lines as it needs, and counts any more in a quieter last chip, which screen readers hear as and 2 more. The count only counts, so the rest belong where users can reach them, such as on the page the chips belong to. Around an organisation's square Avatar, the chip's corners follow the avatar's, not a pill's. The example is a company, with an Avatar in the square shape organisations take, above its contacts.",
+    props: [
+      reference("children", "ReactNode", "Required"),
+      reference("media", "ReactNode, such as an Avatar"),
+      reference("href", "string"),
+      reference("render", "a router's link, in place of the anchor"),
+      reference("RecordChipGroup", "{ more, children, labels }", "Part"),
+    ],
+    example: [
+      toggle("links", true, { note: "Links each chip to its page." }),
+      number("more", 2, { min: 0, note: "Counts the contacts not shown." }),
+    ],
+  },
   "relative-time": {
     name: "Relative time",
     experimental: true,
@@ -4231,6 +4252,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "figure",
     "code-block",
     "avatar",
+    "record-chip",
     "item",
     "attachment",
     "kbd",

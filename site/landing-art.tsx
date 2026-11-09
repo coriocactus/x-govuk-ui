@@ -1566,6 +1566,20 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Words x={56} y={34} w={16} h={4} tone="white" />
     </>
   ),
+  "record-chip": (
+    <>
+      <Frame x={14} y={16} w={50} h={14} r={4} edge="line" />
+      <Area x={16} y={18} w={10} h={10} r={2} tone="brand" />
+      <Link x={30} y={21} w={28} />
+      {[14, 50].map((x, index) => (
+        <g key={x}>
+          <Frame x={x} y={42} w={32} h={14} r={7} edge="line" />
+          <Dot x={x + 7} y={49} r={5} tone={index === 0 ? "go" : "grey"} />
+          <Link x={x + 15} y={47} w={13} />
+        </g>
+      ))}
+    </>
+  ),
   item: (
     <>
       {[16, 36, 56].map((y, index) => (

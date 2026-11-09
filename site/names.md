@@ -29,7 +29,10 @@ The examples name people after UK prime ministers. Each person appears once acro
 | Bonar Law | Editor |
 | David Lloyd George | Tiles |
 | H. H. Asquith | Sidebar |
+| Henry Campbell-Bannerman | Record chip |
+| Arthur Balfour | Record chip |
+| Lord Salisbury | Record chip |
 
-The next unused names are Henry Campbell-Bannerman, Arthur Balfour and Lord Salisbury.
+The next unused names are Lord Rosebery, William Gladstone and Benjamin Disraeli.
 
 The workspace names its applicants and caseworkers after prime ministers too. It is not an example, so it can share their names.

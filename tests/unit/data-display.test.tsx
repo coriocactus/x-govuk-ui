@@ -5,6 +5,7 @@ import {
   CodeBlock,
   CodeBlockCopy,
   DataTable,
+  defaultRelativeTimeLabels,
   Figure,
   FigureCaption,
   FigureData,
@@ -26,6 +27,7 @@ import {
   QrCode,
   QuestionCard,
   ReasoningStep,
+  RelativeTime,
   Sidebar,
   SidebarContent,
   SidebarItem,
@@ -511,4 +513,30 @@ test("a figure is named by its caption's headline, and stats are set in one", ()
       />,
     ),
   ).toContain(">I fyny <");
+});
+
+test("a relative time rounds to its largest whole unit, and a server writes the date", () => {
+  const { relative } = defaultRelativeTimeLabels;
+  const now = new Date(2026, 9, 17, 12, 0);
+  const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000);
+  expect(relative(ago(0.5), now)).toBe("just now");
+  expect(relative(ago(5), now)).toBe("5 minutes ago");
+  expect(relative(ago(3 * 60), now)).toBe("3 hours ago");
+  // Figures, never a calendar word, which a rounded gap would sometimes get wrong.
+  expect(relative(ago(24 * 60), now)).toBe("1 day ago");
+  // 36 hours rounds to 2 days, in the past as in the future.
+  expect(relative(ago(36 * 60), now)).toBe("2 days ago");
+  expect(relative(ago(-36 * 60), now)).toBe("in 2 days");
+  expect(relative(ago(10 * 24 * 60), now)).toBe("1 week ago");
+  expect(relative(ago(-5 * 24 * 60), now)).toBe("in 5 days");
+  expect(relative(ago(200 * 24 * 60), now)).toBe("7 months ago");
+  // On a server, the time where the page is read is unknown, so the date is written instead, in
+  // UTC, which the browser writes the same before it takes over. The exact time is local, so it
+  // waits for the browser too.
+  const date = new Date(Date.UTC(2026, 6, 1, 23, 30));
+  const markup = renderToStaticMarkup(<RelativeTime date={date} className="last-call" />);
+  expect(markup).toContain('dateTime="2026-07-01T23:30:00.000Z"');
+  expect(markup).toContain(">1 July 2026</time>");
+  expect(markup).not.toContain("title=");
+  expect(markup).toContain('class="x-govuk-ui-relative-time last-call"');
 });

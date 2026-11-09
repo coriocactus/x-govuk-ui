@@ -47,6 +47,7 @@ import type { ServicePageLabels } from "./page";
 import type { PaginationLabels } from "./pagination";
 import type { QrCodeLabels } from "./qr-code";
 import type { ReasoningStepsLabels } from "./reasoning-steps";
+import type { RelativeTimeLabels } from "./relative-time";
 import type { ResizableLabels } from "./resizable";
 import type { SearchBoxLabels } from "./search-box";
 import type { ServiceNavigationLabels } from "./service-navigation";
@@ -117,6 +118,7 @@ export interface ComponentLabels {
   qrCode: QrCodeLabels;
   questionCard: QuestionCardLabels;
   reasoningSteps: ReasoningStepsLabels;
+  relativeTime: RelativeTimeLabels;
   resizable: ResizableLabels;
   searchBox: SearchBoxLabels;
   serviceNavigation: ServiceNavigationLabels;

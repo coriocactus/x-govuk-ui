@@ -489,6 +489,21 @@ test("a timeline highlights a run of events, loads earlier ones beneath and take
   expect(join.above).toContain("repeating-linear-gradient");
 });
 
+test("a relative time writes the time from now and keeps itself up to date", async ({
+  page,
+  frame,
+  open,
+}) => {
+  await page.clock.install();
+  await open("relative-time");
+  const times = frame.locator("time");
+  await expect(times).toHaveText(["3 hours ago", "1 week ago", "in 5 days"]);
+  await expect(times.first()).toHaveAttribute("title", / at \d/);
+  // An hour on, the clock has ticked, and the first time has moved on with it.
+  await page.clock.runFor("01:00:00");
+  await expect(times.first()).toHaveText("4 hours ago");
+});
+
 test("an avatar group lifts the avatar under the pointer most, and its neighbours less", async ({
   page,
   frame,

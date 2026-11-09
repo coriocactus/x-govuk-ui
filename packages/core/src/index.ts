@@ -682,6 +682,12 @@ export {
 } from "./reasoning-steps";
 export { useMergedRef } from "./refs";
 export {
+  defaultRelativeTimeLabels,
+  RelativeTime,
+  type RelativeTimeLabels,
+  type RelativeTimeProps,
+} from "./relative-time";
+export {
   defaultResizableLabels,
   ResizableHandle,
   type ResizableHandleProps,

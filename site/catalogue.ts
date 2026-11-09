@@ -4103,6 +4103,21 @@ const entries = {
       }),
     ],
   },
+  "relative-time": {
+    name: "Relative time",
+    experimental: true,
+    width: 460,
+    description: "Show when something happened, or will, as a time from now, such as 3 days ago.",
+    upstream: "",
+    dependencies: "React",
+    changes:
+      "Not in GOV.UK. A time from now, rounded to its largest whole unit, such as just now, 5 minutes ago, 1 day ago, 1 week ago or in 2 hours. It is always in figures, because a gap rounded to days is not a calendar day, and a word such as yesterday would sometimes name the wrong one. Its words are British English, whatever the browser's language, and a service in Welsh gives its own `relative`. It keeps itself up to date, on one clock for the whole page that ticks once a minute only while a time is shown. The exact time, as GOV.UK writes it, shows under the pointer, and the `time` element carries it for machines. Neither reaches a keyboard, a touch screen or a screen reader, so where users must know the exact time, such as a deadline, write it too. Rendered on a server, it writes the date in UTC, because a server cannot know the time where the page is read, and it becomes the time from now once the page is hydrated. The example is a Summary list of a company's last call, last meeting and next visit.",
+    props: [
+      reference("date", "Date", "Required"),
+      reference("labels", "Partial<RelativeTimeLabels>", "English"),
+    ],
+    example: [number("hours", 3, { min: 0, note: "How many hours ago the last call was." })],
+  },
   kbd: {
     name: "Keyboard key",
     description: "Show a key or a shortcut, such as Command-K, as keys on a keyboard.",
@@ -4211,6 +4226,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "grouped-table",
     "task-list",
     "timeline",
+    "relative-time",
     "stat",
     "figure",
     "code-block",

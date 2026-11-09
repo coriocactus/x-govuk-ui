@@ -1494,6 +1494,18 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       ))}
     </>
   ),
+  "relative-time": (
+    <>
+      {[18, 36, 54].map((y, index) => (
+        <g key={y}>
+          <Words x={12} y={y - 2} w={[22, 26, 20][index] ?? 22} h={3.5} tone="ink" />
+          <Ring x={50} y={y} r={5} />
+          <Stroke d={`M50 ${y - 3}V${y}L52.5 ${y + 1.5}`} weight={1.2} />
+          <Words x={59} y={y - 1.5} w={[18, 24, 16][index] ?? 18} h={3} />
+        </g>
+      ))}
+    </>
+  ),
   stat: (
     <>
       <Words x={10} y={18} w={28} />

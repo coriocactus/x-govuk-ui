@@ -1,0 +1,6 @@
+.x-govuk-ui-relative-time
+  display: inline
+  font-size: 19px
+  font-weight: 400
+  line-height: 1.32
+  color: rgb(11, 12, 12)

@@ -529,6 +529,82 @@ test("chips link to their pages, named once, and the count of the rest is not a 
   await expect(contacts.locator(":focus")).toHaveCount(0);
 });
 
+test("a selection bar floats over a table's rows, which make room for it, and gives focus back", async ({
+  page,
+  frame,
+  open,
+  browserName,
+}) => {
+  await open("selection-bar");
+  const table = frame.locator(".x-govuk-ui-data-table");
+  const viewport = table.locator(".x-govuk-ui-scroll-area-viewport");
+  const bar = frame.getByRole("region", { name: "Selection" });
+  await expect(bar).toContainText("1 selected");
+  // The bar floats over the rows, 8px above the foot, whose count stays in view. The table keeps
+  // its height as the bar comes and goes, so nothing moves.
+  const box = await table.boundingBox();
+  await bar.evaluate((element) =>
+    Promise.all(element.getAnimations().map((each) => each.finished)),
+  );
+  const [barBox, footBox] = await Promise.all([
+    bar.boundingBox(),
+    table.locator("tfoot td").first().boundingBox(),
+  ]);
+  expect(barBox!.y + barBox!.height).toBeCloseTo(footBox!.y - 8, 0);
+  await expect(table.locator("tfoot")).toContainText("8 applications");
+  // A row that takes focus from the keyboard scrolls clear of the bar. RF-2045, the fifth of the
+  // five rows in view, is beneath it until then. It is chosen from the keyboard, because WebKit
+  // on a Mac does not focus a checkbox that is clicked, as Safari does not.
+  const fifth = frame.getByRole("checkbox", { name: "Select RF-2045" });
+  const clear = async (row: string) => {
+    const [rowBox, above] = await Promise.all([
+      frame.getByRole("row", { name: new RegExp(row) }).boundingBox(),
+      bar.boundingBox(),
+    ]);
+    return rowBox!.y + rowBox!.height <= above!.y;
+  };
+  expect(await clear("RF-2045")).toBe(false);
+  await frame.getByRole("checkbox", { name: "Select RF-2044" }).focus();
+  await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
+  await expect(fifth).toBeFocused();
+  await expect.poll(() => clear("RF-2045")).toBe(true);
+  // Choosing it counts it, for screen readers too.
+  await page.keyboard.press("Space");
+  await expect(frame.getByRole("status").filter({ hasText: "selected" })).toHaveText("2 selected");
+  // The last row scrolls clear of the bar too, into the room the rows leave beneath them.
+  await viewport.evaluate((element) => element.scrollTo({ top: element.scrollHeight }));
+  await expect.poll(() => clear("RF-2048")).toBe(true);
+  // An action that clears the selection takes the bar away, and focus goes back to the row. The
+  // table is as it was.
+  await bar.getByRole("button", { name: "Approve" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(bar).toBeHidden();
+  await expect(fifth).toBeFocused();
+  await expect(frame.getByRole("row", { name: /RF-2045/ })).toContainText("Approved");
+  expect(await table.boundingBox()).toEqual(box);
+  await expect(table.locator(".x-govuk-ui-data-table-room")).toHaveCount(0);
+  // The × clears it too.
+  await page.keyboard.press("Space");
+  await expect(bar).toBeVisible();
+  expect(await table.boundingBox()).toEqual(box);
+  await bar.getByRole("button", { name: "Clear selection" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(bar).toBeHidden();
+  await expect(fifth).toBeFocused();
+  await expect(fifth).not.toBeChecked();
+  // An action from the bar's menu takes the bar away too, and focus still goes back to the row,
+  // not to the page, as the menu gives it back to its button, which has gone from view.
+  await page.keyboard.press("Space");
+  await bar.getByRole("button", { name: "More" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("menuitem", { name: "Ask for evidence" })).toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(bar).toBeHidden();
+  await expect(frame.getByRole("row", { name: /RF-2045/ })).toContainText("Evidence asked for");
+  await expect(page.getByRole("menu")).toHaveCount(0);
+  await expect(fifth).toBeFocused();
+});
+
 test("an avatar group lifts the avatar under the pointer most, and its neighbours less", async ({
   page,
   frame,

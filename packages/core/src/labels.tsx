@@ -52,6 +52,7 @@ import type { RecordChipGroupLabels } from "./record-chip";
 import type { RelativeTimeLabels } from "./relative-time";
 import type { ResizableLabels } from "./resizable";
 import type { SearchBoxLabels } from "./search-box";
+import type { SelectionBarLabels } from "./selection-bar";
 import type { ServiceNavigationLabels } from "./service-navigation";
 import type { SidePanelLabels } from "./side-panel";
 import type { SidebarLabels } from "./sidebar";
@@ -126,6 +127,7 @@ export interface ComponentLabels {
   relativeTime: RelativeTimeLabels;
   resizable: ResizableLabels;
   searchBox: SearchBoxLabels;
+  selectionBar: SelectionBarLabels;
   serviceNavigation: ServiceNavigationLabels;
   servicePage: ServicePageLabels;
   sidePanel: SidePanelLabels;

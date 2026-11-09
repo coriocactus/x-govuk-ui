@@ -7,6 +7,7 @@
    within it. */
 .x-govuk-ui-data-table {
   --x-govuk-ui-data-table-row: 44px;
+  position: relative;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--x-govuk-ui-line);
@@ -46,11 +47,51 @@
   > .x-govuk-ui-scroll-area-viewport {
   overscroll-behavior-y: none;
 }
-/* A row that takes focus from the keyboard scrolls clear of the headings and the foot, rather
-   than resting beneath them, as WCAG 2.2's focus not obscured asks. A browser counts a row beneath
-   them as in view, so without the padding it would not scroll. */
+/* A row that takes focus from the keyboard scrolls clear of the headings and the foot, and of a
+   Selection bar while one shows, rather than resting beneath them, as WCAG 2.2's focus not
+   obscured asks. A browser counts a row beneath them as in view, so without the padding it would
+   not scroll. */
 .x-govuk-ui-data-table-scroll > .x-govuk-ui-scroll-area-viewport {
-  scroll-padding-block: var(--x-govuk-ui-data-table-row);
+  scroll-padding-block: var(--x-govuk-ui-data-table-row)
+    calc(var(--x-govuk-ui-data-table-row) + var(--x-govuk-ui-data-table-room, 0px));
+}
+/* A Selection bar for the chosen rows floats over them, 8px above the foot, so the count and the
+   figures stay in view. It hangs from a line at the table's foot, which takes no room. In a page
+   that scrolls past the table's foot, the line sticks, so the bar stays 16px above the foot of the
+   scrolling area, over the rows. The line is above the table's sticky cells and the Scroll area's
+   bars, whose layers go up to 4, so the rows scroll beneath the bar. */
+.x-govuk-ui-data-table-bar {
+  position: sticky;
+  z-index: 5;
+  bottom: calc(8px - var(--x-govuk-ui-data-table-row));
+  height: 0;
+}
+.x-govuk-ui-data-table-bar > .x-govuk-ui-selection-bar {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--x-govuk-ui-data-table-row) + 8px);
+  left: 0;
+}
+/* While the bar shows, the rows leave room for it beneath the last one, the bar's height and 8px
+   either side, so the last row can scroll clear of it. Room at the end moves no row in view. A
+   table whose rows scroll keeps its height, and they scroll beneath the bar. A table that shows
+   every row grows by the room, so it still shows every row and the bar covers none, and a table in
+   a page that scrolls does not start to scroll inside it. */
+.x-govuk-ui-data-table[data-bar] {
+  --x-govuk-ui-data-table-room: calc(var(--x-govuk-ui-data-table-bar) + 16px);
+}
+.x-govuk-ui-data-table-table .x-govuk-ui-data-table-room > tr > td {
+  height: var(--x-govuk-ui-data-table-room);
+  padding: 0;
+  border: 0;
+  pointer-events: none;
+}
+.x-govuk-ui-data-table[data-bar="grow"] > .x-govuk-ui-data-table-scroll {
+  max-height: calc(
+    (var(--x-govuk-ui-data-table-max-rows, 8) + 2) *
+    var(--x-govuk-ui-data-table-row) +
+    var(--x-govuk-ui-data-table-room)
+  );
 }
 .x-govuk-ui-table.x-govuk-ui-data-table-table {
   table-layout: fixed;

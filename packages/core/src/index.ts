@@ -731,6 +731,12 @@ export {
   type SelectItemProps,
   type SelectProps,
 } from "./select";
+export {
+  defaultSelectionBarLabels,
+  SelectionBar,
+  type SelectionBarLabels,
+  type SelectionBarProps,
+} from "./selection-bar";
 export { Separator, type SeparatorProps } from "./separator";
 export {
   defaultServiceNavigationLabels,

@@ -33,6 +33,7 @@ import {
   RecordChip,
   RecordChipGroup,
   RelativeTime,
+  SelectionBar,
   Sidebar,
   SidebarContent,
   SidebarItem,
@@ -615,4 +616,48 @@ test("a change summary says what each value was and is, in words screen readers 
   expect(markup).toContain(
     '<span class="x-govuk-ui-change-summary-from"><span class="x-govuk-ui-change-summary-none">None</span></span>',
   );
+});
+
+test("a selection bar is gone at none, says how many from a region always in the page, and hangs from a data table", () => {
+  const none = renderToStaticMarkup(
+    <SelectionBar count={0} onClear={() => {}}>
+      <button type="button">Approve</button>
+    </SelectionBar>,
+  );
+  expect(none).toContain('<p class="x-govuk-ui-visually-hidden" role="status"></p>');
+  expect(none).toMatch(
+    /<section aria-label="Selection" class="x-govuk-ui-selection-bar" hidden="">/,
+  );
+  const two = renderToStaticMarkup(
+    <SelectionBar count={2} onClear={() => {}} className="applications">
+      <button type="button">Approve</button>
+    </SelectionBar>,
+  );
+  expect(two).toContain('role="status">2 selected</p>');
+  expect(two).toContain(
+    '<section aria-label="Selection" class="x-govuk-ui-selection-bar applications">',
+  );
+  expect(two).toContain('aria-label="Clear selection"');
+  // Given to a Data table, it hangs from a line at the table's foot, after its rows. The rows
+  // leave it room only once the page has measured the bar, so the first HTML has none.
+  const table = renderToStaticMarkup(
+    <DataTable
+      label="Applications"
+      columns={[{ id: "reference", header: "Reference", cell: (row: string) => row, width: 120 }]}
+      rows={["RF-2041"]}
+      rowKey={(row) => row}
+      rowName={(row) => row}
+      selectable
+      selectionBar={
+        <SelectionBar count={1} onClear={() => {}}>
+          <button type="button">Approve</button>
+        </SelectionBar>
+      }
+    />,
+  );
+  expect(table).toMatch(
+    /<\/table><\/div><\/div><\/div><div class="x-govuk-ui-data-table-bar"><p class="x-govuk-ui-visually-hidden" role="status">1 selected<\/p><section aria-label="Selection" class="x-govuk-ui-selection-bar">/,
+  );
+  expect(table).not.toContain("x-govuk-ui-data-table-room");
+  expect(table).not.toContain("data-bar");
 });

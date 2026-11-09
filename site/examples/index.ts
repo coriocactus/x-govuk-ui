@@ -89,6 +89,7 @@ import sankey from "./sankey";
 import scrollArea from "./scroll-area";
 import searchBox from "./search-box";
 import select from "./select";
+import selectionBar from "./selection-bar";
 import separator from "./separator";
 import serviceNavigation from "./service-navigation";
 import sheet from "./sheet";
@@ -235,6 +236,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   "inline-citation": inlineCitation,
   "grouped-table": groupedTable,
   "data-table": dataTable,
+  "selection-bar": selectionBar,
   chart,
   "chart-set": chartSet,
   "calendar-heatmap": calendarHeatmap,

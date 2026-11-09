@@ -2168,7 +2168,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI · Motion",
     changes:
-      "A dense table for working through many records, as a CRM's is. It is built from Table's parts in a Scroll area that scrolls both ways. The headings stay at the top, the foot at the bottom and the first columns at the side, and once the rest has scrolled under them they cast a shadow along their edge. It is as tall as its rows, up to its most rows, and given less height, as a page laid out to fill the window gives it, it takes what it is given and its rows scroll within it, so the page need not scroll. The columns fill the table's width: where the table has more room than their widths add up to, each column takes a share of the rest, in proportion to its width, so no space is left empty at the side. Each column's edge is a Resizable handle, dragged or moved with the arrow keys. A column resized keeps the width users give it, and the others share what room is left. Double-clicking the edge returns the column to its width and its share. Sortable headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes, the heading one choosing every row or none. The foot counts the rows, and offers each column's figure, such as a sum or an average, on a button. The rows scroll between the headings and the foot, with the scrollbar beside them alone, and stop at either end without a bounce, which would move the headings and the foot too. A row that takes focus from the keyboard scrolls clear of the headings and the foot, never under them. minRows and maxRows set the table's height in rows of data. The example sets both to 8, so Long's 1,000 or so rows scroll in a box of that size.",
+      "A dense table for working through many records, as a CRM's is. It is built from Table's parts in a Scroll area that scrolls both ways. The headings stay at the top, the foot at the bottom and the first columns at the side, and once the rest has scrolled under them they cast a shadow along their edge. It is as tall as its rows, up to its most rows, and given less height, as a page laid out to fill the window gives it, it takes what it is given and its rows scroll within it, so the page need not scroll. The columns fill the table's width: where the table has more room than their widths add up to, each column takes a share of the rest, in proportion to its width, so no space is left empty at the side. Each column's edge is a Resizable handle, dragged or moved with the arrow keys. A column resized keeps the width users give it, and the others share what room is left. Double-clicking the edge returns the column to its width and its share. Sortable headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes, the heading one choosing every row or none, and acted on from a Selection bar that floats over the rows. The foot counts the rows, and offers each column's figure, such as a sum or an average, on a button. The rows scroll between the headings and the foot, with the scrollbar beside them alone, and stop at either end without a bounce, which would move the headings and the foot too. A row that takes focus from the keyboard scrolls clear of the headings and the foot, never under them. minRows and maxRows set the table's height in rows of data. The example sets both to 8, so Long's 1,000 or so rows scroll in a box of that size.",
     props: [
       reference("label", "string", "Required"),
       reference(
@@ -2190,6 +2190,7 @@ const entries = {
       toggle("selectable", true, { default: "false" }),
       reference("selected / onSelectedChange", "string[] / (selected: string[]) => void"),
       reference("count", "(rows: number) => ReactNode"),
+      reference("selectionBar", "a SelectionBar for the chosen rows"),
       number("minRows", 8, {
         min: 0,
         default: "None",
@@ -4151,6 +4152,25 @@ const entries = {
       ),
     ],
   },
+  "selection-bar": {
+    name: "Selection bar",
+    experimental: true,
+    width: 640,
+    anchor: "top",
+    description:
+      "Offer what to do with the rows users have chosen, in a bar that rises while any are.",
+    upstream: "",
+    dependencies: "React · Base UI",
+    changes:
+      "Not in GOV.UK. A bar that rises while any rows are chosen. Given to a Data table as its selectionBar, it floats over the rows just above the foot, so the count and the figures stay in view, and the rows make room for it beneath the last one, so nothing moves as it comes and goes. Elsewhere, it takes its room after the list it follows, and stays at the foot of the scrolling area as the list scrolls beneath it. Either way, a control that takes focus from the keyboard scrolls clear of it. It says how many, and screen readers hear the count as it changes, from a region that is always in the page, so the first count is heard too. It never takes focus as it appears, because users are still choosing. If it goes while it has focus, such as once an action clears the selection, focus goes back to where it was before it came into the bar, such as the last row's checkbox. Its × clears the selection. Its actions are Buttons, and a Dropdown menu holds any that are used less, or destroy. It rises into place, unless users ask for reduced motion, and its actions wrap rather than clip. Data table chooses the rows. The example is a table of applications, one already chosen, which Approve approves. Its rows scroll in a table five rows tall, beneath the bar.",
+    props: [
+      reference("count", "number", "Required"),
+      reference("onClear", "() => void", "Required"),
+      reference("children", "the actions, as Buttons and a Dropdown menu", "Required"),
+      reference("labels", "Partial<SelectionBarLabels>", "English"),
+    ],
+    example: [toggle("actions", true, { note: "Adds a More menu of rarer actions." })],
+  },
   "side-panel": {
     name: "Side panel",
     experimental: true,
@@ -4325,6 +4345,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "table",
     "summary-list",
     "data-table",
+    "selection-bar",
     "grouped-table",
     "task-list",
     "timeline",

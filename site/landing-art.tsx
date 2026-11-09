@@ -1504,6 +1504,29 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Stroke d="M69.5 33.5l3.5 3.5 3.5-3.5" tone="white" weight={1.5} />
     </>
   ),
+  "selection-bar": (
+    <>
+      {[12, 22, 32].map((y, index) => (
+        <g key={y}>
+          <Frame
+            x={10}
+            y={y}
+            w={6}
+            h={6}
+            r={1}
+            edge="border"
+            fill={index === 1 ? "brand" : "paper"}
+          />
+          <Words x={21} y={y + 1.5} w={[30, 24, 28][index] ?? 28} h={3} tone="ink" />
+          <Words x={60} y={y + 1.5} w={18} h={3} />
+        </g>
+      ))}
+      <Frame x={16} y={46} w={64} h={16} r={3} fill="paper" edge="line" />
+      <Words x={21} y={52.5} w={14} h={3} tone="ink" />
+      <Area x={40} y={50} w={16} h={8} tone="go" r={1.5} />
+      <Stroke d="M70 51.5l5 5m0-5l-5 5" weight={1.2} />
+    </>
+  ),
   "side-panel": (
     <>
       <Frame x={6} y={8} w={84} h={56} r={3} fill="paper" edge="line" />

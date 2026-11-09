@@ -1,0 +1,54 @@
+/* Selection bar. A bar as wide as its words and actions, which wrap onto more lines rather than
+   clip, in the middle of what it sits in. It rises into place as it appears, unless users ask for
+   reduced motion. Alone, it takes its room after the list it follows, and stays at the foot of the
+   scrolling area as the list scrolls beneath it. The box it sits in sets the space above it. In a
+   Data table, the table places it, over its rows. */
+.x-govuk-ui-selection-bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: calc(100% - 16px);
+  margin-inline: auto;
+  padding: 8px 8px 8px 16px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: var(--x-govuk-ui-radius-surface);
+  background: var(--x-govuk-ui-paper);
+  box-shadow: var(--x-govuk-ui-shadow-floating);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  animation: x-govuk-ui-selection-bar-in var(--x-govuk-ui-duration-medium)
+    var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-selection-bar[hidden] {
+  display: none;
+}
+@keyframes x-govuk-ui-selection-bar-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-selection-bar {
+    animation: none;
+  }
+}
+.x-govuk-ui-selection-bar-count {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-selection-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

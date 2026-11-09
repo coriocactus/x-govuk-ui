@@ -16,6 +16,7 @@ import { useLabels } from "./labels";
 import { useLatest } from "./refs";
 import { ResizableHandle } from "./resizable";
 import { ScrollArea } from "./scroll-area";
+import { SelectionBarHost } from "./selection-bar";
 import { useScopeSound } from "./sound-scope";
 import { TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "./table";
 
@@ -69,6 +70,12 @@ export type DataTableProps<Row> = ComponentPropsWithRef<"div"> & {
    * By default, 8. Every row is 44 pixels tall, as the headings and the foot are.
    */
   maxRows?: number;
+  /**
+   * A SelectionBar for the chosen rows. It floats over the rows, just above the foot, so the count
+   * and the figures stay in view. While it shows, the rows make room for it beneath the last one,
+   * so nothing moves as it comes and goes, and a row that takes focus scrolls clear of it.
+   */
+  selectionBar?: ReactNode;
 };
 
 type Sort = { id: string; direction: "ascending" | "descending" } | null;
@@ -110,9 +117,10 @@ export const defaultDataTableLabels: DataTableLabels = {
  * the side. Each column's edge is a Resizable handle, dragged or moved with the arrow keys. A
  * column resized keeps the width users give it, and the others share what room is left.
  * Double-clicking the edge returns the column to its starting width, and to its share. Sortable
- * headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes. The
- * foot counts the rows, and offers each column's figure, such as a sum, on a button. A row that
- * takes focus from the keyboard scrolls clear of the headings and the foot.
+ * headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes, and
+ * acted on from a `selectionBar`. The foot counts the rows, and offers each column's figure, such
+ * as a sum, on a button. A row that takes focus from the keyboard scrolls clear of the headings
+ * and the foot.
  */
 export function DataTable<Row>({
   label,
@@ -128,6 +136,7 @@ export function DataTable<Row>({
   count,
   minRows,
   maxRows = 8,
+  selectionBar,
   className = "",
   style,
   ...props
@@ -142,6 +151,8 @@ export function DataTable<Row>({
   const [sort, setSort] = useState<Sort>(null);
   const [summed, setSummed] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
+  // How tall the Selection bar is while it shows, which the rows leave room for.
+  const [bar, setBar] = useState(0);
   const viewport = useRef<HTMLDivElement>(null);
   const [chosen, choose] = useControllableState<readonly string[]>(
     controlled,
@@ -319,11 +330,14 @@ export function DataTable<Row>({
       className={`x-govuk-ui-data-table ${className}`.trim()}
       data-scrolled={scrolled || undefined}
       data-min-rows={minRows ? "" : undefined}
+      // While a Selection bar shows, a table that shows every row grows to leave it room.
+      data-bar={bar > 0 ? (rows.length <= maxRows ? "grow" : "") : undefined}
       style={
         {
           ...style,
           "--x-govuk-ui-data-table-min-rows": minRows || undefined,
           "--x-govuk-ui-data-table-max-rows": maxRows,
+          "--x-govuk-ui-data-table-bar": bar > 0 ? `${bar}px` : undefined,
         } as CSSProperties
       }
     >
@@ -414,6 +428,14 @@ export function DataTable<Row>({
             </TableRow>
           </TableHeader>
           {body}
+          {/* The room beneath the last row for the Selection bar, which screen readers pass over. */}
+          {bar > 0 && (
+            <tbody className="x-govuk-ui-data-table-room" aria-hidden="true">
+              <tr>
+                <td colSpan={columns.length + (selectable ? 1 : 0)} />
+              </tr>
+            </tbody>
+          )}
           <TableFooter>
             <TableRow>
               {selectable && (
@@ -428,6 +450,11 @@ export function DataTable<Row>({
           </TableFooter>
         </table>
       </ScrollArea>
+      {selectionBar && (
+        <div className="x-govuk-ui-data-table-bar">
+          <SelectionBarHost value={setBar}>{selectionBar}</SelectionBarHost>
+        </div>
+      )}
     </div>
   );
 }

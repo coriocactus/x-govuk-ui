@@ -239,6 +239,8 @@ export function Board({
       let origin: DOMRect | null = null;
       let ghost: HTMLElement | null = null;
       let frame = 0;
+      // When the last frame scrolled the stages, or 0 when it did not.
+      let scrolled = 0;
       let hold: ReturnType<typeof setTimeout> | undefined;
       // Each stage's cards as they lie when the drag begins, before any makes way, by where each
       // sits in its list. The list moves as its stage scrolls, so each card's place is read from
@@ -368,7 +370,7 @@ export function Board({
       const request = () => {
         if (!frame) frame = requestAnimationFrame(step);
       };
-      const step = () => {
+      const step = (now = performance.now()) => {
         frame = 0;
         const area = viewport.current;
         if (!active || !area) return;
@@ -384,11 +386,17 @@ export function Board({
         const down = lane
           ? Math.max(lane.top + reach - at.y, 0) - Math.max(at.y - (lane.bottom - reach), 0)
           : 0;
+        // Each scroll is as far as the 60ths of a second since the last one, so the stages scroll
+        // at one speed whatever the screen's frame rate. A first scroll counts as one, and a
+        // stalled frame as no more than a tenth of a second, so neither jumps.
+        const frames = scrolled ? Math.min(now - scrolled, 100) / (1000 / 60) : 1;
+        scrolled = into !== 0 || down !== 0 ? now : 0;
         if (into !== 0)
-          area.scrollLeft -= Math.round(Math.min(Math.abs(into), edge) / 4) * Math.sign(into);
+          area.scrollLeft -=
+            Math.round((Math.min(Math.abs(into), edge) / 4) * frames) * Math.sign(into);
         if (down !== 0 && stage?.scroll)
           stage.scroll.scrollTop -=
-            Math.round(Math.min(Math.abs(down), reach) / 4) * Math.sign(down);
+            Math.round((Math.min(Math.abs(down), reach) / 4) * frames) * Math.sign(down);
         if (ghost) ghost.style.transform = `translate(${at.x - start.x}px, ${at.y - start.y}px)`;
         aim(target);
         arrange(target ? { stage: target, place } : null);

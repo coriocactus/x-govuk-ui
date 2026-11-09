@@ -728,6 +728,11 @@
   }
 }
 
+/* Board. It fills the preview, but for a margin, as a page laid out to fill the window. */
+.preview-example--board {
+  box-sizing: border-box;
+  padding: 24px 16px 8px;
+}
 /* Sidebar. A small application frame with the sidebar beside its page. */
 .preview-app {
   height: 480px;

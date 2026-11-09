@@ -2,6 +2,9 @@ import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   Avatar,
+  Board,
+  BoardCard,
+  BoardColumn,
   ChangeSummary,
   ChangeSummaryItem,
   Choices,
@@ -660,4 +663,30 @@ test("a selection bar is gone at none, says how many from a region always in the
   );
   expect(table).not.toContain("x-govuk-ui-data-table-room");
   expect(table).not.toContain("data-bar");
+});
+
+test("a board's stages are named groups with their counts, and each card has a menu to move it", () => {
+  const markup = renderToStaticMarkup(
+    <Board label="Onboarding" onMove={() => {}} className="pipeline">
+      <BoardColumn value="introduced" label="Introduced">
+        <BoardCard value="tamar" label="Tamar Valley Foundry">
+          Tamar Valley Foundry
+        </BoardCard>
+      </BoardColumn>
+      <BoardColumn value="live" label="Live" />
+    </Board>,
+  );
+  // The stages scroll sideways in a Scroll area, inside the named board.
+  expect(markup).toContain(
+    '<section aria-label="Onboarding" class="x-govuk-ui-board pipeline"><div role="presentation"',
+  );
+  expect(markup).toContain('class="x-govuk-ui-scroll-area x-govuk-ui-board-scroll"');
+  expect(markup).toMatch(
+    /<div role="group" aria-labelledby="([^"]+)" class="x-govuk-ui-board-column"><h3 id="\1"/,
+  );
+  expect(markup).toContain('<span class="x-govuk-ui-visually-hidden">1 card</span>');
+  expect(markup).toContain('aria-label="Move Tamar Valley Foundry"');
+  // A stage without cards says so.
+  expect(markup).toContain('<p class="x-govuk-ui-board-empty">None</p>');
+  expect(markup).toContain('<p class="x-govuk-ui-visually-hidden" role="status"></p>');
 });

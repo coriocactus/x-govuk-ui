@@ -34,7 +34,9 @@ The examples name people after UK prime ministers. Each person appears once acro
 | Lord Salisbury | Record chip |
 | Lord Rosebery | Change summary |
 | William Gladstone | Change summary |
+| Benjamin Disraeli | Board |
+| Lord Derby | Board |
 
-The next unused names are Benjamin Disraeli, Lord Derby and Lord John Russell.
+The next unused names are Lord John Russell, Lord Palmerston and Lord Aberdeen.
 
 The workspace names its applicants and caseworkers after prime ministers too. It is not an example, so it can share their names.

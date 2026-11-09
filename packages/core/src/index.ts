@@ -52,6 +52,16 @@ export {
   defaultBackLinkLabels,
 } from "./back-link";
 export {
+  Board,
+  BoardCard,
+  type BoardCardProps,
+  BoardColumn,
+  type BoardColumnProps,
+  type BoardLabels,
+  type BoardProps,
+  defaultBoardLabels,
+} from "./board";
+export {
   Breadcrumbs,
   BreadcrumbsEllipsis,
   type BreadcrumbsEllipsisProps,

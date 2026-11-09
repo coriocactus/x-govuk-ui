@@ -85,6 +85,7 @@
 @import "./styles/sheet.css" layer(x-govuk-ui);
 @import "./styles/side-panel.css" layer(x-govuk-ui);
 @import "./styles/selection-bar.css" layer(x-govuk-ui);
+@import "./styles/board.css" layer(x-govuk-ui);
 @import "./styles/floating.css" layer(x-govuk-ui);
 @import "./styles/callout.css" layer(x-govuk-ui);
 @import "./styles/tour.css" layer(x-govuk-ui);

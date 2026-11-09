@@ -4171,6 +4171,32 @@ const entries = {
     ],
     example: [toggle("actions", true, { note: "Adds a More menu of rarer actions." })],
   },
+  board: {
+    name: "Board",
+    experimental: true,
+    // A board fills what it is given, as a service's page laid out to fill the window gives it,
+    // so the example takes the whole preview, its stages reach the foot, and they scroll sideways.
+    width: "100%",
+    anchor: "fill",
+    description: "Show things in stages, such as companies being onboarded, and move them on.",
+    upstream: "",
+    dependencies: "React · Base UI",
+    changes:
+      "Not in GOV.UK. Stages side by side, each a column with its name, its count and its cards, which scroll sideways in a Scroll area where there are more than fit, fading at the edges with more beyond. The board fills the height its container gives it, such as a page laid out to fill the window or a tile, so its stages reach its foot, each scrolls its own cards, and the scrollbar sits at the foot. In a page that flows, it is as tall as its tallest stage. Each stage's cards are in the service's order. Each card has a menu at its corner that moves it up or down its stage, or to the foot of another stage, from the keyboard, a pointer or a touch screen alike, so moving needs no drag, as WCAG 2.2 asks. A mouse or pen can also drag a card, by anywhere but a control, and a finger once it has held the card for a moment, so a swipe still scrolls the board. Dragged, a copy follows the pointer, and the cards make way for it where it would drop: the stage it leaves closes its space, and the stage it is over opens one where it is. Where it would drop follows the card's middle, not the pointer, so a card held by its foot drops where it is seen, and passes another once it is half over it. Over its own stage, the faded card goes to the place it would take. Another stage is outlined with a tick, and near the board's edge, or a stage's top or foot, the cards scroll. Escape, or a drop outside any stage, puts it back. onMove hears the card it goes before, or null at the foot. Once the card is in its new place, at once or once the service has saved the move, it rises into it, unless users ask for reduced motion, and screen readers hear where it went, as its place among the stage's cards. Moved from its menu, its menu takes focus there. A move that fails says nothing, so the service says why. Each stage is a group named by its heading, so the board adds one landmark. A stage without cards says None. A stage's heading says how many cards it has to screen readers. The example is companies being onboarded, each stage with a Tag in its colour.",
+    props: [
+      reference("label", "string", "Required"),
+      reference(
+        "onMove",
+        "(card: string, stage: string, before: string | null) => void",
+        "Required",
+      ),
+      reference("headingLevel", "2 | 3 | 4 | 5 | 6", "3"),
+      reference("BoardColumn", "{ value, label, marker, children }", "Part"),
+      reference("BoardCard", "{ value, label, children }", "Part"),
+      reference("labels", "Partial<BoardLabels>", "English"),
+    ],
+    example: [toggle("markers", true, { note: "Marks each stage with a Tag in its colour." })],
+  },
   "side-panel": {
     name: "Side panel",
     experimental: true,
@@ -4347,6 +4373,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "data-table",
     "selection-bar",
     "grouped-table",
+    "board",
     "task-list",
     "timeline",
     "relative-time",

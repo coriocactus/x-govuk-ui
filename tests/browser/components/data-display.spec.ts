@@ -605,6 +605,199 @@ test("a selection bar floats over a table's rows, which make room for it, and gi
   await expect(fifth).toBeFocused();
 });
 
+test("a board's card moves up, down or to another stage from its menu, keeps focus, and says where", async ({
+  page,
+  frame,
+  open,
+}) => {
+  await open("board");
+  const meeting = frame.getByRole("group", { name: /^Meeting held/ });
+  const agreement = frame.getByRole("group", { name: /^Agreement drafted/ });
+  await expect(meeting.getByRole("listitem")).toHaveCount(2);
+  // From the keyboard, the card's menu moves it down its stage, as the first, or to another.
+  const menu = meeting.getByRole("button", { name: "Move Tamar Valley Foundry" });
+  await menu.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("menuitem")).toHaveText([
+    "Move down",
+    "Move to Introduced",
+    "Move to Checks done",
+    "Move to Agreement drafted",
+    "Move to Live",
+  ]);
+  await page.getByRole("menuitem", { name: "Move down" }).click();
+  // Moved down, it is second, its menu keeps focus, and screen readers hear its place.
+  await expect(meeting.locator(".x-govuk-ui-board-card strong")).toHaveText([
+    "Cotswold Glassworks",
+    "Tamar Valley Foundry",
+  ]);
+  await expect(menu).toBeFocused();
+  await expect(frame.getByRole("status")).toHaveText(
+    "Tamar Valley Foundry moved to Meeting held, 2 of 2",
+  );
+  // As the last, it moves up, and not down.
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("menuitem").first()).toHaveText("Move up");
+  await expect(page.getByRole("menuitem", { name: "Move down" })).toHaveCount(0);
+  await page.getByRole("menuitem", { name: "Move to Agreement drafted" }).click();
+  // In another stage, it goes to the foot, its menu has focus, and screen readers hear where.
+  await expect(meeting.getByRole("listitem")).toHaveCount(1);
+  await expect(agreement.locator(".x-govuk-ui-board-card strong")).toHaveText([
+    "Pennine Oat Mills",
+    "Tamar Valley Foundry",
+  ]);
+  await expect(agreement.getByRole("button", { name: "Move Tamar Valley Foundry" })).toBeFocused();
+  await expect(frame.getByRole("status")).toHaveText(
+    "Tamar Valley Foundry moved to Agreement drafted, 2 of 2",
+  );
+  // A stage's name says how many cards it has.
+  await expect(agreement).toHaveAccessibleName("Agreement drafted 2 cards");
+  // The stages scroll sideways in a Scroll area, and a card's menu that takes focus comes into
+  // view.
+  const viewport = frame.locator(".x-govuk-ui-board-scroll > .x-govuk-ui-scroll-area-viewport");
+  expect(await viewport.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(
+    true,
+  );
+  await frame.getByRole("button", { name: "Move Mersey Tool Hire" }).focus();
+  await expect.poll(() => viewport.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+});
+
+test("a board fills the preview, and its cards drag between others, in a stage or another, back with Escape, and past its edge", async ({
+  page,
+  frame,
+  open,
+}) => {
+  await open("board");
+  const board = frame.locator(".x-govuk-ui-board");
+  const viewport = frame.locator(".x-govuk-ui-board-scroll > .x-govuk-ui-scroll-area-viewport");
+  const introduced = frame.getByRole("group", { name: /^Introduced/ });
+  const meeting = frame.getByRole("group", { name: /^Meeting held/ });
+  const checks = frame.getByRole("group", { name: /^Checks done/ });
+  // Given the preview's height, the stages reach the board's foot, whatever their cards.
+  const foot = async (locator: typeof board) =>
+    locator.evaluate((element) => Math.round(element.getBoundingClientRect().bottom));
+  expect((await foot(board)) - (await foot(meeting))).toBeLessThan(24);
+  expect(await foot(introduced)).toBe(await foot(meeting));
+  const centre = async (locator: typeof board) => {
+    const box = (await locator.boundingBox())!;
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  };
+  const grab = async (name: string) => {
+    // A card drags by its words, not its menu.
+    const words = frame.locator(".x-govuk-ui-board-card", { hasText: name }).locator("strong");
+    const from = await centre(words);
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.down();
+    await page.mouse.move(from.x + 10, from.y + 4, { steps: 3 });
+  };
+  // The copy is above the page, outside the preview.
+  const ghost = page.locator(".x-govuk-ui-board-ghost");
+  // How far each card of a stage is moving aside, by the transform it glides to, to a tenth of a
+  // pixel, as engines lay out to fractions of one.
+  const aside = (stage: typeof board) =>
+    stage.locator(".x-govuk-ui-board-card").evaluateAll((all) =>
+      all.map((each) => {
+        const { transform } = (each as HTMLElement).style;
+        return transform ? Math.round(new DOMMatrix(transform).f * 10) / 10 : 0;
+      }),
+    );
+  const names = (stage: typeof board) => stage.locator(".x-govuk-ui-board-card strong");
+  // Dragged, a copy follows the pointer. Over another stage, between two cards, the stage is
+  // outlined, the card below makes way, and in the stage it left, the cards after it close its
+  // space. Dropped there, it takes that place, and screen readers hear where it went, with focus
+  // left where the pointer had it. The cards are then at rest.
+  await grab("Kittiwake Software");
+  const card = introduced.locator(".x-govuk-ui-board-card", { hasText: "Kittiwake Software" });
+  await expect(card).toHaveAttribute("data-dragging", "");
+  await expect(ghost).toHaveCount(1);
+  const tamar = (await meeting.locator(".x-govuk-ui-board-card").first().boundingBox())!;
+  await page.mouse.move(tamar.x + tamar.width / 2, tamar.y + tamar.height - 4, { steps: 8 });
+  await expect(meeting).toHaveAttribute("data-over", "");
+  await expect.poll(() => aside(meeting)).toEqual([0, expect.any(Number)]);
+  const [, room] = await aside(meeting);
+  expect(room).toBeGreaterThan(40);
+  await expect.poll(() => aside(introduced)).toEqual([0, -room!, -room!]);
+  await page.mouse.up();
+  await expect(names(meeting)).toHaveText([
+    "Tamar Valley Foundry",
+    "Kittiwake Software",
+    "Cotswold Glassworks",
+  ]);
+  await expect(ghost).toHaveCount(0);
+  await expect(meeting).not.toHaveAttribute("data-over");
+  await expect(frame.getByRole("status")).toHaveText(
+    "Kittiwake Software moved to Meeting held, 2 of 3",
+  );
+  await expect(meeting.getByRole("button", { name: "Move Kittiwake Software" })).not.toBeFocused();
+  expect([...(await aside(meeting)), ...(await aside(introduced))]).toEqual([0, 0, 0, 0, 0]);
+  // In its own stage, the faded card goes to the place it would take, as the cards it passes
+  // make way. Dropped, it takes that place.
+  await grab("Cotswold Glassworks");
+  const top = (await meeting.locator(".x-govuk-ui-board-card").first().boundingBox())!;
+  await page.mouse.move(top.x + top.width / 2, top.y + 6, { steps: 8 });
+  await expect(meeting).not.toHaveAttribute("data-over");
+  await expect
+    .poll(async () =>
+      (await aside(meeting)).map((each, index) => each - [1, 1, -2][index]! * room!),
+    )
+    .toEqual([0, 0, expect.closeTo(0, 0)]);
+  await page.mouse.up();
+  await expect(names(meeting)).toHaveText([
+    "Cotswold Glassworks",
+    "Tamar Valley Foundry",
+    "Kittiwake Software",
+  ]);
+  await expect(frame.getByRole("status")).toHaveText(
+    "Cotswold Glassworks moved to Meeting held, 1 of 3",
+  );
+  // Where a card would drop follows the card, not the pointer. Held by its foot, it passes the
+  // card below once it is more than half over it, and goes back once it is less, as it would
+  // held anywhere.
+  const held = (await meeting.locator(".x-govuk-ui-board-card").first().boundingBox())!;
+  const by = { x: held.x + held.width / 3, y: held.y + held.height - 6 };
+  await page.mouse.move(by.x, by.y);
+  await page.mouse.down();
+  await page.mouse.move(by.x, by.y + 6, { steps: 3 });
+  await page.mouse.move(by.x, by.y + room! * 0.4, { steps: 4 });
+  await expect.poll(() => aside(meeting)).toEqual([0, 0, 0]);
+  await page.mouse.move(by.x, by.y + room! * 0.6, { steps: 4 });
+  await expect.poll(() => aside(meeting)).toEqual([room, -room!, 0]);
+  await page.mouse.move(by.x, by.y + room! * 0.4, { steps: 4 });
+  await expect.poll(() => aside(meeting)).toEqual([0, 0, 0]);
+  await page.keyboard.press("Escape");
+  await page.mouse.up();
+  // Escape puts a dragged card back, as the cards that made way go back, and the drop that
+  // follows moves nothing.
+  await grab("Fenland Seed Company");
+  const over = await centre(checks);
+  await page.mouse.move(over.x, over.y, { steps: 8 });
+  await expect(checks).toHaveAttribute("data-over", "");
+  await page.keyboard.press("Escape");
+  await expect(checks).not.toHaveAttribute("data-over");
+  await expect(ghost).toHaveCount(0);
+  await page.mouse.up();
+  await expect(introduced).toContainText("Fenland Seed Company");
+  await expect(checks.getByRole("listitem")).toHaveCount(2);
+  await expect
+    .poll(async () => [...(await aside(introduced)), ...(await aside(checks))])
+    .toEqual([0, 0, 0, 0]);
+  // Held near the board's right edge, a card scrolls the stages to the last, and drops there.
+  await grab("Solway Wind Services");
+  const area = (await viewport.boundingBox())!;
+  await page.mouse.move(area.x + area.width - 8, area.y + area.height / 2, { steps: 10 });
+  await expect
+    .poll(() =>
+      viewport.evaluate(
+        (element) => element.scrollLeft + element.clientWidth >= element.scrollWidth - 1,
+      ),
+    )
+    .toBe(true);
+  const live = frame.getByRole("group", { name: /^Live/ });
+  await expect(live).toHaveAttribute("data-over", "");
+  await page.mouse.up();
+  await expect(live).toContainText("Solway Wind Services");
+});
+
 test("an avatar group lifts the avatar under the pointer most, and its neighbours less", async ({
   page,
   frame,

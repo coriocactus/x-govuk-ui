@@ -1527,6 +1527,23 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Stroke d="M70 51.5l5 5m0-5l-5 5" weight={1.2} />
     </>
   ),
+  board: (
+    <>
+      {[8, 38, 68].map((x, column) => (
+        <g key={x}>
+          <Area x={x} y={10} w={24} h={52} tone="surface" r={2} />
+          <Words x={x + 3} y={14} w={12} h={3} tone="ink" />
+          {[0, 1, 2].slice(0, [2, 1, 3][column] ?? 1).map((card) => (
+            <g key={card}>
+              <Frame x={x + 2} y={21 + card * 13} w={20} h={11} r={1.5} fill="paper" edge="line" />
+              <Words x={x + 4} y={24 + card * 13} w={[12, 10, 14][card] ?? 12} h={2.5} tone="ink" />
+              <Words x={x + 4} y={28.5 + card * 13} w={9} h={2} />
+            </g>
+          ))}
+        </g>
+      ))}
+    </>
+  ),
   "side-panel": (
     <>
       <Frame x={6} y={8} w={84} h={56} r={3} fill="paper" edge="line" />

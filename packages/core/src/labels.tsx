@@ -6,6 +6,7 @@ import type { QuestionCardLabels } from "./agent-cards";
 import type { AttachmentLabels } from "./attachment";
 import type { AvatarGroupLabels } from "./avatar";
 import type { BackLinkLabels } from "./back-link";
+import type { BoardLabels } from "./board";
 import type { BreadcrumbsLabels } from "./breadcrumbs";
 import type { BubbleLabels } from "./bubble";
 import type { CalendarLabels } from "./calendar";
@@ -79,6 +80,7 @@ export interface ComponentLabels {
   attachment: AttachmentLabels;
   avatarGroup: AvatarGroupLabels;
   backLink: BackLinkLabels;
+  board: BoardLabels;
   breadcrumbs: BreadcrumbsLabels;
   bubble: BubbleLabels;
   calendar: CalendarLabels;

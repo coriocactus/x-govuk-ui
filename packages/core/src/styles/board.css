@@ -1,0 +1,201 @@
+/* Board. Stages side by side, each as wide as a card's words need, which scroll sideways in a
+   Scroll area where there are more than fit. The space beneath the stages holds the scrollbar, so
+   it covers no card.
+
+   The board takes the height its container gives it, through each box inside it, to the stages.
+   Given a height, as by a page laid out to fill the window, the stages reach the board's foot,
+   each scrolls its own cards, and the scrollbar sits at the foot. Where the container leaves its
+   height to its content, as a page that flows does, each 100% here comes to nothing, and the
+   board is as tall as its tallest stage.
+
+   Its width comes from its container alone, never from its stages, so a container that fits its
+   content, such as a Scroll area that scrolls sideways, does not widen to hold every stage. */
+.x-govuk-ui-board {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  max-width: 100%;
+  contain: inline-size;
+  font-family: var(--x-govuk-ui-font);
+}
+.x-govuk-ui-board-scroll {
+  flex: 1;
+}
+.x-govuk-ui-board-scroll > .x-govuk-ui-scroll-area-viewport > .x-govuk-ui-scroll-area-content {
+  height: 100%;
+}
+.x-govuk-ui-board-stages {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  box-sizing: border-box;
+  height: 100%;
+  padding-bottom: 14px;
+}
+/* A stage's cards scroll beneath its heading, out to the stage's edges, so the scrollbar sits in
+   the margin beside the cards, not over them. */
+.x-govuk-ui-board-column {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 18em;
+  min-height: 0;
+  padding-top: 10px;
+  border-radius: var(--x-govuk-ui-radius-surface);
+  background: var(--x-govuk-ui-surface);
+  font-size: 16px;
+}
+/* The stage a dragged card would drop into is outlined. The outline is always there, unseen, and
+   fades in, so marking a stage changes only its opacity, which the compositor runs. */
+.x-govuk-ui-board-column::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--x-govuk-ui-brand);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--x-govuk-ui-duration-fast) ease;
+}
+.x-govuk-ui-board-column[data-over]::after {
+  opacity: 1;
+}
+.x-govuk-ui-board-column-heading {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  margin: 0 10px;
+  padding: 2px 4px;
+  color: var(--x-govuk-ui-text);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.x-govuk-ui-board-column-marker {
+  display: flex;
+  flex: none;
+}
+.x-govuk-ui-board-column-name {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.x-govuk-ui-board-column-count {
+  margin-left: auto;
+  color: var(--x-govuk-ui-muted);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.x-govuk-ui-board-column-scroll {
+  flex: 1 1 auto;
+  border-radius: 0 0 var(--x-govuk-ui-radius-surface) var(--x-govuk-ui-radius-surface);
+}
+/* A stage without cards keeps its list in the page, so a wrapper that draws no card yet can draw
+   one later. The list hides by what it holds, not by the count, so a card that arrives can take
+   focus as it appears, before its stage has counted it. */
+.x-govuk-ui-board-column-scroll:has(.x-govuk-ui-board-cards:empty) {
+  display: none;
+}
+.x-govuk-ui-board-cards {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0 10px 10px;
+  list-style: none;
+}
+.x-govuk-ui-board-empty {
+  margin: 0 10px;
+  padding: 12px 4px 22px;
+  color: var(--x-govuk-ui-muted);
+}
+/* A card's words fill it, and its menu sits at its corner. A press anywhere else on it can drag
+   it, so it shows the grab cursor. */
+.x-govuk-ui-board-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  box-sizing: border-box;
+  padding: 10px 6px 10px 12px;
+  border: 1px solid var(--x-govuk-ui-line);
+  border-radius: var(--x-govuk-ui-radius-surface);
+  background: var(--x-govuk-ui-paper);
+  color: var(--x-govuk-ui-text);
+  line-height: 1.4;
+  cursor: grab;
+  -webkit-touch-callout: none;
+}
+/* On a touch screen, holding a card lifts it, so it selects no words. */
+@media (pointer: coarse) {
+  .x-govuk-ui-board-card {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+.x-govuk-ui-board-card-body {
+  display: grid;
+  flex: 1;
+  justify-items: start;
+  gap: 6px;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+/* While dragged, the card fades, holding the pointer with the grabbing cursor, and its copy
+   follows the pointer above the page, with a popup's shadow. The copy moves by a transform alone,
+   on a layer of its own. Over its own stage, the faded card goes to the place it would drop in.
+   Away from it, the card is hidden, and the cards after it close its space. */
+.x-govuk-ui-board-card[data-dragging] {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+.x-govuk-ui-board-card[data-dragging][data-away] {
+  opacity: 0;
+}
+/* The cards glide as they make way for a dragged card, and back, by transforms alone. */
+.x-govuk-ui-board[data-sorting] .x-govuk-ui-board-card {
+  transition: transform var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+.x-govuk-ui-board-ghost.x-govuk-ui-board-card {
+  position: fixed;
+  z-index: var(--x-govuk-ui-layer-overlay);
+  margin: 0;
+  list-style: none;
+  box-shadow: var(--x-govuk-ui-shadow-popup);
+  pointer-events: none;
+  will-change: transform;
+}
+/* A card just moved rises into its new stage. */
+.x-govuk-ui-board-card[data-arrived] {
+  animation: x-govuk-ui-board-card-in var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+@keyframes x-govuk-ui-board-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .x-govuk-ui-board-card[data-arrived] {
+    animation: none;
+  }
+  .x-govuk-ui-board[data-sorting] .x-govuk-ui-board-card {
+    transition: none;
+  }
+  .x-govuk-ui-board-column::after {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-board-column[data-over]::after {
+    box-shadow: none;
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .x-govuk-ui-board-ghost.x-govuk-ui-board-card {
+    border-color: CanvasText;
+  }
+}

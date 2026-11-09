@@ -7,6 +7,7 @@ import attachment from "./attachment";
 import avatar from "./avatar";
 import backLink from "./back-link";
 import barList from "./bar-list";
+import board from "./board";
 import breadcrumbs from "./breadcrumbs";
 import bubble from "./bubble";
 import bulletChart from "./bullet-chart";
@@ -237,6 +238,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   "grouped-table": groupedTable,
   "data-table": dataTable,
   "selection-bar": selectionBar,
+  board,
   chart,
   "chart-set": chartSet,
   "calendar-heatmap": calendarHeatmap,

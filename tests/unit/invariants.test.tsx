@@ -8,6 +8,7 @@ import { Credits, everySystem } from "../../site/credits";
 import { componentDocs, llmsDocuments } from "../../site/llms";
 import { met, presetAt, startingArgs } from "../../site/props";
 import { stylingContracts } from "../../site/styling";
+import { nativeScroll, toScrollArea } from "../types/exceptions";
 
 test("a component's credits say what inspired it or it was adapted from, then what it is built on", () => {
   const editor = renderToStaticMarkup(<Credits name="editor" />);
@@ -157,6 +158,35 @@ test("each extension declares the cascade layers in core's order, and puts its s
 // Each component's props keep the library's conventions, such as taking `className` and `ref`, and
 // giving each idea one name. `tests/types/conventions.ts` checks them against the exported types,
 // as part of `bun run typecheck`.
+
+test("everything that scrolls does so in a Scroll area, or is listed with the reason it does not", async () => {
+  // A rule that sets overflow to auto or scroll makes its element scroll with the browser's own
+  // scrollbar, which differs from browser to browser. A part that holds long content scrolls it in
+  // a Scroll area, or a part built on one, instead.
+  const files = (patterns: string[]) =>
+    patterns.flatMap((pattern) => [...new Bun.Glob(pattern).scanSync(".")]);
+  const found = new Set<string>();
+  for (const path of files(["packages/*/src/**/*.css", "site/*.css"])) {
+    const css = (await Bun.file(path).text()).replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const [, selector, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g))
+      if (/(?:^|[;\s])overflow(?:-[xy])?\s*:\s*(?:auto|scroll)/.test(body ?? ""))
+        found.add(`${path}: ${selector?.trim().replace(/\s+/g, " ")}`);
+  }
+  // A style set in code scrolls the same way, so the file that sets it is listed.
+  for (const path of files(["packages/*/src/**/*.tsx", "site/**/*.tsx"])) {
+    const code = await Bun.file(path).text();
+    if (
+      /overflow[XY]?\s*:\s*(?:["'](?:auto|scroll)["']|[^,}\n]*\?\s*["'](?:auto|scroll)["'])/.test(
+        code,
+      )
+    )
+      found.add(path);
+  }
+  expect(found.size).toBeGreaterThan(5);
+  const listed = new Set<string>([...Object.keys(nativeScroll), ...toScrollArea]);
+  expect([...found].filter((entry) => !listed.has(entry))).toEqual([]);
+  expect([...listed].filter((entry) => !found.has(entry))).toEqual([]);
+});
 
 test("the glide in CSS is the glide that Motion runs", async () => {
   const css = await Bun.file("packages/core/src/styles/base.css").text();

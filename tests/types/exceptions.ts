@@ -195,3 +195,45 @@ export const unchecked = {
     "TilePager",
   ],
 } as const;
+
+/**
+ * What scrolls with the browser's own scrolling, by the rule or the file that makes it scroll,
+ * with the reason. Everything else that scrolls does so in a Scroll area, or a part built on one,
+ * such as SidePanelBody, so every scrollbar is the same thin bar in every browser.
+ * `tests/unit/invariants.test.tsx` fails on a rule that scrolls and is listed in neither list, and
+ * on a listed one that no longer scrolls, so the lists stay true.
+ */
+export const nativeScroll = {
+  "packages/core/src/scroll-area.tsx": "It is the Scroll area, whose viewport scrolls natively.",
+  "packages/core/src/textarea.tsx":
+    "A field scrolls its own box, so typing and the caret behave as the browser's, under the Scroll area's bars.",
+  "packages/core/src/chat-input.tsx":
+    "A field scrolls its own box, so typing and the caret behave as the browser's, under the Scroll area's bars.",
+  "packages/jorjorwel/src/editor-content.tsx":
+    "A field scrolls its own box, so typing and the caret behave as the browser's, under the Scroll area's bars.",
+  "packages/core/src/styles/carousel.css: .x-govuk-ui-carousel-viewport":
+    "The slides snap as they scroll and are moved by their own buttons, with no scrollbar.",
+  "packages/core/src/styles/prose.css: :where(.x-govuk-ui-prose) pre":
+    "Markdown draws it as HTML, not React, so no part can wrap it.",
+  "packages/core/src/styles/prose.css: .x-govuk-ui-rich-text-table":
+    "Markdown draws it as HTML, not React, so no part can wrap it.",
+  "packages/jorjorwel/src/styles/editor.css: .x-govuk-ui-prose .x-govuk-ui-editor-code":
+    "Lexical draws and owns its elements, so no part can wrap them.",
+  "packages/jorjorwel/src/styles/editor.css: .x-govuk-ui-editor-table":
+    "Lexical draws and owns its elements, so no part can wrap them.",
+} as const;
+
+/**
+ * What still scrolls with the browser's own scrolling, and is to move into a Scroll area. Each
+ * leaves this list as it moves.
+ */
+export const toScrollArea = [
+  "packages/core/src/styles/menu.css: .x-govuk-ui-menu",
+  "packages/core/src/styles/select.css: .x-govuk-ui-select-popup",
+  "packages/core/src/styles/navigation-menu.css: .x-govuk-ui-navigation-menu-content",
+  "packages/core/src/styles/sheet.css: .x-govuk-ui-sheet",
+  "packages/core/src/styles/dialog.css: .x-govuk-ui-dialog-viewport",
+  "packages/core/src/styles/tabs.css: .x-govuk-ui-tabs-list",
+  "packages/belsize/src/styles/tiles.css: .x-govuk-ui-tiles-empty",
+  "site/workbench.css: .home",
+] as const;

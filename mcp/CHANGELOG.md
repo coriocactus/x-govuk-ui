@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-09
+
 ### Fixed
 
 - Fixed the server bundling zod 4.6.5 and fast-uri 3.1.8, which have security advisories. It now bundles zod 4.6.6 and fast-uri 3.1.9.

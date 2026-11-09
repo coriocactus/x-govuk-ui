@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-09
+
 ### Fixed
 
 - Fixed paragraphs in the Editor drawn indented, though the value keeps no indent. An item of a nested list made a paragraph, and pasted HTML, could give one. Paragraphs, headings and quotations are now drawn flush with the text.

@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-09
+
 ### Breaking Changes
 
 - Removed Sidebar's `animations` prop, with `sidebarAnimations` and `SidebarAnimation`. Every movement of the Sidebar now runs, unless users prefer reduced motion. Remove `animations` from your Sidebar. The sidebar no longer has a `data-animate` attribute, so select its parts by their classes.

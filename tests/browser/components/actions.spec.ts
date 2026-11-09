@@ -89,3 +89,39 @@ test("pressing Shift three times exits the page, here to the next component", as
   await expect(page).toHaveURL(/\/workbench\/checkboxes$/);
   await expect(frame.getByRole("group").first()).toBeVisible();
 });
+
+test("a split button's chevron opens its other ways, and focus comes back to it", async ({
+  page,
+  frame,
+  open,
+  playground,
+}) => {
+  await open("split-button");
+  await frame.getByRole("button", { name: "Save as a new view" }).click();
+  await expect(frame.getByRole("status")).toHaveText("Saved as a new view.");
+  // From the keyboard, the chevron opens its menu, and focus goes back to it once one is chosen.
+  const chevron = frame.getByRole("button", { name: "More ways to save" });
+  await chevron.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("menuitem", { name: "Update Strategic accounts" })).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(frame.getByRole("status")).toHaveText("Changes discarded.");
+  await expect(chevron).toBeFocused();
+  // The two halves meet, with only a hairline between them. An outline button shares its keyline
+  // with its chevron, and a quiet one is parted from it by a line of its own.
+  const join = () =>
+    Promise.all([
+      frame.getByRole("button", { name: "Save as a new view" }).boundingBox(),
+      chevron.boundingBox(),
+    ]).then(([button, trigger]) => Math.round(trigger!.x - (button!.x + button!.width)));
+  expect(await join()).toBe(1);
+  await playground.set("variant", "Outline");
+  expect(await join()).toBe(-1);
+  await playground.set("variant", "Quiet");
+  // Firefox rounds the meeting to -0, which toBe tells apart from 0.
+  expect(await join()).toBeCloseTo(0);
+  expect(await chevron.evaluate((element) => getComputedStyle(element).borderLeftWidth)).toBe(
+    "1px",
+  );
+});

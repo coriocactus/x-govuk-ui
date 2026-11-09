@@ -280,8 +280,8 @@ test("the phone preview shows the example in a frame as wide as a phone, which f
   await toggle.click();
   await expect(phone.getByRole("button", { name: "Continue to payment" })).toBeVisible();
   await page.getByRole("button", { name: /^Next: / }).click();
-  await expect(page).toHaveURL(/\/workbench\/link$/);
-  await expect(phone.locator(".preview-stage")).toHaveAttribute("data-component", "link");
+  await expect(page).toHaveURL(/\/workbench\/split-button$/);
+  await expect(phone.locator(".preview-stage")).toHaveAttribute("data-component", "split-button");
   expect(
     await frame.evaluate(
       (element: HTMLIFrameElement) => (element.contentWindow as unknown as { kept?: boolean }).kept,

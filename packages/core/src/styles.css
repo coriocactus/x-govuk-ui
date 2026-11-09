@@ -65,6 +65,7 @@
 @import "./styles/timeline.css" layer(x-govuk-ui);
 @import "./styles/resizable.css" layer(x-govuk-ui);
 @import "./styles/button.css" layer(x-govuk-ui);
+@import "./styles/split-button.css" layer(x-govuk-ui);
 @import "./styles/exit-this-page.css" layer(x-govuk-ui);
 @import "./styles/copy.css" layer(x-govuk-ui);
 @import "./styles/accordion.css" layer(x-govuk-ui);

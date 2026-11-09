@@ -392,12 +392,14 @@ test("Customise the sidebar hides, moves and resets entries, and the arrangement
   await expect(nameOf("Exit this page")).toHaveCSS("translate", "none");
   await sheet.getByRole("switch", { name: "Show Link" }).uncheck();
   await expect(entry("Link")).toHaveCount(0);
-  // The sheet lists hidden entries too, so Button first moves past the hidden Link, then past Exit
-  // this page.
-  await sheet.getByRole("button", { name: "Move Button down" }).click();
-  await sheet.getByRole("button", { name: "Move Button down" }).click();
+  // The sheet lists hidden entries too, so Button moves past Split button, then past the hidden
+  // Link, then past Exit this page.
+  for (let step = 0; step < 3; step++) {
+    await sheet.getByRole("button", { name: "Move Button down" }).click();
+  }
   const actions = sidebar.locator(".x-govuk-ui-sidebar-group", { hasText: "Actions" });
-  await expect(actions.locator("a")).toHaveText(["Exit this page", "Button"]);
+  // Split button is experimental, so its link says so to screen readers after its name.
+  await expect(actions.locator("a")).toHaveText([/^Split button/, "Exit this page", "Button"]);
   await sheet.getByRole("button", { name: "Move Actions down" }).click();
   await expect(sidebar.locator(".x-govuk-ui-sidebar-group-label").nth(1)).toHaveText(
     "Form controls",
@@ -414,7 +416,7 @@ test("Customise the sidebar hides, moves and resets entries, and the arrangement
   expect(kept).toMatchObject({
     pinned: ["choices"],
     hidden: ["link"],
-    order: { Actions: ["link", "exit-this-page", "button"] },
+    order: { Actions: ["split-button", "link", "exit-this-page", "button"] },
   });
   expect(kept.groups.slice(0, 2)).toEqual(["Form controls", "Actions"]);
   await page.getByRole("button", { name: "Customise the sidebar" }).click();

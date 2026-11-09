@@ -849,6 +849,12 @@ export {
 export { SoundScope, type SoundScopeProps, useScopeSound } from "./sound-scope";
 export { Spinner, type SpinnerProps } from "./spinner";
 export {
+  SplitButton,
+  type SplitButtonProps,
+  SplitButtonTrigger,
+  type SplitButtonTriggerProps,
+} from "./split-button";
+export {
   Stat,
   type StatChange,
   type StatLabels,

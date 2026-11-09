@@ -1,6 +1,16 @@
 import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Button, Card, CardTitle, Pagination, TaskList, TaskListItem } from "x-govuk-ui";
+import {
+  Button,
+  Card,
+  CardTitle,
+  DropdownMenu,
+  Pagination,
+  SplitButton,
+  SplitButtonTrigger,
+  TaskList,
+  TaskListItem,
+} from "x-govuk-ui";
 
 test("pending buttons preserve their name and prevent repeated activation", () => {
   let calls = 0;
@@ -94,4 +104,23 @@ test("link parts render a router's link in place of their anchor", () => {
   );
   expect(pages.match(/data-router=""/g)?.length).toBe(5);
   expect(pages).toContain('href="?page=3"');
+});
+
+test("a split button is a named group of a button and a chevron named for its menu", () => {
+  const markup = renderToStaticMarkup(
+    <SplitButton aria-label="Save the view" className="save">
+      <Button>Save as a new view</Button>
+      <DropdownMenu>
+        <SplitButtonTrigger label="More ways to save" />
+      </DropdownMenu>
+    </SplitButton>,
+  );
+  expect(markup).toMatch(
+    /^<div role="group" aria-label="Save the view" class="x-govuk-ui-split-button save">/,
+  );
+  // The chevron matches the button's primary look, and says what its menu holds.
+  expect(markup).toMatch(
+    /aria-label="More ways to save"[^>]*class="[^"]*x-govuk-ui-split-button-trigger/,
+  );
+  expect(markup).not.toContain("x-govuk-ui-button--secondary");
 });

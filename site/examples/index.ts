@@ -100,6 +100,7 @@ import slider from "./slider";
 import SoundExample from "./sound";
 import sparkline from "./sparkline";
 import spinner from "./spinner";
+import splitButton from "./split-button";
 import stat from "./stat";
 import streamingText from "./streaming-text";
 import summaryList from "./summary-list";
@@ -135,6 +136,7 @@ import widthContainer from "./width-container";
 export const examples: Record<ComponentName, ComponentType<never>> = {
   accordion,
   button,
+  "split-button": splitButton,
   carousel,
   "command-menu": commandMenu,
   conversation,

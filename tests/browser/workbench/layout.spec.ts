@@ -128,8 +128,8 @@ test("navigation keeps the frame, divider sizes and code-panel visibility", asyn
   ).toBe(true);
   // Next and Previous follow the sidebar's order. Previous wraps from the first component to the
   // last.
-  await page.getByRole("button", { name: "Next: Link" }).click();
-  await expect(page).toHaveURL(/\/workbench\/link$/);
+  await page.getByRole("button", { name: "Next: Split button" }).click();
+  await expect(page).toHaveURL(/\/workbench\/split-button$/);
   await page.getByRole("button", { name: "Previous: Button" }).click();
   await page.getByRole("button", { name: "Previous: Visually hidden" }).click();
   await expect(page).toHaveURL(/\/workbench\/visually-hidden$/);

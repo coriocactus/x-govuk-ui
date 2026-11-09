@@ -1494,6 +1494,16 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       ))}
     </>
   ),
+  "split-button": (
+    <>
+      <Area x={14} y={29} w={50} h={16} tone="go-dark" r={2} />
+      <Area x={14} y={27} w={50} h={16} tone="go" r={2} />
+      <Words x={20} y={33.5} w={38} h={3} tone="white" />
+      <Area x={65} y={29} w={16} h={16} tone="go-dark" r={2} />
+      <Area x={65} y={27} w={16} h={16} tone="go" r={2} />
+      <Stroke d="M69.5 33.5l3.5 3.5 3.5-3.5" tone="white" weight={1.5} />
+    </>
+  ),
   "side-panel": (
     <>
       <Frame x={6} y={8} w={84} h={56} r={3} fill="paper" edge="line" />

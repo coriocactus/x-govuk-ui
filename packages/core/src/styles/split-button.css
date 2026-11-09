@@ -1,0 +1,48 @@
+/* Split button. The button and its chevron join into one, with a hairline of the page between
+   them, so each still shows its own press and focus. The outer corners are the button's. */
+.x-govuk-ui-split-button {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: middle;
+}
+.x-govuk-ui-split-button > .x-govuk-ui-button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.x-govuk-ui-split-button > .x-govuk-ui-split-button-trigger {
+  margin-left: 1px;
+  padding-inline: 10px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+/* An outline button's keyline parts it from its chevron, shared, not doubled. A quiet button has no
+   fill for a hairline of the page to part, so a line in the page's line colour parts them. */
+.x-govuk-ui-split-button > .x-govuk-ui-button--outline.x-govuk-ui-split-button-trigger {
+  margin-left: -1px;
+}
+.x-govuk-ui-split-button > .x-govuk-ui-button--quiet.x-govuk-ui-split-button-trigger {
+  margin-left: 0;
+  border-left: 1px solid var(--x-govuk-ui-line);
+}
+/* The half with focus is above the other, so its yellow edge shows whole where they meet. */
+.x-govuk-ui-split-button > :focus-visible {
+  z-index: 1;
+}
+/* The chevron has no words to sit apart from, so it sits in the middle of its button. */
+.x-govuk-ui-split-button > .x-govuk-ui-split-button-trigger .x-govuk-ui-chevron {
+  margin-left: 0;
+}
+/* On a phone, where GOV.UK's buttons take the full width, the button takes what the chevron
+   leaves. */
+@media (max-width: 40.0525em) {
+  .x-govuk-ui-split-button {
+    display: flex;
+  }
+  .x-govuk-ui-split-button > .x-govuk-ui-button:first-child {
+    flex: 1;
+    width: auto;
+  }
+  .x-govuk-ui-split-button > .x-govuk-ui-split-button-trigger {
+    width: auto;
+  }
+}

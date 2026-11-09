@@ -203,17 +203,20 @@
   margin: 0;
   color: var(--x-govuk-ui-muted);
 }
-/* Overlays. Each example's button sits centred, with its outcome beneath. */
+/* Overlays, and Split button, whose menu is one. Each example's button sits centred, with its
+   outcome beneath. */
 .preview-example--dialog,
 .preview-example--sheet,
 .preview-example--popover,
-.preview-example--dropdown-menu {
+.preview-example--dropdown-menu,
+.preview-example--split-button {
   display: grid;
   justify-items: center;
 }
 .preview-example--dialog .preview-message,
 .preview-example--sheet .preview-message,
-.preview-example--dropdown-menu .preview-message {
+.preview-example--dropdown-menu .preview-message,
+.preview-example--split-button .preview-message {
   text-align: center;
 }
 .preview-hint {

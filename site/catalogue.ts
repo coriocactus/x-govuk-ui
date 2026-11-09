@@ -4124,6 +4124,33 @@ const entries = {
       number("more", 2, { min: 0, note: "Counts the contacts not shown." }),
     ],
   },
+  "split-button": {
+    name: "Split button",
+    experimental: true,
+    width: 420,
+    description: "Offer one action, with a menu of other ways to do the same thing beside it.",
+    upstream: "",
+    dependencies: "React · Base UI",
+    changes:
+      "Not in GOV.UK. A Button joined to a chevron that opens a Dropdown menu, with a hairline of the page between them, so each shows its own press and GOV.UK's yellow focus. The outer corners are the button's. An outline button shares its keyline with its chevron, and a quiet one is parted from it by a line. The button does what most users want, such as Save as a new view, and the menu has the other ways, such as Update this view or Discard changes. Give the chevron the button's variant and size, so the two read as one. On a phone, where GOV.UK's buttons take the full width, the button takes what the chevron leaves. Name the group with `aria-label`, as the example does, and the chevron is named for its menu. An action that takes the split button away must move focus somewhere that stays.",
+    props: [
+      reference("children", "a Button, then a DropdownMenu with a SplitButtonTrigger", "Required"),
+      reference("SplitButtonTrigger", "{ label, variant, size }", "Part"),
+    ],
+    example: [
+      choice(
+        "variant",
+        [
+          ["primary", "Primary"],
+          ["secondary", "Secondary"],
+          ["outline", "Outline"],
+          ["warning", "Warning"],
+          ["quiet", "Quiet"],
+        ],
+        "primary",
+      ),
+    ],
+  },
   "side-panel": {
     name: "Side panel",
     experimental: true,
@@ -4221,7 +4248,7 @@ export type ComponentName = keyof typeof entries;
  * order, as do the command menu's groups.
  */
 const order: Record<Group, readonly ComponentName[]> = {
-  Actions: ["button", "link", "exit-this-page"],
+  Actions: ["button", "split-button", "link", "exit-this-page"],
   // Text first, then choices, dates and files, then richer choices, then app-style controls.
   "Form controls": [
     "input",

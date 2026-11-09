@@ -499,6 +499,18 @@ test("a timeline highlights a run of events, loads earlier ones beneath and take
   expect(Math.abs(join.dashes + 13 - join.way)).toBeLessThanOrEqual(1);
   expect(join.above).toEqual([join.tick, "none"]);
   expect(join.above?.[0]).not.toBe(join.rail);
+  // Starting again takes the added events away from the top, and the earlier ones from the foot.
+  // They fade as they close, and at once the first event that stays has no rail above its tick,
+  // which would reach into the space the leaving events give up.
+  await frame.getByRole("button", { name: "Add the next update" }).click();
+  await frame.getByRole("button", { name: "Start again" }).click();
+  const leaving = frame.locator(".x-govuk-ui-timeline-item[data-leaving]");
+  await expect(leaving).toHaveCount(6);
+  const stays = frame.locator(".x-govuk-ui-timeline-item:not([data-leaving])").first();
+  await expect(stays).toContainText("Application approved");
+  expect(await stays.evaluate((item) => getComputedStyle(item, "::before").display)).toBe("none");
+  await expect(leaving).toHaveCount(0);
+  await expect(items).toHaveCount(3);
 });
 
 test("a relative time writes the time from now and keeps itself up to date", async ({

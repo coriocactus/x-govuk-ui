@@ -7,7 +7,7 @@
  * rail, and it sets TimelineMore apart from the list of events.
  */
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import {
   Children,
   type ComponentPropsWithRef,
@@ -75,7 +75,6 @@ export function Timeline({
   style,
   ...props
 }: TimelineProps) {
-  const timing = useMotionTiming();
   const parts = Children.toArray(children).filter(isValidElement);
   const items = parts.filter((part) => part.type !== TimelineMore);
   const more = parts.filter((part) => part.type === TimelineMore);
@@ -123,23 +122,17 @@ export function Timeline({
                 const arrival = arrivals[index];
                 const highlighted = marked ? marks[index] === true : index === 0;
                 return (
-                  <motion.li
+                  <TimelineRow
                     key={item.key}
                     ref={(node: HTMLLIElement | null) => {
                       if (node) nodes.current.set(item.key, node);
                       else nodes.current.delete(item.key);
                     }}
-                    className="x-govuk-ui-timeline-item"
-                    data-highlighted={highlighted || undefined}
-                    data-entered={arrival === "new" || undefined}
-                    data-sound-enter={arrival === "new" ? "notification" : undefined}
-                    initial={{ height: 0 }}
-                    animate={{ height: "auto" }}
-                    exit={{ height: 0 }}
-                    transition={timing.ease(duration.slow)}
+                    highlighted={highlighted}
+                    arrival={arrival}
                   >
                     {item}
-                  </motion.li>
+                  </TimelineRow>
                 );
               })}
             </AnimatePresence>
@@ -152,6 +145,47 @@ export function Timeline({
         </div>
       </MoreContext>
     </HeadingLevel>
+  );
+}
+
+/**
+ * One event's place in the list, which opens as the event arrives and closes as it leaves. A
+ * leaving event fades out as it closes, faster than it closes, so its words are not seen cut
+ * short as its item clips them. It is marked as leaving at once, so the events that stay take the
+ * ends of the rail while it closes. @internal
+ */
+function TimelineRow({
+  highlighted,
+  arrival,
+  children,
+  ref,
+}: {
+  highlighted: boolean;
+  arrival: Arrival | undefined;
+  children: ReactNode;
+  ref: (node: HTMLLIElement | null) => void;
+}) {
+  const timing = useMotionTiming();
+  const present = useIsPresent();
+  return (
+    <motion.li
+      ref={ref}
+      className="x-govuk-ui-timeline-item"
+      data-highlighted={highlighted || undefined}
+      data-entered={arrival === "new" || undefined}
+      data-leaving={!present || undefined}
+      data-sound-enter={arrival === "new" ? "notification" : undefined}
+      initial={{ height: 0 }}
+      animate={{ height: "auto" }}
+      exit={{
+        height: 0,
+        opacity: 0,
+        transition: { height: timing.ease(duration.slow), opacity: timing.ease(duration.fast) },
+      }}
+      transition={timing.ease(duration.slow)}
+    >
+      {children}
+    </motion.li>
   );
 }
 

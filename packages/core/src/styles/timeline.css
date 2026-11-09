@@ -25,7 +25,9 @@
   isolation: isolate;
 }
 /* The rail above the tick, and the rail below it. The tick covers the join between them. The first
-   event has no rail above, and the last none below, unless a TimelineMore follows. */
+   event has no rail above, and the last none below, unless a TimelineMore follows. While events
+   leave, as they close, the first and last that stay take the ends of the rail at once, so no
+   stretch of rail reaches into the space a leaving event gives up. */
 .x-govuk-ui-timeline-item::before,
 .x-govuk-ui-timeline-item::after {
   content: "";
@@ -42,10 +44,14 @@
   top: var(--x-govuk-ui-timeline-middle);
   bottom: 0;
 }
-.x-govuk-ui-timeline-item:first-child::before,
+.x-govuk-ui-timeline-item:not([data-leaving]):not(
+  .x-govuk-ui-timeline-item:not([data-leaving]) ~ *
+)::before,
 .x-govuk-ui-timeline:not(:has(> .x-govuk-ui-timeline-foot))
   > .x-govuk-ui-timeline-list
-  > .x-govuk-ui-timeline-item:last-child::after {
+  > .x-govuk-ui-timeline-item:not([data-leaving]):not(
+    :has(~ .x-govuk-ui-timeline-item:not([data-leaving]))
+  )::after {
   display: none;
 }
 .x-govuk-ui-timeline-item[data-highlighted] + [data-highlighted]::before,
@@ -114,7 +120,9 @@
 /* The last event has no rail below it, unless a TimelineMore follows, so it has no dashes either. */
 .x-govuk-ui-timeline:not(:has(> .x-govuk-ui-timeline-foot))
   > .x-govuk-ui-timeline-list
-  > .x-govuk-ui-timeline-item:last-child
+  > .x-govuk-ui-timeline-item:not([data-leaving]):not(
+    :has(~ .x-govuk-ui-timeline-item:not([data-leaving]))
+  )
   > .x-govuk-ui-timeline-event::before {
   display: none;
 }
@@ -133,12 +141,15 @@
   background: var(--x-govuk-ui-timeline-colour);
   transform-origin: left center;
 }
-.x-govuk-ui-timeline-item:first-child > .x-govuk-ui-timeline-event::after {
+.x-govuk-ui-timeline-item:not([data-leaving]):not(.x-govuk-ui-timeline-item:not([data-leaving]) ~ *)
+  > .x-govuk-ui-timeline-event::after {
   border-top-left-radius: 999px;
 }
 .x-govuk-ui-timeline:not(:has(> .x-govuk-ui-timeline-foot))
   > .x-govuk-ui-timeline-list
-  > .x-govuk-ui-timeline-item:last-child
+  > .x-govuk-ui-timeline-item:not([data-leaving]):not(
+    :has(~ .x-govuk-ui-timeline-item:not([data-leaving]))
+  )
   > .x-govuk-ui-timeline-event::after {
   border-bottom-left-radius: 999px;
 }

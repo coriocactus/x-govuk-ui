@@ -83,6 +83,22 @@ test("the workbench's own page counts the components, says how to find one and d
   await expect(
     frame.getByRole("region", { name: "Overlays" }).getByRole("link", { name: "Dialog" }),
   ).toHaveAttribute("href", "/workbench/dialog");
+  // Each experimental component, which the sidebar marks with a flask, has the same flask on its
+  // drawing's top edge, not after its name. The lead explains the flask, and the link's name says
+  // so.
+  const flasks = await page.locator(".workbench-sidebar nav .sidebar-experimental").count();
+  const experimental = frame.locator(".landing-tile:has(.landing-flask)");
+  await expect(experimental).toHaveCount(flasks);
+  if (flasks > 0) {
+    await expect(experimental.first()).toHaveAccessibleName(/ Experimental$/);
+    await expect(experimental.locator(".landing-name .sidebar-experimental")).toHaveCount(0);
+    await expect(
+      experimental.locator(".landing-figure > .landing-flask > .sidebar-experimental"),
+    ).toHaveCount(flasks);
+    await expect(frame.locator(".landing-lead")).toContainText("experimental");
+  } else {
+    await expect(frame.locator(".landing-lead")).not.toContainText("experimental");
+  }
   // The shortcut that finds one is the device's own, ⌘ K on a Mac or Ctrl K elsewhere.
   await expect(frame.locator(".landing-lead kbd").first()).toHaveText(/^(⌘|Ctrl)\s*K$/);
   // There are no props to show, so no playground, and nothing points at one.

@@ -1462,6 +1462,24 @@
 .landing-tile:hover .landing-art {
   border-color: var(--x-govuk-ui-border);
 }
+/* An experimental component has the sidebar's flask on the middle of its drawing's top edge, half
+   in and half out, so its name lines up with the others. A ring of the page's colour parts the
+   flask from the edge it crosses. It sits outside the drawing, which cuts off what it draws at its
+   edge. */
+.landing-figure {
+  position: relative;
+  display: block;
+}
+.landing-flask {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  transform: translate(-50%, -50%);
+}
+.landing-flask .sidebar-experimental {
+  box-shadow: 0 0 0 2px var(--preview);
+}
 .landing-tile:hover .landing-name {
   color: var(--x-govuk-ui-link-hover);
   text-decoration-line: underline;
@@ -1480,11 +1498,6 @@
     0 -2px var(--x-govuk-ui-focus),
     0 4px var(--x-govuk-ui-focus-text);
   box-decoration-break: clone;
-}
-/* An experimental component has the sidebar's flask after its name, clear of the drawing. */
-.landing-name .sidebar-experimental {
-  padding: 1px;
-  vertical-align: -3px;
 }
 
 /* The drawings' tones, each a design token or a mix of two, so the drawings follow the theme. Each

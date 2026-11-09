@@ -127,6 +127,14 @@ export {
   type CarouselViewportProps,
   defaultCarouselLabels,
 } from "./carousel";
+export {
+  ChangeSummary,
+  ChangeSummaryItem,
+  type ChangeSummaryItemProps,
+  type ChangeSummaryLabels,
+  type ChangeSummaryProps,
+  defaultChangeSummaryLabels,
+} from "./change-summary";
 export { type CharacterCountLabels, defaultCharacterCountLabels } from "./character-count";
 export {
   browserRecogniser,

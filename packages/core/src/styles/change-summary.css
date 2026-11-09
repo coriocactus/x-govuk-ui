@@ -1,0 +1,68 @@
+/* Change summary. The changes sit together on GOV.UK's tinted surface, so they read apart from
+   who made them and when. Each change is on a line of its own: what changed, in a column of its
+   own so the names line up, then what it was, in the muted colour, an arrow, and what it is now,
+   in bold, so the eye finds the new values first. Where the line has no room for the values
+   beside the name, they go beneath it. A value wraps rather than clip, between any two letters if
+   it must, such as a long address. */
+.x-govuk-ui-change-summary {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--x-govuk-ui-radius-surface);
+  background: var(--x-govuk-ui-surface);
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-size: 16px;
+  line-height: 1.4;
+}
+/* The name takes 30% of the line, or 11em on a wide one, and the values the rest. They go beneath
+   it once they would have less than 14em, and the name then takes the whole line. */
+.x-govuk-ui-change-summary-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+}
+.x-govuk-ui-change-summary-label {
+  flex: 1 0 min(30%, 11em);
+  min-width: 0;
+  color: var(--x-govuk-ui-muted);
+  overflow-wrap: break-word;
+}
+.x-govuk-ui-change-summary-change {
+  display: flex;
+  flex: 1000 1 14em;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  min-width: 0;
+  margin: 0;
+}
+.x-govuk-ui-change-summary-from,
+.x-govuk-ui-change-summary-to {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.x-govuk-ui-change-summary-from {
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-change-summary-to {
+  font-weight: 700;
+}
+/* The arrow sits on the middle of the text, as tall as its capitals, in any typeface. */
+.x-govuk-ui-change-summary-arrow {
+  flex: none;
+  align-self: center;
+  width: 1em;
+  height: 1em;
+  color: var(--x-govuk-ui-muted);
+}
+.x-govuk-ui-change-summary-none {
+  font-style: italic;
+  font-weight: 400;
+}
+@media (forced-colors: active) {
+  .x-govuk-ui-change-summary {
+    border: 1px solid CanvasText;
+  }
+}

@@ -16,6 +16,7 @@ import calendarHeatmap from "./calendar-heatmap";
 import callout from "./callout";
 import card from "./card";
 import carousel from "./carousel";
+import changeSummary from "./change-summary";
 import chart from "./chart";
 import chartSet from "./chart-set";
 import chatInput from "./chat-input";
@@ -216,6 +217,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   avatar,
   "record-chip": recordChip,
   "relative-time": relativeTime,
+  "change-summary": changeSummary,
   marker,
   attachment,
   "cookie-banner": cookieBanner,

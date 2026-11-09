@@ -1,0 +1,62 @@
+.x-govuk-ui-change-summary
+  display: grid
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  background-color: rgb(244, 248, 251)
+  padding-top: 12px
+  padding-right: 16px
+  padding-bottom: 12px
+  padding-left: 16px
+  row-gap: 6px
+  column-gap: 6px
+  border-top-left-radius: 8px
+  border-top-right-radius: 8px
+  border-bottom-right-radius: 8px
+  border-bottom-left-radius: 8px
+.x-govuk-ui-change-summary-arrow
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-change-summary-change
+  display: flex
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  column-gap: 8px
+.x-govuk-ui-change-summary-from
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-change-summary-item
+  display: flex
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(11, 12, 12)
+  column-gap: 16px
+.x-govuk-ui-change-summary-label
+  display: block
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-change-summary-none
+  display: inline
+  font-size: 16px
+  font-weight: 400
+  font-style: italic
+  line-height: 1.4
+  color: rgb(72, 73, 73)
+.x-govuk-ui-change-summary-to
+  display: block
+  font-size: 16px
+  font-weight: 700
+  line-height: 1.4
+  color: rgb(11, 12, 12)

@@ -4124,6 +4124,25 @@ const entries = {
       number("more", 2, { min: 0, note: "Counts the contacts not shown." }),
     ],
   },
+  "change-summary": {
+    name: "Change summary",
+    experimental: true,
+    width: 560,
+    // In a Timeline, its top stays still. Alone, it sits in the middle.
+    anchor: "top",
+    placement: ({ timeline }) => (timeline === false ? { anchor: undefined } : {}),
+    description:
+      "Show what a change to a record changed, each value from what it was to what it is.",
+    upstream: "",
+    dependencies: "React",
+    changes:
+      "Not in GOV.UK. The values that changed, together on GOV.UK's tinted surface, as a description list. Each is on a line of its own: what changed, with the names lined up in a column, then what it was in the muted colour, an arrow, and what it is now in bold, so the eye finds the new values first. Where the line is short, the values go beneath the name. Screen readers do not see the arrow, so it says, as Owner, changed from Lord Rosebery to William Gladstone. A value that was not set, or was removed, is None. A value wraps rather than clip. It suits a record's history in a Timeline, where each event says who changed what, and when. The example is a company's history, with a handover and the reason for it.",
+    props: [
+      reference("children", "ChangeSummaryItem parts", "Required"),
+      reference("ChangeSummaryItem", "{ label, from, to, labels }", "Part"),
+    ],
+    example: [toggle("timeline", true, { note: "Shows the changes in a Timeline." })],
+  },
   "relative-time": {
     name: "Relative time",
     experimental: true,
@@ -4248,6 +4267,7 @@ const order: Record<Group, readonly ComponentName[]> = {
     "task-list",
     "timeline",
     "relative-time",
+    "change-summary",
     "stat",
     "figure",
     "code-block",

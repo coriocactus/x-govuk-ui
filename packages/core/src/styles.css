@@ -107,6 +107,7 @@
 @import "./styles/item.css" layer(x-govuk-ui);
 @import "./styles/avatar.css" layer(x-govuk-ui);
 @import "./styles/record-chip.css" layer(x-govuk-ui);
+@import "./styles/change-summary.css" layer(x-govuk-ui);
 @import "./styles/aspect-ratio.css" layer(x-govuk-ui);
 @import "./styles/aside.css" layer(x-govuk-ui);
 @import "./styles/marker.css" layer(x-govuk-ui);

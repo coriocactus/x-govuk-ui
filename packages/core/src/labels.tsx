@@ -12,6 +12,7 @@ import type { CalendarLabels } from "./calendar";
 import type { CalloutLabels } from "./callout";
 import type { MediaCreditLabels } from "./card";
 import type { CarouselLabels } from "./carousel";
+import type { ChangeSummaryLabels } from "./change-summary";
 import type { CharacterCountLabels } from "./character-count";
 import type { ChatInputLabels } from "./chat-input";
 import type { ChoiceDividerLabels } from "./choice";
@@ -82,6 +83,7 @@ export interface ComponentLabels {
   callout: CalloutLabels;
   carousel: CarouselLabels;
   characterCount: CharacterCountLabels;
+  changeSummary: ChangeSummaryLabels;
   chatInput: ChatInputLabels;
   choiceDivider: ChoiceDividerLabels;
   combobox: ComboboxLabels;

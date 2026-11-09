@@ -2,6 +2,8 @@ import { expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
   Avatar,
+  ChangeSummary,
+  ChangeSummaryItem,
   Choices,
   CodeBlock,
   CodeBlockCopy,
@@ -590,5 +592,27 @@ test("a record chip links only when given somewhere to go, and a record chip gro
   expect(drawn.match(/<li>/g)).toHaveLength(2);
   expect(renderToStaticMarkup(<RecordChipGroup />)).toBe(
     '<ul class="x-govuk-ui-record-chip-group"></ul>',
+  );
+});
+
+test("a change summary says what each value was and is, in words screen readers hear", () => {
+  const markup = renderToStaticMarkup(
+    <ChangeSummary className="history">
+      <ChangeSummaryItem label="Owner" from="Lord Rosebery" to="William Gladstone" />
+      <ChangeSummaryItem label="Website" to="tamarvalleyfoundry.example" />
+    </ChangeSummary>,
+  );
+  expect(markup).toMatch(/^<dl class="x-govuk-ui-change-summary history">/);
+  expect(markup).toContain('<dt class="x-govuk-ui-change-summary-label">Owner</dt>');
+  // An arrow for the eye, hidden from screen readers, which hear words in its place.
+  expect(markup).toContain(
+    '<span class="x-govuk-ui-visually-hidden">changed from </span><span class="x-govuk-ui-change-summary-from">Lord Rosebery</span><svg class="x-govuk-ui-change-summary-arrow"',
+  );
+  expect(markup).toMatch(/<svg class="x-govuk-ui-change-summary-arrow"[^>]*aria-hidden="true"/);
+  expect(markup).toContain('<span class="x-govuk-ui-visually-hidden"> to </span>');
+  expect(markup).toContain('<span class="x-govuk-ui-change-summary-to">William Gladstone</span>');
+  // A value that was not set is None.
+  expect(markup).toContain(
+    '<span class="x-govuk-ui-change-summary-from"><span class="x-govuk-ui-change-summary-none">None</span></span>',
   );
 });

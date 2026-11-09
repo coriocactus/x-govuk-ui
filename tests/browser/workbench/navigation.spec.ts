@@ -414,8 +414,7 @@ test("Customise the sidebar hides, moves and resets entries, and the arrangement
     await sheet.getByRole("button", { name: "Move Button down" }).click();
   }
   const actions = sidebar.locator(".x-govuk-ui-sidebar-group", { hasText: "Actions" });
-  // Split button is experimental, so its link says so to screen readers after its name.
-  await expect(actions.locator("a")).toHaveText([/^Split button/, "Exit this page", "Button"]);
+  await expect(actions.locator("a")).toHaveText(["Split button", "Exit this page", "Button"]);
   await sheet.getByRole("button", { name: "Move Actions down" }).click();
   await expect(sidebar.locator(".x-govuk-ui-sidebar-group-label").nth(1)).toHaveText(
     "Form controls",

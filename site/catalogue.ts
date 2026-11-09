@@ -4108,7 +4108,6 @@ const entries = {
   },
   "record-chip": {
     name: "Record chip",
-    experimental: true,
     width: 520,
     description: "Name a thing, such as a company or a person, with its avatar, and link to it.",
     upstream: "",
@@ -4129,7 +4128,6 @@ const entries = {
   },
   "split-button": {
     name: "Split button",
-    experimental: true,
     width: 420,
     description: "Offer one action, with a menu of other ways to do the same thing beside it.",
     upstream: "",
@@ -4156,7 +4154,6 @@ const entries = {
   },
   "selection-bar": {
     name: "Selection bar",
-    experimental: true,
     width: 640,
     anchor: "top",
     description:
@@ -4175,7 +4172,6 @@ const entries = {
   },
   board: {
     name: "Board",
-    experimental: true,
     // A board fills what it is given, as a service's page laid out to fill the window gives it,
     // so the example takes the whole preview, its stages reach the foot, and they scroll sideways.
     width: "100%",
@@ -4201,7 +4197,6 @@ const entries = {
   },
   "side-panel": {
     name: "Side panel",
-    experimental: true,
     width: 720,
     anchor: "top",
     description:
@@ -4235,7 +4230,6 @@ const entries = {
   },
   "change-summary": {
     name: "Change summary",
-    experimental: true,
     width: 560,
     // In a Timeline, its top stays still. Alone, it sits in the middle.
     anchor: "top",
@@ -4254,7 +4248,6 @@ const entries = {
   },
   "relative-time": {
     name: "Relative time",
-    experimental: true,
     width: 460,
     description: "Show when something happened, or will, as a time from now, such as 3 days ago.",
     upstream: "",

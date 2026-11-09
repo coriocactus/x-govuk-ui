@@ -17,7 +17,6 @@ import {
 } from "@x-govuk-ui/belsize";
 import { Chart } from "@x-govuk-ui/memetics";
 import {
-  type CSSProperties,
   Fragment,
   memo,
   type RefObject,
@@ -63,9 +62,6 @@ import {
   MessageScrollerItem,
   MessageSuggestion,
   MessageSuggestions,
-  ResizableHandle,
-  Sheet,
-  SheetContent,
   Sidebar,
   SidebarContent,
   SidebarCustomise,
@@ -80,6 +76,13 @@ import {
   SidebarProvider,
   SidebarSeparator,
   SidebarTrigger,
+  SidePanel,
+  SidePanelClose,
+  SidePanelHeader,
+  SidePanelLayout,
+  SidePanelProvider,
+  SidePanelTitle,
+  SidePanelTrigger,
   SoundScope,
   StreamingText,
   Tag,
@@ -91,6 +94,7 @@ import {
   TooltipProvider,
   useSidebar,
   useSidebarArrangement,
+  useSidePanel,
   useSound,
   useTheme,
 } from "x-govuk-ui";
@@ -277,8 +281,6 @@ const overviewTiles = [
   { id: "applications", title: "Applications" },
 ];
 
-/** Piscine Assist's width, which its handle changes, within these. */
-const ASSIST = { min: 300, max: 560, start: 380 };
 /**
  * Narrower than this, the body has no space for Piscine Assist beside the work, so it is a sheet.
  */
@@ -314,9 +316,17 @@ const signOut = () => location.assign("/");
 
 export function Workspace() {
   return (
-    // The sidebar remembers whether it is open, and its width, in this browser.
+    // The sidebar remembers whether it is open, and its width, in this browser. Piscine Assist
+    // belongs to the workspace, not to one part of it, so its provider is around the bar's fish and
+    // the command menu as well as the body. Its width and whether it is open are kept too.
     <SidebarProvider defaultOpen storageKey="x-govuk-ui-workspace-sidebar-state">
-      <Shell />
+      <SidePanelProvider
+        id="workspace-assist"
+        storageKey="x-govuk-ui-workspace-assist"
+        besideFrom={BESIDE}
+      >
+        <Shell />
+      </SidePanelProvider>
     </SidebarProvider>
   );
 }
@@ -338,29 +348,7 @@ function Shell() {
   const [current, setCurrent] = useState<Section>("Overview");
   const [commandsOpen, setCommandsOpen] = useState(false);
   const [customising, setCustomising] = useState(false);
-  const [assistOpen, setAssistOpen] = useStoredState("x-govuk-ui-workspace-assist", true);
-  // The width is kept in this browser once it is chosen, and follows a drag only in memory.
-  const [keptWidth, setKeptWidth] = useStoredState(
-    "x-govuk-ui-workspace-assist-width",
-    ASSIST.start,
-  );
-  const [dragWidth, setDragWidth] = useState<number | null>(null);
-  const assistWidth = dragWidth ?? keptWidth;
-  const [resizingAssist, setResizingAssist] = useState(false);
-  const assistShow = useRef<HTMLButtonElement>(null);
-  const body = useRef<HTMLDivElement>(null);
   const work = useRef<HTMLDivElement>(null);
-  const beside = useRoomFor(body, BESIDE);
-  // Where it is too narrow beside the work, Piscine Assist opens over the work as a sheet. Its own
-  // state is not kept, so the sheet never opens over the work by itself as the window narrows.
-  const [sheetOpen, setSheetOpen] = useState(false);
-  // A change of space puts the sheet away, in the render that brings the change instead of after
-  // it, so the sheet never shows over the work for a frame.
-  const [roomWas, setRoomWas] = useState(beside);
-  if (roomWas !== beside) {
-    setRoomWas(beside);
-    setSheetOpen(false);
-  }
   // The views Piscine Assist composed, each a tile of the Overview, which keeps their arrangement
   // with its own tiles. A composed view lasts as long as the page, so a tile kept from an earlier
   // visit that is not here now is left out.
@@ -396,19 +384,6 @@ function Shell() {
   };
   const chat = useAssistChat(compose);
   const openApplications = useOpenApplications().length;
-  // The fish disappears as it is pressed, so its message box takes focus instead.
-  const showAssist = () => {
-    if (!beside) return setSheetOpen(true);
-    setAssistOpen(true);
-    requestAnimationFrame(() =>
-      document.getElementById("workspace-assist-message")?.focus({ preventScroll: true }),
-    );
-  };
-  // Closed, Piscine Assist slides away out of reach, and focus goes to the fish that replaces it.
-  const closeAssist = () => {
-    setAssistOpen(false);
-    requestAnimationFrame(() => assistShow.current?.focus());
-  };
   const footerRow = useRef<HTMLDivElement>(null);
   // Users pin, move and hide the parts of the work, and the arrangement is kept in this browser.
   const arranger = useSidebarArrangement({
@@ -629,39 +604,15 @@ function Shell() {
                   </MenuContent>
                 </DropdownMenu>
               </div>
-              {/* While Piscine Assist is hidden, a fish brings it back. Open, it has its own cross
-                  to close it, so the bar needs no button for that. Where it is too narrow beside
-                  the work, the fish opens it as a sheet, and focus returns to the fish. */}
               <div className="workspace-bar-end">
-                {(!beside || !assistOpen) && (
-                  <Tooltip side="bottom" content="Show Piscine Assist">
-                    <Button
-                      ref={assistShow}
-                      variant="quiet"
-                      size="small-icon"
-                      aria-label="Show Piscine Assist"
-                      // The sheet is not in the page while it is closed, so the fish names it only
-                      // while there is a pane or an open sheet to name.
-                      aria-controls={beside || sheetOpen ? "workspace-assist" : undefined}
-                      onClick={showAssist}
-                    >
-                      <Icon name="fish" />
-                    </Button>
-                  </Tooltip>
-                )}
+                <ShowAssist />
               </div>
             </SidebarPageBar>
-            {/* Piscine Assist belongs to the workspace, not to one part of it. It stays open, with
-                its conversation, from part to part, beside the work, as wide as its handle is
-                dragged. It is a pane of a fixed width, not a tile, so it keeps its pixels as the
-                window changes. */}
-            <div
-              ref={body}
-              className="workspace-body"
-              data-assist={beside && assistOpen ? "open" : "closed"}
-              data-resizing={resizingAssist || undefined}
-              style={{ "--workspace-assist-width": `${assistWidth}px` } as CSSProperties}
-            >
+            {/* Piscine Assist stays open, with its conversation, from part to part, beside the
+                work, as wide as its handle is dragged. It is a Side panel of a fixed width, not a
+                tile, so it keeps its pixels as the window changes. Where the body is too narrow
+                for it beside the work, it opens as a sheet. */}
+            <SidePanelLayout className="workspace-body">
               <div ref={work} id="workspace-work" className="workspace-work">
                 {current === "Overview" ? (
                   <Overview
@@ -684,43 +635,13 @@ function Shell() {
                   </section>
                 )}
               </div>
-              {beside ? (
-                <>
-                  <ResizableHandle
-                    className="workspace-assist-handle"
-                    label="Resize Piscine Assist"
-                    controls="workspace-assist"
-                    panel="after"
-                    value={assistWidth}
-                    min={ASSIST.min}
-                    max={ASSIST.max}
-                    defaultValue={ASSIST.start}
-                    disabled={!assistOpen}
-                    onValueChange={setDragWidth}
-                    onValueCommit={(width) => {
-                      setKeptWidth(width);
-                      setDragWidth(null);
-                    }}
-                    onDraggingChange={setResizingAssist}
-                  />
-                  <div id="workspace-assist" className="workspace-assist-pane" inert={!assistOpen}>
-                    <PiscineAssist chat={chat} onClose={closeAssist} />
-                  </div>
-                </>
-              ) : (
-                <Sheet side="right" open={sheetOpen} onOpenChange={setSheetOpen}>
-                  <SheetContent
-                    id="workspace-assist"
-                    label="Piscine Assist"
-                    className="workspace-assist-sheet"
-                    initialFocus={() => document.getElementById("workspace-assist-message")}
-                    finalFocus={assistShow}
-                  >
-                    <PiscineAssist chat={chat} onClose={() => setSheetOpen(false)} />
-                  </SheetContent>
-                </Sheet>
-              )}
-            </div>
+              <SidePanel
+                label="Piscine Assist"
+                initialFocus={() => document.getElementById("workspace-assist-message")}
+              >
+                <PiscineAssist chat={chat} />
+              </SidePanel>
+            </SidePanelLayout>
           </SidebarInset>
           <SidebarCustomise
             arranger={arranger}
@@ -761,13 +682,7 @@ function Shell() {
                 >
                   Customise the sidebar
                 </CommandMenuItem>
-                <CommandMenuItem
-                  icon={<Icon name="fish" />}
-                  keywords={["chat", "assistant", "help", "fish"]}
-                  onSelect={() => (beside && assistOpen ? closeAssist() : showAssist())}
-                >
-                  {beside && assistOpen ? "Hide Piscine Assist" : "Show Piscine Assist"}
-                </CommandMenuItem>
+                <AssistCommand />
                 <CommandMenuItem
                   icon={<Icon name="sidebar" />}
                   shortcut="⌘ B"
@@ -801,6 +716,41 @@ function Shell() {
         </SidebarLayout>
       </TooltipProvider>
     </SoundScope>
+  );
+}
+
+/**
+ * While Piscine Assist is hidden, a fish in the bar brings it back. Open, it has its own cross to
+ * close it, so the bar needs no button for that. Where it is too narrow beside the work, the fish
+ * opens it as a sheet, and focus returns to the fish.
+ */
+function ShowAssist() {
+  const assist = useSidePanel();
+  if (assist.shown && assist.beside) return null;
+  return (
+    <Tooltip side="bottom" content="Show Piscine Assist">
+      <SidePanelTrigger
+        render={<Button variant="quiet" size="small-icon" />}
+        aria-label="Show Piscine Assist"
+      >
+        <Icon name="fish" />
+      </SidePanelTrigger>
+    </Tooltip>
+  );
+}
+
+/** Shows or hides Piscine Assist from the command menu. */
+function AssistCommand() {
+  const assist = useSidePanel();
+  const open = assist.shown && assist.beside;
+  return (
+    <CommandMenuItem
+      icon={<Icon name="fish" />}
+      keywords={["chat", "assistant", "help", "fish"]}
+      onSelect={() => (open ? assist.close() : assist.show())}
+    >
+      {open ? "Hide Piscine Assist" : "Show Piscine Assist"}
+    </CommandMenuItem>
   );
 }
 
@@ -1096,29 +1046,16 @@ function useAssistChat(compose: (view: Composed) => void) {
  * A chat with Piscine Assist, the licensing team's assistant, like the Message scroller example's.
  * Hidden, it is out of reach as well as out of sight, and keeps its conversation.
  */
-function PiscineAssist({
-  chat,
-  onClose,
-}: {
-  chat: ReturnType<typeof useAssistChat>;
-  onClose: () => void;
-}) {
+function PiscineAssist({ chat }: { chat: ReturnType<typeof useAssistChat> }) {
   const { messages, waiting, streaming, ask, done, stop, unasked } = chat;
   return (
-    <aside className="workspace-panel workspace-assist" aria-labelledby="workspace-assist-title">
-      <header className="workspace-assist-header">
-        <h2 id="workspace-assist-title">Piscine Assist</h2>
+    <>
+      <SidePanelHeader>
+        <SidePanelTitle>Piscine Assist</SidePanelTitle>
         <Tooltip content="Close">
-          <Button
-            variant="quiet"
-            size="small-icon"
-            aria-label="Close Piscine Assist"
-            onClick={onClose}
-          >
-            <Icon name="close" />
-          </Button>
+          <SidePanelClose />
         </Tooltip>
-      </header>
+      </SidePanelHeader>
       <MessageScroller
         label="Messages with Piscine Assist"
         framed={false}
@@ -1182,6 +1119,6 @@ function PiscineAssist({
           </MessageScrollerItem>
         )}
       </MessageScroller>
-    </aside>
+    </>
   );
 }

@@ -143,52 +143,19 @@
   justify-self: end;
 }
 
-/* The body has the work, then Piscine Assist beside it, as wide as its handle is dragged. Closed,
-   the assist slides away over the right edge as the work takes its space. That is a change of
-   layout, because the work has to reflow to fill it, and it happens rarely and on request. A drag
-   follows the pointer at once. */
+/* The body fills the page beneath the bar. It is a Side panel's layout, with the work, then
+   Piscine Assist beside it, so it leaves its display to the layout. */
 .workspace-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 .workspace-work {
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-}
-.workspace-assist-pane {
-  display: flex;
-  flex-direction: column;
-  width: var(--workspace-assist-width);
-  min-height: 0;
-  transition: margin-right var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-drawer);
-}
-.workspace-body[data-assist="closed"] > .workspace-assist-pane {
-  margin-right: calc(-1 * var(--workspace-assist-width) - 1px);
-}
-.workspace-body[data-assist="closed"] > .workspace-assist-handle {
-  display: none;
-}
-.workspace-body[data-resizing] > .workspace-assist-pane {
-  transition: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .workspace-assist-pane {
-    transition: none;
-  }
-}
-/* On a narrow screen, Piscine Assist is a sheet over the work, as wide as it is beside it. */
-.workspace-assist-sheet.x-govuk-ui-sheet {
-  --x-govuk-ui-stack-gap: 0px;
-  display: flex;
-  flex-direction: column;
-  width: min(380px, 100%);
-  padding: 0;
-  overflow: hidden;
 }
 /* The Overview's tiles fill the work. */
 .workspace-overview {
@@ -257,14 +224,6 @@
   border: 0;
   border-radius: 0;
 }
-/* Piscine Assist fills its pane, with its log beneath its header. */
-.workspace-assist {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-height: 0;
-  padding: 0;
-}
 
 .workspace-reference {
   font-variant-numeric: tabular-nums;
@@ -278,25 +237,7 @@
   white-space: nowrap;
 }
 
-/* Piscine Assist has a heading, the log, and the message box floating over its foot. */
-.workspace-assist-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex: none;
-  /* As tall as a tile's bar, so the keylines beneath them meet. */
-  box-sizing: border-box;
-  min-height: 44px;
-  padding: 0 6px 0 20px;
-  border-bottom: 1px solid var(--x-govuk-ui-line);
-}
-.workspace-assist-header h2 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.25;
-}
+/* Piscine Assist has the log beneath its head, and the message box floating over its foot. */
 .workspace-assist-log {
   flex: 1;
   min-height: 0;

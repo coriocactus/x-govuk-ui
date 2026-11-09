@@ -733,9 +733,14 @@
   box-sizing: border-box;
   padding: 24px 16px 8px;
 }
-/* Sidebar. A small application frame with the sidebar beside its page. */
+/* Sidebar. An application's frame with the sidebar beside its page, filling the preview but for
+   a margin, so its border shows. */
+.preview-example--sidebar {
+  box-sizing: border-box;
+  padding: 16px;
+}
 .preview-app {
-  height: 480px;
+  height: 100%;
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: var(--x-govuk-ui-radius-surface);
 }

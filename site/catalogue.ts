@@ -3967,7 +3967,9 @@ const entries = {
   },
   sidebar: {
     name: "Sidebar",
-    width: 780,
+    // An application's frame takes the whole preview, so its page has the space a service's has.
+    width: "100%",
+    anchor: "fill",
     description:
       "Keep an application's sections in reach, in groups that collapse to icons or slide away.",
     upstream: "",

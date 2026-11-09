@@ -101,7 +101,9 @@ export const defaultDataTableLabels: DataTableLabels = {
 /**
  * A dense table for working through many records, as in a CRM. It is built from Table's parts in a
  * Scroll area. As it scrolls, the headings stay at the top and the first columns stay at the side.
- * A shadow runs along their edge once the rest has moved under them.
+ * A shadow runs along their edge once the rest has moved under them. It is as tall as its rows, up
+ * to `maxRows`. Given less height, as a page laid out to fill the window gives it, it takes what it
+ * is given, and its rows scroll within it, so the page need not scroll.
  *
  * The columns fill the table's width. Where the table has more room than their widths add up to,
  * each column takes a share of the rest, in proportion to its width, so no space is left empty at

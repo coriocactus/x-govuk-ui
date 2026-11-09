@@ -1,8 +1,14 @@
 /* Data table. A bordered card over Table's parts, scrolling both ways. The headings stay at the
    top, the foot at the bottom, and the pinned columns at the side, each over the page's paper, so
-   the rows pass beneath them. Cells keep to one line and end with an ellipsis. */
+   the rows pass beneath them. Cells keep to one line and end with an ellipsis.
+
+   The card is as tall as its rows, up to its most rows. Given less height, as by a column that
+   fills the window and gives it `min-height: 0`, it takes what it is given and its rows scroll
+   within it. */
 .x-govuk-ui-data-table {
   --x-govuk-ui-data-table-row: 44px;
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--x-govuk-ui-line);
   border-radius: var(--x-govuk-ui-radius-large);
   overflow: clip;
@@ -13,6 +19,7 @@
    of data, with a row each for the headings and the foot. A cap below the least wins, because a
    least height would otherwise override a most height. */
 .x-govuk-ui-data-table-scroll {
+  flex: 0 1 auto;
   min-height: 0;
   max-height: calc(
     (var(--x-govuk-ui-data-table-max-rows, 8) + 2) *

@@ -413,6 +413,7 @@ test("a timeline highlights a run of events, loads earlier ones beneath and take
         return {
           highlighted: item.hasAttribute("data-highlighted"),
           above: getComputedStyle(item, "::before").backgroundColor,
+          aboveDashed: getComputedStyle(item, "::before").backgroundImage.includes("gradient"),
           below: getComputedStyle(item, "::after").backgroundColor,
           dashes: length,
           way: item.getBoundingClientRect().height,
@@ -420,8 +421,9 @@ test("a timeline highlights a run of events, loads earlier ones beneath and take
       }),
     );
   // The two events since users last looked are highlighted, and screen readers hear that they are
-  // new. The rail is blue between them. Below them, blue dashes run on over the grey for about half
-  // the way, and stop after a whole dash, every 10 pixels.
+  // new. The rail is blue between them. Below them, blue dashes run over the grey the whole way to
+  // the next tick: the highlighted event draws them from its tick to its foot, and the 13 pixels
+  // of rail above the next tick draw the rest.
   const [first, second, third] = await rail();
   expect([first?.highlighted, second?.highlighted, third?.highlighted]).toEqual([
     true,
@@ -432,8 +434,12 @@ test("a timeline highlights a run of events, loads earlier ones beneath and take
   expect(second?.below).not.toBe(second?.above);
   expect(third?.above).toBe(second?.below);
   expect([first?.dashes, third?.dashes]).toEqual([0, 0]);
-  expect((second?.dashes ?? 0) % 10).toBe(0);
-  expect(Math.abs((second?.dashes ?? 0) - (second?.way ?? 0) / 2)).toBeLessThanOrEqual(5);
+  expect(Math.abs((second?.dashes ?? 0) + 13 - (second?.way ?? 0))).toBeLessThanOrEqual(1);
+  expect([first?.aboveDashed, second?.aboveDashed, third?.aboveDashed]).toEqual([
+    false,
+    false,
+    true,
+  ]);
   await expect(frame.getByRole("heading", { level: 3 }).first()).toHaveAccessibleName(
     "New: Application approved",
   );
@@ -464,9 +470,9 @@ test("a timeline highlights a run of events, loads earlier ones beneath and take
   expect(arrived?.highlighted).toBe(true);
   expect(arrived?.below).toBe(latest?.above);
   expect(latest?.above).toBe(first?.below);
-  // Above a highlighted event beneath a plain one, the dashes count up from its tick, across the
-  // join. The plain event draws them down to its foot, and the rail above the tick draws the rest.
-  // The test highlights the fifth event alone, as a service may.
+  // Above a highlighted event beneath a plain one, the dashes count down from the plain tick, the
+  // whole way to the foot of the plain event. The rail above the highlighted tick is blue, and the
+  // last dash runs into it. The test highlights the fifth event alone, as a service may.
   await items.evaluateAll((all) => {
     for (const [index, item] of all.entries())
       item.toggleAttribute("data-highlighted", index === 4);
@@ -475,18 +481,24 @@ test("a timeline highlights a run of events, loads earlier ones beneath and take
     const [plain, highlighted] = [all[3], all[4]];
     const event = plain?.querySelector(".x-govuk-ui-timeline-event");
     const dashes = event && getComputedStyle(event, "::before");
+    const above = highlighted && getComputedStyle(highlighted, "::before");
+    const rail = highlighted && getComputedStyle(highlighted, "::after");
     return {
       dashes: Number.parseFloat(dashes?.height ?? "0"),
-      bottom: dashes?.bottom,
+      top: dashes?.top,
       way: plain?.getBoundingClientRect().height ?? 0,
-      above: highlighted && getComputedStyle(highlighted, "::before").backgroundImage,
+      above: above && [above.backgroundColor, above.backgroundImage],
+      tick:
+        highlighted &&
+        getComputedStyle(highlighted.querySelector(".x-govuk-ui-timeline-event")!, "::after")
+          .backgroundColor,
+      rail: rail?.backgroundColor,
     };
   });
-  // The dashes in the plain event and the 13 pixels above the tick end after a whole dash.
-  expect(join.bottom).toBe("0px");
-  expect((join.dashes + 13) % 10).toBe(0);
-  expect(Math.abs(join.dashes + 13 - join.way / 2)).toBeLessThanOrEqual(5);
-  expect(join.above).toContain("repeating-linear-gradient");
+  expect(join.top).toBe("13px");
+  expect(Math.abs(join.dashes + 13 - join.way)).toBeLessThanOrEqual(1);
+  expect(join.above).toEqual([join.tick, "none"]);
+  expect(join.above?.[0]).not.toBe(join.rail);
 });
 
 test("a relative time writes the time from now and keeps itself up to date", async ({

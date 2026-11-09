@@ -60,18 +60,17 @@
 .x-govuk-ui-timeline-item[data-highlighted] > .x-govuk-ui-timeline-event {
   --x-govuk-ui-timeline-colour: var(--x-govuk-ui-timeline-highlight);
 }
-/* Where a highlighted event meets one that is not, the rail does not turn grey at once. Blue dashes
-   run on over the grey from the highlighted tick, for about half the way to the next tick. Each
-   dash is 6px, with 4px between, and the first meets the tick's edge. The way from one tick to the
-   next is as tall as the event above, so half of it is 50% of that event's height. The dashes stop
-   at the nearest 10px to it, after a whole dash, so none is cut short. A browser without `round()`
-   draws no dashes, and forced colours drop them with every other background image. The rail then
-   changes colour at the tick.
+/* Where a highlighted event meets one that is not, the rail between their ticks is dashed in blue
+   over the grey, so it reads as neither, and the change of colour falls at no point between them.
+   Each dash is 6px, with 4px between. The dashes are counted from the tick of the event that is
+   not highlighted, so the first dash meets that tick's edge. At the highlighted tick, the last dash
+   runs into the tick, which is the same blue, so a part of a dash is not seen as one. A browser
+   with no background images, as in forced colours, draws the grey rail alone, which changes
+   colour at the highlighted tick.
 
-   The event draws the dashes, over the rail that its item draws. Below a highlighted tick, they
-   start at the tick. Above one, they cross the join between two items. The event above draws them
-   down to its foot, and the stretch of rail above the tick draws the rest. Both count the dashes
-   from the tick, so they meet in step. */
+   The way from one tick to the next crosses two items. The event above draws the dashes from its
+   tick down to its foot, over the rail that its item draws, and the stretch of rail above the tick
+   below draws the rest. */
 .x-govuk-ui-timeline-item[data-highlighted]:not(:has(+ [data-highlighted]))
 > .x-govuk-ui-timeline-event::before,
 .x-govuk-ui-timeline-item:not([data-highlighted]):has(+ [data-highlighted])
@@ -79,6 +78,8 @@
   content: "";
   position: absolute;
   z-index: 1;
+  top: var(--x-govuk-ui-timeline-middle);
+  bottom: 0;
   left: 0;
   width: 4px;
   background-image: repeating-linear-gradient(
@@ -88,16 +89,12 @@
   );
   background-repeat: no-repeat;
 }
+/* Below a highlighted tick, the dashes count up from the tick beneath, which is the middle's height
+   beneath the event's foot, so their background reaches that far beneath the box it is drawn in.
+   The stretch of rail above that tick counts up from it too, so the two meet in step. */
 .x-govuk-ui-timeline-item[data-highlighted]:not(:has(+ [data-highlighted]))
-  > .x-govuk-ui-timeline-event::before {
-  top: var(--x-govuk-ui-timeline-middle);
-  height: round(nearest, 50%, 10px);
-}
-/* Above a highlighted tick, the dashes count up from the tick, which is the middle's height beneath
-   the event's foot. Their background therefore reaches that far beneath the box it is drawn in. */
-.x-govuk-ui-timeline-item:not([data-highlighted]):has(+ [data-highlighted])
 > .x-govuk-ui-timeline-event::before,
-.x-govuk-ui-timeline-item:not([data-highlighted]) + [data-highlighted]::before {
+.x-govuk-ui-timeline-item[data-highlighted] + :not([data-highlighted])::before {
   background-image: repeating-linear-gradient(
     to top,
     transparent 0 2px,
@@ -105,11 +102,14 @@
     transparent 8px 10px
   );
 }
-.x-govuk-ui-timeline-item:not([data-highlighted]):has(+ [data-highlighted])
+.x-govuk-ui-timeline-item[data-highlighted]:not(:has(+ [data-highlighted]))
   > .x-govuk-ui-timeline-event::before {
-  bottom: 0;
-  height: calc(round(nearest, 50%, 10px) - var(--x-govuk-ui-timeline-middle));
   background-size: 100% calc(100% + var(--x-govuk-ui-timeline-middle));
+}
+/* Above a highlighted tick, the dashes count down from the tick above, and the stretch of rail
+   above the highlighted tick is blue, into which the last dash runs. */
+.x-govuk-ui-timeline-item:not([data-highlighted]) + [data-highlighted]::before {
+  background: var(--x-govuk-ui-timeline-highlight);
 }
 /* The last event has no rail below it, unless a TimelineMore follows, so it has no dashes either. */
 .x-govuk-ui-timeline:not(:has(> .x-govuk-ui-timeline-foot))

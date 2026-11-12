@@ -336,6 +336,10 @@ test("Piscine Assist composes views of the work from the library's parts, in til
   await expect(refund.locator(".x-govuk-ui-error-summary")).toBeFocused();
   await expect(refund.getByRole("link", { name: "Select the payment to refund" })).toBeVisible();
   await refund.getByRole("radio", { name: /10:04am/ }).check();
+  // Fixing the answer folds the summary away, which moves the button up. The fold starts two or
+  // three frames after the answer changes. A press sent in those frames lands where the button
+  // was. Once the summary has gone, Playwright sees the button move and waits for it to rest.
+  await expect(refund.locator(".x-govuk-ui-error-summary")).toHaveCount(0);
   await send.click();
   await expect(refund.locator(".x-govuk-ui-notification-banner")).toBeFocused();
   await expect(refund.getByText(/£24.50 is on its way to the card ending 4421/)).toBeVisible();

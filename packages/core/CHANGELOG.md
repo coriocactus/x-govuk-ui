@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Added
+
+- Added `sort`, `defaultSort` and `onSortChange` to DataTable, and the type `DataTableSort`, so a service can keep the table's sort. A `DataTableSort` names a column by its `id` and gives a direction, and `null` is no sort. The table still orders only the rows it is given. A service that shows one page of a longer list orders the whole list itself, by the sort that `onSortChange` gives, and passes that page.
+
 ## [0.6.0] - 2026-11-09
 
 ### Breaking Changes

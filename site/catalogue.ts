@@ -2189,6 +2189,7 @@ const entries = {
       ),
       toggle("selectable", true, { default: "false" }),
       reference("selected / onSelectedChange", "string[] / (selected: string[]) => void"),
+      reference("sort / onSortChange", "{ id, direction } | null / (sort: DataTableSort) => void"),
       reference("count", "(rows: number) => ReactNode"),
       reference("selectionBar", "a SelectionBar for the chosen rows"),
       number("minRows", 8, {

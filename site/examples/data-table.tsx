@@ -1,4 +1,12 @@
-import { Avatar, DataTable, type DataTableColumn, Tag, type TagColour } from "x-govuk-ui";
+import { useState } from "react";
+import {
+  Avatar,
+  DataTable,
+  type DataTableColumn,
+  type DataTableSort,
+  Tag,
+  type TagColour,
+} from "x-govuk-ui";
 
 type Props = {
   selectable?: boolean;
@@ -179,6 +187,7 @@ export default function DataTableExample({
   maxRows = 8,
   long = false,
 }: Props) {
+  const [sort, setSort] = useState<DataTableSort>(null);
   return (
     <DataTable
       label="Partner organisations"
@@ -188,6 +197,8 @@ export default function DataTableExample({
       rowName={(partner) => partner.name}
       pinned={pinned}
       selectable={selectable}
+      sort={sort}
+      onSortChange={setSort}
       count={(count) => `${count} organisations`}
       minRows={minRows || undefined}
       maxRows={maxRows || undefined}

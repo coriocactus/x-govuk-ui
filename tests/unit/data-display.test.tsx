@@ -11,6 +11,7 @@ import {
   CodeBlock,
   CodeBlockCopy,
   DataTable,
+  type DataTableSort,
   defaultRelativeTimeLabels,
   Figure,
   FigureCaption,
@@ -367,6 +368,63 @@ test("grouped and data tables name their parts", () => {
   expect(data).toContain('role="separator"');
   expect(data).toContain('aria-sort="none"');
   expect(data).toContain("1 partner");
+});
+
+test("a data table sorts by the sort a service gives it, or by the sort it starts with", () => {
+  const rows = [
+    { name: "Harbour Water", funding: 438000 },
+    { name: "Westmere NHS Trust", funding: 548900 },
+    { name: "Ashby Community Trust", funding: 497210 },
+  ];
+  const table = (props: { sort?: DataTableSort; defaultSort?: DataTableSort }) =>
+    renderToStaticMarkup(
+      <DataTable
+        label="Partners"
+        rows={rows}
+        rowKey={(row) => row.name}
+        rowName={(row) => row.name}
+        columns={[
+          {
+            id: "name",
+            header: "Organisation",
+            width: 200,
+            sortBy: (row) => row.name,
+            cell: (row) => row.name,
+          },
+          {
+            id: "funding",
+            header: "Funding",
+            width: 120,
+            sortBy: (row) => row.funding,
+            cell: (row) => row.funding,
+          },
+        ]}
+        {...props}
+      />,
+    );
+  /** Each heading's `aria-sort`, in the columns' order. */
+  const sorts = (html: string) =>
+    [...html.matchAll(/<th scope="col" aria-sort="([a-z]+)"/g)].map((match) => match[1]);
+  /** The organisations' names, in the rows' order. */
+  const names = (html: string) =>
+    [...html.matchAll(/<th scope="row"[^>]*>([^<]+)</g)].map((match) => match[1]);
+
+  const controlled = table({ sort: { id: "funding", direction: "descending" } });
+  expect(sorts(controlled)).toEqual(["none", "descending"]);
+  expect(names(controlled)).toEqual([
+    "Westmere NHS Trust",
+    "Ashby Community Trust",
+    "Harbour Water",
+  ]);
+
+  const started = table({ defaultSort: { id: "name", direction: "ascending" } });
+  expect(sorts(started)).toEqual(["ascending", "none"]);
+  expect(names(started)).toEqual(["Ashby Community Trust", "Harbour Water", "Westmere NHS Trust"]);
+
+  // `null` is a value, so a table controlled with it has no sort, whatever it would start with.
+  const none = table({ sort: null, defaultSort: { id: "name", direction: "ascending" } });
+  expect(sorts(none)).toEqual(["none", "none"]);
+  expect(names(none)).toEqual(rows.map((row) => row.name));
 });
 
 test("timelines write dates as GOV.UK does, and media parts name themselves", () => {

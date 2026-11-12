@@ -37,7 +37,9 @@ test("a data table sorts, chooses rows, resizes its columns and sums a column", 
   await open("data-table");
   const first = frame.locator("tbody tr").first().locator("th");
   const funding = frame.getByRole("button", { name: "Funding", exact: true });
+  // The example keeps the sort itself, so each press sorts through `sort` and `onSortChange`.
   await funding.click();
+  await expect(frame.locator('th[aria-sort="ascending"]')).toHaveCount(1);
   await expect(first).toContainText("Lowfield Arts Council");
   await funding.click();
   await expect(frame.locator('th[aria-sort="descending"]')).toHaveCount(1);

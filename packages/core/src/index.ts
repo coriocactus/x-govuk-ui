@@ -273,6 +273,7 @@ export {
   type DataTableColumn,
   type DataTableLabels,
   type DataTableProps,
+  type DataTableSort,
   defaultDataTableLabels,
 } from "./data-table";
 export {

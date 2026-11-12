@@ -42,6 +42,9 @@ export type DataTableColumn<Row> = {
   summary?: { label: string; value: (rows: readonly Row[]) => ReactNode };
 };
 
+/** The column a Data table sorts by, named by its `id`, and which way. `null` is no sort. */
+export type DataTableSort = { id: string; direction: "ascending" | "descending" } | null;
+
 // The box around the table takes the rest of the props.
 export type DataTableProps<Row> = ComponentPropsWithRef<"div"> & {
   /** Names the table and the box it scrolls in. */
@@ -61,6 +64,16 @@ export type DataTableProps<Row> = ComponentPropsWithRef<"div"> & {
   /** The rows' keys chosen at first, for a table that keeps track itself. */
   defaultSelected?: readonly string[];
   onSelectedChange?: (selected: string[]) => void;
+  /**
+   * The table's sort. Leave it out to let the table keep track. The table orders only the rows it
+   * is given, by the column's `sortBy`. A service that gives the table one page of a longer list
+   * orders the whole list itself, by the sort that `onSortChange` gives, and passes that page.
+   */
+  sort?: DataTableSort;
+  /** The sort at first, for a table that keeps track itself. */
+  defaultSort?: DataTableSort;
+  /** Hears the new sort when users press a heading that sorts. */
+  onSortChange?: (sort: DataTableSort) => void;
   /** Says how many rows there are, at the foot of the first column. */
   count?: (rows: number) => ReactNode;
   /** The table's least height, in rows of data. `rows` is the data itself. */
@@ -77,8 +90,6 @@ export type DataTableProps<Row> = ComponentPropsWithRef<"div"> & {
    */
   selectionBar?: ReactNode;
 };
-
-type Sort = { id: string; direction: "ascending" | "descending" } | null;
 
 /** The width of the checkboxes' column, in pixels. */
 const CHECKS = 44;
@@ -133,6 +144,9 @@ export function DataTable<Row>({
   selected: controlled,
   defaultSelected = [],
   onSelectedChange,
+  sort: controlledSort,
+  defaultSort = null,
+  onSortChange,
   count,
   minRows,
   maxRows = 8,
@@ -148,7 +162,11 @@ export function DataTable<Row>({
   const [widths, setWidths] = useState<Record<string, number>>({});
   // The table's room, measured, so the columns can share what their widths leave over.
   const [room, setRoom] = useState(0);
-  const [sort, setSort] = useState<Sort>(null);
+  const [sort, setSort] = useControllableState<DataTableSort>(
+    controlledSort,
+    defaultSort,
+    onSortChange,
+  );
   const [summed, setSummed] = useState<string[]>([]);
   const [scrolled, setScrolled] = useState(false);
   // How tall the Selection bar is while it shows, which the rows leave room for.

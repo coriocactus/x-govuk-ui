@@ -5,9 +5,13 @@ import { packages } from "./stage";
 
 // What changed in the packages' API since a version on npm. It compares this checkout's build with
 // that version's packages, as npm serves them. It compares each package's exports, and each
-// component's documented props and styling contract, from the documentation core ships in
+// part's own props and each component's styling contract, from the documentation core ships in
 // dist/lib/docs. A removed or narrowed name is breaking. A changed custom property's value is
 // probably visual. Run `bun run build:lib` first.
+//
+// A version's documentation gives each part's props where the compiler read them. Up to 0.6.0, it
+// lists a component's props as written by hand, some of them together and some not the part's
+// own, so the props of such a version are not compared.
 //
 //   bun scripts/api-diff.ts 0.2.0
 
@@ -21,13 +25,20 @@ export type ApiChange = {
   what: string;
 };
 
-type Prop = { name: string; type: string; default: string };
+type Prop = { name: string; type: string; default?: string };
 type Styling = {
   parts: { name: string; classes: string[]; inner: string[] }[];
   states: { attribute: string; values: string[] }[];
   properties: { name: string; value?: string }[];
 };
-type Doc = { slug: string; name: string; package: string; props: Prop[]; styling: Styling };
+type Doc = {
+  slug: string;
+  name: string;
+  package: string;
+  /** Each part, with its own props where the version's documentation gives them. */
+  parts: { name: string; props?: Prop[] }[];
+  styling: Styling;
+};
 
 /** The names a package's index exports, values and types alike. */
 async function exportsOf(directory: string) {
@@ -52,51 +63,13 @@ async function docsOf(core: string) {
   return docs;
 }
 
-/** The choices of a type written as a union of words, such as `primary | secondary`, or none. */
+/** A value written as itself, such as `"medium"`, `4000` or `true`. */
+const literal = /^(?:"[^"]*"|-?\d+(?:\.\d+)?|true|false|null)$/;
+
+/** The choices of a type that is a union of literals, such as `"primary" | "secondary"`, or none. */
 function choices(type: string) {
   const parts = type.split("|").map((part) => part.trim());
-  return parts.length > 1 && parts.every((part) => /^[\w-]+$/.test(part)) ? parts : null;
-}
-
-/**
- * The props a part's type names, where it is written as a list of them, such as `{ href, render,
- * children }`, or none. A prop written with its type, such as `side: "left" | "right"`, counts by
- * its name. Each of two written as alternatives, such as `items | search`, counts too. A hook's
- * type, such as `() => { step, data }`, names what the hook gives, and `head` keeps its arguments.
- */
-function members(type: string) {
-  const text = type.trim();
-  const arrow = text.startsWith("{") ? -1 : text.indexOf("=> {");
-  if (!text.endsWith("}") || (arrow < 0 && !text.startsWith("{"))) return null;
-  const head = arrow < 0 ? "" : text.slice(0, arrow);
-  const names = new Set<string>();
-  let depth = 0;
-  let piece = "";
-  for (const character of `${text.slice(arrow < 0 ? 1 : arrow + 4, -1)},`) {
-    if ("{[(<".includes(character)) depth++;
-    // The > of an arrow, as in `(value) => void`, closes nothing.
-    if ("}])".includes(character) || (character === ">" && !piece.endsWith("="))) depth--;
-    if (depth === 0 && (character === "," || character === "|")) {
-      const name = piece.trim().match(/^[\w-]+/)?.[0];
-      if (name && !piece.trim().startsWith('"')) names.add(name);
-      piece = "";
-    } else piece += character;
-  }
-  return { head, names };
-}
-
-/**
- * A component's props, one for each name. The documentation lists some props together, such as
- * `value / defaultValue / onValueChange`, with one type for the group, so a grouped prop is
- * compared by its name alone.
- */
-function propsOf(doc: Doc) {
-  const props = new Map<string, Prop & { grouped: boolean }>();
-  for (const prop of doc.props) {
-    const names = prop.name.split(" / ");
-    for (const name of names) props.set(name, { ...prop, name, grouped: names.length > 1 });
-  }
-  return props;
+  return parts.length > 1 && parts.every((part) => literal.test(part)) ? parts : null;
 }
 
 /** The changes between two versions of a component's documentation. */
@@ -104,52 +77,30 @@ function compareDocs(before: Doc, after: Doc | undefined, add: (change: ApiChang
   const where = before.package;
   const breaking = (what: string) => add({ package: where, kind: "breaking", what });
   if (!after) return breaking(`removed ${before.name}`);
-  const props = propsOf(after);
-  const was = propsOf(before);
-  for (const prop of was.values()) {
-    const now = props.get(prop.name);
-    if (!now) breaking(`removed ${before.name}'s \`${prop.name}\` prop`);
-    else if (
-      !prop.grouped &&
-      !now.grouped &&
-      members(prop.type)?.head !== undefined &&
-      members(prop.type)?.head === members(now.type)?.head
-    ) {
-      const had = members(prop.type)?.names ?? new Set<string>();
-      const has = members(now.type)?.names ?? new Set<string>();
-      const lost = [...had].filter((name) => !has.has(name));
-      if (lost.length)
-        breaking(
-          `removed ${lost.map((name) => `\`${name}\``).join(", ")} from ${before.name}'s \`${prop.name}\``,
-        );
-      for (const name of has)
-        if (!had.has(name))
-          add({
-            package: where,
-            kind: "added",
-            what: `added \`${name}\` to ${after.name}'s \`${prop.name}\``,
-          });
-    } else if (!prop.grouped && !now.grouped) {
-      const was = choices(prop.type);
-      const is = choices(now.type);
-      const lost = was && is ? was.filter((choice) => !is.includes(choice)) : [];
-      if (lost.length)
-        breaking(
-          `removed ${lost.map((choice) => `\`${choice}\``).join(", ")} from ${before.name}'s \`${prop.name}\``,
-        );
-      else if (!was && prop.type !== now.type)
-        breaking(
-          `changed ${before.name}'s \`${prop.name}\` from \`${prop.type}\` to \`${now.type}\``,
-        );
-      if (prop.default !== now.default)
-        breaking(
-          `changed ${before.name}'s \`${prop.name}\` default from ${prop.default} to ${now.default}`,
-        );
+  for (const part of before.parts) {
+    const now = after.parts.find((one) => one.name === part.name)?.props;
+    if (!part.props || !now) continue;
+    for (const prop of part.props) {
+      const current = now.find((one) => one.name === prop.name);
+      if (!current) {
+        breaking(`removed ${part.name}'s \`${prop.name}\` prop`);
+        continue;
+      }
+      const had = choices(prop.type);
+      const has = choices(current.type);
+      const lost = had && has ? had.filter((choice) => !has.includes(choice)) : [];
+      if (lost.length) breaking(`removed ${lost.join(", ")} from ${part.name}'s \`${prop.name}\``);
+      // Only a default written as a value is compared. One written as a name, such as a
+      // constant's, can change its name and stay the same value.
+      const from = prop.default ?? "";
+      const to = current.default ?? "";
+      if (from !== to && literal.test(from) && literal.test(to))
+        breaking(`changed ${part.name}'s \`${prop.name}\` default from ${from} to ${to}`);
     }
+    for (const prop of now)
+      if (!part.props.some((one) => one.name === prop.name))
+        add({ package: where, kind: "added", what: `added ${part.name}'s \`${prop.name}\` prop` });
   }
-  for (const prop of props.values())
-    if (!was.has(prop.name))
-      add({ package: where, kind: "added", what: `added ${after.name}'s \`${prop.name}\` prop` });
 
   const classes = (styling: Styling) =>
     new Set(styling.parts.flatMap((part) => [...part.classes, ...part.inner]));
@@ -182,7 +133,11 @@ function compareDocs(before: Doc, after: Doc | undefined, add: (change: ApiChang
 export async function apiDiff(version: string): Promise<ApiChange[]> {
   const into = await mkdtemp(join(tmpdir(), "x-govuk-ui-api-"));
   const changes: ApiChange[] = [];
-  const add = (change: ApiChange) => changes.push(change);
+  // A part on two components' pages, such as MenuItem, is in both records, so its change is too.
+  const add = (change: ApiChange) => {
+    if (!changes.some((one) => one.package === change.package && one.what === change.what))
+      changes.push(change);
+  };
   for (const directory of packages) {
     const { name } = await Bun.file(`${directory}/package.json`).json();
     const pack = Bun.spawnSync([

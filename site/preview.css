@@ -164,9 +164,7 @@
 .preview-prose h2 {
   margin: 0 0 10px;
 }
-/* A tab's panel spaces its own parts, so its heading has no margin of its own. */
-.preview-prose h2,
-.preview-panel-heading {
+.preview-prose h2 {
   font-size: 24px;
   line-height: 1.25;
 }
@@ -869,15 +867,6 @@
 .preview-stage[data-anchor="fill"] .x-govuk-ui-page {
   min-height: 100%;
 }
-/* A page's heading, in GOV.UK's large size. */
-.preview-page-heading {
-  margin: 0 0 30px;
-  color: var(--x-govuk-ui-text);
-  font-family: var(--x-govuk-ui-font);
-  font-size: 36px;
-  line-height: 1.11;
-  font-weight: 700;
-}
 /* The Form example's own list of errors, in place of the Error summary. */
 .preview-own-errors {
   margin-bottom: 30px;
@@ -900,10 +889,6 @@
 }
 .preview-own-errors a {
   color: var(--x-govuk-ui-error);
-}
-/* Among a form's fields, the form's gap is part of the heading's space. */
-.x-govuk-ui-form-fields > .preview-page-heading {
-  margin-bottom: calc(30px - var(--x-govuk-ui-form-gap));
 }
 /* Grouped table. Status marks, priorities and the pills in each row. */
 .preview-grouped-title {
@@ -1334,11 +1319,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-}
-.preview-tour-title {
-  margin: 0;
-  font-size: 24px;
-  line-height: 1.25;
 }
 .preview-tour-list {
   display: grid;

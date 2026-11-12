@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsPanel, TabsTrigger } from "x-govuk-ui";
+import { Heading, Tabs, TabsList, TabsPanel, TabsTrigger } from "x-govuk-ui";
 
 const sections = [
   {
@@ -42,7 +42,7 @@ export default function TabsExample() {
       </TabsList>
       {sections.map((section) => (
         <TabsPanel key={section.value} value={section.value}>
-          <h2 className="preview-panel-heading">{section.label}</h2>
+          <Heading level={2}>{section.label}</Heading>
           <dl className="preview-pairs">
             {section.cases.map(([caseworker, closed]) => (
               <div key={caseworker}>

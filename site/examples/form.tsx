@@ -12,6 +12,7 @@ import {
   type FormStepsProps,
   FormStepsProvider,
   FormStepsSummary,
+  Heading,
   Input,
   Radio,
   Radios,
@@ -122,7 +123,7 @@ function OnePage({
         {/* The page's heading is inside the Form, so the Form's summary opens above it, as GOV.UK
             puts it. A list of the example's own can take the summary's place. */}
         {ownSummary && <OwnErrors />}
-        <h1 className="preview-page-heading">Your details</h1>
+        <Heading>Your details</Heading>
         <Input
           id="email"
           name="email"
@@ -233,7 +234,7 @@ function LicenceAnswer() {
 function CheckHeading() {
   const steps = useFormSteps();
   if (!steps?.reviewing) return null;
-  return <h1 className="preview-page-heading">Check your answers before you apply</h1>;
+  return <Heading>Check your answers before you apply</Heading>;
 }
 
 /**

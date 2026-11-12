@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Link, SearchBox, Tag, Tour, TourStep, useTour } from "x-govuk-ui";
+import { Button, Heading, Link, SearchBox, Tag, Tour, TourStep, useTour } from "x-govuk-ui";
 
 type Props = {
   variant?: "brand" | "plain";
@@ -30,7 +30,7 @@ export default function TourExample({
   return (
     <div className="preview-tour">
       <div className="preview-tour-head">
-        <h2 className="preview-tour-title">Your applications</h2>
+        <Heading level={2}>Your applications</Heading>
         <Button variant="secondary" size="small" data-sound="open" onClick={() => setOpen(true)}>
           Take the tour
         </Button>

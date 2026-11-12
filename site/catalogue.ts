@@ -112,10 +112,11 @@ type Entry = Placement & {
   /** Named starting points, each the settings for one use of the component. */
   presets?: readonly Preset[];
   /**
-   * Hooks and functions its page shows, by their exports, as well as those declared in its parts'
-   * own files. It is for a helper kept in a file that components share, such as `dateFromParts`.
+   * Hooks, functions and constants its page shows, by their exports, as well as those declared in
+   * its parts' own files. It is for one kept in a file that components share, such as
+   * `dateFromParts`.
    */
-  functions?: readonly Exported[];
+  shows?: readonly Exported[];
   /**
    * Where the example sits for its current settings, over the placement above, such as a page for
    * one example and a card for another.
@@ -179,7 +180,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "GOV.UK's date input, three short numeric fields in a fieldset with GOV.UK's ids, merged with a Calendar. Each field is also a dial, as Time input's are. Drag it up or down, scroll over it, or press the arrow keys, and it turns a step at a time from today's date. A button beside the fields, as tall as they are with its bottom edge, opens the calendar in a popover, and choosing a day fills the fields in. The calendar's month and year are Selects, so a date of birth decades back is two choices away.",
-    functions: ["dateFromParts"],
+    shows: ["dateFromParts"],
     props: [
       text("legend", "When do you want your licence to start?", {
         type: "ReactNode",
@@ -500,6 +501,7 @@ const entries = {
     dependencies: "React · Base UI · Lexical · Motion",
     changes:
       "Textarea's field, built from the same Field parts, around a Lexical editor, after 37signals' Lexxy, with its defaults. The toolbar is Lexxy's, with images and files, bold, italic, strikethrough and underline, a formatting menu of normal text, the headings and Clear formatting, colour for the text and its background from GOV.UK's palette, a link, a quotation, code, bulleted and numbered lists, a table and a divider, with history at the end of the row. It is WAI-ARIA's toolbar, one Tab stop with the arrow keys moving between its controls. Each is a quiet icon Button, pressed where its formatting is on, with its name and shortcut in a Tooltip, and what has no space waits behind More. Markdown turns into formatting as it is typed, and pasted Markdown, links, Word's lists and other pages' HTML are made good. Code is a block, or inline around words on one line, coloured by its syntax with sugar-high as Code block colours code, with its language in a list at its corner. A table's tools come up over it, to add, remove and head rows and columns, and Enter and Backspace move through it as Lexxy's do. A link shows its address, which opens it in a new tab, with Edit and Unlink, under it while the pointer rests on it or the caret is in it, where Alt F10 reaches them. Each of these floating tools is a part EditorContent shows, which can be left out or joined by tools of a service's own, made with EditorTools. Given onUpload, images, video and files go in from the toolbar, a paste or a drop, drawn from the file with a progress bar while they are stored. Several images make a gallery, an image has a caption and a description, and an attachment can be dragged, or moved with Alt, Shift and the arrows, as screen readers hear. Typing with an attachment, a divider or a mention selected types after it. EditorPrompt opens a menu of suggestions on a trigger, such as `@` for mentions or `:` for emoji, filtered as users type, from a list or a service's search, and puts in a mention or text. EditorAI offers a model's suggestions for selected text, in a toolbar over it. The selection is kept while the suggestion is written, moving with the text, and the suggestion replaces the selection once approved. The service connects its own model through onRequestEdit, which is sent the selection as plain text and as Markdown. The example makes its suggestions in the page, without a model. A suggestion of text is fitted in word by word, so the words it keeps keep their formatting, links and colours, while one of Markdown comes in as written, shown formatted. A form around the editor waits while files upload. The Source control shows what the field submits in the document's place, in an editable Code block with the rest of the toolbar greyed, its HTML laid out one block on each line, and reads it back as the document. The field submits as HTML, or as Markdown, takes part in a Form by its name, and counts characters or words as the Textarea does. The box grows with the document, as Lexxy's does, the toolbar sticking to the top of the page, or with maxRows scrolls inside with the thin scrollbar. It can be plain text, or one line. Every word it says can be changed with labels.",
+    shows: ["defaultEditorToolbar", "editorToolbarGroups", "editorColours", "editorBackgrounds"],
     props: [
       text("label", "Notes for the caseworker", { type: "ReactNode", default: "Required" }),
       text(
@@ -894,7 +896,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's way with a question page, as one component. FormSteps asks a form a step at a time, and the In stages example is a short survey asked that way. Each field takes part by its name, so Input, Textarea, Select, Radios, Checkboxes, Date input, Combobox, File upload and One-time code need nothing more. When the form is sent, one function checks every answer. If any need fixing, an Error summary opens above everything inside the Form as what is beneath eases down to make space, takes focus and lists the problems in the fields' order, each linking to its field, and every field shows its own message. Fixing an answer clears its message and its line at once, and the summary folds away when nothing is left. A failing answer that changes keeps its message until the form is sent again. While there are errors the page's title starts with Error, as GOV.UK asks. Messages that onSubmit returns, such as the server's, show in the same way. Continue with the form empty to see it. A form small enough to do without an Error summary can turn it off, and focus goes to the first field to fix instead. defaultValues gives the fields their answers to start with, such as ones kept from an earlier visit. FormSteps is a Form in steps, each a FormStep containing any fields. Continue checks only the step's answers and runs its own onContinue, such as saving a rating straight away, with a spinner on the button. Steps whose when says no are passed over, and their answers left out. It can end with Check your answers, worked out from the fields' labels and answers, with Change. It comes as GOV.UK question pages, or a card set into a page, such as a survey or an agent's questions, and Back, progress, the Error summary, the Command with Enter shortcut and the browser's history can each be turned on or off. The One page example is a service's page, a ServicePage with its questions in a three-quarters column. Its heading is inside the Form, so the summary opens above it, as GOV.UK puts it. The In pages example is FormSteps in a ServicePage. Its Back link is a FormStepsBack in the page's own place for one, which a FormStepsProvider around both allows. Save and come back later sits beside Continue, and Check your answers lists the answers in two sections beneath a heading of the example's own, a FormStepsSummary and a sentence of the example's own from useFormStepsAnswers.",
-    functions: ["validateWith"],
+    shows: ["validateWith"],
     props: [
       text("errorTitle", "There is a problem", {
         type: "ReactNode",
@@ -1289,7 +1291,7 @@ const entries = {
     dependencies: "React · Base UI · react-mosaic",
     changes:
       "A tiling window manager on react-mosaic, for screens that are worked in instead of read through. react-mosaic's tree of splits is the arrangement, and react-mosaic draws the board and its drop targets. Every change, from a drag, a divider or a menu, goes through the Tiles' own helpers by the tiles' ids, so a drag and the keyboard do the same thing. The Tiles sets the tiles in GOV.UK's way, flush with a keyline between, and draws its own dividers, as react-mosaic's take no keyboard. Each divider is a Resizable handle. The arrow keys move it, each step with a tick, and a double-click shares the space evenly. It can show a grip, and preview a drag, moving only the line until it is let go. A tile's bar is its handle. Drag it to another tile's edge to split that tile there, or to an edge of the desk. The band it would fill widens in link blue, and the tiles ease into their new places with a swoosh. The dock contains the closed tiles. Drag one onto any edge to open it there, or press it, and drag a tile onto the dock to close it. A TilesProvider keeps the arrangement for parts anywhere inside it, such as a dock in a sidebar, and useTilesActions gives a service's own controls every action the menu has. A tile's bar is parts too, so its heading can show a count, as the workspace's Applications does. Each tile's menu makes every move from the keyboard too, beside any tile, to an edge, swapped with another, or another tile shown in its place. It says what it did. Make larger gives a tile most of the space at each level, as react-mosaic's expand does, and Maximise fills the desk with it. Tidy lays every tile out evenly, in rows suited to the desk's proportions. Close gives a tile's space to its neighbours and its focus to the tile beside it. A narrow tile lets its buttons go, the splits first, and keeps its menu, which does what they do. In the example, Split across and Split down add a note beside a tile. Drop behaviour swaps tiles instead of splitting, or both. The workspace's Overview is Tiles, and a Resizable handle on its own sizes Piscine Assist beside it, the workbench's panels and the Sidebar.",
-    functions: [
+    shows: [
       "placeTile",
       "removeTile",
       "swapTiles",
@@ -2131,7 +2133,7 @@ const entries = {
     dependencies: "React · Motion",
     changes:
       "The Home Office design system's timeline, with a tick as thick as the rail at each heading, and the date and who did it on one line beneath it, such as 12 March 2026 at 2:05pm by the Passport Office. Here, the events since users last looked are highlighted. Add the next update adds an event above them, which joins them. Show earlier events loads 3 more events beneath the others, after a moment, as a service's API would, then the last one.",
-    functions: ["formatDateTime", "formatDate", "formatTime"],
+    shows: ["formatDateTime", "formatDate", "formatTime"],
     props: [],
   },
   "summary-list": {
@@ -2377,7 +2379,7 @@ const entries = {
     dependencies: "React · Web Audio",
     changes:
       "Not in GOV.UK. Every sound is made as it plays, with the Web Audio API, from a tone or a burst of noise or two, each shaped by an envelope and sometimes a filter, so the library ships no audio files, and each play is detuned a little at random, so a repeat never sounds mechanical. The cues come in six families, which are presses, toggles, surfaces, values, outcomes and small moments. SoundScope plays the one for each interaction inside it, from what was pressed. A toggle rises turning on and falls turning off, a warning button sounds weightier, a row sounds a step higher down its list, and outcomes that arrive by themselves, such as an error or a toast, play theirs too. data-sound names a cue for a part of the page, or turns sound off there, and data-sound-enter names one for content that arrives. Nothing plays until the user has used the page, as browsers ask. The example is every cue on a card, with a drawing of what plays it beside a drawing of the sound itself. The sound's pitch runs from left to right, as thick as it is loud, on one scale for every cue. The cards run in their families, which only their colour tells apart. A press plays the cue, the icon acts out what plays it, and the drawing lights at the sound's own pace. A card that steps, such as a row in a list, moves on a step each press, and a drag across the cards plays each in turn. The board has a SoundScope of its own, whose play sets every cue at the playground's volume, pitch and softness, and each card plays through it with useScopeSound. The workbench's mute silences it.",
-    functions: ["useSound"],
+    shows: ["useSound", "soundCues"],
     props: [
       range("volume", 0.5, 0, 1, 0.05),
       range("detune", 0, -1200, 1200, 100),

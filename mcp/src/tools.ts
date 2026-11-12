@@ -38,6 +38,7 @@ export const sections = [
   "parts",
   "props",
   "functions",
+  "types",
   "words",
   "example",
   "styling",
@@ -46,7 +47,8 @@ export type Section = (typeof sections)[number];
 const headings: Record<Exclude<Section, "about">, string> = {
   parts: "Parts",
   props: "Props",
-  functions: "Hooks and functions",
+  functions: "Hooks, functions and constants",
+  types: "Types",
   words: "Words",
   example: "Example",
   styling: "Styling",
@@ -135,8 +137,8 @@ export function search(index: DocsIndex, query: string, limit = 10): Match[] {
 }
 
 /**
- * The hooks and functions on no component's page that a query names, such as `useLocale`. A
- * component's own hooks and functions find their component in `search`.
+ * The hooks, functions and constants on no component's page that a query names, such as
+ * `useLocale`. A component's own find their component in `search`.
  */
 export function sharedFunctions(index: DocsIndex, query: string) {
   const terms = new Set(query.toLowerCase().split(/[^a-z0-9$_-]+/));

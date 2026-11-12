@@ -21,7 +21,7 @@ beforeAll(async () => {
   index = JSON.parse(documents["docs/index.json"] ?? "{}");
   const { functions: _, ...rest } = index;
   const button: ComponentDoc = JSON.parse(documents["docs/button.json"] ?? "{}");
-  const { functions, words, ...record } = button;
+  const { functions, types, words, ...record } = button;
   await Promise.all([
     ...Object.entries(documents).map(([path, text]) =>
       Bun.write(join(place, path.replace(/^docs\//, "")), text),
@@ -62,9 +62,11 @@ test("the MCP server answers with one section of a component's page, and searche
   expect(about).not.toContain("## Props");
   // A page's hooks and functions, and its words, are sections of their own.
   const form = await openDocs({ X_GOVUK_UI_DOCS: place }).component("form");
-  expect(section(form.markdown, "functions")).toStartWith("## Hooks and functions\n");
+  expect(section(form.markdown, "functions")).toStartWith("## Hooks, functions and constants\n");
+  expect(section(form.markdown, "types")).toContain("### `FormProblem`");
   expect(section(form.markdown, "words")).toContain("### `formSteps`");
   expect(section(form.markdown, "about")).not.toContain("validateWith`\n");
+  expect(section(form.markdown, "about")).not.toContain("FormProblem");
   expect(section(button.markdown, "words")).toBeUndefined();
   // A data attribute finds its component, and a word every component shares finds none above it.
   expect(search(index, "data-loading")[0]?.slug).toBe("button");

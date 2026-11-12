@@ -6,13 +6,23 @@
  * the compiler reads it, the examples' source and the styling contracts, so it says what the
  * workbench says.
  */
-import { type ApiFunction, type ApiLabels, type ApiProp, readApi } from "./api";
+import {
+  type ApiFunction,
+  type ApiLabels,
+  type ApiMember,
+  type ApiProp,
+  type ApiType,
+  readApi,
+} from "./api";
 import { type ComponentName, catalogue, componentNames, groups, upstreamPage } from "./catalogue";
 import { sources } from "./sources";
 import { type StylingContract, stylingContracts } from "./styling";
 
-/** A hook or function, as the pages and the records give it. */
+/** A hook, function or constant, as the pages and the records give it. */
 export type DocFunction = Omit<ApiFunction, "file">;
+
+/** A type, as the pages and the records give it. */
+export type DocType = Omit<ApiType, "file">;
 
 /** One component's words, as the pages and the records give them. */
 export type DocWords = Omit<ApiLabels, "file">;
@@ -42,9 +52,22 @@ export type ComponentDoc = {
   /** The own props of the component's own export, which `parts` gives with every other part's. */
   props: ApiProp[];
   /** Every part, in the source's order, each with the props the library's source declares. */
-  parts: { name: string; doc?: string; classes: string[]; inner: string[]; props: ApiProp[] }[];
-  /** The hooks and functions that go with the component. */
+  parts: {
+    name: string;
+    doc?: string;
+    classes: string[];
+    inner: string[];
+    /** The exported type of its props, such as `DialogProps`, where they have one. */
+    propsType?: string;
+    props: ApiProp[];
+  }[];
+  /** The hooks, functions and constants that go with the component. */
   functions: DocFunction[];
+  /**
+   * The types that go with the component. Each part's props, and each map of words, has its type
+   * by name alone, because the record gives its members as the props and the words.
+   */
+  types: DocType[];
   /**
    * The words its parts write, by their key in a LabelsProvider's `labels`. A part's own `labels`
    * takes the same words.
@@ -61,7 +84,7 @@ export type DocsIndex = {
   version: string;
   /** What every component shares, as `/llms.txt` says it. */
   usage: string;
-  /** The hooks and functions on no component's page, which `usage` lists. */
+  /** The hooks, functions and constants on no component's page, which `usage` lists. */
   functions: DocFunction[];
   components: (Pick<
     ComponentDoc,
@@ -106,17 +129,35 @@ const asCode = (text: string) => (text.includes("`") ? `\`\` ${text} \`\`` : `\`
 /** The first sentence of a JSDoc comment. */
 const firstSentence = (doc = "") => doc.match(/^.*?[.?!](?=\s|$)/s)?.[0] ?? doc;
 
+/** A type's members or a part's props, as a list beneath the item that has them. */
+const membersList = (members: readonly ApiMember[]) =>
+  members.map(
+    ({ name, type, required, doc }) =>
+      `    - \`${name}\`, ${asCode(type)}${required ? ", required" : ""}.${doc ? ` ${doc.replaceAll("\n", " ")}` : ""}`,
+  );
+
 /**
  * What every component shares, as `/llms.txt` and the MCP server's `get_usage` say it. It ends
- * with the hooks and functions that are on no component's page.
+ * with whatever the packages export that is on no component's page.
  */
-function usageText(functions: readonly DocFunction[]) {
+function usageText({ functions, types }: Pick<LibraryDocs, "functions" | "types">) {
   return [
     shared,
-    "- These hooks and functions belong to no one component, so no component's page has them:",
+    "- These hooks, functions and constants belong to no one component, so no component's page has them:",
     ...functions.map(
       ({ name, package: from, signature, doc }) =>
         `  - \`${name}\`, from \`${from}\`, is ${asCode(signature)}. ${firstSentence(doc)}`,
+    ),
+    "- These types are on no component's page:",
+    ...types.flatMap(({ name, parameters = "", package: from, doc, members, type }) =>
+      members
+        ? [
+            `  - \`${name}${parameters}\`, from \`${from}\`.${doc ? ` ${firstSentence(doc)}` : ""} Its members:`,
+            ...membersList(members),
+          ]
+        : [
+            `  - \`${name}${parameters}\`, from \`${from}\`, is ${asCode(type ?? "")}.${doc ? ` ${firstSentence(doc)}` : ""}`,
+          ],
     ),
   ].join("\n");
 }
@@ -131,6 +172,19 @@ function propsMarkdown(props: readonly ApiProp[]) {
       const start = fallback === undefined ? (required ? "Required" : "") : asCode(fallback);
       return `| \`${name}\` | ${cell(asCode(type))} | ${cell(start)} | ${cell(doc)} |`;
     }),
+  ];
+}
+
+/** A type's members as a table, or the type as the compiler writes it. */
+function typeMarkdown({ members, type }: DocType) {
+  if (!members) return [asCode(type ?? "")];
+  return [
+    "| Member | Type | Required | What it is |",
+    "| --- | --- | --- | --- |",
+    ...members.map(
+      ({ name, type, required, doc = "" }) =>
+        `| \`${name}\` | ${cell(asCode(type))} | ${required ? "Yes" : "No"} | ${cell(doc)} |`,
+    ),
   ];
 }
 
@@ -251,6 +305,7 @@ function componentMarkdown(
     slug,
     parts: allParts,
     functions,
+    types,
     words,
     styling,
     package: from,
@@ -285,17 +340,36 @@ function componentMarkdown(
     "## Props",
     "",
     "Each part's own props. A part that renders an element takes that element's attributes too.",
-    ...allParts.flatMap((part) => ["", `### \`${part.name}\``, "", ...propsMarkdown(part.props)]),
+    ...allParts.flatMap((part) => [
+      "",
+      `### \`${part.name}\``,
+      "",
+      ...(part.propsType ? [`The type of its props is \`${part.propsType}\`.`, ""] : []),
+      ...propsMarkdown(part.props),
+    ]),
     "",
     ...(functions.length
       ? [
-          "## Hooks and functions",
+          "## Hooks, functions and constants",
           ...functions.flatMap(({ name, signature, doc }) => [
             "",
             `### \`${name}\``,
             "",
             asCode(signature),
             ...(doc ? ["", doc] : []),
+          ]),
+          "",
+        ]
+      : []),
+    ...(types.length
+      ? [
+          "## Types",
+          ...types.flatMap((type) => [
+            "",
+            `### \`${type.name}${type.parameters ?? ""}\``,
+            ...(type.doc ? ["", type.doc] : []),
+            "",
+            ...typeMarkdown(type),
           ]),
           "",
         ]
@@ -309,7 +383,7 @@ function componentMarkdown(
             "",
             `### \`${map.key}\``,
             "",
-            `The defaults are \`${map.defaults}\`.`,
+            `Their type is \`${map.type}\`, and their defaults are \`${map.defaults}\`.`,
             "",
             ...wordsMarkdown(map),
           ]),
@@ -331,19 +405,27 @@ function componentMarkdown(
   ].join("\n");
 }
 
-/** Every component's documentation, and the hooks and functions that are on no component's page. */
+/** Every component's documentation, and whatever the packages export that is on no page. */
 export type LibraryDocs = {
   /** In the sidebar's order. */
   components: ComponentDoc[];
+  /** The hooks, functions and constants on no component's page. */
   functions: DocFunction[];
+  /** The types on no component's page. */
+  types: DocType[];
 };
 
 /**
  * The library's documentation. A component's page has every part the styling contract gives the
  * component, with each part's own props.
  *
- * - A hook or function is on the page of each component with a part declared in its source file,
- *   and on each page whose entry in the catalogue names it.
+ * - A hook, function or constant is on the page of each component with a part declared in its
+ *   source file, and on each page whose entry in the catalogue names it.
+ * - A type is on the page of each component with a part declared in its source file. It is also on
+ *   each page that names it, in a prop's type, a hook's signature, a word's type or another type
+ *   there, so a page that gives `items` as `TreeNode[]` says what a `TreeNode` has. The type of a
+ *   part's props, or of a map of words, is not shown again, because the page gives its members as
+ *   the props or the words.
  * - A map of words is on the page of each component with a part that takes it in `labels`. Many
  *   parts take their words from a LabelsProvider alone, so no `labels` says which map is theirs.
  *   A map that no part takes in `labels` is on the page of each component with a part declared in
@@ -360,6 +442,14 @@ export async function libraryDocs(
   ]);
   const flat = (name: string) => name.toLowerCase().replaceAll("-", "");
   const taken = new Set(Object.values(api.components).flatMap((part) => part.labels));
+  // The types a page gives by name alone, with its parts' props and its words.
+  const given = new Set([
+    ...Object.values(api.components).map((part) => part.propsType),
+    ...api.labels.map((map) => map.type),
+  ]);
+  const types = new Map(
+    api.types.flatMap((type) => (given.has(type.name) ? [] : [[type.name, type]])),
+  );
   const components = await Promise.all(
     componentNames.map(async (slug) => {
       const entry = catalogue[slug];
@@ -379,6 +469,28 @@ export async function libraryDocs(
       const from = owners.get(exported) ?? core;
       const files = new Set(parts.map((part) => part.file));
       const takes = new Set(parts.flatMap((part) => part.labels));
+      const values = api.functions.filter(
+        ({ name, file }) => files.has(file) || entry.shows?.some((one) => one === name),
+      );
+      const words = api.labels.filter(
+        ({ key, file }) => takes.has(key) || (!taken.has(key) && files.has(file)),
+      );
+      // The types the page names, and the types those name in turn.
+      const named = new Set<string>();
+      const read = (texts: readonly (string | undefined)[]) => {
+        for (const name of texts.flatMap((text) => text?.match(/[\w$]+/g) ?? [])) {
+          const type = types.get(name);
+          if (!type || named.has(name)) continue;
+          named.add(name);
+          read(type.members?.map((member) => member.type) ?? [type.type]);
+        }
+      };
+      read([
+        ...parts.flatMap((part) => part.props.map((prop) => prop.type)),
+        ...values.map((value) => value.signature),
+        ...words.flatMap((map) => map.words.map((word) => word.type)),
+        ...api.types.flatMap(({ name, file }) => (files.has(file) ? [name] : [])),
+      ]);
       const record = {
         slug,
         name: entry.name,
@@ -393,30 +505,31 @@ export async function libraryDocs(
         builtOn: entry.dependencies,
         notes: entry.changes,
         props: parts.find((part) => part.name === exported)?.props ?? [],
-        parts: parts.map(({ name, classes, inner, props }) => ({
+        parts: parts.map(({ name, classes, inner, propsType, props }) => ({
           name,
           doc: docs.get(name),
           classes,
           inner,
+          ...(propsType && { propsType }),
           props,
         })),
-        functions: api.functions
-          .filter(
-            ({ name, file }) => files.has(file) || entry.functions?.some((one) => one === name),
-          )
-          .map(({ file, ...rest }) => rest),
-        words: api.labels
-          .filter(({ key, file }) => takes.has(key) || (!taken.has(key) && files.has(file)))
-          .map(({ file, ...rest }) => rest),
+        functions: values.map(({ file, ...rest }) => rest),
+        types: api.types.filter(({ name }) => named.has(name)).map(({ file, ...rest }) => rest),
+        words: words.map(({ file, ...rest }) => rest),
         styling: contract,
       };
       return { ...record, markdown: componentMarkdown(record, source) };
     }),
   );
-  const shown = new Set(components.flatMap((doc) => doc.functions.map(({ name }) => name)));
+  const shown = new Set(
+    components.flatMap((doc) => [...doc.functions, ...doc.types].map(({ name }) => name)),
+  );
   return {
     components,
     functions: api.functions
+      .filter(({ name }) => !shown.has(name))
+      .map(({ file, ...rest }) => rest),
+    types: [...types.values()]
       .filter(({ name }) => !shown.has(name))
       .map(({ file, ...rest }) => rest),
   };
@@ -424,12 +537,12 @@ export async function libraryDocs(
 
 /** The MCP server's documents, by their paths, `docs/index.json` and each `docs/<slug>.json`. */
 export async function docsDocuments(library?: LibraryDocs): Promise<Record<string, string>> {
-  const { components: all, functions } = library ?? (await libraryDocs());
+  const { components: all, functions, types } = library ?? (await libraryDocs());
   const { version } = await Bun.file("packages/core/package.json").json();
   const index: DocsIndex = {
     library: "x-govuk-ui",
     version,
-    usage: usageText(functions),
+    usage: usageText({ functions, types }),
     functions,
     components: all.map((doc) => ({
       slug: doc.slug,
@@ -473,8 +586,8 @@ export function propsDocuments({ components }: LibraryDocs): Record<string, stri
  * `llms-full.txt` or a component's `llms/<name>.md`.
  */
 export async function llmsDocuments(library?: LibraryDocs): Promise<Record<string, string>> {
-  const { components: all, functions } = library ?? (await libraryDocs());
-  const usage = usageText(functions);
+  const { components: all, functions, types } = library ?? (await libraryDocs());
+  const usage = usageText({ functions, types });
   const pages = Object.fromEntries(all.map((doc) => [doc.slug, doc.markdown])) as Record<
     ComponentName,
     string
@@ -484,7 +597,7 @@ export async function llmsDocuments(library?: LibraryDocs): Promise<Record<strin
     "",
     `> ${summary}`,
     "",
-    `It has ${componentNames.length} components for GOV.UK services. Each page below gives a component's description, its parts and each part's props, its hooks and functions, its words, an example and its styling contract.`,
+    `It has ${componentNames.length} components for GOV.UK services. Each page below gives a component's description, its parts and each part's props, its hooks, functions, constants and types, its words, an example and its styling contract.`,
     "",
     usage,
     ...groups.flatMap((group) => [

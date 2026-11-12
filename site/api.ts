@@ -1,8 +1,8 @@
 /**
  * The library's API, read from the TypeScript compiler as the site builds, so the documentation
- * says what the types say. It gives each exported component's own props, each exported hook and
- * function, and each map of words in `ComponentLabels`. `site/llms.ts` writes the pages and the
- * records from it.
+ * says what the types say. It gives everything a package exports. That is each component's own
+ * props, each hook, function and constant, each type, and each map of words in `ComponentLabels`.
+ * `site/llms.ts` writes the pages and the records from it.
  *
  * It asks TypeScript's own API, which starts the compiler's program for the platform and answers
  * over a pipe. The compiler checks the whole repository, by the root `tsconfig.json`, so an
@@ -15,6 +15,7 @@ import {
   isCallExpression,
   isFunctionDeclaration,
   isIdentifier,
+  isInterfaceDeclaration,
   isNoSubstitutionTemplateLiteral,
   isObjectBindingPattern,
   isObjectLiteralExpression,
@@ -24,6 +25,9 @@ import {
   isSatisfiesExpression,
   isSpreadAssignment,
   isStringLiteral,
+  isTypeAliasDeclaration,
+  isTypeLiteralNode,
+  isTypeReferenceNode,
   isVariableDeclaration,
   isVariableStatement,
   type Node,
@@ -37,32 +41,40 @@ import {
   type Type,
 } from "typescript/unstable/async";
 
-/** One prop of a part's own, which the library's source declares. */
-export type ApiProp = {
+/** One member of an object type. */
+export type ApiMember = {
   name: string;
   required: boolean;
-  /** Its type as the compiler writes it, without the `| undefined` of an optional prop. */
+  /** Its type as the compiler writes it, without the `| undefined` of an optional member. */
   type: string;
-  /** The initialiser the part gives it where it takes its props apart, as written. */
-  default?: string;
   /** Its JSDoc, each paragraph on one line. */
   doc?: string;
+};
+
+/** One prop of a part's own, which the library's source declares. */
+export type ApiProp = ApiMember & {
+  /** The initialiser the part gives it where it takes its props apart, as written. */
+  default?: string;
 };
 
 /** An exported component, which is a part of some component's page. */
 export type ApiComponent = {
   name: string;
+  /** The package it is imported from, such as `x-govuk-ui`. */
+  package: string;
   /** The source file that declares it, from the checkout's root. */
   file: string;
   /** Where it starts in its file, which puts a file's parts in the order the file has them. */
   at: number;
+  /** The exported type of its props, such as `DialogProps`, where they have one. */
+  propsType?: string;
   /** Its own props. Those it takes from React's or Base UI's types are left out. */
   props: ApiProp[];
   /** The keys of the maps of words its `labels` takes, such as `overlay`. */
   labels: string[];
 };
 
-/** An exported hook or function that is not a component. */
+/** An exported hook, function or constant, which is any exported value that is not a component. */
 export type ApiFunction = {
   name: string;
   /** The package it is imported from, such as `x-govuk-ui`. */
@@ -73,6 +85,23 @@ export type ApiFunction = {
   signature: string;
   /** Its JSDoc, each paragraph on one line. */
   doc?: string;
+};
+
+/** An exported type. */
+export type ApiType = {
+  name: string;
+  /** Its type parameters as written, such as `<Row>`. */
+  parameters?: string;
+  /** The package it is imported from, such as `x-govuk-ui`. */
+  package: string;
+  /** The source file that declares it, from the checkout's root. */
+  file: string;
+  /** Its JSDoc, each paragraph on one line. */
+  doc?: string;
+  /** Its members, where it is an object type, which is an interface or a type literal. */
+  members?: ApiMember[];
+  /** Any other type, as the compiler writes it, such as `"light" | "dark"`. */
+  type?: string;
 };
 
 /** One word of a map of words. */
@@ -93,6 +122,8 @@ export type ApiWord = {
 export type ApiLabels = {
   /** The map's key in `ComponentLabels`, which is its key in a LabelsProvider's `labels`. */
   key: string;
+  /** The exported type its words are written in, such as `OverlayLabels`. */
+  type?: string;
   /** The export with its English defaults, such as `defaultOverlayLabels`. */
   defaults: string;
   /** The source file that declares the defaults, from the checkout's root. */
@@ -104,6 +135,7 @@ export type Api = {
   /** Every exported component, by its export. */
   components: Record<string, ApiComponent>;
   functions: ApiFunction[];
+  types: ApiType[];
   labels: ApiLabels[];
 };
 
@@ -334,66 +366,130 @@ export async function readApi(): Promise<Api> {
       }),
     );
 
+    const defaults = new Set(labels.map((map) => map.defaults));
+    const typed = (symbol: CompilerSymbol) =>
+      symbol.flags & (SymbolFlags.TypeAlias | SymbolFlags.Interface);
+    const types = new Set(exported.flatMap(({ name, symbol }) => (typed(symbol) ? [name] : [])));
+    /** A type's members, or a part's props, each with its type and JSDoc. */
+    const membersOf = async (members: readonly CompilerSymbol[]) => {
+      const memberTypes = await checker.getTypeOfSymbol(members);
+      return Promise.all(
+        members.map(async (member, index): Promise<ApiMember> => {
+          const type = memberTypes[index];
+          const text = type ? await textOf(type) : "unknown";
+          const required = !(member.flags & SymbolFlags.Optional);
+          return {
+            name: member.name,
+            required,
+            type: required ? text : withoutUndefined(text),
+            doc: await propDocOf(member),
+          };
+        }),
+      );
+    };
+
+    /** An export's value, which is a component, or a hook, function or constant. */
+    const exportedValue = async ({ name, from, symbol }: (typeof exported)[number]) => {
+      // A map's defaults are given with its words.
+      if (!symbol.valueDeclaration || defaults.has(name)) return {};
+      const type = await checker.getTypeOfSymbol(symbol);
+      if (!type) return {};
+      const file = fileOf(symbol.valueDeclaration.path);
+      // A component is a function named with a capital, as React asks.
+      if (!(symbol.flags & SymbolFlags.Function) || !/^[A-Z]/.test(name)) {
+        const value: ApiFunction = {
+          name,
+          package: from,
+          file,
+          signature: await textOf(type),
+          doc: await docOf(symbol),
+        };
+        return { value };
+      }
+      const [signature] = await checker.getSignaturesOfType(type, SignatureKind.Call);
+      const taken = signature && (await checker.getParameterType(signature, 0));
+      const declaration = await symbol.valueDeclaration.resolve();
+      const all = taken ? await checker.getPropertiesOfType(taken) : [];
+      // A prop is the part's own when the library's source declares it. A part can declare a
+      // prop that React's types declare too, such as a `children` it requires.
+      const own = all.filter((prop) => prop.declarations.some(({ path }) => ours(path)));
+      const given = defaultsOf(declaration);
+      const takes = own.find((prop) => prop.name === "labels");
+      const takesType = takes && (await checker.getTypeOfSymbol(takes));
+      // The type its props are written as, such as `DialogProps`, where a package exports it.
+      const written =
+        declaration && isFunctionDeclaration(declaration) && declaration.parameters[0]?.type;
+      const propsType =
+        written && isTypeReferenceNode(written) && isIdentifier(written.typeName)
+          ? written.typeName.text
+          : undefined;
+      const component: ApiComponent = {
+        name,
+        package: from,
+        file,
+        at: declaration?.getStart() ?? 0,
+        ...(propsType && types.has(propsType) && { propsType }),
+        props: (await membersOf(own)).map((prop): ApiProp => {
+          const fallback = given.get(prop.name);
+          return fallback === undefined ? prop : { ...prop, default: fallback };
+        }),
+        labels: takesType
+          ? [...new Set((await mapTypes(takesType)).flatMap((id) => keyOf.get(id) ?? []))]
+          : [],
+      };
+      return { component };
+    };
+
+    /** An export's type. An interface or a type literal gives its members. */
+    const exportedType = async ({ name, from, symbol }: (typeof exported)[number]) => {
+      if (!typed(symbol)) return {};
+      const declared = await symbol.declarations[0]?.resolve();
+      if (!declared || !(isInterfaceDeclaration(declared) || isTypeAliasDeclaration(declared)))
+        return {};
+      const declaredType = await checker.getDeclaredTypeOfSymbol(symbol);
+      const object = isInterfaceDeclaration(declared) || isTypeLiteralNode(declared.type);
+      const type: ApiType = {
+        name,
+        ...(declared.typeParameters && {
+          parameters: `<${declared.typeParameters.map((one) => one.getText()).join(", ")}>`,
+        }),
+        package: from,
+        file: fileOf(declared.getSourceFile().path),
+        doc: await docOf(symbol),
+        ...(object
+          ? { members: await membersOf(await checker.getPropertiesOfType(declaredType)) }
+          : {
+              type: await checker.typeToString(
+                declaredType,
+                undefined,
+                NodeBuilderFlags.NoTruncation | NodeBuilderFlags.InTypeAlias,
+              ),
+            }),
+      };
+      return { type, words: keyOf.get(declaredType.id) };
+    };
+
     // Each export's answer keeps its export's place, whichever answer came first.
     const read = await Promise.all(
-      exported.map(async ({ name, from, symbol }) => {
-        if (!(symbol.flags & SymbolFlags.Function) || !symbol.valueDeclaration) return;
-        const type = await checker.getTypeOfSymbol(symbol);
-        if (!type) return;
-        const file = fileOf(symbol.valueDeclaration.path);
-        // A component is a function named with a capital, as React asks.
-        if (!/^[A-Z]/.test(name)) {
-          const hook: ApiFunction = {
-            name,
-            package: from,
-            file,
-            signature: await textOf(type),
-            doc: await docOf(symbol),
-          };
-          return { hook };
-        }
-        const [signature] = await checker.getSignaturesOfType(type, SignatureKind.Call);
-        const taken = signature && (await checker.getParameterType(signature, 0));
-        const declaration = await symbol.valueDeclaration.resolve();
-        const all = taken ? await checker.getPropertiesOfType(taken) : [];
-        // A prop is the part's own when the library's source declares it. A part can declare a
-        // prop that React's types declare too, such as a `children` it requires.
-        const own = all.filter((prop) => prop.declarations.some(({ path }) => ours(path)));
-        const types = await checker.getTypeOfSymbol(own);
-        const defaults = defaultsOf(declaration);
-        const takes = types[own.findIndex((prop) => prop.name === "labels")];
-        const component: ApiComponent = {
-          name,
-          file,
-          at: declaration?.getStart() ?? 0,
-          props: await Promise.all(
-            own.map(async (prop, index): Promise<ApiProp> => {
-              const propType = types[index];
-              const text = propType ? await textOf(propType) : "unknown";
-              const required = !(prop.flags & SymbolFlags.Optional);
-              const fallback = defaults.get(prop.name);
-              return {
-                name: prop.name,
-                required,
-                type: required ? text : withoutUndefined(text),
-                ...(fallback !== undefined && { default: fallback }),
-                doc: await propDocOf(prop),
-              };
-            }),
-          ),
-          labels: takes
-            ? [...new Set((await mapTypes(takes)).flatMap((id) => keyOf.get(id) ?? []))]
-            : [],
-        };
-        return { component };
-      }),
+      exported.map(async (one) => ({
+        ...(await exportedValue(one)),
+        ...(await exportedType(one)),
+      })),
+    );
+    // The type each map's words are written in, by the map's key.
+    const wordsTypes = new Map(
+      read.flatMap((one) => (one.words && one.type ? [[one.words, one.type.name] as const] : [])),
     );
     return {
       components: Object.fromEntries(
-        read.flatMap((one) => (one?.component ? [[one.component.name, one.component]] : [])),
+        read.flatMap((one) => (one.component ? [[one.component.name, one.component]] : [])),
       ),
-      functions: read.flatMap((one) => one?.hook ?? []),
-      labels,
+      functions: read.flatMap((one) => one.value ?? []),
+      types: read.flatMap((one) => one.type ?? []),
+      labels: labels.map((map) => {
+        const type = wordsTypes.get(map.key);
+        return type ? { ...map, type } : map;
+      }),
     };
   } finally {
     await api.close();
@@ -408,6 +504,7 @@ if (import.meta.main) {
       name
         ? (api.components[name] ??
             api.functions.find((one) => one.name === name) ??
+            api.types.find((one) => one.name === name) ??
             api.labels.find((one) => one.key === name))
         : api,
       null,

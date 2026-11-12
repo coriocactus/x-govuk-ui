@@ -450,18 +450,21 @@ test("each part's props are read from its types, with each prop's type, default 
   expect(table.find((prop) => prop.name === "maxRows")?.default).toBe("8");
   // Each page has a table for each part.
   const { "llms/dialog.md": page = "" } = await llmsDocuments(await library);
-  expect(page).toContain("### `Dialog`\n\n| Prop | Type | Default | What it does |");
+  expect(page).toContain(
+    "### `Dialog`\n\nThe type of its props is `DialogProps`.\n\n| Prop | Type | Default | What it does |",
+  );
   expect(page).toContain("| `closeOnPressOutside` | `boolean` | `true` | Closes it when");
   expect(page).toContain("### `DialogTitle`\n\nIt has no props of its own.");
 });
 
-test("each page lists its words with their English defaults, and its hooks and functions", async () => {
+test("each page lists its words with their English defaults, and its hooks, functions and constants", async () => {
   const all = await library;
   const doc = (slug: ComponentName) => all.components.find((one) => one.slug === slug);
   // A string's default is the string, and a function's is its source.
   expect(doc("pagination")?.words).toEqual([
     {
       key: "pagination",
+      type: "PaginationLabels",
       defaults: "defaultPaginationLabels",
       words: expect.arrayContaining([
         {
@@ -496,6 +499,16 @@ test("each page lists its words with their English defaults, and its hooks and f
       "<Output>(schema: StandardSchema<Output>, { lists, root }?: ValidateWithOptions) => SchemaCheck<Output>",
     doc: expect.stringMatching(/^Makes a Form's `validate` from a Standard Schema\. /),
   });
+  // A constant is given as a function is, with its type, where its file's parts are.
+  expect(doc("toast")?.functions).toContainEqual({
+    name: "toastPositions",
+    package: "x-govuk-ui",
+    signature:
+      'readonly ["top-start", "top-center", "top-end", "bottom-start", "bottom-center", "bottom-end"]',
+    doc: "Where a stack of toasts can sit in the window.",
+  });
+  expect(doc("sound")?.functions.map((one) => one.name)).toContain("soundCues");
+  expect(doc("editor")?.functions.map((one) => one.name)).toContain("MentionNode");
   const documents = await llmsDocuments(all);
   expect(documents["llms/form.md"]).toContain(
     "### `validateWith`\n\n`<Output>(schema: StandardSchema<Output>, { lists, root }?: ValidateWithOptions) => SchemaCheck<Output>`",
@@ -508,6 +521,78 @@ test("each page lists its words with their English defaults, and its hooks and f
   expect(usage).toContain("`LabelsProvider` gives every component inside it the words");
   expect(usage).toContain("A component's own `labels` come first");
   expect(documents["llms.txt"]).toContain(usage);
+});
+
+test("each page gives the types it names, an object type by its members", async () => {
+  const all = await library;
+  const types = (slug: ComponentName) =>
+    all.components.find((one) => one.slug === slug)?.types ?? [];
+  // A type declared beside the page's parts, with its type parameter and its members.
+  const column = types("data-table").find((type) => type.name === "DataTableColumn");
+  expect(column).toEqual({
+    name: "DataTableColumn",
+    parameters: "<Row>",
+    package: "x-govuk-ui",
+    members: expect.any(Array),
+  });
+  expect(column?.members?.map((member) => member.name)).toEqual([
+    "id",
+    "header",
+    "icon",
+    "cell",
+    "sortBy",
+    "numeric",
+    "width",
+    "minWidth",
+    "summary",
+  ]);
+  expect(column?.members?.[1]).toEqual({
+    name: "header",
+    required: true,
+    type: "string",
+    doc: "The column's heading.",
+  });
+  expect(column?.members?.[4]).toEqual({
+    name: "sortBy",
+    required: false,
+    type: "(row: Row) => string | number",
+    doc: "The value the column sorts by. With it, the heading sorts the rows.",
+  });
+  // A type that is not an object type is written out.
+  expect(types("data-table").find((type) => type.name === "DataTableSort")).toEqual({
+    name: "DataTableSort",
+    package: "x-govuk-ui",
+    doc: expect.stringMatching(/^The column a Data table sorts by/),
+    type: '{ id: string; direction: "ascending" | "descending"; } | null',
+  });
+  // A type declared in a file no part is in is on each page that names it, as Tree's `items` do.
+  const node = types("tree").find((type) => type.name === "TreeNode");
+  expect(node?.members?.map((member) => [member.name, member.required, member.type])).toEqual([
+    ["value", true, "string"],
+    ["label", true, "string"],
+    ["description", false, "string"],
+    ["disabled", false, "boolean"],
+    ["children", false, "readonly TreeNode[]"],
+  ]);
+  expect(types("tree-select").map((type) => type.name)).toContain("TreeNode");
+  // A type another type names comes with it.
+  expect(types("combobox").map((type) => type.name)).toEqual(["ComboboxItem", "ComboboxOption"]);
+  // The type of a part's props, or of a map of words, is named with them, and not shown again.
+  const table = all.components.find((one) => one.slug === "data-table");
+  expect(table?.parts.find((part) => part.name === "DataTable")?.propsType).toBe("DataTableProps");
+  expect(types("data-table").map((type) => type.name)).toEqual([
+    "DataTableColumn",
+    "DataTableSort",
+  ]);
+  const documents = await llmsDocuments(all);
+  expect(documents["llms/data-table.md"]).toContain(
+    "### `DataTableColumn<Row>`\n\n| Member | Type | Required | What it is |",
+  );
+  expect(documents["llms/data-table.md"]).toContain(
+    "| `header` | `string` | Yes | The column's heading. |",
+  );
+  expect(documents["llms/data-table.md"]).toContain("The type of its props is `DataTableProps`.");
+  expect(documents["llms/tree.md"]).toContain("| `children` | `readonly TreeNode[]` | No |");
 });
 
 test("every exported hook and function is on a component's page, or listed in what every component shares", async () => {

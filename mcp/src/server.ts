@@ -49,7 +49,7 @@ export function createServer(docs: Docs): McpServer {
     {
       title: "How to use x-govuk-ui",
       description:
-        "What every component shares. That is the imports and stylesheet, parts and their className and render props, fields and forms, the components' words and LabelsProvider, styling through the cascade layer, the themes, GOV.UK's branding rules, and the hooks and functions that belong to no one component. Read it before writing code with the library.",
+        "What every component shares. That is the imports and stylesheet, parts and their className and render props, fields and forms, the components' words and LabelsProvider, styling through the cascade layer, the themes, GOV.UK's branding rules, and whatever the library exports that belongs to no one component. Read it before writing code with the library.",
     },
     safely(async () => {
       const index = await docs.index();
@@ -109,14 +109,14 @@ export function createServer(docs: Docs): McpServer {
     {
       title: "Read a component's page",
       description:
-        "A component's page in Markdown, with its description and what it does here, its parts, each part's props, its hooks and functions, its words, the workbench's example, and its styling contract. Ask for one section to keep the answer short.",
+        "A component's page in Markdown, with its description and what it does here, its parts, each part's props, its hooks, functions and constants, its types, its words, the workbench's example, and its styling contract. Ask for one section to keep the answer short.",
       inputSchema: {
         name: component,
         section: z
           .enum(sections)
           .optional()
           .describe(
-            "One section only, which is about, parts, props, functions, words, example or styling",
+            "One section only, which is about, parts, props, functions, types, words, example or styling",
           ),
       },
     },
@@ -169,7 +169,7 @@ export function createServer(docs: Docs): McpServer {
     {
       title: "Search the components",
       description:
-        "The components a query is about, the strongest match first, each with what matched. It searches names, parts, hooks and functions, data attributes, custom properties, classes, props, descriptions and notes. A hook or function that belongs to no one component is found by its name.",
+        "The components a query is about, the strongest match first, each with what matched. It searches names, parts, hooks, functions and constants, data attributes, custom properties, classes, props, descriptions and notes. A hook, function or constant that belongs to no one component is found by its name.",
       inputSchema: {
         query: z.string().describe("Such as date of birth, data-loading or a sidebar that folds"),
         limit: z

@@ -11,12 +11,12 @@ import type { ComponentDoc, DocsIndex } from "../../site/llms";
 
 /**
  * A component's record, as any version of the library wrote it. An older record gives its parts no
- * props, and has no hooks, functions or words.
+ * props, and has no hooks, functions, constants, types or words.
  */
-export type AnyComponentDoc = Omit<ComponentDoc, "parts" | "functions" | "words"> & {
+export type AnyComponentDoc = Omit<ComponentDoc, "parts" | "functions" | "types" | "words"> & {
   parts: (Omit<ComponentDoc["parts"][number], "props"> &
     Partial<Pick<ComponentDoc["parts"][number], "props">>)[];
-} & Partial<Pick<ComponentDoc, "functions" | "words">>;
+} & Partial<Pick<ComponentDoc, "functions" | "types" | "words">>;
 
 type Entry = DocsIndex["components"][number];
 

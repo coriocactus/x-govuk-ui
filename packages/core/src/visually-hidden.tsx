@@ -4,7 +4,10 @@ import { useRender } from "@base-ui/react/use-render";
 import type { ComponentPropsWithRef } from "react";
 
 export type VisuallyHiddenProps = ComponentPropsWithRef<"span"> & {
-  /** Another element for the words, such as a heading that only screen readers hear. */
+  /**
+   * Another element for the words in place of the `span`, such as a heading that only screen
+   * readers hear.
+   */
   render?: useRender.RenderProp;
 };
 

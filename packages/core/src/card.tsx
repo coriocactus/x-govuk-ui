@@ -56,7 +56,8 @@ export function Card({ className = "", ...props }: CardProps) {
 }
 
 /**
- * An image across the top of the card, cropped to the card's width, with an optional MediaCredit.
+ * An image or a video across the top of the card, cropped to the card's width, with an optional
+ * MediaCredit.
  */
 export function CardMedia({ className = "", ...props }: ComponentPropsWithRef<"div">) {
   return <div {...props} className={`x-govuk-ui-card-media ${className}`.trim()} />;

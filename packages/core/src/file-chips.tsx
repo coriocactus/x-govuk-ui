@@ -45,9 +45,9 @@ export const defaultFileChipsLabels: FileChipsLabels = {
 };
 
 /**
- * Files or documents as a row of chips that wraps, named for screen readers. It can sit anywhere,
- * such as under a sent message, to list what went with it. Chat input lists what goes with the next
- * message with the same chips, as ChatInputAttachments.
+ * Files or documents as a row of chips that wraps, named for screen readers. Its children are
+ * `FileChip` parts. It can sit anywhere, such as under a sent message, to list what went with it.
+ * Chat input lists what goes with the next message with the same chips, as ChatInputAttachments.
  */
 export function FileChips({ label: ownLabel, className = "", ...props }: FileChipsProps) {
   const words = useLabels("fileChips", defaultFileChipsLabels);

@@ -22,7 +22,7 @@ export const defaultBackLinkLabels: BackLinkLabels = {
 
 /**
  * Takes users back one page, at the top of a page in a journey. Its arrow leans back a little
- * under the pointer.
+ * under the pointer. Without an `href`, it links to `#`.
  */
 export function BackLink({
   href = "#",

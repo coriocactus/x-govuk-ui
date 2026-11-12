@@ -35,7 +35,11 @@ const stage = (option: Stage): ToastManagerUpdateOptions<object> =>
     ? { title: option, description: undefined }
     : { description: undefined, ...option };
 
-/** Base UI's toast manager, with promise stages that replace each other's text. */
+/**
+ * Base UI's toast manager, with promise stages that replace each other's text. A toast's `type` is
+ * `loading`, `success`, `error`, `warning` or `info`. The type chooses the toast's mark and its
+ * sound, and `data.sound` names another cue for it.
+ */
 export function useToastManager() {
   const manager = Primitive.useToastManager();
   return useMemo(

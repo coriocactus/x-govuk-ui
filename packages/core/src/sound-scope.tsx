@@ -76,6 +76,10 @@ export function useScopeSound() {
  * Plays a cue for each interaction inside it. These are a press on a control, a toggle turning, a
  * surface opening or closing, a value stepping, and outcomes that arrive without a press, such as
  * an error or a success. Put one near the root of the application, with `useSound`'s function.
+ *
+ * An element inside it can choose its own cue. `data-sound` names the cue a press on it plays, such
+ * as `data-sound="close"`, and `data-sound="off"` plays none. `data-sound-enter` names a cue for
+ * content that arrives by itself, such as a reply.
  */
 export function SoundScope({ children, play }: SoundScopeProps) {
   const scope = useRef<HTMLDivElement>(null);

@@ -19,7 +19,10 @@ export type OrganisationNameProps = ComponentPropsWithRef<"span"> & {
    * `small` suits a sidebar or a footer, with the name at 15 pixels and a smaller Royal Arms.
    */
   size?: "medium" | "small";
-  /** A link for the name, such as to the organisation's page, as an element or a function. */
+  /**
+   * A link for the name in place of the `span`, such as to the organisation's page, as an element
+   * or a function.
+   */
   render?: useRender.RenderProp;
 };
 

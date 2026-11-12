@@ -76,6 +76,7 @@ export type CalendarProps = CalendarBaseProps &
     | {
         /** One date. */
         mode?: "single";
+        /** In `single` mode, the chosen date, or null for none. */
         value?: Date | null;
         defaultValue?: Date | null;
         onValueChange?: (value: Date | null) => void;
@@ -83,6 +84,7 @@ export type CalendarProps = CalendarBaseProps &
     | {
         /** A first and last date, such as the dates of a stay. */
         mode: "range";
+        /** In `range` mode, the first and last dates. */
         value?: DateRange;
         defaultValue?: DateRange;
         onValueChange?: (value: DateRange) => void;
@@ -90,6 +92,7 @@ export type CalendarProps = CalendarBaseProps &
     | {
         /** Any number of dates. */
         mode: "multiple";
+        /** In `multiple` mode, the chosen dates. */
         value?: Date[];
         defaultValue?: Date[];
         onValueChange?: (value: Date[]) => void;

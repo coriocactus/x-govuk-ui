@@ -12,7 +12,10 @@ const swipeTowards = { left: "left", right: "right", top: "up", bottom: "down" }
 
 export type SheetProps = {
   children: ReactNode;
-  /** The edge it slides in from. A swipe back towards that edge closes it. */
+  /**
+   * The edge it slides in from. A swipe back towards that edge closes it. A sheet at the left or
+   * the right is as wide as `--x-govuk-ui-sheet-width`.
+   */
   side?: SheetSide;
   open?: boolean;
   defaultOpen?: boolean;

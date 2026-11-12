@@ -2,7 +2,7 @@
  * What the MCP server's tools do, apart from the protocol. They find a component by any of its
  * names, cut one section from its page, and search every component.
  */
-import type { DocsIndex } from "../../site/llms";
+import type { AnyDocsIndex as DocsIndex } from "./docs";
 
 export type Entry = DocsIndex["components"][number];
 
@@ -33,24 +33,36 @@ export function suggestions(index: DocsIndex, name: string): string[] {
   return (near.length ? near : search(index, name, 3)).slice(0, 3).map((entry) => entry.slug);
 }
 
-export const sections = ["about", "parts", "props", "example", "styling"] as const;
+export const sections = [
+  "about",
+  "parts",
+  "props",
+  "functions",
+  "words",
+  "example",
+  "styling",
+] as const;
 export type Section = (typeof sections)[number];
 const headings: Record<Exclude<Section, "about">, string> = {
   parts: "Parts",
   props: "Props",
+  functions: "Hooks and functions",
+  words: "Words",
   example: "Example",
   styling: "Styling",
 };
 
 /**
  * One section of a component's page. `about` is the page's head and what the component does here,
- * which is everything except its parts, props, example and styling.
+ * which is everything except the other sections.
  */
 export function section(markdown: string, name: Section): string | undefined {
   const chunks = markdown.split(/^(?=## )/m);
   if (name === "about")
     return chunks
-      .filter((chunk) => !/^## (Parts|Props|Example|Styling)\n/.test(chunk))
+      .filter(
+        (chunk) => !Object.values(headings).some((heading) => chunk.startsWith(`## ${heading}\n`)),
+      )
       .join("")
       .trim();
   return chunks.find((chunk) => chunk.startsWith(`## ${headings[name]}\n`))?.trim();
@@ -92,6 +104,7 @@ export function search(index: DocsIndex, query: string, limit = 10): Match[] {
       };
       look("component", [entry.name, entry.slug, entry.export], 20, 8);
       look("part", entry.words.parts, 10, 4);
+      look("function", entry.words.functions ?? [], 10, 4);
       look("attribute", entry.words.attributes, 8, 3);
       look("property", entry.words.properties, 8, 3);
       look("class", entry.words.classes, 6, 2);
@@ -119,4 +132,13 @@ export function search(index: DocsIndex, query: string, limit = 10): Match[] {
     .filter((match) => match.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
+}
+
+/**
+ * The hooks and functions on no component's page that a query names, such as `useLocale`. A
+ * component's own hooks and functions find their component in `search`.
+ */
+export function sharedFunctions(index: DocsIndex, query: string) {
+  const terms = new Set(query.toLowerCase().split(/[^a-z0-9$_-]+/));
+  return (index.functions ?? []).filter(({ name }) => terms.has(name.toLowerCase()));
 }

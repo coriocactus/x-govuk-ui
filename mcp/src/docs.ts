@@ -9,14 +9,33 @@ import { dirname, join } from "node:path";
 import { SITE } from "../../site/address";
 import type { ComponentDoc, DocsIndex } from "../../site/llms";
 
+/**
+ * A component's record, as any version of the library wrote it. An older record gives its parts no
+ * props, and has no hooks, functions or words.
+ */
+export type AnyComponentDoc = Omit<ComponentDoc, "parts" | "functions" | "words"> & {
+  parts: (Omit<ComponentDoc["parts"][number], "props"> &
+    Partial<Pick<ComponentDoc["parts"][number], "props">>)[];
+} & Partial<Pick<ComponentDoc, "functions" | "words">>;
+
+type Entry = DocsIndex["components"][number];
+
+/** The index, as any version of the library wrote it. An older index lists no hooks or functions. */
+export type AnyDocsIndex = Omit<DocsIndex, "functions" | "components"> &
+  Partial<Pick<DocsIndex, "functions">> & {
+    components: (Omit<Entry, "words"> & {
+      words: Omit<Entry["words"], "functions"> & Partial<Pick<Entry["words"], "functions">>;
+    })[];
+  };
+
 /** The site's copy, for a project that has not installed the library. */
 export const SITE_DOCS = `${SITE}/docs/`;
 
 export type Docs = {
   /** Where the documents come from, which is a directory or an address. */
   place: string;
-  index(): Promise<DocsIndex>;
-  component(slug: string): Promise<ComponentDoc>;
+  index(): Promise<AnyDocsIndex>;
+  component(slug: string): Promise<AnyComponentDoc>;
 };
 
 /** The installed library's documents, searched for from `from` up to the root. */
@@ -57,7 +76,7 @@ export function openDocs(
   };
   return {
     place,
-    index: () => once("index.json") as Promise<DocsIndex>,
-    component: (slug) => once(`${slug}.json`) as Promise<ComponentDoc>,
+    index: () => once("index.json") as Promise<AnyDocsIndex>,
+    component: (slug) => once(`${slug}.json`) as Promise<AnyComponentDoc>,
   };
 }

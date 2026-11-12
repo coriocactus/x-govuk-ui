@@ -6,7 +6,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import packageFile from "../package.json" with { type: "json" };
 import type { Docs } from "./docs";
-import { resolve, search, section, sections, suggestions } from "./tools";
+import { resolve, search, section, sections, sharedFunctions, suggestions } from "./tools";
 
 type Answer = { content: { type: "text"; text: string }[]; isError?: boolean };
 const say = (text: string): Answer => ({ content: [{ type: "text", text }] });
@@ -49,7 +49,7 @@ export function createServer(docs: Docs): McpServer {
     {
       title: "How to use x-govuk-ui",
       description:
-        "What every component shares. That is the imports and stylesheet, parts and their className and render props, fields and forms, styling through the cascade layer, the themes, and GOV.UK's branding rules. Read it before writing code with the library.",
+        "What every component shares. That is the imports and stylesheet, parts and their className and render props, fields and forms, the components' words and LabelsProvider, styling through the cascade layer, the themes, GOV.UK's branding rules, and the hooks and functions that belong to no one component. Read it before writing code with the library.",
     },
     safely(async () => {
       const index = await docs.index();
@@ -109,13 +109,15 @@ export function createServer(docs: Docs): McpServer {
     {
       title: "Read a component's page",
       description:
-        "A component's page in Markdown, with its description and what it does here, its parts, its props, the workbench's example, and its styling contract. Ask for one section to keep the answer short.",
+        "A component's page in Markdown, with its description and what it does here, its parts, each part's props, its hooks and functions, its words, the workbench's example, and its styling contract. Ask for one section to keep the answer short.",
       inputSchema: {
         name: component,
         section: z
           .enum(sections)
           .optional()
-          .describe("One section only, which is about, parts, props, example or styling"),
+          .describe(
+            "One section only, which is about, parts, props, functions, words, example or styling",
+          ),
       },
     },
     safely(
@@ -134,13 +136,13 @@ export function createServer(docs: Docs): McpServer {
     {
       title: "A component's props",
       description:
-        "A component's props as JSON, each with its type, default and note, and its parts, each with its JSDoc.",
+        "A component's props as JSON, each with its type, default and JSDoc, and its parts, each with its JSDoc and its own props. An older library's records give the parts no props.",
       inputSchema: { name: component },
     },
     safely(async ({ name }: { name: string }) => {
       const { doc, answer } = await find(name);
       if (!doc) return answer;
-      const parts = doc.parts.map(({ name, doc }) => ({ name, doc }));
+      const parts = doc.parts.map(({ name, doc, props }) => ({ name, doc, props }));
       return say(
         JSON.stringify({ name: doc.name, export: doc.export, props: doc.props, parts }, null, 2),
       );
@@ -167,7 +169,7 @@ export function createServer(docs: Docs): McpServer {
     {
       title: "Search the components",
       description:
-        "The components a query is about, the strongest match first, each with what matched. It searches names, parts, data attributes, custom properties, classes, props, descriptions and notes.",
+        "The components a query is about, the strongest match first, each with what matched. It searches names, parts, hooks and functions, data attributes, custom properties, classes, props, descriptions and notes. A hook or function that belongs to no one component is found by its name.",
       inputSchema: {
         query: z.string().describe("Such as date of birth, data-loading or a sidebar that folds"),
         limit: z
@@ -180,15 +182,19 @@ export function createServer(docs: Docs): McpServer {
       },
     },
     safely(async ({ query, limit }: { query: string; limit?: number }) => {
-      const matches = search(await docs.index(), query, limit);
-      if (!matches.length) return say("No component matches.");
+      const index = await docs.index();
+      const matches = search(index, query, limit);
+      const shared = sharedFunctions(index, query).map(
+        ({ name, package: from, signature, doc }) =>
+          `- \`${name}\`, from \`${from}\`, is \`${signature}\`, and is on no component's page. ${doc ?? ""}`,
+      );
+      if (!matches.length && !shared.length) return say("No component matches.");
+      const found = matches.map(
+        (match) =>
+          `- ${match.name} (\`${match.slug}\`): ${match.description} Matched ${match.found.slice(0, 4).join(", ")}.`,
+      );
       return say(
-        `${matches
-          .map(
-            (match) =>
-              `- ${match.name} (\`${match.slug}\`): ${match.description} Matched ${match.found.slice(0, 4).join(", ")}.`,
-          )
-          .join("\n")}\n\nget_component reads one in full.`,
+        `${[...shared, ...found].join("\n")}${found.length ? "\n\nget_component reads one in full." : ""}`,
       );
     }),
   );

@@ -1,4 +1,8 @@
-/* A box easing to the height of its content clips the content while it eases. */
+/* A box eases to the height of its content, which it sets as a style, and clips the content while
+   it eases. */
+.x-govuk-ui-auto-height {
+  transition: height var(--x-govuk-ui-duration-slow) var(--x-govuk-ui-ease-out);
+}
 .x-govuk-ui-auto-height[data-moving] {
   overflow: hidden;
 }

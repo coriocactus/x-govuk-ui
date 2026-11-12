@@ -4,9 +4,17 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Visual
+
+- Changed EditorAISuggestion's panel where it turns back to the height it was leaving. The way back takes the share of the 300ms that the panel had already moved, not all of it. The browser shortens a transition that turns back, which Motion did not.
+
 ### Added
 
 - Added `size` and `pageHeading` to EditorLabel, which is core's Label and takes its new props. `size` is `small`, `medium` or `large`, and `small` looks as the label did before. `pageHeading` puts the label in the page's `h1`, for a page that asks one question.
+
+### Changed
+
+- Changed EditorAISuggestion's panel, `.x-govuk-ui-editor-ai-panel`, to ease to its content's height with a CSS transition, not Motion. It no longer eases or clips its content as it first shows.
 
 ## [0.6.0] - 2026-11-09
 

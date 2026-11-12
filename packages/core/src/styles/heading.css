@@ -1,0 +1,44 @@
+/* Heading. GOV.UK's four heading sizes, each with its font size and line height at GOV.UK's two
+   breakpoints. Each line height is GOV.UK's line in pixels over its font size.
+
+   Its margin adds no specificity. The box it sits in therefore spaces it as it spaces a plain
+   heading. A Form's fields, for example, keep 20 pixels beneath a heading below the first level. */
+.x-govuk-ui-heading {
+  color: var(--x-govuk-ui-text);
+  font-family: var(--x-govuk-ui-font);
+  font-weight: 700;
+}
+:where(.x-govuk-ui-heading) {
+  margin: 0;
+}
+.x-govuk-ui-heading[data-size="small"] {
+  font-size: 19px;
+  line-height: calc(25 / 19);
+}
+.x-govuk-ui-heading[data-size="medium"] {
+  font-size: 24px;
+  line-height: calc(30 / 24);
+}
+.x-govuk-ui-heading[data-size="large"] {
+  font-size: 36px;
+  line-height: calc(40 / 36);
+}
+.x-govuk-ui-heading[data-size="extra-large"] {
+  font-size: 48px;
+  line-height: calc(50 / 48);
+}
+
+@media (max-width: 40em) {
+  .x-govuk-ui-heading[data-size="medium"] {
+    font-size: 21px;
+    line-height: calc(25 / 21);
+  }
+  .x-govuk-ui-heading[data-size="large"] {
+    font-size: 27px;
+    line-height: calc(30 / 27);
+  }
+  .x-govuk-ui-heading[data-size="extra-large"] {
+    font-size: 32px;
+    line-height: calc(35 / 32);
+  }
+}

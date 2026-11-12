@@ -115,11 +115,11 @@ function answer(data: FormData, name: string) {
  * `name`. When the form is sent, `validate` checks every answer. If any need fixing, the form stays
  * on the page. An Error summary opens above everything inside the form and takes focus, and each
  * field shows its own message. Put the page's heading inside the Form, so the summary opens above
- * it, as GOV.UK puts it. The fields' gap, `--x-govuk-ui-form-gap`, then follows the heading too, so
- * give back that much of the heading's own margin beneath it. The summary lists the messages in the
- * fields' order, and each links to its field. Fixing an answer clears its message and its line in
- * the summary at once. The summary folds away once nothing is wrong. The fields stack with GOV.UK's
- * spacing between them. The browser's own validation is off, as GOV.UK advises.
+ * it, as GOV.UK puts it. The Form spaces the heading, and keeps GOV.UK's 30 pixels beneath a large
+ * `Heading`. The summary lists the messages in the fields' order, and each links to its field.
+ * Fixing an answer clears its message and its line in the summary at once. The summary folds away
+ * once nothing is wrong. The fields stack with GOV.UK's spacing between them. The browser's own
+ * validation is off, as GOV.UK advises.
  */
 export function Form({
   validate,

@@ -34,3 +34,8 @@
 :where(.x-govuk-ui-form-fields > :is(h2, h3, h4, h5, h6):not(:last-child)) {
   margin-bottom: min(0px, 20px - var(--x-govuk-ui-form-gap));
 }
+/* A large Heading, such as the page's, keeps 30 pixels beneath it, as GOV.UK's large heading does.
+   The form's gap is part of that space. */
+.x-govuk-ui-form-fields > .x-govuk-ui-heading[data-size="large"] {
+  margin-bottom: calc(30px - var(--x-govuk-ui-form-gap));
+}

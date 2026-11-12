@@ -52,6 +52,7 @@ import form from "./form";
 import gauge from "./gauge";
 import groupedTable from "./grouped-table";
 import header from "./header";
+import heading from "./heading";
 import hoverCard from "./hover-card";
 import imageGeneration from "./image-generation";
 import inlineCitation from "./inline-citation";
@@ -189,6 +190,7 @@ export const examples: Record<ComponentName, ComponentType<never>> = {
   "service-navigation": serviceNavigation,
   footer,
   "phase-banner": phaseBanner,
+  heading,
   page,
   "width-container": widthContainer,
   breadcrumbs,

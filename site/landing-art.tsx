@@ -1093,6 +1093,14 @@ const drawings: Record<Exclude<ComponentName, "qr-code">, ReactNode> = {
       <Words x={8} y={57} w={60} />
     </>
   ),
+  heading: (
+    <>
+      <Words x={10} y={11} w={64} h={10} tone="ink" />
+      <Words x={10} y={29} w={50} h={7} tone="ink" />
+      <Words x={10} y={44} w={38} h={5} tone="ink" />
+      <Words x={10} y={57} w={28} h={4} tone="ink" />
+    </>
+  ),
   feedback: (
     <>
       <Words x={8} y={8} w={70} />

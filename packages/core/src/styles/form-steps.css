@@ -118,6 +118,11 @@ h4.x-govuk-ui-form-steps-review-title {
 .x-govuk-ui-form-steps-body > .x-govuk-ui-panel {
   margin-bottom: 30px;
 }
+/* A large Heading of a service's own, such as one above the answers, keeps 30 pixels beneath it, as
+   GOV.UK's large heading does. */
+.x-govuk-ui-form-steps-body > .x-govuk-ui-heading[data-size="large"] {
+  margin-bottom: 30px;
+}
 /* Each section of the answers after the first stands apart from the one before, as GOV.UK's lists
    do. */
 .x-govuk-ui-form-steps-review ~ .x-govuk-ui-form-steps-review {

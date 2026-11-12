@@ -15,6 +15,7 @@
 @import "./styles/header.css" layer(x-govuk-ui);
 @import "./styles/service-navigation.css" layer(x-govuk-ui);
 @import "./styles/phase-banner.css" layer(x-govuk-ui);
+@import "./styles/heading.css" layer(x-govuk-ui);
 @import "./styles/back-link.css" layer(x-govuk-ui);
 @import "./styles/breadcrumbs.css" layer(x-govuk-ui);
 @import "./styles/language-navigation.css" layer(x-govuk-ui);

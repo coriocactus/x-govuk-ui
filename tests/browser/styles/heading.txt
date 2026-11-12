@@ -1,0 +1,6 @@
+.x-govuk-ui-heading
+  display: block
+  font-size: 36px
+  font-weight: 700
+  line-height: 1.11111
+  color: rgb(11, 12, 12)

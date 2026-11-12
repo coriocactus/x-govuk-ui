@@ -468,6 +468,7 @@ export {
   type GroupedTableRowProps,
 } from "./grouped-table";
 export { Header, type HeaderProps } from "./header";
+export { Heading, type HeadingProps } from "./heading";
 export {
   type DateParts,
   dateFromParts,

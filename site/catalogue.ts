@@ -3623,6 +3623,44 @@ const entries = {
       reference("children", "ReactNode", "Required"),
     ],
   },
+  heading: {
+    name: "Heading",
+    width: 560,
+    description: "Head a page, or a section of it, at one of GOV.UK's four sizes.",
+    upstream: "styles/headings",
+    dependencies: "React",
+    changes:
+      "GOV.UK's four heading sizes, with its font sizes and line heights on narrow and wide screens. The size follows the level unless you set it, as GOV.UK advises. It has no margin, so the box it sits in spaces it, such as a Stack or a Form. The example is a page's heading.",
+    props: [
+      choice(
+        "level",
+        [
+          [1, "1"],
+          [2, "2"],
+          [3, "3"],
+          [4, "4"],
+          [5, "5"],
+          [6, "6"],
+        ],
+        1,
+      ),
+      choice(
+        "size",
+        [
+          ["small", "Small"],
+          ["medium", "Medium"],
+          ["large", "Large"],
+          ["extra-large", "Extra large"],
+        ],
+        "large",
+        {
+          default: "Follows level",
+          note: "The example sets it, so it stays as the level changes.",
+        },
+      ),
+      text("children", "Apply for a fishing licence", { type: "ReactNode" }),
+    ],
+  },
   breadcrumbs: {
     fit: true,
     name: "Breadcrumbs",
@@ -4332,7 +4370,15 @@ const order: Record<Group, readonly ComponentName[]> = {
     "command-menu",
   ],
   // The page, then its parts from top to bottom.
-  "Page structure": ["page", "cookie-banner", "header", "phase-banner", "feedback", "footer"],
+  "Page structure": [
+    "page",
+    "cookie-banner",
+    "header",
+    "phase-banner",
+    "heading",
+    "feedback",
+    "footer",
+  ],
   // The page's width, then what contains content, what folds it away, and what divides, scrolls and
   // resizes it.
   Layout: [

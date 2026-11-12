@@ -21,6 +21,7 @@ import {
   GridColumn,
   GridRow,
   Header,
+  Heading,
   Inline,
   Input,
   Kbd,
@@ -289,4 +290,25 @@ test("a stack's spacing comes after the margins of the parts it holds", async ()
     ...(await Bun.file("packages/core/src/styles.css").text()).matchAll(/@import "([^"]+)"/g),
   ].map(([, path]) => path);
   expect(imports.at(-1)).toBe("./styles/stack.css");
+});
+
+test("a heading's level is its element, and its size follows the level unless one is given", () => {
+  const sizes = { 1: "large", 2: "medium", 3: "small", 4: "small", 5: "small", 6: "small" };
+  for (const level of [1, 2, 3, 4, 5, 6] as const) {
+    expect(renderToStaticMarkup(<Heading level={level}>Your details</Heading>)).toBe(
+      `<h${level} class="x-govuk-ui-heading" data-size="${sizes[level]}">Your details</h${level}>`,
+    );
+  }
+  // Without a level it is the page's heading.
+  expect(renderToStaticMarkup(<Heading>Your details</Heading>)).toMatch(/^<h1 [^>]*large/);
+  // A size of its own takes the level's place, and a service's attributes go on the heading.
+  expect(
+    renderToStaticMarkup(
+      <Heading level={2} size="extra-large" id="details" className="mine">
+        Your details
+      </Heading>,
+    ),
+  ).toBe(
+    '<h2 id="details" class="x-govuk-ui-heading mine" data-size="extra-large">Your details</h2>',
+  );
 });

@@ -34,8 +34,10 @@ export type PaginationLabels = {
   navigation: string;
   previous: ReactNode;
   next: ReactNode;
-  /** Follows Previous and Next for screen readers only, as in "Previous page". */
-  page: string;
+  /** Names the Previous link for screen readers, in place of `previous`. */
+  previousPage: string;
+  /** Names the Next link for screen readers, in place of `next`. */
+  nextPage: string;
   /** Names a page's number for screen readers, as in "Page 3". */
   pageNumber: (page: number) => string;
 };
@@ -44,7 +46,8 @@ export const defaultPaginationLabels: PaginationLabels = {
   navigation: "Pagination",
   previous: "Previous",
   next: "Next",
-  page: "page",
+  previousPage: "Previous page",
+  nextPage: "Next page",
   pageNumber: (page) => `Page ${page}`,
 };
 
@@ -163,9 +166,15 @@ export function Pagination({
           <svg viewBox="0 0 15 13" width="15" height="13" aria-hidden="true">
             <path d={direction === "previous" ? previousArrow : nextArrow} />
           </svg>
+          {/* Screen readers hear the link's whole name, in its language's word order, in place of
+              the visible word. */}
           <span className="x-govuk-ui-pagination-title">
-            {direction === "previous" ? labels.previous : labels.next}
-            <span className="x-govuk-ui-visually-hidden"> {labels.page}</span>
+            <span aria-hidden="true">
+              {direction === "previous" ? labels.previous : labels.next}
+            </span>
+            <span className="x-govuk-ui-visually-hidden">
+              {direction === "previous" ? labels.previousPage : labels.nextPage}
+            </span>
           </span>
           {/* In block mode the title's line is kept when there is no title, so the pagination
               keeps its height from page to page. */}

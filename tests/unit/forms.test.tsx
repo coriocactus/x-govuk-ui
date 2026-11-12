@@ -1122,6 +1122,29 @@ test("a labels provider gives every component inside it a service's words, and a
   for (const word of ["Day", "Month", "Year"]) expect(english).toContain(word);
 });
 
+test("pagination names Previous and Next for screen readers in a language's own word order", () => {
+  const welsh = renderToStaticMarkup(
+    <Pagination
+      page={2}
+      pageCount={3}
+      href={(page) => `?page=${page}`}
+      labels={{
+        previous: "Blaenorol",
+        next: "Nesaf",
+        previousPage: "Tudalen flaenorol",
+        nextPage: "Tudalen nesaf",
+      }}
+    />,
+  );
+  // The visible word is hidden from screen readers, and the whole name follows it.
+  expect(welsh).toContain(
+    '<span aria-hidden="true">Blaenorol</span><span class="x-govuk-ui-visually-hidden">Tudalen flaenorol</span>',
+  );
+  expect(welsh).toContain(
+    '<span aria-hidden="true">Nesaf</span><span class="x-govuk-ui-visually-hidden">Tudalen nesaf</span>',
+  );
+});
+
 test("an extension's component takes its words from a labels provider too", () => {
   const html = renderToStaticMarkup(
     <LabelsProvider labels={{ editor: { toolbar: "Fformatio" } }}>

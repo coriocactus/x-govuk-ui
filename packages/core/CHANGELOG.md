@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Removed `page` from `PaginationLabels`, and added `previousPage` and `nextPage`. Each is the whole name that screen readers hear for its link, by default "Previous page" and "Next page", so a language can put the words in its own order. Pagination no longer makes the name by joining `previous` or `next` to `page`. Where you gave `page`, give `previousPage` and `nextPage`, such as "Tudalen flaenorol" and "Tudalen nesaf".
+
 ### Added
 
 - Added `sort`, `defaultSort` and `onSortChange` to DataTable, and the type `DataTableSort`, so a service can keep the table's sort. A `DataTableSort` names a column by its `id` and gives a direction, and `null` is no sort. The table still orders only the rows it is given. A service that shows one page of a longer list orders the whole list itself, by the sort that `onSortChange` gives, and passes that page.

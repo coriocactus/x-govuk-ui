@@ -26,7 +26,7 @@ import {
 /** Every package's words, in one provider, as a Welsh service gives them. */
 export const welsh: Labels = {
   locale: "cy",
-  pagination: { previous: "Blaenorol" },
+  pagination: { previous: "Blaenorol", previousPage: "Tudalen flaenorol" },
   chart: { showTable: "Dangos y tabl" },
   tiles: { tidy: "Tacluso'r teils" },
   editor: { bold: "Trwm" },

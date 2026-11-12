@@ -239,6 +239,9 @@ test("pagination changes page in place, fits a narrow page in one row of one wid
   await open("pagination");
   const pagination = frame.locator(".x-govuk-ui-pagination");
   await expect(pagination).toHaveAttribute("data-fit", "words");
+  // Screen readers hear each of Previous and Next by its whole name, once.
+  await expect(frame.getByRole("link", { name: "Previous page", exact: true })).toHaveCount(1);
+  await expect(frame.getByRole("link", { name: "Next page", exact: true })).toHaveCount(1);
   await frame.getByRole("link", { name: "Page 6" }).click();
   await expect(frame.locator('[aria-current="page"]')).toHaveText("6");
   await frame.getByRole("link", { name: "Previous page" }).click();
@@ -266,7 +269,9 @@ test("pagination changes page in place, fits a narrow page in one row of one wid
   await pagination.getByRole("link", { name: "Page 10" }).click();
   await expect(frame.locator('[aria-current="page"]')).toHaveText("10");
   expect(await span()).toBe(across);
-  await pagination.getByRole("link", { name: "Previous page" }).click();
+  // On the last page, Next keeps its name, disabled. As arrows, both keep their names.
+  await expect(pagination.getByRole("link", { name: "Next page", exact: true })).toBeDisabled();
+  await pagination.getByRole("link", { name: "Previous page", exact: true }).click();
   await expect(frame.locator('[aria-current="page"]')).toHaveText("9");
   await page.setViewportSize(wide);
   // Block pagination keeps its page's title still as Previous appears.
@@ -278,6 +283,13 @@ test("pagination changes page in place, fits a narrow page in one row of one wid
   const titled = (await title.boundingBox())!.y;
   await frame.getByRole("link", { name: /^Next/ }).click();
   await expect(frame.getByRole("link", { name: /^Previous/ })).toBeVisible();
+  // In block mode, each page's title follows the link's name.
+  await expect(
+    frame.getByRole("link", { name: "Previous page Overview", exact: true }),
+  ).toHaveCount(1);
+  await expect(
+    frame.getByRole("link", { name: "Next page How to apply", exact: true }),
+  ).toHaveCount(1);
   expect(
     Math.abs((await frame.getByText("Eligibility", { exact: true }).boundingBox())!.y - titled),
   ).toBeLessThan(1);

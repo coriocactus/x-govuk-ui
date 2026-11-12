@@ -444,6 +444,7 @@ export function Workbench() {
         <TabsPanel value="props" className="inspector-panel">
           <ScrollArea className="inspector-scroll" label="Props" fade>
             <PropsPanel
+              name={name}
               props={component.props}
               example={component.example}
               presets={component.presets}

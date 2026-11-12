@@ -49,6 +49,11 @@ export type StylingProperty = {
 
 export type StylingContract = {
   parts: StylingPart[];
+  /**
+   * The component's other parts, by their exports. Each has no class, on its own element or
+   * inside it, such as a Dialog, which renders no element.
+   */
+  unstyled: string[];
   states: StylingState[];
   properties: StylingProperty[];
   /** The theme's tokens the component reads, which change every component that reads them. */
@@ -497,8 +502,11 @@ export async function stylingContracts(): Promise<Record<ComponentName, StylingC
       if (!exported) continue;
       const visited = new Set<Source["functions"]>();
       const { classes, inner } = resolve(functions, name, parts, new Set(), visited);
-      if (!classes.length && !inner.length) continue;
       for (const component of owners(name, file)) {
+        if (!classes.length && !inner.length) {
+          contracts[component].unstyled.push(name);
+          continue;
+        }
         contracts[component].parts.push({ name, classes, inner });
         for (const read of visited) files.get(component)?.add(fileOfFunctions.get(read) ?? file);
       }
@@ -598,7 +606,7 @@ export async function stylingContracts(): Promise<Record<ComponentName, StylingC
 }
 
 function emptyContract(): StylingContract {
-  return { parts: [], states: [], properties: [], tokens: [] };
+  return { parts: [], unstyled: [], states: [], properties: [], tokens: [] };
 }
 
 if (import.meta.main) {

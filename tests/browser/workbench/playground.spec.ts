@@ -166,6 +166,29 @@ test("the Styling tab lists a component's classes, data attributes and custom pr
   expect((await page.request.get("/styling/not-a-component.json")).status()).toBe(404);
 });
 
+test("the Props tab lists each part's own props that have no control, as the types give them", async ({
+  page,
+  open,
+}) => {
+  await open("dialog");
+  const props = page.getByRole("tabpanel", { name: "Props" });
+  // Each part has a table named for it, with each prop's type, its JSDoc and its default.
+  const dialog = props.getByRole("table", { name: "Dialog", exact: true });
+  await expect(dialog.getByRole("row", { name: /^onOpenChange/ })).toContainText(
+    "(open: boolean) => void",
+  );
+  await expect(dialog.getByRole("row", { name: /^children/ })).toContainText("Required");
+  const content = props.getByRole("table", { name: "DialogContent", exact: true });
+  await expect(content.getByRole("row", { name: /^initialFocus/ })).toContainText(
+    "Where focus goes as it opens.",
+  );
+  // A prop with a control is not listed again, and a part with no props of its own has no table.
+  await expect(dialog.getByRole("row", { name: /^closeOnPressOutside/ })).toHaveCount(0);
+  await expect(content.getByRole("row", { name: /^closeButton/ })).toHaveCount(0);
+  await expect(props.getByRole("table", { name: "DialogTitle", exact: true })).toHaveCount(0);
+  expect((await page.request.get("/props/not-a-component.json")).status()).toBe(404);
+});
+
 test("the usage code can be loaded again when it failed to come", async ({ page, open }) => {
   let fail = true;
   await page.route("**/source/**", (route) => (fail ? route.abort() : route.continue()));

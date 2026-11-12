@@ -87,7 +87,7 @@ const listen = (port: number | string) =>
       // A missing file is a plain 404. Any other address gets the app's page for an address the
       // site does not have, with the same status.
       if (!file) {
-        if (/^\/(source|assets|styling|llms|docs|compositions)\//.test(path)) {
+        if (/^\/(source|assets|styling|props|llms|docs|compositions)\//.test(path)) {
           return new Response("Not found", { status: 404, headers: security });
         }
         return new Response(Bun.file("dist/index.html"), {

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Button,
   EmptyState,
@@ -8,6 +7,7 @@ import {
   Skeleton,
 } from "x-govuk-ui";
 import type { ComponentName } from "./catalogue";
+import { useLoaded } from "./loaded";
 import type { StylingContract } from "./styling";
 
 /** Names, one on each line, each in full, under a label if it has one. */
@@ -39,32 +39,12 @@ function Lines({
  * in for it only if it takes a while.
  */
 export function StylingPanel({ name }: { name: ComponentName }) {
-  const [loaded, setLoaded] = useState<{ name: ComponentName; contract: StylingContract }>();
-  const [failed, setFailed] = useState(false);
-  const [slow, setSlow] = useState(false);
-  const [attempt, setAttempt] = useState(0);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Try again loads it once more.
-  useEffect(() => {
-    const controller = new AbortController();
-    setFailed(false);
-    setSlow(false);
-    const late = setTimeout(() => setSlow(true), 300);
-    fetch(`/styling/${name}.json`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error("Styling unavailable");
-        return response.json() as Promise<StylingContract>;
-      })
-      .then((contract) => setLoaded({ name, contract }))
-      .catch((error) => {
-        if (error.name !== "AbortError") setFailed(true);
-      })
-      .finally(() => clearTimeout(late));
-    return () => {
-      controller.abort();
-      clearTimeout(late);
-    };
-  }, [name, attempt]);
+  const {
+    document: contract,
+    failed,
+    slow,
+    retry,
+  } = useLoaded<StylingContract>(`/styling/${name}.json`);
 
   if (failed)
     return (
@@ -72,13 +52,12 @@ export function StylingPanel({ name }: { name: ComponentName }) {
         <EmptyStateTitle level={3}>The styling could not be loaded</EmptyStateTitle>
         <EmptyStateDescription>Check your connection, then try again.</EmptyStateDescription>
         <EmptyStateActions>
-          <Button variant="secondary" size="small" onClick={() => setAttempt((value) => value + 1)}>
+          <Button variant="secondary" size="small" onClick={retry}>
             Try again
           </Button>
         </EmptyStateActions>
       </EmptyState>
     );
-  const contract = loaded?.name === name ? loaded.contract : undefined;
   if (!contract)
     return (
       <div className="styling-status" aria-busy="true">

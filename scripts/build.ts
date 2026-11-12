@@ -1,6 +1,6 @@
 import { copyFile, mkdir, rm } from "node:fs/promises";
 import { dirname } from "node:path";
-import { componentDocs, docsDocuments, llmsDocuments } from "../site/llms";
+import { docsDocuments, libraryDocs, llmsDocuments, propsDocuments } from "../site/llms";
 import {
   assets,
   compiledComposition,
@@ -48,11 +48,15 @@ await Promise.all(
     compiledComposition(path).then((code) => Bun.write(`dist/compositions/${name}.js`, code)),
   ]),
 );
-// Each component's styling contract, for the playground's Styling tab, and the documentation for
-// language models and the MCP server, all read from the current source.
+// Each component's styling contract and its parts' props, for the playground, and the
+// documentation for language models and the MCP server, all read from the current source.
 const contracts = await stylingContracts();
-const records = await componentDocs(contracts);
-const documents = { ...(await llmsDocuments(records)), ...(await docsDocuments(records)) };
+const library = await libraryDocs(contracts);
+const documents = {
+  ...(await llmsDocuments(library)),
+  ...(await docsDocuments(library)),
+  ...propsDocuments(library),
+};
 await Promise.all([
   ...Object.entries(contracts).map(([name, contract]) =>
     Bun.write(`dist/styling/${name}.json`, JSON.stringify(contract)),

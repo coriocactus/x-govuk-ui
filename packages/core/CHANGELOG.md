@@ -26,9 +26,14 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added `labelSize` and `pageHeading` to Input, Textarea and Select, which pass them to their Label, as Fieldset passes `legendSize` and `pageHeading` to its legend. For another field, such as a Combobox, compose a Field with a Label and the field's control.
 - Added the label in its `h1` to the questions that FormSteps sizes. On a page, a step with no title shows its first question at 24 pixels, whatever its `labelSize`, as it does a legend, whatever its `legendSize`. When the step shows, the `h1` takes focus, with no outline.
 - Added Heading, a heading at GOV.UK's sizes, for a page or a section of it. `level`, from 1 to 6, sets its element, and `size` is `small`, `medium`, `large` or `extra-large`. Left out, the size follows the level, as GOV.UK advises: large for level 1, medium for level 2 and small below that. It has no margin, so the box it sits in spaces it. Among a Form's fields, and above the answers in a FormSteps, a large Heading keeps GOV.UK's 30 pixels beneath it.
+- Added each part's own props to the documentation records in `dist/lib/docs`, which the MCP server reads. Each part in a record's `parts` has `props`, read from the part's types. Each prop has its `name`, its `type`, whether it is `required`, its `default` where the part gives one, and its JSDoc as `doc`. Props that a part takes from React's or Base UI's types are left out.
+- Added `functions` and `words` to each record. `functions` gives the hooks and functions that go with the component, each with its signature and its JSDoc. `words` gives the words the component writes, by their key in a LabelsProvider's `labels`, each with its English default.
+- Added `functions` to the records' `index.json`, for the hooks and functions that belong to no one component, such as `useLocale`. Its `usage` lists them, and says what LabelsProvider does.
+- Added `unstyled` to a record's `styling`, which names the component's parts that have no class, such as Dialog.
 
 ### Changed
 
+- Changed a record's `props` in `dist/lib/docs` to the own props of the component's own export, as that part's `props` gives them. They were written by hand, and listed parts, hooks and custom properties among the props. A prop no longer has `note`, and has `default` only where the part gives one.
 - Changed ServicePage, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary and Button to load almost none of Motion. A page built from them has 3 KB of Motion's code, minified, where it had 151 KB, and is 50 KB smaller gzipped. What is left comes with the `LayoutGroup` in ServiceNavigation. Motion is still a peer dependency, and the parts that need its presence, layout or drag, such as Toast, Conversation and Timeline, load it as before.
 - Changed ErrorMessage to open and close with CSS transitions, not Motion. Its box, `.x-govuk-ui-error-container`, is now a grid with one row, and no longer has its height and opacity as inline styles. The box has `data-opened` when it opened after its field first rendered, and `data-closing` while it closes.
 - Changed the box that eases to its content's height, in Form, FormSteps, Feedback and CookieBanner, to ease with a CSS transition, not Motion. The box, `.x-govuk-ui-auto-height`, no longer eases or clips its content as it first shows.
@@ -37,6 +42,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 ### Fixed
 
 - Fixed `validateWith` failing when server code calls it, such as a Next.js server action or server component, with "Attempted to call validateWith() from the server but validateWith is on the client". A service can now check its answers again on its server, with the schema its Form checks them with.
+- Fixed a record's `export` in `dist/lib/docs` for Dialog, Sheet, Popover, Callout, Hover card, Command menu, Dropdown menu, Context menu and Input OTP. It named another part, such as `DialogTrigger`, because the records left out a part with no class, such as Dialog. Each record's `parts` now has them.
 
 ## [0.6.0] - 2026-11-09
 

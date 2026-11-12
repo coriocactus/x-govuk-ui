@@ -765,11 +765,17 @@ body {
   color: var(--text);
   overflow-wrap: anywhere;
 }
-/* Props without a control are a Table, with each name, its type and note, and its default. */
+/* Each part's props without a control are a Table, named by the part, with each prop's name, its
+   type and what it does, and its default. */
 .prop-table {
   font-size: 11px;
   line-height: 1.5;
   table-layout: fixed;
+}
+.prop-table .x-govuk-ui-table-caption {
+  margin: 14px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
 }
 .prop-table thead .x-govuk-ui-table-head {
   padding-block: 14px 6px;

@@ -7,7 +7,7 @@ import { Button, Input, InsetText } from "x-govuk-ui";
 import { glideEasing } from "../../packages/core/src/motion";
 import { type ComponentName, catalogue, componentNames } from "../../site/catalogue";
 import { Credits, everySystem } from "../../site/credits";
-import { componentDocs, llmsDocuments } from "../../site/llms";
+import { type DocsIndex, docsDocuments, libraryDocs, llmsDocuments } from "../../site/llms";
 import { met, presetAt, startingArgs } from "../../site/props";
 import { stylingContracts } from "../../site/styling";
 import { nativeScroll, toScrollArea } from "../types/exceptions";
@@ -413,14 +413,164 @@ test("every component's styling contract names its parts, read rightly from the 
   expect(property("message-scroller", "--x-govuk-ui-message-scroller-footer")?.inline).toBe(true);
 });
 
+// The documentation, written once for the tests below, from the compiler's reading of the types.
+const library = contracts.then(libraryDocs);
+
 test("the documentation for language models lists every component, each page with its example and styling", async () => {
-  const documents = await llmsDocuments(await componentDocs(await contracts));
+  const documents = await llmsDocuments(await library);
   for (const name of componentNames) {
     expect(documents["llms.txt"]).toContain(`(/llms/${name}.md)`);
     expect(documents[`llms/${name}.md`]).toContain("## Styling");
     expect(documents[`llms/${name}.md`]).toContain("```tsx");
   }
   expect(documents["llms-full.txt"]).toContain("## Button");
+});
+
+test("each part's props are read from its types, with each prop's type, default and JSDoc", async () => {
+  const { components } = await library;
+  const part = (slug: ComponentName, name: string) =>
+    components.find((doc) => doc.slug === slug)?.parts.find((one) => one.name === name);
+  // A part with no class of its own is on its component's page, and is the component's export.
+  const dialog = components.find((doc) => doc.slug === "dialog");
+  expect(dialog?.export).toBe("Dialog");
+  expect(dialog?.props.map((prop) => prop.name)).toEqual([
+    "children",
+    "open",
+    "defaultOpen",
+    "onOpenChange",
+    "closeOnPressOutside",
+  ]);
+  // A required prop, an optional one without its `| undefined`, and one with a default.
+  expect(dialog?.props[0]).toEqual({ name: "children", required: true, type: "ReactNode" });
+  expect(dialog?.props[3]).toEqual({
+    name: "onOpenChange",
+    required: false,
+    type: "(open: boolean) => void",
+  });
+  expect(dialog?.props[4]).toEqual({
+    name: "closeOnPressOutside",
+    required: false,
+    type: "boolean",
+    default: "true",
+    doc: expect.stringMatching(/^Closes it when someone presses outside it, on the dimmed page\. /),
+  });
+  // Only a part's own props. Base UI's and the element's are left out.
+  expect(part("dialog", "DialogContent")?.props).toEqual([
+    {
+      name: "closeButton",
+      required: false,
+      type: "boolean",
+      default: "true",
+      doc: "Shows a × button in the corner. Escape and a press outside close the dialog either way.",
+    },
+    expect.objectContaining({ name: "labels", type: "Partial<OverlayLabels>" }),
+    expect.objectContaining({ name: "initialFocus" }),
+    expect.objectContaining({ name: "finalFocus" }),
+  ]);
+  expect(part("dialog", "DialogTitle")?.props).toEqual([]);
+  // A default the part gives in its body, where it takes its props apart there.
+  expect(part("input", "InputControl")?.props).toContainEqual(
+    expect.objectContaining({ name: "strength", default: "false" }),
+  );
+  // React's types declare `aria-label` too. Only the library's JSDoc is given.
+  expect(part("tabs", "TabsList")?.props).toContainEqual(
+    expect.objectContaining({
+      name: "aria-label",
+      doc: 'Names the tabs for screen readers, such as "Application".',
+    }),
+  );
+  // A generic part keeps its type parameter.
+  const table = part("data-table", "DataTable")?.props ?? [];
+  const typed = Object.fromEntries(table.map((prop) => [prop.name, prop.type]));
+  expect(typed.columns).toBe("readonly DataTableColumn<Row>[]");
+  expect(typed.rows).toBe("readonly Row[]");
+  expect(typed.rowKey).toBe("(row: Row) => string");
+  expect(typed.onSortChange).toBe("(sort: DataTableSort) => void");
+  expect(table.find((prop) => prop.name === "maxRows")?.default).toBe("8");
+  // Each page has a table for each part.
+  const { "llms/dialog.md": page = "" } = await llmsDocuments(await library);
+  expect(page).toContain("### `Dialog`\n\n| Prop | Type | Default | What it does |");
+  expect(page).toContain("| `closeOnPressOutside` | `boolean` | `true` | Closes it when");
+  expect(page).toContain("### `DialogTitle`\n\nIt has no props of its own.");
+});
+
+test("each page lists its words with their English defaults, and its hooks and functions", async () => {
+  const all = await library;
+  const doc = (slug: ComponentName) => all.components.find((one) => one.slug === slug);
+  // A string's default is the string, and a function's is its source.
+  expect(doc("pagination")?.words).toEqual([
+    {
+      key: "pagination",
+      defaults: "defaultPaginationLabels",
+      words: expect.arrayContaining([
+        {
+          name: "navigation",
+          type: "string",
+          doc: "Names the navigation for screen readers.",
+          default: "Pagination",
+        },
+        {
+          name: "pageNumber",
+          type: "(page: number) => string",
+          doc: 'Names a page\'s number for screen readers, as in "Page 3".',
+          // biome-ignore lint/suspicious/noTemplateCurlyInString: It is the function's source.
+          default: "(page) => `Page ${page}`",
+          code: true,
+        },
+      ]),
+    },
+  ]);
+  // A map a part takes in `labels`, and one that only a LabelsProvider gives.
+  expect(doc("dialog")?.words.map((map) => map.key)).toEqual(["overlay"]);
+  expect(doc("back-link")?.words.map((map) => map.key)).toEqual(["backLink"]);
+  // An extension's words, which it adds to core's interface.
+  expect(doc("chart")?.words.map((map) => map.key)).toEqual(["chart"]);
+  // A function of a part's own file, and one the catalogue names from a file components share.
+  const form = doc("form")?.functions ?? [];
+  expect(form.map((one) => one.name)).toContain("useFormErrors");
+  expect(form).toContainEqual({
+    name: "validateWith",
+    package: "x-govuk-ui",
+    signature:
+      "<Output>(schema: StandardSchema<Output>, { lists, root }?: ValidateWithOptions) => SchemaCheck<Output>",
+    doc: expect.stringMatching(/^Makes a Form's `validate` from a Standard Schema\. /),
+  });
+  const documents = await llmsDocuments(all);
+  expect(documents["llms/form.md"]).toContain(
+    "### `validateWith`\n\n`<Output>(schema: StandardSchema<Output>, { lists, root }?: ValidateWithOptions) => SchemaCheck<Output>`",
+  );
+  expect(documents["llms/pagination.md"]).toContain(
+    '| `navigation` | `string` | `"Pagination"` | Names the navigation for screen readers. |',
+  );
+  // What every component shares says how the words are given.
+  const { usage }: DocsIndex = JSON.parse((await docsDocuments(all))["docs/index.json"] ?? "{}");
+  expect(usage).toContain("`LabelsProvider` gives every component inside it the words");
+  expect(usage).toContain("A component's own `labels` come first");
+  expect(documents["llms.txt"]).toContain(usage);
+});
+
+test("every exported hook and function is on a component's page, or listed in what every component shares", async () => {
+  const all = await library;
+  const { usage }: DocsIndex = JSON.parse((await docsDocuments(all))["docs/index.json"] ?? "{}");
+  const onPage = new Set(all.components.flatMap((doc) => doc.functions.map((one) => one.name)));
+  // What each package exports as it runs, so a hook the compiler's reading left out is found.
+  const exported = (
+    await Promise.all(
+      ["x-govuk-ui", "@x-govuk-ui/belsize", "@x-govuk-ui/jorjorwel", "@x-govuk-ui/memetics"].map(
+        async (name) => Object.entries(await import(name)),
+      ),
+    )
+  )
+    .flat()
+    .filter(([name, value]) => typeof value === "function" && !/^[A-Z]/.test(name))
+    .map(([name]) => name);
+  expect(exported.length).toBeGreaterThan(50);
+  expect(
+    exported.filter((name) => !onPage.has(name) && !usage.includes(`\`${name}\`, from`)),
+  ).toEqual([]);
+  // A function is listed there only when no page has it.
+  expect(all.functions.filter((one) => onPage.has(one.name))).toEqual([]);
+  expect(usage).toContain("- `useLocale`, from `x-govuk-ui`, is `() => string`. The language");
 });
 
 /**

@@ -1,7 +1,7 @@
 import { workbenchPort } from "../scripts/checkout";
 import { type ComponentName, componentNames } from "./catalogue";
 import index from "./index.html";
-import { docsDocuments, llmsDocuments } from "./llms";
+import { docsDocuments, libraryDocs, llmsDocuments, propsDocuments } from "./llms";
 import {
   assets,
   compiledComposition,
@@ -77,12 +77,18 @@ const server = Bun.serve({
         ],
       ]),
     ),
-    // Each component's styling contract and the documentation for language models, read from
-    // the current source, so an edit shows on the next request.
+    // Each component's styling contract, its parts' props and the documentation for language
+    // models, read from the current source, so an edit shows on the next request.
     "/styling/:file": async (request) => {
       const name = request.params.file.replace(/\.json$/, "") as ComponentName;
       const contract = componentNames.includes(name) && (await stylingContracts())[name];
       return contract ? Response.json(contract) : new Response("Not found", { status: 404 });
+    },
+    "/props/:file": async (request) => {
+      const body = propsDocuments(await libraryDocs())[`props/${request.params.file}`];
+      return body === undefined
+        ? new Response("Not found", { status: 404 })
+        : new Response(body, { headers: { "Content-Type": "application/json; charset=utf-8" } });
     },
     "/llms.txt": async () => text((await llmsDocuments())["llms.txt"], "plain"),
     "/llms-full.txt": async () => text((await llmsDocuments())["llms-full.txt"], "plain"),

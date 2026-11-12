@@ -84,7 +84,7 @@ test("the MCP server answers over stdio, as an agent's client asks", async () =>
       JSON.parse((await text("get_styling", { name: "avatar" })).text).properties,
     ).toContainEqual(expect.objectContaining({ name: "--x-govuk-ui-avatar-size", value: "40px" }));
     expect(JSON.parse((await text("get_props", { name: "Button" })).text).props[0].name).toBe(
-      "children",
+      "variant",
     );
     expect((await text("list_components", { group: "Media" })).text.split("\n")).toHaveLength(5);
     expect((await text("get_usage")).text).toContain("x-govuk-ui/styles.css");

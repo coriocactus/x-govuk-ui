@@ -1,12 +1,18 @@
 import { type ReactNode, useLayoutEffect, useRef } from "react";
 import {
+  Button,
   Checkbox,
   Checkboxes,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateTitle,
   FilterChip,
   FilterChips,
   Input,
   Select,
   SelectItem,
+  Skeleton,
   Slider,
   Switch,
   Table,
@@ -18,16 +24,23 @@ import {
   TableRow,
   Textarea,
 } from "x-govuk-ui";
+import type { ComponentName } from "./catalogue";
+import type { PartProps } from "./llms";
+import { useLoaded } from "./loaded";
 import { met, type Preset, type PropDoc, presetAt, startingArgs } from "./props";
 
 type Args = Record<string, unknown>;
 type Change = (prop: PropDoc, value: unknown) => void;
 
-/** Words with `names` in code, as the reasons write them. */
+/** Words with `names` in code, as the reasons and the JSDoc write them. */
 function withCode(text: string): ReactNode {
-  return text
-    .split(/`([^`]+)`/)
-    .map((part, index) => (index % 2 ? <code key={part}>{part}</code> : part));
+  // Each name's key is where it starts, because JSDoc can give one name twice.
+  let at = 0;
+  return text.split(/`([^`]+)`/).map((part, index) => {
+    const start = at;
+    at += part.length;
+    return index % 2 ? <code key={start}>{part}</code> : part;
+  });
 }
 
 /**
@@ -296,32 +309,79 @@ function ControlList({
   );
 }
 
-/** Props without a control, in a table with their types and defaults. */
-function ReferenceTable({ props }: { props: readonly PropDoc[] }) {
+/**
+ * The props set only in code, which are each part's own props that the playground has no control
+ * for. Each part has a table, with each prop's type, what it does and its default. The site reads
+ * them from the library's types as it builds. They load when the panel opens, and lines of
+ * skeleton stand in for them only if that takes a while.
+ */
+function CodedProps({
+  name,
+  heading,
+  controlled,
+}: {
+  name: ComponentName;
+  heading: string;
+  /** The props that have a control, by name. */
+  controlled: ReadonlySet<string>;
+}) {
+  const { document, failed, slow, retry } = useLoaded<PartProps[]>(`/props/${name}.json`);
+  const parts = document
+    ?.map((part) => ({ ...part, props: part.props.filter((prop) => !controlled.has(prop.name)) }))
+    .filter((part) => part.props.length > 0);
+  if (parts?.length === 0) return null;
   return (
-    <Table className="prop-table">
-      <TableCaption className="x-govuk-ui-visually-hidden">Props set in code</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Prop</TableHead>
-          <TableHead>Default</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {props.map((prop) => (
-          <TableRow key={prop.name}>
-            <TableHead>
-              <code>{prop.name}</code>
-              <span className="prop-type">{prop.type}</span>
-              {prop.note && <span className="prop-note">{prop.note}</span>}
-            </TableHead>
-            <TableCell>
-              <code className="prop-default">{prop.default}</code>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <section className="props-section" aria-labelledby="coded-heading">
+      <h3 id="coded-heading">{heading}</h3>
+      {failed ? (
+        <EmptyState size="small" className="styling-status">
+          <EmptyStateTitle level={4}>The props could not be loaded</EmptyStateTitle>
+          <EmptyStateDescription>Check your connection, then try again.</EmptyStateDescription>
+          <EmptyStateActions>
+            <Button variant="secondary" size="small" onClick={retry}>
+              Try again
+            </Button>
+          </EmptyStateActions>
+        </EmptyState>
+      ) : parts ? (
+        parts.map((part) => (
+          <Table key={part.name} className="prop-table">
+            <TableCaption>
+              <code className="styling-name">{part.name}</code>
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Prop</TableHead>
+                <TableHead>Default</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {part.props.map((prop) => (
+                <TableRow key={prop.name}>
+                  <TableHead>
+                    <code>{prop.name}</code>
+                    <span className="prop-type">{prop.type}</span>
+                    {prop.doc && <span className="prop-note">{withCode(prop.doc)}</span>}
+                  </TableHead>
+                  <TableCell>
+                    {(prop.default ?? prop.required) && (
+                      <code className="prop-default">{prop.default ?? "Required"}</code>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ))
+      ) : (
+        <div className="styling-status" aria-busy="true">
+          <span className="visually-hidden" role="status">
+            Loading props
+          </span>
+          {slow && <Skeleton lines={6} />}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -334,12 +394,13 @@ function ReferenceTable({ props }: { props: readonly PropDoc[] }) {
  * 2. The example's own settings, each shown only while what it needs is set.
  * 3. The props the playground can set, each always shown, and disabled while what it needs is not
  *    set.
- * 4. The props set only in code.
+ * 4. The props set only in code, for each of the component's parts.
  *
  * As example settings appear and disappear above a setting just changed, the panel scrolls by the
  * same amount, so the setting stays under the pointer.
  */
 export function PropsPanel({
+  name,
   props,
   example = [],
   presets = [],
@@ -347,6 +408,7 @@ export function PropsPanel({
   onChange,
   onReplace,
 }: {
+  name: ComponentName;
   props: readonly PropDoc[];
   example?: readonly PropDoc[];
   presets?: readonly Preset[];
@@ -359,7 +421,6 @@ export function PropsPanel({
   const effective = effectiveArgs(all, args);
   const controls = props.filter((prop) => prop.control);
   const applying = example.filter((prop) => prop.control && applies(prop, effective));
-  const coded = all.filter((prop) => !prop.control);
   const chosen = presetAt(presets, effective, startingArgs(all));
 
   // The setting just changed, and where it was on the screen, to keep it there. The browser's own
@@ -439,12 +500,11 @@ export function PropsPanel({
           />
         </section>
       )}
-      {coded.length > 0 && (
-        <section className="props-section" aria-labelledby="coded-heading">
-          <h3 id="coded-heading">{controls.length ? "Set in code" : "Props"}</h3>
-          <ReferenceTable props={coded} />
-        </section>
-      )}
+      <CodedProps
+        name={name}
+        heading={controls.length ? "Set in code" : "Props"}
+        controlled={new Set(controls.map((prop) => prop.name))}
+      />
     </div>
   );
 }

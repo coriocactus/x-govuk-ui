@@ -108,10 +108,15 @@ export function ServiceNavigation({
 }
 
 export type ServiceNavigationItemProps = ComponentPropsWithRef<"li"> & {
+  /** The address of the section. Give it here with `render` too. */
   href: string;
   /** Marks the section the page is in. */
   current?: boolean;
-  /** Renders a router's link in place of the anchor. */
+  /**
+   * Renders a router's link in place of the anchor, and gives it `href`. Give an element that
+   * takes `href`, such as `<NextLink />`, or a function, such as
+   * `(props) => <RouterLink to={props.href} {...props} />`.
+   */
   render?: useRender.RenderProp;
   children: ReactNode;
 };

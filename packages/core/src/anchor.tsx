@@ -5,9 +5,10 @@ import type { ComponentPropsWithRef } from "react";
 
 export type AnchorProps = ComponentPropsWithRef<"a"> & {
   /**
-   * Renders a router's link in place of the anchor, keeping the part's look. Give an element, such
-   * as `<NextLink />`, or a function that takes the anchor's props, such as
-   * `(props) => <RouterLink to={props.href} {...props} />`.
+   * Renders a router's link in place of the anchor, keeping the part's look. The address goes in
+   * the part's `href`, because `render` only says what draws the link. Give an element that takes
+   * `href`, such as `<NextLink />`. For a router whose prop has another name, give a function that
+   * takes the anchor's props, such as `(props) => <RouterLink to={props.href} {...props} />`.
    */
   render?: useRender.RenderProp;
 };

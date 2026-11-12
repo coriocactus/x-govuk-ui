@@ -296,10 +296,15 @@ export function MenuItem({
 }
 
 export type MenuLinkItemProps = Omit<ComponentPropsWithRef<"a">, "href"> & {
+  /** The address the item goes to. Give it here with `render` too. */
   href: string;
   children: ReactNode;
   icon?: ReactNode;
-  /** Renders a router's link in place of the item's anchor. */
+  /**
+   * Renders a router's link in place of the item's anchor, and gives it `href`. Give an element
+   * that takes `href`, such as `<NextLink />`, or a function, such as
+   * `(props) => <RouterLink to={props.href} {...props} />`.
+   */
   render?: Menu.LinkItem.Props["render"];
 };
 

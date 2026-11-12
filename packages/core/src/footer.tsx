@@ -211,7 +211,13 @@ export function FooterLinks({
 }
 
 export type FooterLinkProps = Omit<ComponentPropsWithRef<"a">, "href"> & {
+  /** The address the link goes to. Give it here with `render` too. */
   href: string;
+  /**
+   * Renders a router's link in place of the anchor, and gives it `href`. Give an element that
+   * takes `href`, such as `<NextLink />`, or a function, such as
+   * `(props) => <RouterLink to={props.href} {...props} />`.
+   */
   render?: useRender.RenderProp;
 };
 

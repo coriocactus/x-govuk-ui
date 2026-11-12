@@ -7,8 +7,13 @@ import { Link, type LinkProps } from "./link";
 
 export type AttachmentProps = Omit<ComponentPropsWithRef<"section">, "title"> & {
   title: ReactNode;
+  /** The address of the file. Give it here with `render` too. */
   href: string;
-  /** Renders a router's link in place of the title's anchor. */
+  /**
+   * Renders a router's link in place of the title's anchor, and gives it `href`. Give an element
+   * that takes `href`, such as `<NextLink />`, or a function, such as
+   * `(props) => <RouterLink to={props.href} {...props} />`.
+   */
   render?: LinkProps["render"];
   /** The file's format, such as PDF or CSV, shown on its thumbnail and in its details. */
   format?: string;

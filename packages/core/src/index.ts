@@ -424,13 +424,11 @@ export {
   type FormErrors,
   type FormProblem,
   type FormProps,
-  type StandardSchema,
   type UseFormErrorsOptions,
   type UseFormErrorsResult,
   useFormErrors,
-  type ValidateWithOptions,
-  validateWith,
 } from "./form";
+export { type StandardSchema, type ValidateWithOptions, validateWith } from "./form-schema";
 export {
   defaultFormStepsLabels,
   FormStep,

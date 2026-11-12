@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Button, Input, InsetText } from "x-govuk-ui";
 import { glideEasing } from "../../packages/core/src/motion";
@@ -91,6 +92,26 @@ test("every file that uses React's client-only API says it is client code", asyn
       unmarked.push(`${path}: ${used.join(", ")}`);
   }
   expect(unmarked).toEqual([]);
+});
+
+test("validateWith's module, and each of the library's modules it imports at run time, is not client code", async () => {
+  // A server checks a form's answers again with validateWith. A server build, such as Next.js's,
+  // makes each export of a file that starts "use client" a client reference, which a server cannot
+  // call. The build drops an import of types alone, so the check does not follow one.
+  const files = ["packages/core/src/form-schema.ts"];
+  const marked: string[] = [];
+  for (const file of files) {
+    const code = await Bun.file(file).text();
+    if (code.trimStart().startsWith('"use client"')) marked.push(file);
+    const transpiler = new Bun.Transpiler({ loader: file.endsWith(".tsx") ? "tsx" : "ts" });
+    for (const { path } of transpiler.scan(code).imports) {
+      if (!path.startsWith(".")) continue;
+      const imported = join(dirname(file), path);
+      const next = existsSync(`${imported}.ts`) ? `${imported}.ts` : `${imported}.tsx`;
+      if (!files.includes(next)) files.push(next);
+    }
+  }
+  expect(marked).toEqual([]);
 });
 
 test("a part keeps a latest value with useLatest, not by writing a ref as it renders", async () => {

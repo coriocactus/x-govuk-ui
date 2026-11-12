@@ -138,7 +138,7 @@ const entries = {
     changes:
       "Compact spacing, rounded corners, a field that takes its container's colour, and an error message that opens between the hint and the input, where GOV.UK places it. A prefix or suffix, such as an icon, a currency or a shortcut, sits inside the field's border. With type password, it is GOV.UK's password input. Show reveals the password and Hide covers it, screen readers hear which, and it is covered again when the form is sent. A strength meter can fill beneath it, four bars coloured from red to green with a word.",
     props: [
-      text("label", "Email address", { type: "ReactNode", default: "Required" }),
+      text("label", "Email address", { type: "ReactNode" }),
       text("hint", "We’ll only use this to contact you about your application.", {
         type: "ReactNode",
         rows: 2,
@@ -187,12 +187,10 @@ const entries = {
     props: [
       text("legend", "When do you want your licence to start?", {
         type: "ReactNode",
-        default: "Required",
       }),
       text("hint", "For example, 27 3 2026", { type: "ReactNode" }),
       text("errorMessage", ""),
       toggle("calendar", true, {
-        default: "false",
         note: "Adds the button that opens a Calendar.",
       }),
       toggle("disabled"),
@@ -237,7 +235,6 @@ const entries = {
           ["multiple", "Several dates"],
         ],
         "single",
-        { default: '"single"' },
       ),
       choice(
         "months",
@@ -246,10 +243,8 @@ const entries = {
           [2, "Two, side by side"],
         ],
         1,
-        { default: "1" },
       ),
       toggle("monthYearSelects", true, {
-        default: "true",
         note: "Chooses the month and year from Selects, or names them as a heading.",
       }),
       choice(
@@ -259,7 +254,6 @@ const entries = {
           [0, "Sunday"],
         ],
         1,
-        { default: "1" },
       ),
     ],
     example: [
@@ -292,7 +286,6 @@ const entries = {
     props: [
       text("legend", "What time does your appointment start?", {
         type: "ReactNode",
-        default: "Required",
       }),
       choice(
         "hourCycle",
@@ -326,7 +319,7 @@ const entries = {
     changes:
       "GOV.UK's file upload as a drop zone. The native file input lies over the whole zone, so pressing anywhere opens the picker and dropping works as the browser's own does. Dragged over, the zone turns brand blue and its contents lean towards the pointer, as if drawn by a magnet. Each chosen file is listed with its size and a Remove button, and choosing plays a sound.",
     props: [
-      text("label", "Upload a photo of your passport", { type: "ReactNode", default: "Required" }),
+      text("label", "Upload a photo of your passport", { type: "ReactNode" }),
       text("hint", "It must be a JPG, PNG or PDF, and smaller than 10 MB.", { type: "ReactNode" }),
       toggle("multiple"),
       text("errorMessage", "", { note: "The example also asks for a file when you continue." }),
@@ -343,7 +336,7 @@ const entries = {
     changes:
       "GOV.UK's accessible autocomplete pattern, built on Base UI's Combobox with Input's field. Options narrow as users type, the part that matches is bold, and one highlight glides between them as the menus' does. Buttons in the field clear it and show every option. It submits the chosen value with a form.",
     props: [
-      text("label", "Which country do you live in?", { type: "ReactNode", default: "Required" }),
+      text("label", "Which country do you live in?", { type: "ReactNode" }),
       text("hint", "Start typing, then choose from the list.", { type: "ReactNode" }),
       text("placeholder", ""),
       toggle("disabled"),
@@ -364,7 +357,7 @@ const entries = {
     changes:
       "Built on Base UI's Combobox, sharing Combobox's list. Each choice becomes a chip in the field with a button to remove it, and Backspace in an empty field removes the last. Chips grow in, the list stays open with ticks by the choices, and the field wraps onto more lines as it fills. For a short list, GOV.UK's Checkboxes are clearer.",
     props: [
-      text("label", "Which languages do you speak?", { type: "ReactNode", default: "Required" }),
+      text("label", "Which languages do you speak?", { type: "ReactNode" }),
       text("hint", "Choose all that apply.", { type: "ReactNode" }),
       text("placeholder", "Start typing a language"),
       toggle("disabled"),
@@ -382,7 +375,6 @@ const entries = {
     props: [
       text("label", "Which letter do you want to send?", {
         type: "ReactNode",
-        default: "Required",
       }),
       text("hint", "Letters are kept in folders by what they are about.", {
         type: "ReactNode",
@@ -417,7 +409,6 @@ const entries = {
     props: [
       text("label", "Which organisation do you work for?", {
         type: "ReactNode",
-        default: "Required",
       }),
       text(
         "hint",
@@ -442,7 +433,7 @@ const entries = {
     changes:
       "GOV.UK's site search, which is Input's field joined to a brand-blue button with a magnifying glass. It is a search landmark, so screen readers can go straight to it. Without onSearch it submits to its action, as a site search does.",
     props: [
-      text("label", "Search GOV.UK", { type: "ReactNode", default: "Search" }),
+      text("label", "Search GOV.UK", { type: "ReactNode" }),
       text("placeholder", ""),
       toggle("hideLabel", true, {
         note: "The label is hidden by default, as the button names the search.",
@@ -459,7 +450,7 @@ const entries = {
     changes:
       "Input's field, built from the same Field parts, so its error opens above the field. It has GOV.UK's character count. With a character or word limit, a line beneath says how many are left, turns red once there are too many, and screen readers hear it when typing pauses. It can grow with its text where the browser supports it. Its text scrolls with the thin scrollbar of a Scroll area, which follows the textarea's edge as its corner is dragged.",
     props: [
-      text("label", "Can you provide more detail?", { type: "ReactNode", default: "Required" }),
+      text("label", "Can you provide more detail?", { type: "ReactNode" }),
       text(
         "hint",
         "Do not include personal or financial information, like your National Insurance number or credit card details.",
@@ -467,10 +458,9 @@ const entries = {
       ),
       toggle("hideLabel"),
       text("placeholder", "For example, what happened and when it started"),
-      number("rows", 5, { min: 2, default: "5" }),
+      number("rows", 5, { min: 2 }),
       number("characterLimit", 200, {
         min: 0,
-        default: "None",
         note: "Counts what is left, as GOV.UK's character count. 0 for none.",
       }),
       choice(
@@ -506,7 +496,7 @@ const entries = {
       "Textarea's field, built from the same Field parts, around a Lexical editor, after 37signals' Lexxy, with its defaults. The toolbar is Lexxy's, with images and files, bold, italic, strikethrough and underline, a formatting menu of normal text, the headings and Clear formatting, colour for the text and its background from GOV.UK's palette, a link, a quotation, code, bulleted and numbered lists, a table and a divider, with history at the end of the row. It is WAI-ARIA's toolbar, one Tab stop with the arrow keys moving between its controls. Each is a quiet icon Button, pressed where its formatting is on, with its name and shortcut in a Tooltip, and what has no space waits behind More. Markdown turns into formatting as it is typed, and pasted Markdown, links, Word's lists and other pages' HTML are made good. Code is a block, or inline around words on one line, coloured by its syntax with sugar-high as Code block colours code, with its language in a list at its corner. A table's tools come up over it, to add, remove and head rows and columns, and Enter and Backspace move through it as Lexxy's do. A link shows its address, which opens it in a new tab, with Edit and Unlink, under it while the pointer rests on it or the caret is in it, where Alt F10 reaches them. Each of these floating tools is a part EditorContent shows, which can be left out or joined by tools of a service's own, made with EditorTools. Given onUpload, images, video and files go in from the toolbar, a paste or a drop, drawn from the file with a progress bar while they are stored. Several images make a gallery, an image has a caption and a description, and an attachment can be dragged, or moved with Alt, Shift and the arrows, as screen readers hear. Typing with an attachment, a divider or a mention selected types after it. EditorPrompt opens a menu of suggestions on a trigger, such as `@` for mentions or `:` for emoji, filtered as users type, from a list or a service's search, and puts in a mention or text. EditorAI offers a model's suggestions for selected text, in a toolbar over it. The selection is kept while the suggestion is written, moving with the text, and the suggestion replaces the selection once approved. The service connects its own model through onRequestEdit, which is sent the selection as plain text and as Markdown. The example makes its suggestions in the page, without a model. A suggestion of text is fitted in word by word, so the words it keeps keep their formatting, links and colours, while one of Markdown comes in as written, shown formatted. A form around the editor waits while files upload. The Source control shows what the field submits in the document's place, in an editable Code block with the rest of the toolbar greyed, its HTML laid out one block on each line, and reads it back as the document. The field submits as HTML, or as Markdown, takes part in a Form by its name, and counts characters or words as the Textarea does. The box grows with the document, as Lexxy's does, the toolbar sticking to the top of the page, or with maxRows scrolls inside with the thin scrollbar. It can be plain text, or one line. Every word it says can be changed with labels.",
     shows: ["defaultEditorToolbar", "editorToolbarGroups", "editorColours", "editorBackgrounds"],
     props: [
-      text("label", "Notes for the caseworker", { type: "ReactNode", default: "Required" }),
+      text("label", "Notes for the caseworker", { type: "ReactNode" }),
       text(
         "hint",
         "Do not include personal or financial information, like a National Insurance number.",
@@ -529,12 +519,10 @@ const entries = {
       number("rows", 15, { min: 1, note: "The document's least height, in lines of its text." }),
       number("maxRows", 15, {
         min: 0,
-        default: "null",
         note: "Lines before the document scrolls inside its box. null lets the box grow, as Lexxy's does, and 0 does so here.",
       }),
       number("characterLimit", 0, {
         min: 0,
-        default: "None",
         note: "Counts what is left, as GOV.UK's character count. 0 for none.",
       }),
       text("errorMessage", ""),
@@ -563,7 +551,6 @@ const entries = {
         editorToolbarGroups.flat().map((kind) => [kind, defaultEditorLabels[kind]] as const),
         [...defaultEditorToolbar, "source"],
         {
-          default: "defaultEditorToolbar",
           note: "On EditorToolbar, the editor's own controls, laid out in their groups with history at the end. Lexxy's are its defaults, and the example adds Source.",
         },
       ),
@@ -607,7 +594,7 @@ const entries = {
     changes:
       "Built on Base UI's Select and the Field parts. The field looks like Input. The list grows from it and opens with the chosen option over the field, as a native select does on a Mac. A list of more than 8 options, such as of years, opens beneath the field instead, at most 320 pixels tall with the chosen option in the middle, and scrolls in a Scroll area that fades its edges. Keys move through the options and type-ahead finds one. The tick stays on the earlier choice while the list closes, and is on the new one next time it opens. GOV.UK advises Radios for short lists.",
     props: [
-      text("label", "Sort by", { type: "ReactNode", default: "Required" }),
+      text("label", "Sort by", { type: "ReactNode" }),
       text("hint", "", { type: "ReactNode" }),
       toggle("hideLabel"),
       text("errorMessage", ""),
@@ -634,7 +621,6 @@ const entries = {
     props: [
       text("legend", "Which types of waste do you transport?", {
         type: "ReactNode",
-        default: "Required",
       }),
       choice(
         "legendSize",
@@ -644,7 +630,6 @@ const entries = {
           ["large", "Large"],
         ],
         "medium",
-        { default: "small" },
       ),
       text("hint", "Select all that apply.", { type: "ReactNode" }),
       text("errorMessage", ""),
@@ -692,7 +677,6 @@ const entries = {
     props: [
       text("legend", "How would you like to be contacted?", {
         type: "ReactNode",
-        default: "Required",
       }),
       choice(
         "legendSize",
@@ -702,7 +686,6 @@ const entries = {
           ["large", "Large"],
         ],
         "medium",
-        { default: "small" },
       ),
       text("hint", "Select one option.", { type: "ReactNode" }),
       text("errorMessage", ""),
@@ -741,7 +724,7 @@ const entries = {
     changes:
       "GOV.UK has no switch. Ours is a native checkbox with the switch role, set out as a settings row with the label on the left. The thumb fills the track to 1px inside its border, so its curve follows the track's ends. Under the pointer it reaches towards the other side, and it stretches as it slides across, its leading edge first. Use Checkboxes for answers that are submitted later.",
     props: [
-      text("label", "Email notifications", { type: "ReactNode", default: "Required" }),
+      text("label", "Email notifications", { type: "ReactNode" }),
       text("hint", "We’ll email you when your application changes.", { type: "ReactNode" }),
       toggle("hideLabel"),
       toggle("disabled"),
@@ -755,12 +738,12 @@ const entries = {
     changes:
       "Base UI provides the behaviour and the Field parts label it. The value shows beside the label, formatted for the locale. The thumb and fill glide from step to step, and the thumb overshoots a little as it comes to rest. Each step ticks.",
     props: [
-      text("label", "Search radius", { type: "ReactNode", default: "Required" }),
+      text("label", "Search radius", { type: "ReactNode" }),
       text("hint", "How far from your postcode to look.", { type: "ReactNode" }),
       toggle("hideLabel"),
-      number("min", 5, { default: "0" }),
-      number("max", 50, { default: "100" }),
-      number("step", 5, { min: 1, default: "1" }),
+      number("min", 5),
+      number("max", 50),
+      number("step", 5, { min: 1 }),
       toggle("showValue", true),
       toggle("disabled"),
     ],
@@ -852,7 +835,7 @@ const entries = {
     changes:
       "GOV.UK's fieldset, with three legend sizes and a legend that can be the page's heading. Its hint and error follow GOV.UK's ids, and Radios and Checkboxes are built on it.",
     props: [
-      text("legend", "What is your address?", { type: "ReactNode", default: "Required" }),
+      text("legend", "What is your address?", { type: "ReactNode" }),
       choice(
         "legendSize",
         [
@@ -861,7 +844,6 @@ const entries = {
           ["large", "Large"],
         ],
         "large",
-        { default: "small" },
       ),
       toggle("pageHeading"),
       text("hint", "", { type: "ReactNode" }),
@@ -878,10 +860,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's summary, with rounder corners and an entrance. It takes focus when it appears. Pressing an error scrolls its field's label or legend into view and focuses the field. Form shows one for its own checks. On its own, it lists errors found elsewhere, such as by a server or another form library. The example opens as a page does when the server has found problems, with the summary taking focus. It checks its answers by the same rule as Form. An answer that now passes loses its line, and one that still fails keeps its message until the form is sent again.",
-    props: [
-      text("title", "There is a problem", { type: "ReactNode", default: "There is a problem" }),
-      toggle("autoFocus", true, { default: "true" }),
-    ],
+    props: [text("title", "There is a problem", { type: "ReactNode" }), toggle("autoFocus", true)],
   },
   form: {
     name: "Form",
@@ -903,11 +882,9 @@ const entries = {
     props: [
       text("errorTitle", "There is a problem", {
         type: "ReactNode",
-        default: "There is a problem",
         needs: [when("example", "page")],
       }),
       toggle("titlePrefix", true, {
-        default: "true",
         note: "Starts the page's title with Error.",
         needs: [when("example", "page")],
       }),
@@ -994,9 +971,8 @@ const entries = {
     changes:
       "GOV.UK has no dialog, and advises a page of its own for most tasks. Ours is Base UI's Dialog, built from parts. It grows into place from a little below over a dimmed page, which stays inert until it closes. Focus moves into it and returns to its button. Escape and a press outside close it with the close sound, and long content scrolls in the window.",
     props: [
-      toggle("closeButton", true, { default: "true", note: "DialogContent's × button." }),
+      toggle("closeButton", true, { note: "DialogContent's × button." }),
       toggle("closeOnPressOutside", true, {
-        default: "true",
         note: "Off, a press on the dimmed page leaves it open.",
       }),
     ],
@@ -1019,9 +995,8 @@ const entries = {
         ],
         "right",
       ),
-      toggle("closeButton", true, { default: "false", note: "SheetContent's × button." }),
+      toggle("closeButton", true, { note: "SheetContent's × button." }),
       toggle("closeOnPressOutside", true, {
-        default: "true",
         note: "Off, a press on the dimmed page leaves it open.",
       }),
     ],
@@ -1044,7 +1019,7 @@ const entries = {
         ],
         "bottom",
       ),
-      toggle("arrow", true, { default: "true" }),
+      toggle("arrow", true),
       toggle("closeButton", false),
     ],
   },
@@ -1093,7 +1068,7 @@ const entries = {
           ["false", "false: both stay"],
         ],
         "default",
-        { type: "boolean", default: "true with a trigger, false with an anchor" },
+        { type: "boolean" },
       ),
       toggle("closeButton", true, { note: "The × in the corner, as Popover's closeButton." }),
     ],
@@ -1190,8 +1165,8 @@ const entries = {
         ],
         "bottom",
       ),
-      toggle("arrow", true, { default: "true" }),
-      number("delay", 200, { min: 0, default: "200", note: "Milliseconds before it opens." }),
+      toggle("arrow", true),
+      number("delay", 200, { min: 0, note: "Milliseconds before it opens." }),
     ],
   },
   table: {
@@ -1245,12 +1220,10 @@ const entries = {
       toggle("wrap", false, { note: "Breaks long lines at the block's width." }),
       number("rows", 0, {
         min: 0,
-        default: "None",
         note: "The least height, in lines of code. 0 is the short sample's length here.",
       }),
       number("maxRows", 0, {
         min: 0,
-        default: "None",
         note: "Lines before it scrolls inside. 0 is the short sample's length here.",
       }),
     ],
@@ -1277,7 +1250,7 @@ const entries = {
         ],
         "vertical",
       ),
-      toggle("fade", true, { default: "false" }),
+      toggle("fade", true),
       text("label", "Updates to this page", {
         note: "Names the box for screen readers once it scrolls.",
       }),
@@ -1317,7 +1290,6 @@ const entries = {
             ["split-and-swap", "Split and swap"],
           ],
           "split",
-          { default: '"split"' },
         ),
         note: "What a tile dropped on another does. It splits it at the edge it lands on, swaps places with it, or both, swapping at its middle.",
       },
@@ -1331,7 +1303,6 @@ const entries = {
             [40, "40px"],
           ],
           0,
-          { default: "Optional" },
         ),
         note: "A dragged divider moves in steps of this many pixels, as each arrow key does.",
       },
@@ -1348,7 +1319,6 @@ const entries = {
             [2000, "Every width"],
           ],
           0,
-          { default: "Off" },
         ),
         note: "Below it, the tiles show one at a time, the one in use, with a pager in its bar.",
       },
@@ -1380,7 +1350,7 @@ const entries = {
           ["large", "Large"],
         ],
         "medium",
-        { default: "none", needs: [when("orientation", "horizontal")] },
+        { needs: [when("orientation", "horizontal")] },
       ),
     ],
   },
@@ -1394,7 +1364,7 @@ const entries = {
     changes:
       "GOV.UK's details, built on Base UI's Collapsible. The triangle turns and the help opens smoothly along a grey bar. Closed, the help stays in the page, so find in page opens it.",
     props: [
-      text("summary", "Help with nationality", { type: "ReactNode", default: "Required" }),
+      text("summary", "Help with nationality", { type: "ReactNode" }),
       toggle("defaultOpen", false, {
         restart: true,
         note: "The example starts again when it changes.",
@@ -1420,7 +1390,7 @@ const entries = {
     changes:
       "GOV.UK's green button, regular-weight label, bottom edge and yellow focus, with rounder corners. A pending state preserves width and keyboard focus. Outline buttons, a keyline on the page's paper as on GOV.UK's “Is this page useful?” buttons, stand out where secondary grey would disappear, such as on a tinted surface. Quiet buttons suit toolbars, and link buttons suit a lesser choice beside a button. Icon sizes make a square button for one icon, which the Sidebar trigger, Carousel and Tooltip use. A ButtonGroup sets buttons in a row, and on a phone stacks them, each the full width, as GOV.UK does. GOV.UK has no group that keeps its row. With stack off, its buttons stay side by side at their text width, as Feedback's Yes and No do. Turn on group, then try stack off on a phone. A quiet button with aria-pressed stays shaded while it is on. An icon given beside the words, before or after them, sits in their middle in every variant, as GOV.UK's start button's arrow does.",
     props: [
-      text("children", "Save and continue", { type: "ReactNode", default: "Required" }),
+      text("children", "Save and continue", { type: "ReactNode" }),
       choice(
         "variant",
         [
@@ -1451,7 +1421,6 @@ const entries = {
       toggle("group", false, { note: "Puts a Cancel link button beside it in a ButtonGroup." }),
       toggle("icon", false, { note: "Puts an arrow after the words, in their middle." }),
       toggle("stack", true, {
-        default: "true",
         note: "ButtonGroup's. Off keeps its buttons in a row at their text width on a phone.",
         needs: [whenOn("group")],
       }),
@@ -1474,7 +1443,7 @@ const entries = {
     changes:
       "Built from parts. Base UI controls expansion and semantics, and CSS animates the panels. GOV.UK's Show all sections, section summaries and heading levels are parts and props. Closed panels stay in the page, so find in page reaches them.",
     props: [
-      toggle("multiple", true, { default: "false" }),
+      toggle("multiple", true),
       choice(
         "headingLevel",
         [
@@ -1507,7 +1476,7 @@ const entries = {
     changes:
       "One input supports autofill, paste and keyboard selection. Digits animate into their slots, one ring glides with the caret, and even-length codes split into two groups. While the service checks the code, a wave passes along the digits. An accepted code hops and settles with a green edge. A wrong code is the application's to clear. Only the ring turns red, at the first slot, and it returns to black when the user types again.",
     props: [
-      text("label", "Security code", { type: "ReactNode", default: "Required" }),
+      text("label", "Security code", { type: "ReactNode" }),
       text("hint", "Enter the code we sent to your email address.", {
         type: "ReactNode",
         rows: 2,
@@ -1541,7 +1510,6 @@ const entries = {
       "Built from parts. Base UI manages the menus and focus, and one panel glides between menus, resizing to fit. Links take a render prop for a router's link and mark the current page. Our stylesheet supplies GOV.UK colours, spacing and reduced-motion transitions.",
     props: [
       text("label", "Services", {
-        default: "Services",
         note: "Names the navigation for screen readers. It is not shown.",
       }),
       toggle("disabled"),
@@ -1601,7 +1569,6 @@ const entries = {
       'Built from parts. Native scrolling handles touch and keyboard input. Buttons move between slides, the position reads as "2 of 3", and each slide is announced with its place. There is no autoplay or looping.',
     props: [
       text("label", "Featured services", {
-        default: "Required",
         note: "Names the carousel for screen readers. It is not shown.",
       }),
     ],
@@ -1647,7 +1614,7 @@ const entries = {
           ["destructive", "Destructive"],
         ],
         "default",
-        { default: "default", note: "The user's bubbles in the example." },
+        { note: "The user's bubbles in the example." },
       ),
     ],
   },
@@ -1662,11 +1629,9 @@ const entries = {
     shows: ["MessageAction"],
     props: [
       text("label", "Conversation", {
-        default: "Conversation",
         note: "Names the message log for screen readers. It is not shown.",
       }),
       text("assistantName", "Service assistant", {
-        default: "Service assistant",
         note: "Screen readers hear it before each reply and while the assistant thinks. It is not shown.",
       }),
     ],
@@ -1701,7 +1666,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Rows sit under bands, such as issues by status, and pressing a band folds its rows away on Base UI's Collapsible. Each column is as wide as its widest cell, and the columns line up across every group, with the first band heading them. No text is ever cut short or wrapped. As the table narrows, the columns give way in steps, each taken only once the one before would cut text short. Some columns are left out, then some join each row's title and the marks go, then some merge into others, as the dates into the people, and the people stand closer together. Each step moves through the rows from the top down, a little later in each row, and goes back the same way as the table widens. Past the last step, the groups scroll sideways in a Scroll area. Screen readers hear each cell's column before it, wherever it sits. With resizable, a Resizable handle on the right edge narrows and widens the table, by dragging or with the arrow keys. The example's To do band starts folded, with defaultOpen.",
-    props: [toggle("resizable", true, { default: "false" })],
+    props: [toggle("resizable", true)],
   },
   "data-table": {
     name: "Data table",
@@ -1720,17 +1685,14 @@ const entries = {
           [2, "First two columns"],
         ],
         1,
-        { default: "1" },
       ),
-      toggle("selectable", true, { default: "false" }),
+      toggle("selectable", true),
       number("minRows", 8, {
         min: 0,
-        default: "None",
         note: "The least height, in rows of data. 0 sets none here.",
       }),
       number("maxRows", 8, {
         min: 0,
-        default: "8",
         note: "Rows of data before they scroll under the headings. 0 is the default here.",
       }),
     ],
@@ -1771,7 +1733,6 @@ const entries = {
           ["radial", "Radial"],
         ],
         "line",
-        { default: "Required" },
       ),
       toggle("stacked", false, {
         note: "Stacks bars and areas on one another.",
@@ -1790,7 +1751,6 @@ const entries = {
         ],
         "auto",
         {
-          default: "Bars, waterfalls and boxes vertical, dots and lollipops horizontal",
           note: "Horizontal sets the categories down the side.",
           needs: [when("type", "bar", "lollipop", "waterfall", "dot", "box")],
         },
@@ -2178,7 +2138,6 @@ const entries = {
       "shadcn's Message scroller, with Conversation's scrolling, in a framed box. At the end of the log it follows new messages and streamed text in the same frame they arrive, so nothing jumps. Scrolled away, it stays put, and a button rises to go back, with a dot once more arrives. A new turn, such as the user's question, glides to near the top with the end of the turn before peeking above it, and its reply streams into the space left below, so the log stays still until the reply fills the box, then follows again. Rows loaded above keep the reader's row where it was. It opens at the newest message, or at the start, or at the last turn from its start with the reply below. From outside, it can go to a message by its id, which glows in the focus colour for a moment. Screen readers hear new messages in a log, and with busy they wait for a streaming reply to finish. Conversation is a Message scroller laid out as a chat. The example is a service's help chat docked at the foot of a page in the middle, as a documentation site's assistant is. It starts folded, with a one-row Chat input and a Callout suggesting a question. The conversation opens up out of the message box and folds back down into it, keeping its place, and sending from the folded chat opens it. The log is unframed inside it. Its messages are Bubbles, its replies Streaming text and its composer a Chat input, which floats over the foot of the log. Suggested questions follow the office's latest reply, on its side, and a pinned question under the header goes to it among the earlier messages. The office's replies have tools beneath them, which are Copy, a thumb up and down, and Try again, which writes the answer out again. On an earlier message, Try again stays in its place but refuses a press, with the refusing sound and a shake.",
     props: [
       toggle("autoScroll", true, {
-        default: "true",
         note: "Follows new messages and streamed text while the reader is at the end of the log.",
       }),
       {
@@ -2194,7 +2153,6 @@ const entries = {
         ],
         "end",
         {
-          default: "end",
           note: "Where the log opens, which is at the newest message, at the first, or at the last question with its answer below, or the end if that turn fits.",
         },
       ),
@@ -2217,7 +2175,6 @@ const entries = {
     props: [
       text("title", "Show refused applications in the summary", {
         type: "ReactNode",
-        default: "Required",
       }),
     ],
     example: [toggle("description", true, { note: "Says what the plan will do." })],
@@ -2257,12 +2214,10 @@ const entries = {
       toggle("wrap", false, { note: "Breaks long lines at the diff's width." }),
       number("rows", 17, {
         min: 0,
-        default: "None",
         note: "The least height, in rows. A row is a line or a fold. 0 sets none here.",
       }),
       number("maxRows", 17, {
         min: 0,
-        default: "None",
         note: "Rows before it scrolls inside. 17 is the short diff's own. 0 sets none here.",
       }),
     ],
@@ -2279,10 +2234,9 @@ const entries = {
     props: [
       text("children", "Department for Business, Innovation, Science and Trade", {
         type: "ReactNode",
-        default: "Required",
       }),
-      text("colour", "#ff4328", { default: "The words' colour" }),
-      text("crest", "/assets/images/govuk-crest.svg", { default: "None" }),
+      text("colour", "#ff4328"),
+      text("crest", "/assets/images/govuk-crest.svg"),
       choice(
         "size",
         [
@@ -2290,7 +2244,6 @@ const entries = {
           ["small", "Small"],
         ],
         "medium",
-        { default: '"medium"' },
       ),
     ],
   },
@@ -2311,7 +2264,6 @@ const entries = {
           [5, "5"],
         ],
         4,
-        { default: "4" },
       ),
     ],
   },
@@ -2360,7 +2312,7 @@ const entries = {
     changes:
       "GOV.UK's link styles as one component. It is underlined, with an underline that thickens under the pointer, GOV.UK's purple once visited, and GOV.UK's yellow focus. It can take the text colour, as in a footer, or white, on brand blue. A link that opens a new tab says so in its text, as GOV.UK advises. It takes a render prop for a router's link.",
     props: [
-      text("children", "guidance on photos", { type: "ReactNode", default: "Required" }),
+      text("children", "guidance on photos", { type: "ReactNode" }),
       choice(
         "colour",
         [
@@ -2370,8 +2322,8 @@ const entries = {
         ],
         "link",
       ),
-      toggle("underline", true, { default: "true" }),
-      toggle("visited", true, { default: "true", note: "Shows visited links in GOV.UK's purple." }),
+      toggle("underline", true),
+      toggle("visited", true, { note: "Shows visited links in GOV.UK's purple." }),
       toggle("newTab", false, { note: "Opens a new tab, and says so in the link." }),
     ],
   },
@@ -2434,7 +2386,7 @@ const entries = {
     dependencies: "React",
     changes:
       "A complementary landmark named by its title, under a brand-blue rule, as GOV.UK's related links. Its links are the library's Link.",
-    props: [text("title", "Related content", { type: "ReactNode", default: "Required" })],
+    props: [text("title", "Related content", { type: "ReactNode" })],
   },
   "aspect-ratio": {
     name: "Aspect ratio",
@@ -2452,7 +2404,7 @@ const entries = {
           ["1:1", "Square"],
         ],
         "16:9",
-        { type: "number", default: "16 / 9" },
+        { type: "number" },
       ),
     ],
   },
@@ -2479,7 +2431,7 @@ const entries = {
     changes:
       "A circle with a photo, which fades in once it has loaded, or the person's initials on one of GOV.UK's colours, the same colour for a name every time. It is named by the person's name. An organisation's avatar is a square with a control's corners, so it reads apart from a person's. An AvatarGroup overlaps several, ringed in the page's colour, and counts any more, in the shape of the avatars beside the count. Under the pointer, the avatar there rises and grows a little over its neighbours, which rise less the further away they are, and they spring back into line with a bounce as the pointer leaves. Built on Base UI's Avatar.",
     props: [
-      text("name", "John Major", { default: "Required" }),
+      text("name", "John Major"),
       choice(
         "size",
         [
@@ -2546,7 +2498,7 @@ const entries = {
     dependencies: "React · Motion",
     changes:
       "GOV.UK's cookie banner, with its question and buttons. Once users choose, the question gives way at once to a message saying what they chose, as the banner eases to its new height, which takes focus so screen readers hear it, with an outline button to hide it. Hiding it folds the banner away.",
-    props: [text("serviceName", "Apply for a licence", { type: "ReactNode", default: "GOV.UK" })],
+    props: [text("serviceName", "Apply for a licence", { type: "ReactNode" })],
   },
   feedback: {
     name: "Feedback",
@@ -2558,7 +2510,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's “Is this page useful?” band, with outline Yes and No buttons and one to report a problem, which stand out on its tint. It shows one stage at a time, as GOV.UK's does. Once users answer, the question gives way. Yes turns to thanks. No and the report button turn to a short Form built from Textarea, whose Cancel brings the question back with focus on the button that opened it, and what was typed is kept. Sending turns to thanks, which takes focus so screen readers hear it. The band eases to each stage's height with the AutoHeight that FormSteps' card uses, and its words never fade or move. The example is the foot of a service's page, with the band at the end of the page's content, then the Footer.",
-    props: [text("question", "Is this page useful?", { default: "Is this page useful?" })],
+    props: [text("question", "Is this page useful?")],
   },
   "filter-chips": {
     name: "Filter chips",
@@ -2594,8 +2546,8 @@ const entries = {
     changes:
       "A rounded box in Input's border that grows with the message, a line at a time, then scrolls. Enter sends and Shift with Enter starts a new line, and a character still being composed is never sent. Send is a square outline icon Button whose arrow lifts under the pointer, and while the assistant replies it becomes Stop. ChatInputAttach sits at the start of the bar and shows each attached file as a chip above the message, with a button to remove it. ChatInputModel, a quiet Dropdown menu of models with a few words on each, and ChatInputDictation, which listens with the browser's speech recognition and pulses brand blue while it does, sit beside Send. GOV.UK's focus goes round the whole box. The message scrolls with the library's thin scrollbar, as a Scroll area does. Inline puts the message and Send on one row, one line tall until the message needs more. Unframed, with framed false, it takes its container's edges, such as a chat panel's, as the Message scroller example's does, with GOV.UK's focus round the whole panel. The Conversation example's composer is a Chat input.",
     props: [
-      text("placeholder", "Write a message…", { default: "Write a message…" }),
-      number("maxRows", 6, { default: "8", note: "The most lines it grows to before it scrolls." }),
+      text("placeholder", "Write a message…"),
+      number("maxRows", 6, { note: "The most lines it grows to before it scrolls." }),
       choice(
         "layout",
         [
@@ -2606,7 +2558,6 @@ const entries = {
         { note: "Inline puts the message and Send on one row, one line tall." },
       ),
       toggle("framed", true, {
-        default: "true",
         note: "Its own rounded box. Without it, it takes its container's edges.",
       }),
       toggle("disabled"),
@@ -2640,7 +2591,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Chat input's chips, as parts that can sit anywhere, such as under a sent question to list the documents it was asked about. Each chip has a page icon, the name and the kind, such as PDF, in the muted colour. A long name is cut short in its middle, as a file's name is in ChatGPT and Claude, so its last word and extension show, where names that differ often differ, such as by a date. It shows in full in its title, and screen readers hear it in full. Given onRemove, a chip has a × button, and focus goes to the next chip's button as the chip is removed. Given render, its name links to the document, as GOV.UK's link in the text's colour. Screen readers hear the chips as a list, named by its label. Chat input's ChatInputAttachments and ChatInputAttachment are File chips that put focus back in the message.",
-    props: [text("label", "Documents with this question", { default: "Files" })],
+    props: [text("label", "Documents with this question")],
     example: [
       toggle("removable", false, { note: "Gives each chip onRemove, so it has a × button." }),
       toggle("links", false, { note: "Makes each name a link to its document, with render." }),
@@ -2738,7 +2689,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's footer under a band of brand blue, on its tinted surface. The crown sits at the top, then any navigation in sections, each a heading over a rule with its links, sharing the row by GOV.UK's widths and setting a long list in columns. A rule closes the navigation. Then come the support links, anything else given, such as who built the service, and the Open Government Licence, with Crown copyright under the Royal Arms at the end of the row. Built from parts. The crown is the library's GOVUKCrown, and the Royal Arms is GOV.UK Frontend's image, drawn in the text's colour. Both are only for GOV.UK services, so crown false leaves them out. Links are GOV.UK's blue, and the sections stack on a phone. The example sits at the foot of the preview, as it would at the foot of a page.",
-    props: [toggle("crown", true, { default: "true" })],
+    props: [toggle("crown", true)],
     example: [
       toggle("sections", true, { note: "Adds GOV.UK's navigation above the support links." }),
     ],
@@ -2767,7 +2718,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's layout as parts. The width container keeps content to 960 pixels in the middle of the screen, with space at its sides when the screen is narrower. GridRow and GridColumn share a row in GOV.UK's quarters, thirds and halves, with its 30 pixel gutter. The columns follow their row's width instead of the screen's, so a row in a narrow space stacks even on a wide screen. Header, Service navigation, Footer, Cookie banner and Page use the width container, so they line up, and the workbench sets each example in one. Stack sets parts one beneath another, and Inline sets them side by side, each spaced by GOV.UK's spacing scale. 30 pixels between a stack's parts is the space between a form's fields, and a field in a line shrinks beside its button. GOV.UK's components each have their own margin beneath them. These parts have none, and the box they sit in spaces them. MainWrapper and GridColumn stack their parts as a Stack does, 20 pixels apart on a phone and 30 from tablet width.",
-    props: [range("width", 960, 480, 1200, 20), toggle("gutters", true, { default: "true" })],
+    props: [range("width", 960, 480, 1200, 20), toggle("gutters", true)],
     example: [
       choice(
         "layout",
@@ -2832,7 +2783,6 @@ const entries = {
         ],
         "large",
         {
-          default: "Follows level",
           note: "The example sets it, so it stays as the level changes.",
         },
       ),
@@ -2868,7 +2818,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's back link. Its chevron leans back under the pointer, and it takes a render prop for a router's link.",
-    props: [text("children", "Back", { type: "ReactNode", default: "Back" })],
+    props: [text("children", "Back", { type: "ReactNode" })],
   },
   pagination: {
     name: "Pagination",
@@ -2916,7 +2866,6 @@ const entries = {
       "GOV.UK's Exit this page. The red button stays at the top as the page scrolls, and pressing Shift three times also leaves, with three dots under the label counting the presses. The page is covered at once as it goes. It makes no sound, because a sound could give it away. Here it goes to the next component.",
     props: [
       text("href", "/workbench/checkboxes", {
-        default: "BBC Weather",
         note: "Here it is the next component.",
       }),
     ],
@@ -2940,7 +2889,6 @@ const entries = {
         "important",
       ),
       toggle("autoFocus", false, {
-        default: "true",
         note: "A success banner takes focus as it appears. It starts off here, so changing the type does not move focus.",
         restart: true,
       }),
@@ -2958,10 +2906,9 @@ const entries = {
     props: [
       text("children", "You can be fined up to £5,000 if you do not register.", {
         type: "ReactNode",
-        default: "Required",
         rows: 2,
       }),
-      text("iconFallbackText", "Warning", { default: "Warning" }),
+      text("iconFallbackText", "Warning"),
     ],
   },
   panel: {
@@ -2972,7 +2919,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's green confirmation panel with softened corners. It rises into place, and plays the success sound when it appears after the page has loaded.",
-    props: [text("title", "Application complete", { type: "ReactNode", default: "Required" })],
+    props: [text("title", "Application complete", { type: "ReactNode" })],
   },
   tag: {
     name: "Tag",
@@ -3001,7 +2948,6 @@ const entries = {
           ["small", "Small"],
         ],
         "large",
-        { default: "medium" },
       ),
       text("label", "Checking your details", {
         note: "Read by screen readers. Leave it out when text beside it says what is happening.",
@@ -3017,7 +2963,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Built on Base UI's Progress, so screen readers hear the label and the value. The bar eases forward in brand blue, sweeps along the track while the amount is unknown, and turns green with the success sound when the task is complete.",
-    props: [toggle("showValue", true, { default: "true", needs: [whenOff("indeterminate")] })],
+    props: [toggle("showValue", true, { needs: [whenOff("indeterminate")] })],
     example: [toggle("indeterminate", false, { note: "Sets the value to null." })],
   },
   skeleton: {
@@ -3028,9 +2974,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Grey shapes for text, blocks and circles. One soft light sweeps across every skeleton on the page together, and stays still with reduced motion. Skeletons are hidden from screen readers, so a status nearby says what is loading. The usage panel shows skeleton lines while its code loads, and SidebarSkeleton stands in for a Sidebar's items.",
-    props: [
-      number("lines", 3, { min: 1, default: "1", note: "For text.", needs: [whenOn("loading")] }),
-    ],
+    props: [number("lines", 3, { min: 1, note: "For text.", needs: [whenOn("loading")] })],
     example: [toggle("loading", true, { note: "Off, the content it stood in for appears." })],
   },
   "empty-state": {
@@ -3110,7 +3054,7 @@ const entries = {
       text(
         "children",
         "It can take up to 8 weeks to register a lasting power of attorney if there are no mistakes in the application.",
-        { type: "ReactNode", default: "Required", rows: 4 },
+        { type: "ReactNode", rows: 4 },
       ),
     ],
   },
@@ -3121,7 +3065,7 @@ const entries = {
     dependencies: "React",
     changes:
       "A band of light sweeps across muted text, like a sheen. The text keeps its full contrast outside the band. With reduced motion, the text is still.",
-    props: [text("children", "Writing a suggestion…", { type: "ReactNode", default: "Required" })],
+    props: [text("children", "Writing a suggestion…", { type: "ReactNode" })],
   },
   sidebar: {
     name: "Sidebar",
@@ -3165,7 +3109,6 @@ const entries = {
           ["none", "Never"],
         ],
         "icon",
-        { default: "offcanvas" },
       ),
       toggle("collapsedTrigger", true, { needs: [when("collapsible", "offcanvas")] }),
       toggle("resizable"),

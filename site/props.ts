@@ -28,8 +28,6 @@ export type Need =
 export type PropDoc = {
   name: string;
   type: string;
-  /** The documented default, such as "false", "Required" or "Optional". */
-  default: string;
   control?: Control;
   /** Where the playground starts. */
   value?: unknown;
@@ -75,7 +73,6 @@ type Extra = Partial<Omit<PropDoc, "name" | "control" | "value">>;
 export const toggle = (name: string, value = false, extra: Extra = {}): PropDoc => ({
   name,
   type: "boolean",
-  default: String(value),
   control: { kind: "switch" },
   value,
   ...extra,
@@ -86,7 +83,6 @@ export const text = (name: string, value: string, extra: Extra & { rows?: number
   return {
     name,
     type: "string",
-    default: "Optional",
     control: { kind: "text", rows },
     value,
     ...rest,
@@ -98,7 +94,6 @@ export const number = (name: string, value: number, extra: Extra & { min?: numbe
   return {
     name,
     type: "number",
-    default: String(value),
     control: { kind: "number", min },
     value,
     ...rest,
@@ -109,7 +104,6 @@ export const range = (name: string, value: number, min: number, max: number, ste
   ({
     name,
     type: `number from ${min} to ${max}`,
-    default: String(value),
     control: { kind: "range", min, max, step },
     value,
   }) satisfies PropDoc;
@@ -123,7 +117,6 @@ export const choice = (
   ({
     name,
     type: options.map(([option]) => option).join(" | "),
-    default: String(value),
     control: { kind: "select", options },
     value,
     ...extra,
@@ -138,7 +131,6 @@ export const checklist = (
   ({
     name,
     type: `(${options.map(([option]) => option).join(" | ")})[]`,
-    default: "All",
     control: { kind: "checklist", options },
     value,
     ...extra,

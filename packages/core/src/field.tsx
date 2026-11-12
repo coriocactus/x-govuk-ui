@@ -27,7 +27,6 @@
  *   inside of `useField` and these parts without changing their props.
  */
 
-import { AnimatePresence, motion } from "motion/react";
 import {
   type ComponentPropsWithRef,
   createContext,
@@ -41,7 +40,6 @@ import {
 } from "react";
 import { defaultErrorLabels } from "./error-summary";
 import { useLabels } from "./labels";
-import { duration, useMotionTiming } from "./motion";
 import { useLatest } from "./refs";
 
 /**
@@ -591,6 +589,45 @@ export function Hint({ className = "", children, ...props }: ComponentPropsWithR
   );
 }
 
+/**
+ * Keeps a box that closes in CSS on the page until it has closed. The box is `open` while it is
+ * shown. It is then `closing`, with the content it had, until its transitions end, and `closed`
+ * after that. A box with no transition to wait for is closed at once. None runs under reduced
+ * motion, or while the box is not displayed. A box that is shown as it first renders is `first`,
+ * so its styles can show it at once.
+ */
+function useClosing<T>(shown: boolean, content: T) {
+  const box = useRef<HTMLDivElement>(null);
+  const [was, setWas] = useState<"first" | "open" | "closing" | "closed">(
+    shown ? "first" : "closed",
+  );
+  const [kept, setKept] = useState(content);
+  // State set during a render makes React render again at once, before the browser paints.
+  const open = was === "first" ? "first" : "open";
+  const phase = shown ? open : was === "closed" ? "closed" : "closing";
+  if (phase !== was) setWas(phase);
+  if (shown && kept !== content) setKept(content);
+  useLayoutEffect(() => {
+    if (phase !== "open" && phase !== "closing") return;
+    // To list the box's animations, the browser works out its styles, which starts the transitions
+    // that opening or closing asks for. Firefox would otherwise draw a box that opens from
+    // `@starting-style` at its full height for one frame, before the transition starts.
+    const running = box.current?.getAnimations() ?? [];
+    if (phase === "open") return;
+    let waiting = true;
+    const close = () => {
+      if (waiting) setWas("closed");
+    };
+    // A transition that is cancelled, as when the field stops being displayed, ends the wait too.
+    if (running.length === 0) close();
+    else void Promise.allSettled(running.map((animation) => animation.finished)).then(close);
+    return () => {
+      waiting = false;
+    };
+  }, [phase]);
+  return { box, phase, content: shown ? content : kept };
+}
+
 /** The message is a paragraph, with the role and the id, which takes every prop. */
 export type ErrorMessageProps = ComponentPropsWithRef<"p">;
 
@@ -607,28 +644,23 @@ export function ErrorMessage({
   className = "",
   ...props
 }: ErrorMessageProps) {
-  const timing = useMotionTiming();
   const field = useContext(FieldContext);
   const labels = useLabels("error", defaultErrorLabels);
   const id = ownId ?? field?.errorId;
-  const children = given ?? field?.errorMessage;
+  const message = given ?? field?.errorMessage;
+  const { box, phase, content } = useClosing(present(message), message);
+  if (phase === "closed") return null;
   return (
-    <AnimatePresence initial={false}>
-      {present(children) && (
-        <motion.div
-          key="error"
-          className="x-govuk-ui-error-container"
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={timing.ease(duration.medium)}
-        >
-          <p {...props} className={`x-govuk-ui-error ${className}`.trim()} id={id} role="alert">
-            <span className="x-govuk-ui-visually-hidden">{labels.prefix}: </span>
-            {children}
-          </p>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div
+      ref={box}
+      className="x-govuk-ui-error-container"
+      data-opened={phase === "open" || undefined}
+      data-closing={phase === "closing" || undefined}
+    >
+      <p {...props} className={`x-govuk-ui-error ${className}`.trim()} id={id} role="alert">
+        <span className="x-govuk-ui-visually-hidden">{labels.prefix}: </span>
+        {content}
+      </p>
+    </div>
   );
 }

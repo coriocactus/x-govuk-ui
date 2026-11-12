@@ -71,8 +71,27 @@
   line-height: 1.6;
   margin-bottom: 14px;
 }
+/* The error message's box opens and closes as a follow-up question does, by a grid row that eases
+   between no height and the message's own. The row's least height is nothing. Otherwise the
+   message's padding would keep it open. A box that is there as its field first renders shows at
+   once. One that opens later has `data-opened`, and starts shut. */
 .x-govuk-ui-error-container {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
+  transition:
+    grid-template-rows var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out),
+    opacity var(--x-govuk-ui-duration-medium) var(--x-govuk-ui-ease-out);
+}
+@starting-style {
+  .x-govuk-ui-error-container[data-opened] {
+    grid-template-rows: minmax(0, 0fr);
+    opacity: 0;
+  }
+}
+.x-govuk-ui-error-container[data-closing] {
+  grid-template-rows: minmax(0, 0fr);
+  opacity: 0;
 }
 /* GOV.UK's error message, bold, in the error colour, between the hint and the control. The space
    below is padding, so the opening animation includes it. */

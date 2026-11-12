@@ -11,6 +11,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Renamed ResizableHandle's `onValueCommit` to `onValueCommitted`, the name Slider gives the same thing. Where you give `onValueCommit`, give `onValueCommitted`.
 - Changed `StandardSchema`'s result to the one the Standard Schema specification gives. A schema of your own must return `{ value }` when the answers pass, where it could return `{}`. Schemas from Zod, Valibot and ArkType already do.
 
+### Visual
+
+- Changed ErrorMessage where it turns back, such as a message that shows again while it closes. The way back takes the share of the 220ms that the message had already moved, not all of it. The browser shortens a transition that turns back, which Motion did not.
+
 ### Added
 
 - Added `sort`, `defaultSort` and `onSortChange` to DataTable, and the type `DataTableSort`, so a service can keep the table's sort. A `DataTableSort` names a column by its `id` and gives a direction, and `null` is no sort. The table still orders only the rows it is given. A service that shows one page of a longer list orders the whole list itself, by the sort that `onSortChange` gives, and passes that page.
@@ -20,6 +24,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Added `labelSize` and `pageHeading` to Input, Textarea and Select, which pass them to their Label, as Fieldset passes `legendSize` and `pageHeading` to its legend. For another field, such as a Combobox, compose a Field with a Label and the field's control.
 - Added the label in its `h1` to the questions that FormSteps sizes. On a page, a step with no title shows its first question at 24 pixels, whatever its `labelSize`, as it does a legend, whatever its `legendSize`. When the step shows, the `h1` takes focus, with no outline.
 - Added Heading, a heading at GOV.UK's sizes, for a page or a section of it. `level`, from 1 to 6, sets its element, and `size` is `small`, `medium`, `large` or `extra-large`. Left out, the size follows the level, as GOV.UK advises: large for level 1, medium for level 2 and small below that. It has no margin, so the box it sits in spaces it. Among a Form's fields, and above the answers in a FormSteps, a large Heading keeps GOV.UK's 30 pixels beneath it.
+
+### Changed
+
+- Changed ErrorMessage to open and close with CSS transitions, not Motion. Its box, `.x-govuk-ui-error-container`, is now a grid with one row, and no longer has its height and opacity as inline styles. The box has `data-opened` when it opened after its field first rendered, and `data-closing` while it closes.
 
 ### Fixed
 

@@ -266,6 +266,9 @@ test("Piscine Assist copies, resizes, answers, floats its message box, closes wi
 test("Piscine Assist composes views of the work from the library's parts, in tiles that act on the workspace's data", async ({
   page,
 }) => {
+  // Three views are written out and drawn, and axe reads the page four times. CI's WebKit takes
+  // 26 to 27 seconds over it, and the first run of a job more than the usual 30.
+  test.setTimeout(60_000);
   await page.setViewportSize({ width: 1600, height: 1000 });
   await page.goto("/workspace");
   const assist = page.getByRole("complementary", { name: "Piscine Assist" });

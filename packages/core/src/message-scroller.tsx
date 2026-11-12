@@ -15,7 +15,8 @@ import {
   useState,
 } from "react";
 import { useLabels } from "./labels";
-import { duration, easeOut, MotionDiv, motionElementProps, useMotionTiming } from "./motion";
+import { duration, easeOut, useMotionTiming } from "./motion";
+import { MotionDiv, motionElementProps } from "./motion-div";
 import { useLatest } from "./refs";
 import { ScrollArea } from "./scroll-area";
 

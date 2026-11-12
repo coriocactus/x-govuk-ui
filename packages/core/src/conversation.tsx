@@ -21,7 +21,8 @@ import { CopyButton, type CopyButtonProps, readableText } from "./copy";
 import { useLabels } from "./labels";
 import { MessageActions } from "./message-actions";
 import { MessageScroller } from "./message-scroller";
-import { duration, MotionDiv, motionElementProps, useMotionTiming } from "./motion";
+import { duration, useMotionTiming } from "./motion";
+import { MotionDiv, motionElementProps } from "./motion-div";
 import { useMergedRef } from "./refs";
 import { TextShimmer } from "./text-shimmer";
 

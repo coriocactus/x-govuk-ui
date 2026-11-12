@@ -6,7 +6,8 @@ import { AutoHeight } from "./auto-height";
 import { Button, ButtonGroup } from "./button";
 import { useLabels } from "./labels";
 import { Link } from "./link";
-import { duration, MotionDiv, motionElementProps, useMotionTiming } from "./motion";
+import { duration, useMotionTiming } from "./motion";
+import { MotionDiv, motionElementProps } from "./motion-div";
 import { WidthContainer } from "./width-container";
 
 export type CookieChoice = "accepted" | "rejected";

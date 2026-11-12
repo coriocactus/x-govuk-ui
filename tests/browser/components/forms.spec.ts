@@ -352,6 +352,10 @@ test("check your answers leaves out the answers of a step that applies no longer
   await frame.getByRole("radio", { name: "GOV.UK" }).check();
   await frame.getByRole("button", { name: "Tablet" }).click();
   await frame.getByRole("button", { name: "Continue" }).click();
+  // FormSteps moves focus to the new step's heading a frame after the step shows. Playwright's
+  // fill focuses the field, then types in a second call. Text typed across that frame would go
+  // to the heading, so the test waits for the heading's focus first.
+  await expect(frame.getByRole("heading", { name: "Your tablet" })).toBeFocused();
   await frame.getByLabel("Which tablet did you use?").fill("A small one");
   await frame.getByRole("button", { name: "Continue" }).click();
   const review = frame.locator(".x-govuk-ui-form-steps-summary");

@@ -30,6 +30,76 @@ export const duration = {
   slow: 0.3,
 } as const;
 
+/**
+ * How far along a movement is, from 0 to 1, a share of the way through its time, on a curve that
+ * CSS writes as `cubic-bezier()`. The browser draws the same curve for a CSS transition.
+ * @internal
+ */
+export function bezier([x1, y1, x2, y2]: Bezier, share: number) {
+  // Where the curve is at a point along it, on one axis, given that axis's two handles.
+  const at = (point: number, first: number, second: number) =>
+    3 * first * point * (1 - point) ** 2 + 3 * second * point ** 2 * (1 - point) + point ** 3;
+  // Time only rises along the curve, so halving the range finds the point that is at this time.
+  let low = 0;
+  let high = 1;
+  for (let step = 0; step < 32; step++) {
+    const middle = (low + high) / 2;
+    if (at(middle, x1, x2) < share) low = middle;
+    else high = middle;
+  }
+  return at((low + high) / 2, y1, y2);
+}
+
+/**
+ * Eases a number from one value to another along a curve, one animation frame at a time, for a
+ * movement that CSS cannot run, such as one that measures where it lands at each frame. `seconds`
+ * is how long it takes, from the call, so the first frame is already part of the way. `onUpdate`
+ * is given each value, and `to` itself last. `onComplete` then runs. `stop` ends it with no more
+ * values, and `running` says whether any are still to come. It moves whatever the setting of
+ * reduced motion, so a part asks `useMotionTiming` first.
+ * @internal
+ */
+export function easeNumber(
+  from: number,
+  to: number,
+  {
+    seconds,
+    curve,
+    onUpdate,
+    onComplete,
+  }: {
+    seconds: number;
+    curve: Bezier;
+    onUpdate: (value: number) => void;
+    onComplete?: () => void;
+  },
+) {
+  // Both times are the clock's. The time a frame is given can be earlier than the clock's time at
+  // the call.
+  const start = performance.now();
+  const step = () => {
+    const share = (performance.now() - start) / (seconds * 1000);
+    if (share < 1) {
+      frame = requestAnimationFrame(step);
+      onUpdate(from + (to - from) * bezier(curve, share));
+      return;
+    }
+    onUpdate(to);
+    frame = 0;
+    onComplete?.();
+  };
+  let frame = requestAnimationFrame(step);
+  return {
+    get running() {
+      return frame !== 0;
+    },
+    stop() {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    },
+  };
+}
+
 /** @internal The library's springs, for movement that follows a hand or settles into place. */
 export const springs = {
   /** Follows the pointer closely, such as the Sidebar's highlight and active line. */

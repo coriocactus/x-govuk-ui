@@ -1,6 +1,5 @@
 "use client";
 
-import { animate } from "motion/react";
 import {
   Children,
   type ComponentPropsWithRef,
@@ -29,7 +28,7 @@ import {
 } from "./field";
 import { FieldsetLegend, type FieldsetProps, FieldsetRoot } from "./fieldset";
 import { useLabels } from "./labels";
-import { duration, useMotionTiming } from "./motion";
+import { duration, easeNumber, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 import { type Registry, useRegister, useRegistry } from "./registry";
 
@@ -388,7 +387,7 @@ function TravellingDot({
   const dot = useRef<HTMLSpanElement>(null);
   const timing = useMotionTiming();
   const at = useRef<{ x: number; y: number } | null>(null);
-  const flight = useRef<ReturnType<typeof animate> | null>(null);
+  const flight = useRef<ReturnType<typeof easeNumber> | null>(null);
   const mounting = useRef(true);
 
   const measure = useCallback(() => {
@@ -438,9 +437,9 @@ function TravellingDot({
       return;
     }
     element.dataset.shown = "";
-    flight.current = animate(0, 1, {
-      duration: duration.slow + 0.04,
-      ease: jump,
+    flight.current = easeNumber(0, 1, {
+      seconds: duration.slow + 0.04,
+      curve: jump,
       onUpdate: (t) => {
         const end = measure() ?? to;
         const down = Math.abs(end.y - from.y) >= Math.abs(end.x - from.x);
@@ -462,7 +461,7 @@ function TravellingDot({
     const group = container.current;
     if (!group) return;
     const observer = new ResizeObserver(() => {
-      if (flight.current?.state === "running") return;
+      if (flight.current?.running) return;
       const to = measure();
       if (!to) return;
       at.current = to;

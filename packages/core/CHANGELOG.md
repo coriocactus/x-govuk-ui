@@ -30,6 +30,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Changed ErrorMessage to open and close with CSS transitions, not Motion. Its box, `.x-govuk-ui-error-container`, is now a grid with one row, and no longer has its height and opacity as inline styles. The box has `data-opened` when it opened after its field first rendered, and `data-closing` while it closes.
 - Changed the box that eases to its content's height, in Form, FormSteps, Feedback and CookieBanner, to ease with a CSS transition, not Motion. The box, `.x-govuk-ui-auto-height`, no longer eases or clips its content as it first shows.
+- Changed Radios' dot, and the dials of DateInput and TimeInput, to ease by the library's own code, not Motion's.
 
 ### Fixed
 

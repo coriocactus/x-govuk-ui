@@ -1,6 +1,5 @@
 "use client";
 
-import { type AnimationPlaybackControls, animate } from "motion/react";
 import {
   type CSSProperties,
   type KeyboardEvent,
@@ -9,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { easeOut, useMotionTiming } from "./motion";
+import { easeNumber, easeOut, useMotionTiming } from "./motion";
 import { useLatest } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
@@ -100,7 +99,7 @@ export function Dial({
   const turning = useRef(turn);
   // The step the dial is heading for, so presses in quick succession each count.
   const aim = useRef(turn);
-  const motion = useRef<AnimationPlaybackControls | null>(null);
+  const motion = useRef<ReturnType<typeof easeNumber> | null>(null);
   const hide = useRef<ReturnType<typeof setTimeout> | null>(null);
   const drag = useRef<{ y: number; from: number; moved: boolean } | null>(null);
   const input = useRef<HTMLInputElement>(null);
@@ -127,13 +126,14 @@ export function Dial({
     if (hide.current) clearTimeout(hide.current);
     setShowing(true);
     motion.current?.stop();
-    if (reduced) {
+    // A drum already at the step has nowhere to turn, such as an empty field's at its first press.
+    if (reduced || to === turning.current) {
       place(to);
       return settle();
     }
-    motion.current = animate(turning.current, to, {
-      duration: quick ? 0.16 : 0.28,
-      ease: easeOut,
+    motion.current = easeNumber(turning.current, to, {
+      seconds: quick ? 0.16 : 0.28,
+      curve: easeOut,
       onUpdate: (position) => place(position),
       onComplete: () => settle(),
     });

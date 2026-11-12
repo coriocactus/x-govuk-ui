@@ -119,7 +119,7 @@ const entries = {
     description:
       "A familiar field, with clear guidance and feedback that stays close to the input.",
     upstream: "text-input",
-    dependencies: "React · Motion",
+    dependencies: "React",
     changes:
       "Compact spacing, rounded corners, a field that takes its container's colour, and an error message that opens between the hint and the input, where GOV.UK places it. A prefix or suffix, such as an icon, a currency or a shortcut, sits inside the field's border. With type password, it is GOV.UK's password input. Show reveals the password and Hide covers it, screen readers hear which, and it is covered again when the form is sent. A strength meter can fill beneath it, four bars coloured from red to green with a word.",
     props: [
@@ -1071,7 +1071,7 @@ const entries = {
     },
     description: "Check a page of answers when it is sent, and show what to fix.",
     upstream: "",
-    dependencies: "React · Motion",
+    dependencies: "React",
     changes:
       "GOV.UK's way with a question page, as one component. FormSteps asks a form a step at a time, and the In stages example is a short survey asked that way. Each field takes part by its name, so Input, Textarea, Select, Radios, Checkboxes, Date input, Combobox, File upload and One-time code need nothing more. When the form is sent, one function checks every answer. If any need fixing, an Error summary opens above everything inside the Form as what is beneath eases down to make space, takes focus and lists the problems in the fields' order, each linking to its field, and every field shows its own message. Fixing an answer clears its message and its line at once, and the summary folds away when nothing is left. A failing answer that changes keeps its message until the form is sent again. While there are errors the page's title starts with Error, as GOV.UK asks. Messages that onSubmit returns, such as the server's, show in the same way. Continue with the form empty to see it. A form small enough to do without an Error summary can turn it off, and focus goes to the first field to fix instead. defaultValues gives the fields their answers to start with, such as ones kept from an earlier visit. FormSteps is a Form in steps, each a FormStep containing any fields. Continue checks only the step's answers and runs its own onContinue, such as saving a rating straight away, with a spinner on the button. Steps whose when says no are passed over, and their answers left out. It can end with Check your answers, worked out from the fields' labels and answers, with Change. It comes as GOV.UK question pages, or a card set into a page, such as a survey or an agent's questions, and Back, progress, the Error summary, the Command with Enter shortcut and the browser's history can each be turned on or off. The One page example is a service's page, a ServicePage with its questions in a three-quarters column. Its heading is inside the Form, so the summary opens above it, as GOV.UK puts it. The In pages example is FormSteps in a ServicePage. Its Back link is a FormStepsBack in the page's own place for one, which a FormStepsProvider around both allows. Save and come back later sits beside Continue, and Check your answers lists the answers in two sections beneath a heading of the example's own, a FormStepsSummary and a sentence of the example's own from useFormStepsAnswers.",
     props: [
@@ -2146,7 +2146,7 @@ const entries = {
     description:
       "Group rows under bands, such as issues by status, with columns that give way as it narrows.",
     upstream: "",
-    dependencies: "React · Base UI · Motion",
+    dependencies: "React · Base UI",
     changes:
       "Rows sit under bands, such as issues by status, and pressing a band folds its rows away on Base UI's Collapsible. Each column is as wide as its widest cell, and the columns line up across every group, with the first band heading them. No text is ever cut short or wrapped. As the table narrows, the columns give way in steps, each taken only once the one before would cut text short. Some columns are left out, then some join each row's title and the marks go, then some merge into others, as the dates into the people, and the people stand closer together. Each step moves through the rows from the top down, a little later in each row, and goes back the same way as the table widens. Past the last step, the groups scroll sideways in a Scroll area. Screen readers hear each cell's column before it, wherever it sits. With resizable, a Resizable handle on the right edge narrows and widens the table, by dragging or with the arrow keys. The example's To do band starts folded, with defaultOpen.",
     props: [
@@ -2171,7 +2171,7 @@ const entries = {
     width: "100%",
     description: "Work through many records in a dense table, with columns you can resize.",
     upstream: "",
-    dependencies: "React · Base UI · Motion",
+    dependencies: "React · Base UI",
     changes:
       "A dense table for working through many records, as a CRM's is. It is built from Table's parts in a Scroll area that scrolls both ways. The headings stay at the top, the foot at the bottom and the first columns at the side, and once the rest has scrolled under them they cast a shadow along their edge. It is as tall as its rows, up to its most rows, and given less height, as a page laid out to fill the window gives it, it takes what it is given and its rows scroll within it, so the page need not scroll. The columns fill the table's width: where the table has more room than their widths add up to, each column takes a share of the rest, in proportion to its width, so no space is left empty at the side. Each column's edge is a Resizable handle, dragged or moved with the arrow keys. A column resized keeps the width users give it, and the others share what room is left. Double-clicking the edge returns the column to its width and its share. Sortable headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes, the heading one choosing every row or none, and acted on from a Selection bar that floats over the rows. The foot counts the rows, and offers each column's figure, such as a sum or an average, on a button. The rows scroll between the headings and the foot, with the scrollbar beside them alone, and stop at either end without a bounce, which would move the headings and the foot too. A row that takes focus from the keyboard scrolls clear of the headings and the foot, never under them. minRows and maxRows set the table's height in rows of data. The example sets both to 8, so Long's 1,000 or so rows scroll in a box of that size.",
     props: [
@@ -2871,7 +2871,7 @@ const entries = {
     grows: 470,
     description: "Ask the questions an agent needs answered before it continues.",
     upstream: "",
-    dependencies: "React · Motion",
+    dependencies: "React",
     changes:
       "A card that asks questions one at a time, with the steps of shadcn's Questionnaire. It is Form steps in its card layout, made from a list of questions as an agent sends them. A question can ask for a choice from Choices, with a letter or number for each answer that pressing chooses, one answer or several, and a last row that takes any words, or for some words, a number, a date, or one answer from a list. The questions come under a header whose ring fills as they are answered. Next, or Command with Enter, moves on, Previous goes back, and Skip passes over a question that need not be answered. Pressing Next without an answer shows GOV.UK's error message beside the question. The words change at once and the card eases to each question's height, while the footer stays put. Once done, the card lists the answers in a Summary list, each with Change to ask that question again. A date question can take a min and max, such as today for a date in the past, and a date outside them has GOV.UK's message, such as “The date must be today or in the past”. With calendar, it offers a Calendar beside its fields, which offers only the days between them.",
     props: [
@@ -3269,7 +3269,7 @@ const entries = {
     anchor: "foot",
     description: "Ask users at the foot of a page whether it was useful.",
     upstream: "",
-    dependencies: "React · Motion",
+    dependencies: "React",
     changes:
       "GOV.UK's “Is this page useful?” band, with outline Yes and No buttons and one to report a problem, which stand out on its tint. It shows one stage at a time, as GOV.UK's does. Once users answer, the question gives way. Yes turns to thanks. No and the report button turn to a short Form built from Textarea, whose Cancel brings the question back with focus on the button that opened it, and what was typed is kept. Sending turns to thanks, which takes focus so screen readers hear it. The band eases to each stage's height with the AutoHeight that FormSteps' card uses, and its words never fade or move. The example is the foot of a service's page, with the band at the end of the page's content, then the Footer.",
     props: [
@@ -4017,7 +4017,7 @@ const entries = {
     description:
       "Keep an application's sections in reach, in groups that collapse to icons or slide away.",
     upstream: "",
-    dependencies: "React · Base UI · Motion",
+    dependencies: "React · Base UI",
     changes:
       "Collapses to icons, off the screen or not at all, on either side. The edge drags to resize, and the rows scroll in a Scroll area. Groups and items with sub-items can fold. One highlight glides to the row under the pointer, on the same curve as the current item's line, which glides when it changes. On small screens, the sidebar opens as a sheet that a swipe closes. It can remember whether it was open, and its width. Command-B or Control-B toggles it. Users can arrange it for themselves. useSidebarArrangement keeps which items are pinned to the top, hidden and in what order. SidebarItemMenu gives each item a menu from three dots at the end of its row to pin, move or hide it. SidebarCustomise is a sheet of lists to show, pin and move every item and group, with Reset. An item's action, such as that menu or a SidebarItemAction, shows while the row is under the pointer or the action has keyboard focus, and rides the highlight from row to row. The workbench's own sidebar is arranged this way.",
     props: [

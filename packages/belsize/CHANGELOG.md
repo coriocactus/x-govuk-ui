@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Changed TileContent with `scroll`. Its Scroll area's viewport is now a plain element, as core's ScrollArea is, so Motion's layout animations inside the tile no longer allow for the distance it has scrolled. TileContent does not take ScrollArea's new `viewportRender`. Where you animate layout with Motion in a tile that scrolls, leave `scroll` off, and scroll the content in a ScrollArea of your own, with `viewportRender={<motion.div layoutScroll />}`.
+
 ## [0.6.0] - 2026-11-09
 
 ### Changed

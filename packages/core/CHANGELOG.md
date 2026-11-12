@@ -10,6 +10,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed `align` on PopoverContent, MenuContent, HoverCardContent, CalloutContent and a `TourStep` to take `"centre"` in place of `"center"`, as Inline's and Stats' `align` do. Where you give `align="center"` to one of them, give `align="centre"`.
 - Renamed ResizableHandle's `onValueCommit` to `onValueCommitted`, the name Slider gives the same thing. Where you give `onValueCommit`, give `onValueCommitted`.
 - Changed `StandardSchema`'s result to the one the Standard Schema specification gives. A schema of your own must return `{ value }` when the answers pass, where it could return `{}`. Schemas from Zod, Valibot and ArkType already do.
+- Changed ScrollArea's viewport to a plain element. It was a Motion element with `layoutScroll`, so Motion's layout animations inside the area allowed for the distance scrolled. Where you animate layout with Motion inside a ScrollArea, with `layout` or `layoutId`, give the area the new `viewportRender={<motion.div layoutScroll />}`. SidePanelBody takes it too. The other parts that scroll in a ScrollArea of their own, such as Sidebar, Board and Table, do not. MessageScroller and Conversation give it to their own log, for the Bubbles in it.
 
 ### Visual
 
@@ -28,6 +29,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ### Changed
 
+- Changed ServicePage, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary and Button to load almost none of Motion. A page built from them has 3 KB of Motion's code, minified, where it had 151 KB, and is 50 KB smaller gzipped. What is left comes with the `LayoutGroup` in ServiceNavigation. Motion is still a peer dependency, and the parts that need its presence, layout or drag, such as Toast, Conversation and Timeline, load it as before.
 - Changed ErrorMessage to open and close with CSS transitions, not Motion. Its box, `.x-govuk-ui-error-container`, is now a grid with one row, and no longer has its height and opacity as inline styles. The box has `data-opened` when it opened after its field first rendered, and `data-closing` while it closes.
 - Changed the box that eases to its content's height, in Form, FormSteps, Feedback and CookieBanner, to ease with a CSS transition, not Motion. The box, `.x-govuk-ui-auto-height`, no longer eases or clips its content as it first shows.
 - Changed Radios' dot, and the dials of DateInput and TimeInput, to ease by the library's own code, not Motion's.

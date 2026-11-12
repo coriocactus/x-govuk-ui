@@ -1581,7 +1581,7 @@ const entries = {
     upstream: "",
     dependencies: "React · Base UI",
     changes:
-      "Built on Base UI's Scroll Area, with native scrolling. A thin scrollbar shows while the content moves or the pointer is over it, widens under the pointer and fades a moment later. Edges with more beyond them can fade out. Once the content scrolls, a named box is a stop for Tab and screen readers hear its name. A box without a name leaves focus to the browser, for content such as a list of links. Motion's layout animations inside allow for the distance scrolled. The preview, the playground, the usage code, the Sidebar, the Command menu's list, Table, Code block and Textarea all scroll this way.",
+      "Built on Base UI's Scroll Area, with native scrolling. A thin scrollbar shows while the content moves or the pointer is over it, widens under the pointer and fades a moment later. Edges with more beyond them can fade out. Once the content scrolls, a named box is a stop for Tab and screen readers hear its name. A box without a name leaves focus to the browser, for content such as a list of links. The preview, the playground, the usage code, the Sidebar, the Command menu's list, Table, Code block and Textarea all scroll this way.",
     props: [
       choice(
         "orientation",
@@ -1598,6 +1598,11 @@ const entries = {
       }),
       reference("labelledBy", "string"),
       reference("viewportRef", "Ref<HTMLDivElement>"),
+      reference(
+        "viewportRender",
+        "An element for the viewport, such as <motion.div layoutScroll />",
+        "<div>",
+      ),
       reference("children", "ReactNode", "Required"),
     ],
   },

@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollArea as Primitive } from "@base-ui/react/scroll-area";
-import { motion } from "motion/react";
 import {
   type ComponentPropsWithRef,
   type Ref,
@@ -31,6 +30,12 @@ export type ScrollAreaProps = ComponentPropsWithRef<"div"> & {
   fade?: boolean;
   /** The element that scrolls, for reading or setting its scroll position. */
   viewportRef?: Ref<HTMLDivElement>;
+  /**
+   * An element for the viewport, in place of the plain one. A service that animates layout with
+   * Motion inside the area gives `<motion.div layoutScroll />`, so that Motion allows for the
+   * distance scrolled.
+   */
+  viewportRender?: Primitive.Viewport.Props["render"];
 };
 
 /** What can take focus with Tab, as a scrolling region's content might. */
@@ -41,8 +46,8 @@ const FOCUSABLE =
  * A scrolling region with thin scrollbars of its own, the same in every browser. A scrollbar shows
  * while the content moves or the pointer is over the region. It widens under the pointer, and
  * fades away a moment after. The region scrolls natively, so wheel, touch and keyboard scrolling
- * work as usual, and Motion's layout animations inside it allow for the distance scrolled. The
- * region needs a height or a maximum height from its container, and takes its width from it.
+ * work as usual. The region needs a height or a maximum height from its container, and takes its
+ * width from it.
  */
 export function ScrollArea({
   orientation = "vertical",
@@ -50,6 +55,7 @@ export function ScrollArea({
   labelledBy,
   fade = false,
   viewportRef,
+  viewportRender,
   className = "",
   children,
   ref,
@@ -74,7 +80,7 @@ export function ScrollArea({
     >
       <Primitive.Viewport
         ref={mergedViewport}
-        render={<motion.div layoutScroll />}
+        render={viewportRender}
         className="x-govuk-ui-scroll-area-viewport"
         // A named region is a Tab stop once it scrolls, and is announced by its name. While its
         // content fits, it is neither. Without a name, it is not a Tab stop while something inside

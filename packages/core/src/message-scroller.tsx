@@ -368,9 +368,11 @@ export function MessageScroller({
       data-framed={framed || undefined}
     >
       {/* The log scrolls in a Scroll area. The log itself takes focus, so the arrow keys scroll it,
-        and the Scroll area adds no second stop. */}
+        and the Scroll area adds no second stop. Its messages can be Bubbles, which animate their
+        position with Motion's layout, so the viewport tells Motion how far the log has scrolled. */}
       <ScrollArea
         viewportRef={log}
+        viewportRender={<motion.div layoutScroll />}
         className="x-govuk-ui-message-scroller-scroll"
         fade
         onWheel={readerScrolls}

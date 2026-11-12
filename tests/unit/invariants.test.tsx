@@ -595,28 +595,75 @@ test("each page gives the types it names, an object type by its members", async 
   expect(documents["llms/tree.md"]).toContain("| `children` | `readonly TreeNode[]` | No |");
 });
 
-test("every exported hook and function is on a component's page, or listed in what every component shares", async () => {
+test("a component the catalogue names for a page is a part of it, with its props, words and classes", async () => {
+  const all = await library;
+  const doc = (slug: ComponentName) => all.components.find((one) => one.slug === slug);
+  // No example uses ResizableHandle, so the styling contract alone gave it no component.
+  const handle = doc("tiles")?.parts.find((part) => part.name === "ResizableHandle");
+  expect(handle).toEqual({
+    name: "ResizableHandle",
+    // Tiles comes from an extension, and the handle from core.
+    package: "x-govuk-ui",
+    doc: expect.stringMatching(/^A line that resizes the panels on either side/),
+    classes: ["x-govuk-ui-resizable-handle"],
+    inner: ["x-govuk-ui-resizable-grip"],
+    propsType: "ResizableHandleProps",
+    props: expect.arrayContaining([expect.objectContaining({ name: "onValueCommitted" })]),
+  });
+  expect(doc("tiles")?.words.map((map) => map.key)).toEqual(["resizable", "tiles"]);
+  expect(doc("tiles")?.styling.parts.map((part) => part.name)).toContain("ResizableHandle");
+  const parts = (slug: ComponentName) => doc(slug)?.parts.map((part) => part.name);
+  expect(parts("conversation")).toContain("MessageAction");
+  expect(parts("sidebar")).toContain("MoreIcon");
+  expect(parts("header")).toEqual(expect.arrayContaining(["GOVUKLockup", "GOVUKCrown"]));
+  const { "llms/tiles.md": page = "" } = await llmsDocuments(all);
+  expect(page).toContain("- `ResizableHandle`, from `x-govuk-ui`: A line that resizes");
+  expect(page).toContain(
+    "### `ResizableHandle`\n\nThe type of its props is `ResizableHandleProps`.",
+  );
+});
+
+test("everything a package exports is on a component's page, or listed in what every component shares", async () => {
   const all = await library;
   const { usage }: DocsIndex = JSON.parse((await docsDocuments(all))["docs/index.json"] ?? "{}");
-  const onPage = new Set(all.components.flatMap((doc) => doc.functions.map((one) => one.name)));
-  // What each package exports as it runs, so a hook the compiler's reading left out is found.
-  const exported = (
-    await Promise.all(
-      ["x-govuk-ui", "@x-govuk-ui/belsize", "@x-govuk-ui/jorjorwel", "@x-govuk-ui/memetics"].map(
-        async (name) => Object.entries(await import(name)),
-      ),
-    )
-  )
-    .flat()
-    .filter(([name, value]) => typeof value === "function" && !/^[A-Z]/.test(name))
-    .map(([name]) => name);
-  expect(exported.length).toBeGreaterThan(50);
-  expect(
-    exported.filter((name) => !onPage.has(name) && !usage.includes(`\`${name}\`, from`)),
-  ).toEqual([]);
-  // A function is listed there only when no page has it.
-  expect(all.functions.filter((one) => onPage.has(one.name))).toEqual([]);
+  // What the pages give by name. Those are each page's parts and the types of their props, its
+  // hooks, functions and constants, its types, and its words' types and defaults.
+  const onPage = new Set(
+    all.components.flatMap((doc) => [
+      ...doc.parts.flatMap((part) => [part.name, part.propsType]),
+      ...[...doc.functions, ...doc.types].map((one) => one.name),
+      ...doc.words.flatMap((map) => [map.type, map.defaults]),
+    ]),
+  );
+  // What belongs to no one component, which what every component shares lists.
+  const shared = [...all.parts, ...all.functions, ...all.types].map((one) => one.name);
+  for (const name of shared) expect(usage).toMatch(new RegExp(`^  - \`${name}[<\`]`, "m"));
+  expect(shared.filter((name) => onPage.has(name))).toEqual([]);
   expect(usage).toContain("- `useLocale`, from `x-govuk-ui`, is `() => string`. The language");
+  expect(usage).toContain(
+    "- `LabelsProvider`, from `x-govuk-ui`. Gives every component inside it the words of a service's language, such as Welsh, in one place. Its own props, of the type `LabelsProviderProps`:\n    - `labels`, `Labels`, required. The words to use, by component.",
+  );
+  const propsTypes = all.parts.map((part) => part.propsType);
+  for (const name of propsTypes) expect(usage).toContain(`of the type \`${name}\``);
+  // Every name each package's index exports, read from its source, so an export the compiler's
+  // reading left out is found.
+  const exported: string[] = [];
+  for (const index of new Bun.Glob("packages/*/src/index.ts").scanSync(".")) {
+    const code = (await Bun.file(index).text()).replace(/\/\/.*|\/\*[\s\S]*?\*\//g, "");
+    for (const [, names] of code.matchAll(/export\s+(?:type\s+)?\{([^}]*)\}\s*from/g))
+      for (const name of (names ?? "").split(","))
+        if (name.trim())
+          exported.push(
+            name
+              .trim()
+              .replace(/^type\s+/, "")
+              .split(/\s+as\s+/)
+              .at(-1) ?? "",
+          );
+  }
+  expect(exported.length).toBeGreaterThan(1000);
+  const documented = new Set([...onPage, ...shared, ...propsTypes]);
+  expect(exported.filter((name) => !documented.has(name))).toEqual([]);
 });
 
 /**

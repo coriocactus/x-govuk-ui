@@ -5,7 +5,7 @@
  * components through these, from its own stylesheet, which overrides the library's `x-govuk-ui`
  * layer.
  */
-import { type ComponentName, componentNames } from "./catalogue";
+import { type ComponentName, catalogue, componentNames } from "./catalogue";
 
 /** One of a component's exported parts. */
 export type StylingPart = {
@@ -449,7 +449,8 @@ export async function stylingContracts(): Promise<Record<ComponentName, StylingC
   // InputOTPSlot belongs to InputOTP, not Input. A part with no such name, such as Label or
   // MenuItem, belongs to the components of its own file, or those of them whose examples use it,
   // as MenuItem does to Dropdown menu and Context menu. A part in a file with no component belongs
-  // to the components whose examples use it.
+  // to the components whose examples use it. A part belongs as well to each component whose entry
+  // in the catalogue names it, such as ResizableHandle, which no example uses, to Tiles.
   const examples = new Map(
     await Promise.all(
       componentNames.map(
@@ -469,7 +470,7 @@ export async function stylingContracts(): Promise<Record<ComponentName, StylingC
       ),
     ),
   );
-  const owners = (part: string, file: string): ComponentName[] => {
+  const ruled = (part: string, file: string): ComponentName[] => {
     const named = componentNames
       .filter((component) => part.startsWith(exportOf.get(component) ?? "\0"))
       .sort((a, b) => (exportOf.get(b)?.length ?? 0) - (exportOf.get(a)?.length ?? 0));
@@ -481,6 +482,14 @@ export async function stylingContracts(): Promise<Record<ComponentName, StylingC
     if (housed.length) return using(housed).length ? using(housed) : housed;
     return using(componentNames);
   };
+  const owners = (part: string, file: string) => [
+    ...new Set([
+      ...ruled(part, file),
+      ...componentNames.filter((component) =>
+        catalogue[component].shows?.some((one) => one === part),
+      ),
+    ]),
+  ];
 
   // Every exported or shared part, by name, for a part that renders one in another file.
   const parts = new Map(

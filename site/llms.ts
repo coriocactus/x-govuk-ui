@@ -27,6 +27,18 @@ export type DocType = Omit<ApiType, "file">;
 /** One component's words, as the pages and the records give them. */
 export type DocWords = Omit<ApiLabels, "file">;
 
+/** A part, as the pages and the records give it. */
+export type DocPart = {
+  name: string;
+  /** The package it is imported from, where that is not its component's. */
+  package?: string;
+  doc?: string;
+  /** The exported type of its props, such as `DialogProps`, where they have one. */
+  propsType?: string;
+  /** Its own props, which the library's source declares. */
+  props: ApiProp[];
+};
+
 /** A component's documentation as data, for the MCP server. */
 export type ComponentDoc = {
   /** Such as `date-input`. */
@@ -51,16 +63,8 @@ export type ComponentDoc = {
   notes: string;
   /** The own props of the component's own export, which `parts` gives with every other part's. */
   props: ApiProp[];
-  /** Every part, in the source's order, each with the props the library's source declares. */
-  parts: {
-    name: string;
-    doc?: string;
-    classes: string[];
-    inner: string[];
-    /** The exported type of its props, such as `DialogProps`, where they have one. */
-    propsType?: string;
-    props: ApiProp[];
-  }[];
+  /** Every part, in the source's order, each with its classes and its own props. */
+  parts: (DocPart & { classes: string[]; inner: string[] })[];
   /** The hooks, functions and constants that go with the component. */
   functions: DocFunction[];
   /**
@@ -140,9 +144,18 @@ const membersList = (members: readonly ApiMember[]) =>
  * What every component shares, as `/llms.txt` and the MCP server's `get_usage` say it. It ends
  * with whatever the packages export that is on no component's page.
  */
-function usageText({ functions, types }: Pick<LibraryDocs, "functions" | "types">) {
+function usageText({ parts, functions, types }: Omit<LibraryDocs, "components">) {
   return [
     shared,
+    "- These components belong to no one component, so no component's page has them:",
+    ...parts.flatMap(({ name, package: from, doc, propsType, props }) => [
+      `  - \`${name}\`, from \`${from}\`.${doc ? ` ${firstSentence(doc)}` : ""} ${
+        props.length
+          ? `Its own props${propsType ? `, of the type \`${propsType}\`` : ""}:`
+          : "It has no props of its own."
+      }`,
+      ...membersList(props),
+    ]),
     "- These hooks, functions and constants belong to no one component, so no component's page has them:",
     ...functions.map(
       ({ name, package: from, signature, doc }) =>
@@ -324,7 +337,10 @@ function componentMarkdown(
   if (entry.upstream) about.push(`GOV.UK's own: ${upstreamPage(entry.upstream)}`);
   const parts = allParts
     .filter((part) => part.doc)
-    .map((part) => `- \`${part.name}\`: ${part.doc}`);
+    .map(
+      (part) =>
+        `- \`${part.name}\`${part.package ? `, from \`${part.package}\`` : ""}: ${part.doc}`,
+    );
   return [
     `# ${entry.name}`,
     "",
@@ -409,6 +425,8 @@ function componentMarkdown(
 export type LibraryDocs = {
   /** In the sidebar's order. */
   components: ComponentDoc[];
+  /** The components on no component's page, such as LabelsProvider. */
+  parts: DocPart[];
   /** The hooks, functions and constants on no component's page. */
   functions: DocFunction[];
   /** The types on no component's page. */
@@ -417,7 +435,8 @@ export type LibraryDocs = {
 
 /**
  * The library's documentation. A component's page has every part the styling contract gives the
- * component, with each part's own props.
+ * component, with each part's own props. The contract gives a component the parts its entry in
+ * the catalogue names, too.
  *
  * - A hook, function or constant is on the page of each component with a part declared in its
  *   source file, and on each page whose entry in the catalogue names it.
@@ -505,8 +524,9 @@ export async function libraryDocs(
         builtOn: entry.dependencies,
         notes: entry.changes,
         props: parts.find((part) => part.name === exported)?.props ?? [],
-        parts: parts.map(({ name, classes, inner, propsType, props }) => ({
+        parts: parts.map(({ name, package: partFrom, classes, inner, propsType, props }) => ({
           name,
+          ...(partFrom !== from && { package: partFrom }),
           doc: docs.get(name),
           classes,
           inner,
@@ -522,10 +542,21 @@ export async function libraryDocs(
     }),
   );
   const shown = new Set(
-    components.flatMap((doc) => [...doc.functions, ...doc.types].map(({ name }) => name)),
+    components.flatMap((doc) =>
+      [...doc.parts, ...doc.functions, ...doc.types].map(({ name }) => name),
+    ),
   );
   return {
     components,
+    parts: Object.values(api.components)
+      .filter(({ name }) => !shown.has(name))
+      .map(({ name, package: from, propsType, props }) => ({
+        name,
+        package: from,
+        doc: docs.get(name),
+        ...(propsType && { propsType }),
+        props,
+      })),
     functions: api.functions
       .filter(({ name }) => !shown.has(name))
       .map(({ file, ...rest }) => rest),
@@ -537,13 +568,13 @@ export async function libraryDocs(
 
 /** The MCP server's documents, by their paths, `docs/index.json` and each `docs/<slug>.json`. */
 export async function docsDocuments(library?: LibraryDocs): Promise<Record<string, string>> {
-  const { components: all, functions, types } = library ?? (await libraryDocs());
+  const { components: all, ...rest } = library ?? (await libraryDocs());
   const { version } = await Bun.file("packages/core/package.json").json();
   const index: DocsIndex = {
     library: "x-govuk-ui",
     version,
-    usage: usageText({ functions, types }),
-    functions,
+    usage: usageText(rest),
+    functions: rest.functions,
     components: all.map((doc) => ({
       slug: doc.slug,
       name: doc.name,
@@ -586,8 +617,8 @@ export function propsDocuments({ components }: LibraryDocs): Record<string, stri
  * `llms-full.txt` or a component's `llms/<name>.md`.
  */
 export async function llmsDocuments(library?: LibraryDocs): Promise<Record<string, string>> {
-  const { components: all, functions, types } = library ?? (await libraryDocs());
-  const usage = usageText({ functions, types });
+  const { components: all, ...rest } = library ?? (await libraryDocs());
+  const usage = usageText(rest);
   const pages = Object.fromEntries(all.map((doc) => [doc.slug, doc.markdown])) as Record<
     ComponentName,
     string

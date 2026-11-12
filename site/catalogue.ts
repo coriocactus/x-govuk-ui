@@ -112,9 +112,12 @@ type Entry = Placement & {
   /** Named starting points, each the settings for one use of the component. */
   presets?: readonly Preset[];
   /**
-   * Hooks, functions and constants its page shows, by their exports, as well as those declared in
-   * its parts' own files. It is for one kept in a file that components share, such as
-   * `dateFromParts`.
+   * What else its page shows, by export.
+   *
+   * - A component is a part of the page, with its props, its words and its classes. It is for a
+   *   part that the styling contract gives no component, such as `ResizableHandle`.
+   * - A hook, a function or a constant shows with those declared in its parts' own files. It is
+   *   for one kept in a file that components share, such as `dateFromParts`.
    */
   shows?: readonly Exported[];
   /**
@@ -1302,6 +1305,7 @@ const entries = {
       "normaliseLayout",
       "tileIds",
       "isTilesLayout",
+      "ResizableHandle",
     ],
     props: [
       {
@@ -1655,6 +1659,7 @@ const entries = {
     dependencies: "React · Motion",
     changes:
       "Built from parts, on a Message scroller. It is laid out like a chat app. The assistant writes as plain text in a centred column, and the user's messages sit in secondary Bubbles on the other side, with consecutive bubbles joined into one run. A bubble of several lines is as wide as its longest line, measured by Pretext, where CSS would leave a ragged gap beside its lines. Each message can have tools in a MessageActions row. Copy's icon turns to a tick once the text is copied, a thumb up and down fill and pop as one is chosen, and Try again's arrow turns once around as it asks for another reply. The latest message always shows its tools, so a message just sent shows them until the reply arrives, and other messages show theirs on hover. Before anything is said, the composer waits in the middle of the empty log, and glides down to the foot as the first message is sent. While the assistant writes, a shimmering status word changes every few seconds, such as Thinking or Working on a reply, or livelier words a service chooses, and screen readers hear one plain status instead. A reply that streams in as anything but plain text, such as Markdown into a Rich text, is a streaming message. Screen readers hear that it is being written, then all of it once it is done, as the example's Markdown setting shows. Each message grows out from its speaker's side. New messages are announced, and the log follows them only when the reader is near the bottom. Scrolled up, a button rises to go back to the newest message, with a dot once more has arrived. The example composes it with Chat input, Reasoning steps, Streaming text and Inline citation, and does not contact an AI service. A Callout above the composer suggests sending something, and disappears once the conversation starts.",
+    shows: ["MessageAction"],
     props: [
       text("label", "Conversation", {
         default: "Conversation",
@@ -2706,6 +2711,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's header, with the crown and logotype in white on brand blue, and GOV.UK's teal dot. The logo is the library's GOVUKLockup, GOV.UK's crown beside its wordmark, and GOVUKCrown gives the crown alone. A government service that is not part of GOV.UK gives its own logo, and the header becomes GOV.UK's generic header, with its mark and name in white on black at 30 pixels, because the crown and the blue are only for GOV.UK services.",
+    shows: ["GOVUKLockup", "GOVUKCrown"],
     props: [text("productName", "", { type: "ReactNode" })],
     example: [
       toggle("generic", false, {
@@ -3128,6 +3134,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Collapses to icons, off the screen or not at all, on either side. The edge drags to resize, and the rows scroll in a Scroll area. Groups and items with sub-items can fold. One highlight glides to the row under the pointer, on the same curve as the current item's line, which glides when it changes. On small screens, the sidebar opens as a sheet that a swipe closes. It can remember whether it was open, and its width. Command-B or Control-B toggles it. Users can arrange it for themselves. useSidebarArrangement keeps which items are pinned to the top, hidden and in what order. SidebarItemMenu gives each item a menu from three dots at the end of its row to pin, move or hide it. SidebarCustomise is a sheet of lists to show, pin and move every item and group, with Reset. An item's action, such as that menu or a SidebarItemAction, shows while the row is under the pointer or the action has keyboard focus, and rides the highlight from row to row. The workbench's own sidebar is arranged this way.",
+    shows: ["MoreIcon"],
     props: [
       toggle("defaultOpen", true, {
         restart: true,

@@ -9,10 +9,13 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Removed `page` from `PaginationLabels`, and added `previousPage` and `nextPage`. Each is the whole name that screen readers hear for its link, by default "Previous page" and "Next page", so a language can put the words in its own order. Pagination no longer makes the name by joining `previous` or `next` to `page`. Where you gave `page`, give `previousPage` and `nextPage`, such as "Tudalen flaenorol" and "Tudalen nesaf".
 - Changed `align` on PopoverContent, MenuContent, HoverCardContent, CalloutContent and a `TourStep` to take `"centre"` in place of `"center"`, as Inline's and Stats' `align` do. Where you give `align="center"` to one of them, give `align="centre"`.
 - Renamed ResizableHandle's `onValueCommit` to `onValueCommitted`, the name Slider gives the same thing. Where you give `onValueCommit`, give `onValueCommitted`.
+- Changed `StandardSchema`'s result to the one the Standard Schema specification gives. A schema of your own must return `{ value }` when the answers pass, where it could return `{}`. Schemas from Zod, Valibot and ArkType already do.
 
 ### Added
 
 - Added `sort`, `defaultSort` and `onSortChange` to DataTable, and the type `DataTableSort`, so a service can keep the table's sort. A `DataTableSort` names a column by its `id` and gives a direction, and `null` is no sort. The table still orders only the rows it is given. A service that shows one page of a longer list orders the whole list itself, by the sort that `onSortChange` gives, and passes that page.
+- Added `answers` to the check that `validateWith` returns. It gives the answers as the schema types them, such as a number the schema makes from an input's text, so `onSubmit` need not read and parse the `FormData` again. It reads the `FormData` as the check does, with the same `lists`. It throws a `TypeError` when an answer needs fixing, so check the answers first, as a Form does before it calls `onSubmit`.
+- Added `SchemaCheck`, the type of the check that `validateWith` returns. `StandardSchema` now takes the schema's output as a type parameter, `unknown` by default, and `validateWith` infers it from the schema.
 
 ### Fixed
 

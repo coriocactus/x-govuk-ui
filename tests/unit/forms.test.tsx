@@ -1053,6 +1053,39 @@ test("validateWith checks a form's answers with a Standard Schema, each message 
   expect(() => validateWith(waits)(data([["email", "a@b.co"]]))).toThrow(/without waiting/);
 });
 
+test("validateWith's answers gives the answers as the schema types them, and throws when one needs fixing", () => {
+  const check = validateWith(
+    z.object({
+      age: z.string().transform(Number).pipe(z.number().min(18, "You must be 18 or over")),
+      topics: z.array(z.string()),
+    }),
+    { lists: ["topics"] },
+  );
+  // The schema makes a number of the text. A list with nothing chosen is an empty list, as it is
+  // for the check.
+  const data = new FormData();
+  data.set("age", "42");
+  const answers = check.answers(data);
+  expect(answers).toEqual({ age: 42, topics: [] });
+  // TypeScript takes the answers' type from the schema, with no cast and no type argument. The
+  // assignment fails to compile when the two types differ.
+  type Same<A, B> =
+    (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
+  const typed: Same<typeof answers, { age: number; topics: string[] }> = true;
+  expect(typed).toBe(true);
+  // One topic is still a list.
+  data.append("topics", "fishing");
+  expect(check.answers(data)).toEqual({ age: 42, topics: ["fishing"] });
+  // An answer that needs fixing gives no answers, so the check comes first.
+  data.set("age", "17");
+  expect(check(data)).toEqual({ age: "You must be 18 or over" });
+  expect(() => check.answers(data)).toThrow(TypeError);
+  expect(() => check.answers(data)).toThrow(/Check the answers first/);
+  // A schema that waits gives no answers either.
+  const waits = validateWith(z.object({ age: z.string().refine(async () => true) }));
+  expect(() => waits.answers(data)).toThrow(/without waiting/);
+});
+
 test("an error under a part of a field belongs to the field", () => {
   const fields = ["birth", "birth-place", "email"];
   expect(fieldOf("birth-day", fields)).toBe("birth");

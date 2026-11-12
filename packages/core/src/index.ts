@@ -428,7 +428,12 @@ export {
   type UseFormErrorsResult,
   useFormErrors,
 } from "./form";
-export { type StandardSchema, type ValidateWithOptions, validateWith } from "./form-schema";
+export {
+  type SchemaCheck,
+  type StandardSchema,
+  type ValidateWithOptions,
+  validateWith,
+} from "./form-schema";
 export {
   defaultFormStepsLabels,
   FormStep,

@@ -1004,7 +1004,7 @@ const entries = {
         "{ controlId, name, hasHint, errorMessage, linkTo, describedBy, invalid, label, answer, children }",
         "Part",
       ),
-      reference("Label", "{ htmlFor, visuallyHidden }", "Part"),
+      reference("Label", "{ htmlFor, visuallyHidden, size, pageHeading }", "Part"),
       reference("Hint", "{ id, children }", "Part"),
       reference("ErrorMessage", "{ id, children }", "Part"),
       reference(

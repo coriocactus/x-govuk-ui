@@ -26,6 +26,12 @@ export type InputProps = Omit<ComponentPropsWithRef<"input">, "prefix"> & {
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
+  /**
+   * `small` suits a question among others. `large` suits a question that is the page's only one.
+   */
+  labelSize?: "small" | "medium" | "large";
+  /** Puts the label in the page's `h1`, for a page that asks one question. */
+  pageHeading?: boolean;
   errorMessage?: ReactNode;
   /**
    * Shown inside the start of the field, such as an icon or "£". Screen readers skip it, so the
@@ -87,6 +93,8 @@ export function Input({
   label,
   hint,
   hideLabel = false,
+  labelSize = "small",
+  pageHeading = false,
   errorMessage,
   id,
   "aria-describedby": describedBy,
@@ -101,7 +109,9 @@ export function Input({
       errorMessage={errorMessage}
       describedBy={describedBy}
     >
-      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Label visuallyHidden={hideLabel} size={labelSize} pageHeading={pageHeading}>
+        {label}
+      </Label>
       <Hint>{hint}</Hint>
       <ErrorMessage />
       <InputControl {...props} />

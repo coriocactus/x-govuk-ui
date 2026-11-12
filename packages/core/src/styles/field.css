@@ -48,6 +48,22 @@
   font-weight: 700;
   margin-bottom: 7px;
 }
+/* A larger label takes FieldsetLegend's sizes. A question that one field asks then looks like a
+   question that a group asks. */
+.x-govuk-ui-label--medium {
+  margin-bottom: 12px;
+  font-size: 24px;
+  line-height: 1.25;
+}
+.x-govuk-ui-label--large {
+  margin-bottom: 16px;
+  font-size: 32px;
+  line-height: 1.15;
+}
+.x-govuk-ui-label-heading {
+  margin: 0;
+  font: inherit;
+}
 .x-govuk-ui-hint {
   display: block;
   color: var(--x-govuk-ui-muted);

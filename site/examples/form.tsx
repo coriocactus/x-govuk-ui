@@ -295,6 +295,7 @@ function Application() {
             id="full-name"
             name="full-name"
             label="What is your full name?"
+            pageHeading
             autoComplete="name"
             spellCheck={false}
           />
@@ -311,6 +312,7 @@ function Application() {
             name="email"
             type="email"
             label="What is your email address?"
+            pageHeading
             hint="We’ll send your licence to this address."
             autoComplete="email"
             spellCheck={false}
@@ -321,7 +323,12 @@ function Application() {
             licence: data.get("licence") ? undefined : "Select how long you need your licence for",
           })}
         >
-          <Radios id="licence" name="licence" legend="How long do you need your licence for?">
+          <Radios
+            id="licence"
+            name="licence"
+            legend="How long do you need your licence for?"
+            pageHeading
+          >
             <Radio value="day">1 day</Radio>
             <Radio value="week">8 days</Radio>
             <Radio value="year">12 months</Radio>

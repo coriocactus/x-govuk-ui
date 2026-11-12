@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Added
+
+- Added `size` and `pageHeading` to EditorLabel, which is core's Label and takes its new props. `size` is `small`, `medium` or `large`, and `small` looks as the label did before. `pageHeading` puts the label in the page's `h1`, for a page that asks one question.
+
 ## [0.6.0] - 2026-11-09
 
 ### Fixed

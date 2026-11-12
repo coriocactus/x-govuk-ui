@@ -531,6 +531,86 @@ test("a label that its control cannot be for takes the field's label id instead"
   expect(html).not.toContain(" for=");
 });
 
+test("a label takes a size, and as the page's heading it sits in the h1 and still names its control", () => {
+  const sized = (size?: "small" | "medium" | "large") =>
+    renderToStaticMarkup(
+      <Label htmlFor="name" size={size}>
+        What is your name?
+      </Label>,
+    );
+  // A small label is the label as it is with no size, with no class for its size.
+  const plain = '<label for="name" class="x-govuk-ui-label">What is your name?</label>';
+  expect(sized()).toBe(plain);
+  expect(sized("small")).toBe(plain);
+  expect(sized("medium")).toContain('class="x-govuk-ui-label x-govuk-ui-label--medium"');
+  expect(sized("large")).toContain('class="x-govuk-ui-label x-govuk-ui-label--large"');
+  // The label takes the class, the style and the data attributes. The h1 has only its own class.
+  expect(
+    renderToStaticMarkup(
+      <Label htmlFor="name" size="large" pageHeading className="own" data-own="1">
+        What is your name?
+      </Label>,
+    ),
+  ).toBe(
+    '<h1 class="x-govuk-ui-label-heading"><label data-own="1" for="name" class="x-govuk-ui-label x-govuk-ui-label--large own">What is your name?</label></h1>',
+  );
+  // Input, Textarea and Select pass the size and the heading to their Label.
+  const heading = (id: string) =>
+    `<h1 class="x-govuk-ui-label-heading"><label for="${id}" class="x-govuk-ui-label x-govuk-ui-label--large">What is your name?</label></h1>`;
+  expect(
+    renderToStaticMarkup(
+      <Input id="name" label="What is your name?" labelSize="large" pageHeading />,
+    ),
+  ).toContain(heading("name"));
+  expect(
+    renderToStaticMarkup(
+      <Textarea id="detail" label="What is your name?" labelSize="large" pageHeading />,
+    ),
+  ).toContain(heading("detail"));
+  const select = renderToStaticMarkup(
+    <Select id="pick" label="What is your name?" labelSize="large" pageHeading>
+      <SelectItem value="a">A</SelectItem>
+    </Select>,
+  );
+  expect(select).toContain(heading("pick"));
+  // A slider's label and an editor's label are Labels, so they take the size and the heading too.
+  expect(
+    renderToStaticMarkup(
+      <Field controlId="volume">
+        <SliderRoot defaultValue={40}>
+          <SliderLabel size="medium" pageHeading>
+            Volume
+          </SliderLabel>
+          <SliderControl />
+        </SliderRoot>
+      </Field>,
+    ),
+  ).toContain(
+    '<h1 class="x-govuk-ui-label-heading"><label id="volume-label" class="x-govuk-ui-label x-govuk-ui-label--medium">Volume</label></h1>',
+  );
+  expect(
+    renderToStaticMarkup(
+      <EditorRoot name="notes">
+        <Field controlId="notes">
+          <EditorLabel size="large" pageHeading>
+            Notes
+          </EditorLabel>
+          <EditorBox />
+        </Field>
+      </EditorRoot>,
+    ),
+  ).toContain(
+    '<h1 class="x-govuk-ui-label-heading"><label id="notes-label" class="x-govuk-ui-label x-govuk-ui-label--large">Notes</label></h1>',
+  );
+  // The control takes neither prop.
+  expect(select).not.toMatch(/labelsize|pageheading/i);
+  expect(
+    renderToStaticMarkup(<Input id="name" label="What is your name?" labelSize="medium" />),
+  ).toContain(
+    '<label for="name" class="x-govuk-ui-label x-govuk-ui-label--medium">What is your name?</label>',
+  );
+});
+
 test("a select given its items' labels shows the chosen label in the first HTML", () => {
   // The options are in a component of the service's own, so the Select cannot read their labels
   // as it renders. Given them, it shows the chosen one's label at once.

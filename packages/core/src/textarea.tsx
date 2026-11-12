@@ -27,6 +27,12 @@ export type TextareaProps = ComponentPropsWithRef<"textarea"> & {
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
+  /**
+   * `small` suits a question among others. `large` suits a question that is the page's only one.
+   */
+  labelSize?: "small" | "medium" | "large";
+  /** Puts the label in the page's `h1`, for a page that asks one question. */
+  pageHeading?: boolean;
   errorMessage?: ReactNode;
   /**
    * Which way users can drag its corner to resize it. It never gets shorter than `rows` lines,
@@ -66,6 +72,8 @@ export function Textarea({
   label,
   hint,
   hideLabel = false,
+  labelSize = "small",
+  pageHeading = false,
   errorMessage,
   id,
   "aria-describedby": describedBy,
@@ -80,7 +88,9 @@ export function Textarea({
       errorMessage={errorMessage}
       describedBy={describedBy}
     >
-      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Label visuallyHidden={hideLabel} size={labelSize} pageHeading={pageHeading}>
+        {label}
+      </Label>
       <Hint>{hint}</Hint>
       <ErrorMessage />
       <TextareaControl {...props} />
@@ -90,7 +100,7 @@ export function Textarea({
 
 export type TextareaControlProps = Omit<
   TextareaProps,
-  "label" | "hint" | "hideLabel" | "errorMessage"
+  "label" | "hint" | "hideLabel" | "labelSize" | "pageHeading" | "errorMessage"
 >;
 
 /**

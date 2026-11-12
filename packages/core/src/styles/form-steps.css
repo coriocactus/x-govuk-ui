@@ -62,7 +62,8 @@
   font-size: 32px;
   line-height: 1.15;
 }
-.x-govuk-ui-legend h1:focus {
+.x-govuk-ui-legend h1:focus,
+.x-govuk-ui-label-heading:focus {
   outline: none;
 }
 /* On a page, a step that asks one thing makes its question the step's heading, as GOV.UK's
@@ -71,6 +72,12 @@
   .x-govuk-ui-form-step:not(:has(> .x-govuk-ui-form-step-title))
   .x-govuk-ui-form-step-fields
   > :first-child
+  > .x-govuk-ui-label,
+.x-govuk-ui-form-steps[data-layout="page"]
+  .x-govuk-ui-form-step:not(:has(> .x-govuk-ui-form-step-title))
+  .x-govuk-ui-form-step-fields
+  > :first-child
+  > .x-govuk-ui-label-heading
   > .x-govuk-ui-label,
 .x-govuk-ui-form-steps[data-layout="page"]
   .x-govuk-ui-form-step:not(:has(> .x-govuk-ui-form-step-title))

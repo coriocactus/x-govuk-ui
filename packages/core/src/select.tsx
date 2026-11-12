@@ -43,6 +43,12 @@ export type SelectProps = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
+  /**
+   * `small` suits a question among others. `large` suits a question that is the page's only one.
+   */
+  labelSize?: "small" | "medium" | "large";
+  /** Puts the label in the page's `h1`, for a page that asks one question. */
+  pageHeading?: boolean;
   errorMessage?: ReactNode;
   /** The chosen value. Leave it out to let the select keep track. */
   value?: string | null;
@@ -196,6 +202,8 @@ export function Select({
   label,
   hint,
   hideLabel = false,
+  labelSize = "small",
+  pageHeading = false,
   errorMessage,
   id,
   "aria-describedby": describedBy,
@@ -210,7 +218,9 @@ export function Select({
       errorMessage={errorMessage}
       describedBy={describedBy}
     >
-      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Label visuallyHidden={hideLabel} size={labelSize} pageHeading={pageHeading}>
+        {label}
+      </Label>
       <Hint>{hint}</Hint>
       <ErrorMessage />
       <SelectControl {...props} />
@@ -218,7 +228,10 @@ export function Select({
   );
 }
 
-export type SelectControlProps = Omit<SelectProps, "label" | "hint" | "hideLabel" | "errorMessage">;
+export type SelectControlProps = Omit<
+  SelectProps,
+  "label" | "hint" | "hideLabel" | "labelSize" | "pageHeading" | "errorMessage"
+>;
 
 /**
  * Select's control on its own, for a field composed from Field's parts. It is the button that shows

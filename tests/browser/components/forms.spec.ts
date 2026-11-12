@@ -379,6 +379,21 @@ test("an application in pages takes its Back link, buttons and answers where it 
   await playground.set("example", "In pages: an application");
   const main = frame.locator("main");
   const back = frame.getByRole("link", { name: "Back", exact: true });
+  // Each question is its page's h1, and takes focus as its page shows. FormSteps gives a label and
+  // a legend one size and one space beneath, and a heading that a script focuses shows no ring.
+  const question = (name: string) => frame.getByRole("heading", { level: 1, name });
+  const look = (name: string) =>
+    question(name).evaluate((heading) => {
+      const sized = getComputedStyle(heading.closest("legend") ?? heading.querySelector("label")!);
+      return [
+        sized.fontSize,
+        sized.lineHeight,
+        sized.marginBottom,
+        getComputedStyle(heading).outlineStyle,
+      ];
+    });
+  const medium = ["24px", "30px", "12px", "none"];
+  const headings = frame.locator(".x-govuk-ui-form-step:not([hidden]) h1");
   // The first question has no way back, and shows how far along it is, once, where the page
   // places it.
   await expect(back).toHaveCount(0);
@@ -388,17 +403,27 @@ test("an application in pages takes its Back link, buttons and answers where it 
   await frame.getByRole("button", { name: "Continue" }).click();
   const email = frame.getByRole("textbox", { name: "What is your email address?" });
   await expect(email).toBeVisible();
+  await expect(question("What is your email address?")).toBeFocused();
+  await expect(headings).toHaveCount(1);
+  expect(await look("What is your email address?")).toEqual(medium);
   // The Back link is in the page's place for one, above the main content, and the form draws
   // none of its own.
   await expect(back).toHaveCount(1);
   await expect(main.getByRole("link", { name: "Back", exact: true })).toHaveCount(0);
   await back.click();
+  await expect(question("What is your full name?")).toBeFocused();
+  expect(await look("What is your full name?")).toEqual(medium);
   await expect(frame.getByRole("textbox", { name: "What is your full name?" })).toHaveValue(
     "Jo Bloggs",
   );
-  await frame.getByRole("button", { name: "Continue" }).click();
+  // Continue by Enter is where a browser would draw a ring on what a script focuses.
+  await frame.getByRole("textbox", { name: "What is your full name?" }).press("Enter");
+  await expect(question("What is your email address?")).toBeFocused();
+  expect(await look("What is your email address?")).toEqual(medium);
   await email.fill("jo@example.com");
-  await frame.getByRole("button", { name: "Continue" }).click();
+  await email.press("Enter");
+  await expect(question("How long do you need your licence for?")).toBeFocused();
+  expect(await look("How long do you need your licence for?")).toEqual(medium);
   await frame.getByRole("radio", { name: "8 days" }).check();
   // A button of the example's own sits beside Continue.
   const buttons = frame.locator(".x-govuk-ui-form-steps-buttons").getByRole("button");

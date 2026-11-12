@@ -535,11 +535,23 @@ export type LabelProps = Omit<ComponentPropsWithRef<"label">, "htmlFor"> & {
   htmlFor?: string | null;
   /** Hides the label visually. Screen readers still announce it. */
   visuallyHidden?: boolean;
+  /**
+   * `small` suits a question among others. `large` suits a question that is the page's only one.
+   */
+  size?: "small" | "medium" | "large";
+  /**
+   * Puts the label in the page's `h1`, for a page that asks one question. The label is still the
+   * element that takes the part's props.
+   */
+  pageHeading?: boolean;
 };
 
 /** Names a control. Pass the control's id as `htmlFor`, unless a bound Field gives it. */
 export function Label({
   visuallyHidden = false,
+  // The class names the size as a field's `labelSize` does, so their styling contracts agree.
+  size: labelSize = "small",
+  pageHeading = false,
   className = "",
   htmlFor,
   id,
@@ -547,15 +559,18 @@ export function Label({
 }: LabelProps) {
   const field = useContext(FieldContext);
   useFieldSummary({ label: props.children });
-  return (
+  const label = (
     // biome-ignore lint/a11y/noLabelWithoutControl: The caller or a bound Field passes htmlFor, or the control names itself by the label's id.
     <label
       {...props}
       htmlFor={htmlFor === null ? undefined : (htmlFor ?? field?.id)}
       id={id ?? (htmlFor === null ? field?.labelId : undefined)}
-      className={`x-govuk-ui-label${visuallyHidden ? " x-govuk-ui-visually-hidden" : ""} ${className}`.trim()}
+      // A small label has no class for its size, because the label's own class sets that size.
+      className={`x-govuk-ui-label${labelSize === "small" ? "" : ` x-govuk-ui-label--${labelSize}`}${visuallyHidden ? " x-govuk-ui-visually-hidden" : ""} ${className}`.trim()}
     />
   );
+  // The heading wraps the label, as GOV.UK Frontend's does, so the label still names the control.
+  return pageHeading ? <h1 className="x-govuk-ui-label-heading">{label}</h1> : label;
 }
 
 /**

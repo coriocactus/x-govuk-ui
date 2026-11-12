@@ -589,7 +589,7 @@ function Shell() {
                       Casework
                     </Tag>
                   </DropdownMenuTrigger>
-                  <MenuContent align="center">
+                  <MenuContent align="centre">
                     <MenuRadioGroup
                       label="Workspaces"
                       value={workspace}

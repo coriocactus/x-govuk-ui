@@ -28,7 +28,7 @@ import { useControllableState } from "./controllable-state";
 import { chain } from "./events";
 import { useLabels } from "./labels";
 import { glideEasing, useMotionTiming } from "./motion";
-import { ArrowShape, CloseIconButton, useOverlaySound } from "./overlay";
+import { ArrowShape, CloseIconButton, positionerAlign, useOverlaySound } from "./overlay";
 import { useLatest, useMergedRef } from "./refs";
 import { type Registry, useRegister, useRegistry } from "./registry";
 import { type StorageLike, useStoredState } from "./stored-state";
@@ -44,7 +44,7 @@ export type TourStepProps = {
   children?: ReactNode;
   /** The side of its target it sits on. With `auto`, the side where it finds the best space. */
   side?: CalloutSide;
-  align?: "start" | "center" | "end";
+  align?: "start" | "centre" | "end";
   /** Added to the card while this step shows. */
   className?: string;
   /**
@@ -480,7 +480,7 @@ export function Tour({
             className="x-govuk-ui-floating-positioner"
             anchor={centred ? middle : element}
             side={side}
-            align={centred ? "center" : (current?.align ?? "center")}
+            align={centred ? "center" : positionerAlign(current?.align ?? "centre")}
             sideOffset={sideOffset}
             collisionPadding={8}
             collisionAvoidance={{ side: "flip", align: "shift", fallbackAxisSide: "end" }}

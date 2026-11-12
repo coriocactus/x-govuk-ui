@@ -14,7 +14,7 @@ import { chain } from "./events";
 import { trackHighlight } from "./highlight";
 import { ChevronIcon, TickIcon } from "./icons";
 import { Kbd } from "./kbd";
-import { useOverlaySound } from "./overlay";
+import { positionerAlign, useOverlaySound } from "./overlay";
 import { useMergedRef } from "./refs";
 import { Separator } from "./separator";
 import { useScopeSound } from "./sound-scope";
@@ -173,7 +173,7 @@ export type MenuContentProps = ComponentPropsWithRef<"div"> & {
   /** For a dropdown menu, the side of its button, or of its anchor, that it opens on. */
   side?: "top" | "bottom" | "left" | "right";
   /** For a dropdown menu, the edge of its button, or of its anchor, that it lines up with. */
-  align?: "start" | "center" | "end";
+  align?: "start" | "centre" | "end";
   /**
    * For a dropdown menu, the element it is placed against instead of its button, such as the row
    * the button sits in. The menu's `--anchor-width` is this element's width. A context menu opens
@@ -212,7 +212,7 @@ export function MenuContent({
           className="x-govuk-ui-floating-positioner"
           anchor={anchor}
           side={side}
-          align={align}
+          align={positionerAlign(align)}
           sideOffset={6}
           collisionPadding={8}
         >

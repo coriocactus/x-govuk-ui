@@ -1271,7 +1271,7 @@ const entries = {
       ),
       toggle("arrow", true, { default: "true" }),
       toggle("closeButton", false),
-      reference("align", '"start" | "center" | "end"', "center"),
+      reference("align", '"start" | "centre" | "end"', "centre"),
       reference("PopoverTrigger", "Button props and { render }", "Part"),
       reference("PopoverClose", "Button props", "Part"),
       reference("PopoverTitle / PopoverDescription", "ReactNode", "Part"),
@@ -1310,7 +1310,7 @@ const entries = {
       reference("anchor", "Element | ref | selector", "None"),
       reference("open / defaultOpen / onOpenChange", "boolean", "false"),
       reference("title / children / actions", "ReactNode", "None"),
-      reference("align", '"start" | "center" | "end"', "center"),
+      reference("align", '"start" | "centre" | "end"', "centre"),
       reference("labels", "Partial<CalloutLabels>", "Help and Close"),
       number("timeout", 0, {
         min: 0,

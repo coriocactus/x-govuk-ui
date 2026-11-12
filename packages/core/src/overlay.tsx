@@ -63,6 +63,15 @@ export function CloseIconButton({ label, ...props }: ButtonProps & { label?: str
 }
 
 /**
+ * An overlay's `align` as Base UI's Positioner takes it. The library's props are in British
+ * English, and Base UI's word for the middle is `center`.
+ * @internal
+ */
+export function positionerAlign(align: "start" | "centre" | "end") {
+  return align === "centre" ? "center" : align;
+}
+
+/**
  * The arrow's shape, with a fill in the surface's colour and an edge in its keyline.
  * @internal
  */

@@ -3,7 +3,13 @@
 import { Popover as Primitive } from "@base-ui/react/popover";
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Button, type ButtonProps, withoutButtonLook } from "./button";
-import { ArrowShape, CloseIconButton, type OverlayLabels, useOverlaySound } from "./overlay";
+import {
+  ArrowShape,
+  CloseIconButton,
+  type OverlayLabels,
+  positionerAlign,
+  useOverlaySound,
+} from "./overlay";
 
 export type PopoverProps = {
   children: ReactNode;
@@ -53,7 +59,7 @@ export function PopoverTrigger({ variant = "secondary", render, ...props }: Popo
 
 export type PopoverContentProps = ComponentPropsWithRef<"div"> & {
   side?: "top" | "bottom" | "left" | "right";
-  align?: "start" | "center" | "end";
+  align?: "start" | "centre" | "end";
   /** Points an arrow at the trigger. */
   arrow?: boolean;
   /** Shows a × button in the corner. */
@@ -65,7 +71,7 @@ export type PopoverContentProps = ComponentPropsWithRef<"div"> & {
 /** The panel. It grows out of its trigger and shrinks back into it. */
 export function PopoverContent({
   side = "bottom",
-  align = "center",
+  align = "centre",
   arrow = true,
   closeButton = false,
   labels,
@@ -78,7 +84,7 @@ export function PopoverContent({
       <Primitive.Positioner
         className="x-govuk-ui-floating-positioner"
         side={side}
-        align={align}
+        align={positionerAlign(align)}
         sideOffset={arrow ? 10 : 6}
         collisionPadding={8}
       >

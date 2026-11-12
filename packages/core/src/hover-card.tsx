@@ -2,7 +2,7 @@
 
 import { PreviewCard as Primitive } from "@base-ui/react/preview-card";
 import type { ComponentPropsWithRef, ReactNode } from "react";
-import { ArrowShape } from "./overlay";
+import { ArrowShape, positionerAlign } from "./overlay";
 
 export type HoverCardProps = {
   children: ReactNode;
@@ -59,14 +59,14 @@ export function HoverCardTrigger({
 
 export type HoverCardContentProps = ComponentPropsWithRef<"div"> & {
   side?: "top" | "bottom" | "left" | "right";
-  align?: "start" | "center" | "end";
+  align?: "start" | "centre" | "end";
   arrow?: boolean;
 };
 
 /** The card. It grows out of the link and fades away. */
 export function HoverCardContent({
   side = "bottom",
-  align = "center",
+  align = "centre",
   arrow = true,
   className = "",
   children,
@@ -77,7 +77,7 @@ export function HoverCardContent({
       <Primitive.Positioner
         className="x-govuk-ui-floating-positioner"
         side={side}
-        align={align}
+        align={positionerAlign(align)}
         sideOffset={arrow ? 10 : 6}
         collisionPadding={8}
       >

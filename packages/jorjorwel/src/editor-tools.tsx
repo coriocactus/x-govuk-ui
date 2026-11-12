@@ -469,7 +469,7 @@ export function EditorTableTools(props: EditorToolPartProps) {
               />
             }
           />
-          <MenuContent align="center" finalFocus={finalFocusFor(editor, chosen)}>
+          <MenuContent align="centre" finalFocus={finalFocusFor(editor, chosen)}>
             <MenuItem
               icon={icons.before}
               onSelect={() => choose(row ? tableCommands.$rowBefore : tableCommands.$columnBefore)}

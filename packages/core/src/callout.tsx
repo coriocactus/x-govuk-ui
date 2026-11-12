@@ -18,7 +18,13 @@ import { Button, type ButtonProps, withoutButtonLook } from "./button";
 import { useControllableState } from "./controllable-state";
 import { Countdown } from "./countdown";
 import { useLabels } from "./labels";
-import { ArrowShape, CloseIconButton, defaultOverlayLabels, useOverlaySound } from "./overlay";
+import {
+  ArrowShape,
+  CloseIconButton,
+  defaultOverlayLabels,
+  positionerAlign,
+  useOverlaySound,
+} from "./overlay";
 import { useLatest, useMergedRef } from "./refs";
 import { useScopeSound } from "./sound-scope";
 
@@ -325,7 +331,7 @@ export type CalloutContentProps = Omit<ComponentPropsWithRef<"div">, "title"> & 
   variant?: CalloutVariant;
   /** The side of its anchor it sits on. With `auto`, the side where it finds the best space. */
   side?: CalloutSide;
-  align?: "start" | "center" | "end";
+  align?: "start" | "centre" | "end";
   /**
    * Closes it after this many milliseconds, as Toast's `timeout` does, for a notice that can go by
    * itself. The default, 0, keeps it open until someone closes it, because a notice that vanishes
@@ -356,7 +362,7 @@ export function CalloutContent({
   actions,
   variant = "brand",
   side = "auto",
-  align = "center",
+  align = "centre",
   timeout = 0,
   countdown = true,
   closeButton = true,
@@ -481,7 +487,7 @@ export function CalloutContent({
             !asked && (!target || anchorHidden) ? { visibility: "hidden" } : undefined
           }
           side={chosen}
-          align={align}
+          align={positionerAlign(align)}
           sideOffset={GAP}
           collisionPadding={EDGE}
           collisionAvoidance={{ side: "flip", align: "shift", fallbackAxisSide: "end" }}

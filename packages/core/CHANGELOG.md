@@ -7,6 +7,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 ### Breaking Changes
 
 - Removed `page` from `PaginationLabels`, and added `previousPage` and `nextPage`. Each is the whole name that screen readers hear for its link, by default "Previous page" and "Next page", so a language can put the words in its own order. Pagination no longer makes the name by joining `previous` or `next` to `page`. Where you gave `page`, give `previousPage` and `nextPage`, such as "Tudalen flaenorol" and "Tudalen nesaf".
+- Changed `align` on PopoverContent, MenuContent, HoverCardContent, CalloutContent and a `TourStep` to take `"centre"` in place of `"center"`, as Inline's and Stats' `align` do. Where you give `align="center"` to one of them, give `align="centre"`.
 
 ### Added
 

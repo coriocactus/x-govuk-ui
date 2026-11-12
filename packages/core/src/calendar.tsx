@@ -74,7 +74,7 @@ type CalendarBaseProps = Omit<ComponentPropsWithRef<"section">, "defaultValue"> 
 export type CalendarProps = CalendarBaseProps &
   (
     | {
-        /** One date. */
+        /** One date, which is the default. */
         mode?: "single";
         /** In `single` mode, the chosen date, or null for none. */
         value?: Date | null;

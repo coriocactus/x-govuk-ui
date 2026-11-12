@@ -149,7 +149,10 @@ export type ChartOptions = {
   direct?: boolean;
   /** The words the chart writes itself, such as Total or No figure, for another language. */
   labels?: Partial<ChartLabels>;
-  /** How a line or area runs between its points, which is smoothly, straight, or in steps. */
+  /**
+   * How a line or area runs between its points, which is smoothly, straight, or in steps. By
+   * default, smoothly.
+   */
   curve?: "smooth" | "straight" | "step";
   /**
    * The series to pick out, or in a slope chart or a beeswarm the category. It takes the palette's

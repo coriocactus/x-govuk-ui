@@ -1,6 +1,7 @@
 /**
- * Each component's props, documented once. A prop with a control appears in the playground and
- * sets the example's prop of the same name. A prop without one is listed for reference.
+ * The playground's settings. Each is a prop of a component, or a setting of its example, with the
+ * control that sets it. A prop's control sets the example's prop of the same name. The props
+ * themselves are documented from their types, by `site/api.ts`.
  */
 export type Option = readonly [value: string | number, label: string];
 
@@ -70,13 +71,6 @@ export function met(need: Need, args: Record<string, unknown>) {
 }
 
 type Extra = Partial<Omit<PropDoc, "name" | "control" | "value">>;
-
-/** A prop without a control, such as a callback, a list of items or a part. */
-export const reference = (name: string, type: string, fallback = "Optional"): PropDoc => ({
-  name,
-  type,
-  default: fallback,
-});
 
 export const toggle = (name: string, value = false, extra: Extra = {}): PropDoc => ({
   name,

@@ -11,7 +11,6 @@ import {
   type Preset,
   type PropDoc,
   range,
-  reference,
   text,
   toggle,
   when,
@@ -147,9 +146,6 @@ const entries = {
       text("errorMessage", "", { note: "The example also checks the address when you continue." }),
       toggle("disabled"),
       toggle("readOnly"),
-      reference("type", '"text" | "email" | "password" | …', "text"),
-      reference("strength", "boolean", "false"),
-      reference("ref", "HTMLInputElement"),
     ],
     example: [
       choice(
@@ -196,12 +192,6 @@ const entries = {
         note: "Adds the button that opens a Calendar.",
       }),
       toggle("disabled"),
-      reference("value / onValueChange", "{ day, month, year } / (value) => void"),
-      reference("id / name", "string", "Each field adds -day, -month or -year"),
-      reference("min / max", "Date"),
-      reference("errorFields", '("day" | "month" | "year")[]', "All three"),
-      reference("autoCompleteBirthday", "boolean", "false"),
-      reference("dateFromParts", "(value) => Date | null", "Helper"),
     ],
     example: [
       choice(
@@ -267,12 +257,6 @@ const entries = {
         1,
         { default: "1" },
       ),
-      reference("value / onValueChange", "Date | null, DateRange or Date[], by mode"),
-      reference("min / max", "Date"),
-      reference("isDateDisabled", "(date: Date) => boolean"),
-      reference("defaultMonth", "Date", "The chosen date's month, or today's"),
-      reference("label", "string", "Its calendar label"),
-      reference("locale / years", "string / number[]"),
     ],
     example: [
       choice(
@@ -326,10 +310,6 @@ const entries = {
       ),
       text("errorMessage", ""),
       toggle("disabled"),
-      reference("hint", "ReactNode"),
-      reference("value / onValueChange", "{ hour, minute, period? }"),
-      reference("id / name", "string"),
-      reference("errorFields", '("hour" | "minute" | "period")[]', "All"),
     ],
   },
   "file-upload": {
@@ -347,14 +327,6 @@ const entries = {
       toggle("multiple"),
       text("errorMessage", "", { note: "The example also asks for a file when you continue." }),
       toggle("disabled"),
-      reference("accept / name", "string"),
-      reference(
-        "files / defaultFiles / onFilesChange",
-        "File[] / (files: File[]) => void",
-        "Uncontrolled",
-      ),
-      reference("list", "boolean", "true"),
-      reference("labels", "Partial<FileUploadLabels>", "GOV.UK's"),
     ],
   },
   combobox: {
@@ -371,12 +343,6 @@ const entries = {
       text("hint", "Start typing, then choose from the list.", { type: "ReactNode" }),
       text("placeholder", ""),
       toggle("disabled"),
-      reference("items", "(string | { value, label, description? })[]", "Required"),
-      reference("value / onValueChange", "string | null / (value) => void"),
-      reference("filter", "((search, option) => boolean) | null", "Label contains search"),
-      reference("inputValue / defaultInputValue / onInputValueChange", "string / (text) => void"),
-      reference("labels", "Partial<ComboboxLabels>", "No results found"),
-      reference("name / errorMessage", "string"),
     ],
     example: [
       toggle("ownSearch", false, {
@@ -398,12 +364,6 @@ const entries = {
       text("hint", "Choose all that apply.", { type: "ReactNode" }),
       text("placeholder", "Start typing a language"),
       toggle("disabled"),
-      reference("items", "(string | { value, label, description? })[]", "Required"),
-      reference("filter", "((search, option) => boolean) | null", "Label contains search"),
-      reference("inputValue / defaultInputValue / onInputValueChange", "string / (text) => void"),
-      reference("value / onValueChange", "string[] / (value: string[]) => void"),
-      reference("labels", "Partial<ComboboxLabels>", "No results found"),
-      reference("name / errorMessage", "string"),
     ],
   },
   tree: {
@@ -435,21 +395,6 @@ const entries = {
         ],
         "leaves",
       ),
-      reference(
-        "items",
-        "TreeNode[], each { value, label, description?, disabled?, children? }",
-        "Required",
-      ),
-      reference("value / defaultValue / onValueChange", "string | null / (value: string) => void"),
-      reference(
-        "expanded / defaultExpanded / onExpandedChange",
-        "string[] / (expanded: string[]) => void",
-        "The chosen node's branches",
-      ),
-      reference("search / filter", "string / (search, node) => boolean", "Label contains search"),
-      reference("children", "(node, state) => TreeItem", "<TreeItem />"),
-      reference("labels", "Partial<TreeLabels>", "Expand and Collapse"),
-      reference("name", "string"),
     ],
     example: [
       toggle("counts", true, { note: "Shows how many letters are in each folder, as its badge." }),
@@ -482,17 +427,6 @@ const entries = {
       text("placeholder", "Choose an organisation", { type: "ReactNode" }),
       text("errorMessage", ""),
       toggle("disabled"),
-      reference(
-        "items",
-        "TreeNode[], each { value, label, description?, disabled?, children? }",
-        "Required",
-      ),
-      reference("value / defaultValue / onValueChange", "string | null / (value: string) => void"),
-      reference("choose", '"leaves" | "any"', "leaves"),
-      reference("filter", "(search, node) => boolean", "Label contains search"),
-      reference("children", "(node, state) => TreeItem", "<TreeItem />"),
-      reference("labels", "Partial<TreeSelectLabels>", "Search and No results found"),
-      reference("name", "string"),
     ],
   },
   "search-box": {
@@ -509,10 +443,6 @@ const entries = {
       toggle("hideLabel", true, {
         note: "The label is hidden by default, as the button names the search.",
       }),
-      reference("onSearch", "(query: string) => void"),
-      reference("action / name", "string", "q"),
-      reference("value / onValueChange", "string / (value: string) => void"),
-      reference("labels", "Partial<SearchBoxLabels>", "Search"),
     ],
   },
   textarea: {
@@ -553,10 +483,6 @@ const entries = {
       toggle("autoResize", false, { note: "Grows with its text where the browser supports it." }),
       text("errorMessage", "", { note: "The example also asks for detail when you continue." }),
       toggle("disabled"),
-      reference("wordLimit", "number", "None"),
-      reference("threshold", "number from 0 to 1", "0"),
-      reference("labels", "Partial<CharacterCountLabels>", "GOV.UK's"),
-      reference("ref", "HTMLTextAreaElement"),
     ],
     presets: [
       { name: "Grows as you type", args: { autoResize: true, resize: "none", rows: 3 } },
@@ -622,25 +548,11 @@ const entries = {
         restart: true,
         note: "Lists with boxes to tick. Add the Checklist control to see it. The example starts again.",
       }),
-      reference("value / defaultValue / onValueChange", "string, in the format"),
-      reference("name", "string", "Submits the document, and finds its Form error"),
-      reference("wordLimit", "number", "None"),
-      reference("threshold", "number from 0 to 1", "0"),
-      reference("headings", "HeadingTagType[]", '["h2", "h3", "h4"]'),
-      reference("colours / permittedColours", "{ text, background }", "GOV.UK's palette"),
-      reference("onUpload", "(file, { signal, onProgress }) => Promise<string | EditorUpload>"),
       toggle("attachments", true, {
         restart: true,
         note: "Takes files, such as images, video and anything else. On by default whenever there is onUpload, as the example gives it, which keeps each file in the page. The example starts again.",
         needs: [whenOn("richText")],
       }),
-      reference("permittedAttachmentTypes", "string[]", "Any"),
-      reference("onFileAccept", "(file) => boolean"),
-      reference("onLinkPaste", "({ url, replaceWith, insertBelow }) => void"),
-      reference("onMarkdownPaste", "({ markdown, document, addBlockSpacing }) => void"),
-      reference("nodes", "Lexical nodes", "The editor's own"),
-      reference("labels", "Partial<EditorLabels>", "English"),
-      reference("editorRef", "Ref<LexicalEditor>", "The Lexical editor"),
       checklist(
         "controls",
         editorToolbarGroups.flat().map((kind) => [kind, defaultEditorLabels[kind]] as const),
@@ -649,51 +561,6 @@ const entries = {
           default: "defaultEditorToolbar",
           note: "On EditorToolbar, the editor's own controls, laid out in their groups with history at the end. Lexxy's are its defaults, and the example adds Source.",
         },
-      ),
-      reference("EditorToolbar", "{ label, controls, sticky, stickyOffset, children }", "Part"),
-      reference(
-        "EditorControl",
-        "{ kind | label, action, active, enabled, shortcut, children }",
-        "Part",
-      ),
-      reference(
-        "EditorPrompt",
-        "{ trigger, name, label, items | search, insert, spaceInSearch, onlyAt, placement, emptyMessage, renderMention }",
-        "Part",
-      ),
-      reference(
-        "EditorAI",
-        "{ onRequestEdit: ({ instruction, text, markdown, document, signal }) => Promise<string | { text } | { markdown }>, disabled, children }",
-        "Part",
-      ),
-      reference(
-        "EditorAIToolbar / EditorAITools / EditorAIAsk / EditorAIAction / EditorAIPrompt / EditorAISuggestion",
-        "",
-        "Part",
-      ),
-      reference("EditorContent", "{ tools: the floating tools, or null for none }", "Part"),
-      reference(
-        "EditorTableTools / EditorLinkTools / EditorCodeLanguage / EditorAttachmentTools",
-        "",
-        "Part",
-      ),
-      reference("EditorTools", "{ label, anchor, placement, children }", "Part"),
-      reference(
-        "MentionNode / $createMentionNode / $isMentionNode",
-        "A mention, for a service to put in itself",
-        "Lexical node",
-      ),
-      reference("EditorTool", "{ label, icon, destructive, onClick }", "Part"),
-      reference("EditorSeparator / EditorAISeparator", "", "Part"),
-      reference(
-        "useEditor / useEditorRead / useEditorAnchor / useEditorAltF10 / useEditorAI",
-        "The Lexical editor with announce, uploadFiles, insertAttachment, source and toggleSource, its state, an element's place, Alt F10, and the suggestions' state",
-        "Hook",
-      ),
-      reference(
-        "defaultEditorToolbar / editorToolbarGroups / defaultEditorLabels / editorColours / editorBackgrounds",
-        "",
-        "Constant",
       ),
     ],
     example: [
@@ -748,9 +615,6 @@ const entries = {
         ],
         "medium",
       ),
-      reference("value / onValueChange", "string / (value: string) => void"),
-      reference("placeholder", "ReactNode"),
-      reference("SelectItem", "{ value, disabled, children }", "Part"),
     ],
   },
   checkboxes: {
@@ -788,23 +652,6 @@ const entries = {
         "medium",
       ),
       toggle("disabled"),
-      reference("name", "string", "Required"),
-      reference("value / onValueChange", "string[] / (value: string[]) => void"),
-      reference("Checkbox", "{ value, hint, exclusive, conditional, controlId, children }", "Part"),
-      reference("ChoiceDivider", '{ children = "or" }', "Part"),
-      reference(
-        "CheckboxesRoot",
-        "{ controlId, name, value, defaultValue, onValueChange, disabled }",
-        "Part",
-      ),
-      reference("ChoiceList", "{ inline, size }", "Part"),
-      reference(
-        "ChoiceRoot",
-        "{ controlId, value, disabled, exclusive, hasHint, conditionalId }",
-        "Part",
-      ),
-      reference("ChoiceControl / ChoiceLabel / ChoiceHint", "input / label / hint", "Part"),
-      reference("ChoiceConditional", "{ value, id, children }", "Part"),
     ],
     example: [
       toggle("exclusive", true, { note: "Adds None of these, which clears the other answers." }),
@@ -864,19 +711,6 @@ const entries = {
         "medium",
       ),
       toggle("disabled"),
-      reference("name", "string", "Required"),
-      reference("value / onValueChange", "string / (value: string) => void"),
-      reference("Radio", "{ value, hint, conditional, controlId, children }", "Part"),
-      reference("ChoiceDivider", '{ children = "or" }', "Part"),
-      reference(
-        "RadiosRoot",
-        "{ controlId, name, value, defaultValue, onValueChange, disabled }",
-        "Part",
-      ),
-      reference("ChoiceList", "{ inline, size }", "Part"),
-      reference("ChoiceRoot", "{ controlId, value, disabled, hasHint, conditionalId }", "Part"),
-      reference("ChoiceControl / ChoiceLabel / ChoiceHint", "input / label / hint", "Part"),
-      reference("ChoiceConditional", "{ value, id, children }", "Part"),
     ],
     example: [
       toggle("conditional", true, {
@@ -906,7 +740,6 @@ const entries = {
       text("hint", "We’ll email you when your application changes.", { type: "ReactNode" }),
       toggle("hideLabel"),
       toggle("disabled"),
-      reference("checked / onCheckedChange", "boolean / (checked: boolean) => void"),
     ],
   },
   slider: {
@@ -925,8 +758,6 @@ const entries = {
       number("step", 5, { min: 1, default: "1" }),
       toggle("showValue", true),
       toggle("disabled"),
-      reference("value / onValueChange", "number / (value: number) => void"),
-      reference("format", "Intl.NumberFormatOptions"),
     ],
   },
   choices: {
@@ -939,9 +770,6 @@ const entries = {
     changes:
       "Answers as rows, each with a letter, a number from 1 to 9, or nothing, for a question that should be quick to answer, such as an agent's. Pressing an answer's letter or number chooses it, anywhere on the page while they are the only choices on show and nobody is typing, or only within their form, or not at all. Enter on a chosen answer sends the form, and a last row can take any words, which choose it as they are typed. One answer or several. They are native radios or checkboxes in a Fieldset, so they submit with a form, take part in a Form by their name, show its error, and start with an answer it kept. Question card asks with them. For a service's own questions, Radios and Checkboxes are GOV.UK's.",
     props: [
-      reference("name", "string", "Required"),
-      reference("legend", "ReactNode", "Required"),
-      reference("options", "{ value, label, hint? }[]", "Required"),
       choice(
         "markers",
         [
@@ -965,8 +793,6 @@ const entries = {
           needs: [when("markers", "letters", "numbers")],
         },
       ),
-      reference("other", "string, the words shown in the last row", "None"),
-      reference("value / defaultValue / onValueChange", "string[]", "Optional"),
     ],
     example: [toggle("other", true, { note: "Adds a last row to type another answer into." })],
     presets: [
@@ -993,9 +819,6 @@ const entries = {
         "medium",
       ),
       toggle("disabled"),
-      reference("value / onValueChange", "string[] / (value: string[]) => void"),
-      reference("aria-label", "string", "Required"),
-      reference("ToggleGroupItem", "{ value, children }", "Part"),
     ],
   },
   field: {
@@ -1012,20 +835,6 @@ const entries = {
       text("label", "How many people live in your home?", { type: "ReactNode" }),
       text("hint", "Include yourself and any children.", { type: "ReactNode" }),
       text("errorMessage", "", { note: "Clearing the number shows an error too." }),
-      reference(
-        "Field",
-        "{ controlId, name, hasHint, errorMessage, linkTo, describedBy, invalid, label, answer, children }",
-        "Part",
-      ),
-      reference("Label", "{ htmlFor, visuallyHidden, size, pageHeading }", "Part"),
-      reference("Hint", "{ id, children }", "Part"),
-      reference("ErrorMessage", "{ id, children }", "Part"),
-      reference(
-        "useControlProps",
-        "props → props with the bound Field's id and descriptions",
-        "Hook",
-      ),
-      reference("useField", "{ id, hint, errorMessage } → { id, controlProps, … }", "Hook"),
     ],
   },
   fieldset: {
@@ -1066,9 +875,7 @@ const entries = {
       "GOV.UK's summary, with rounder corners and an entrance. It takes focus when it appears. Pressing an error scrolls its field's label or legend into view and focuses the field. Form shows one for its own checks. On its own, it lists errors found elsewhere, such as by a server or another form library. The example opens as a page does when the server has found problems, with the summary taking focus. It checks its answers by the same rule as Form. An answer that now passes loses its line, and one that still fails keeps its message until the form is sent again.",
     props: [
       text("title", "There is a problem", { type: "ReactNode", default: "There is a problem" }),
-      reference("description", "ReactNode"),
       toggle("autoFocus", true, { default: "true" }),
-      reference("ErrorSummaryItem", "{ href, children }", "Part"),
     ],
   },
   form: {
@@ -1089,12 +896,6 @@ const entries = {
       "GOV.UK's way with a question page, as one component. FormSteps asks a form a step at a time, and the In stages example is a short survey asked that way. Each field takes part by its name, so Input, Textarea, Select, Radios, Checkboxes, Date input, Combobox, File upload and One-time code need nothing more. When the form is sent, one function checks every answer. If any need fixing, an Error summary opens above everything inside the Form as what is beneath eases down to make space, takes focus and lists the problems in the fields' order, each linking to its field, and every field shows its own message. Fixing an answer clears its message and its line at once, and the summary folds away when nothing is left. A failing answer that changes keeps its message until the form is sent again. While there are errors the page's title starts with Error, as GOV.UK asks. Messages that onSubmit returns, such as the server's, show in the same way. Continue with the form empty to see it. A form small enough to do without an Error summary can turn it off, and focus goes to the first field to fix instead. defaultValues gives the fields their answers to start with, such as ones kept from an earlier visit. FormSteps is a Form in steps, each a FormStep containing any fields. Continue checks only the step's answers and runs its own onContinue, such as saving a rating straight away, with a spinner on the button. Steps whose when says no are passed over, and their answers left out. It can end with Check your answers, worked out from the fields' labels and answers, with Change. It comes as GOV.UK question pages, or a card set into a page, such as a survey or an agent's questions, and Back, progress, the Error summary, the Command with Enter shortcut and the browser's history can each be turned on or off. The One page example is a service's page, a ServicePage with its questions in a three-quarters column. Its heading is inside the Form, so the summary opens above it, as GOV.UK puts it. The In pages example is FormSteps in a ServicePage. Its Back link is a FormStepsBack in the page's own place for one, which a FormStepsProvider around both allows. Save and come back later sits beside Continue, and Check your answers lists the answers in two sections beneath a heading of the example's own, a FormStepsSummary and a sentence of the example's own from useFormStepsAnswers.",
     functions: ["validateWith"],
     props: [
-      reference("validate", "(data: FormData) => FormErrors"),
-      reference(
-        "onSubmit",
-        "(data: FormData, event) => FormErrors | undefined | Promise<…>",
-        "Sends the form",
-      ),
       text("errorTitle", "There is a problem", {
         type: "ReactNode",
         default: "There is a problem",
@@ -1105,39 +906,6 @@ const entries = {
         note: "Starts the page's title with Error.",
         needs: [when("example", "page")],
       }),
-      reference("errorSummary", "boolean", "true"),
-      reference(
-        "useFormErrors",
-        "({ summary? }) => { errors: { name, message, id }[], attempt }",
-        "Hook",
-      ),
-      reference("defaultValues", "Record<string, string | string[]>", "None"),
-      reference(
-        "--x-govuk-ui-form-gap",
-        "CSS length, between the fields",
-        "20px, 30px on a wider screen",
-      ),
-      reference("children", "Fields with a name, and a submit Button"),
-      reference(
-        "FormSteps",
-        '{ layout: "page" | "card", title, icon, checkAnswers, back, progress, errorSummary, keyboardShortcut, actions, history, defaultValues, onComplete, step, defaultStep, defaultSettled, onStepChange, done, labels }',
-        "Part",
-      ),
-      reference(
-        "FormStep",
-        "Fieldset props and { title?, titleLevel?, hint?, validate, onContinue, when, optional, labels: { continue }, summary }",
-        "Part",
-      ),
-      reference("FormStepsBack", "BackLink props, without href, render or children", "Part"),
-      reference("FormStepsProgress", "p props", "Part"),
-      reference("FormStepsSummary", "{ title, titleLevel, steps, children } and div props", "Part"),
-      reference("FormStepsProvider", "{ children }", "Part"),
-      reference(
-        "useFormSteps",
-        "() => { step, count, position, total, settled, answered, skipped, reviewing, sent, busy, back, skip, data }",
-        "Hook",
-      ),
-      reference("useFormStepsAnswers", "({ summary? }) => { answers, change }", "Hook"),
     ],
     example: [
       choice(
@@ -1226,12 +994,6 @@ const entries = {
         default: "true",
         note: "Off, a press on the dimmed page leaves it open.",
       }),
-      reference("open / onOpenChange", "boolean / (open: boolean) => void"),
-      reference("DialogTrigger", "Button props and { render }", "Part"),
-      reference("DialogClose", "Button props", "Part"),
-      reference("--x-govuk-ui-dialog-width", "CSS length", "560px"),
-      reference("DialogContent", "{ closeButton, labels, initialFocus, finalFocus }", "Part"),
-      reference("DialogTitle / DialogDescription", "ReactNode", "Part"),
     ],
   },
   sheet: {
@@ -1257,12 +1019,6 @@ const entries = {
         default: "true",
         note: "Off, a press on the dimmed page leaves it open.",
       }),
-      reference("open / onOpenChange", "boolean / (open: boolean) => void"),
-      reference("SheetTrigger", "Button props and { render }", "Part"),
-      reference("SheetClose", "Button props", "Part"),
-      reference("--x-govuk-ui-sheet-width", "CSS length, for a sheet at the side", "360px"),
-      reference("SheetContent", "{ label, closeButton, initialFocus, finalFocus, labels }", "Part"),
-      reference("SheetTitle / SheetDescription", "ReactNode", "Part"),
     ],
   },
   popover: {
@@ -1285,11 +1041,6 @@ const entries = {
       ),
       toggle("arrow", true, { default: "true" }),
       toggle("closeButton", false),
-      reference("align", '"start" | "centre" | "end"', "centre"),
-      reference("PopoverTrigger", "Button props and { render }", "Part"),
-      reference("PopoverClose", "Button props", "Part"),
-      reference("PopoverTitle / PopoverDescription", "ReactNode", "Part"),
-      reference("--x-govuk-ui-popover-width", "CSS length", "340px"),
     ],
   },
   callout: {
@@ -1321,11 +1072,6 @@ const entries = {
         ],
         "auto",
       ),
-      reference("anchor", "Element | ref | selector", "None"),
-      reference("open / defaultOpen / onOpenChange", "boolean", "false"),
-      reference("title / children / actions", "ReactNode", "None"),
-      reference("align", '"start" | "centre" | "end"', "centre"),
-      reference("labels", "Partial<CalloutLabels>", "Help and Close"),
       number("timeout", 0, {
         min: 0,
         note: "Milliseconds. 0 keeps the notice until it is closed, as Toast's timeout does.",
@@ -1345,13 +1091,6 @@ const entries = {
         { type: "boolean", default: "true with a trigger, false with an anchor" },
       ),
       toggle("closeButton", true, { note: "The × in the corner, as Popover's closeButton." }),
-      reference("--x-govuk-ui-callout-width", "CSS length", "320px"),
-      reference("CalloutTrigger", "Button props and { label, render }", "Part"),
-      reference(
-        "CalloutContent",
-        "{ title, actions, variant, side, align, timeout, countdown, closeButton }",
-        "Part",
-      ),
     ],
     presets: [
       { name: "Plain, above", args: { variant: "plain", side: "top" } },
@@ -1389,26 +1128,6 @@ const entries = {
       ),
       toggle("closeOnPressOutside", false),
       toggle("closeButton", true, { note: "The × in the corner, as Popover's closeButton." }),
-      reference("open / defaultOpen / onOpenChange", "boolean", "false"),
-      reference("step / defaultStep / onStepChange", "number / (step) => void", "Uncontrolled"),
-      reference(
-        "storageKey / storage",
-        "string, to keep progress between visits / StorageLike",
-        "None / local storage",
-      ),
-      reference("onFinish", "() => void", "None"),
-      reference("labels", "Partial<TourLabels>", "2 of 4, Next, Back, Done"),
-      reference(
-        "--x-govuk-ui-tour-dim / --x-govuk-ui-tour-radius",
-        "CSS colour / length",
-        "--x-govuk-ui-backdrop / --x-govuk-ui-radius-large",
-      ),
-      reference(
-        "TourStep",
-        "{ target?, title, children, side, align, className, actions }",
-        "Part",
-      ),
-      reference("useTour", "() => { step, count, goTo, finish, close }", "Hook"),
     ],
     example: [
       toggle("welcome", false, { note: "Starts with a welcome in the middle of the screen." }),
@@ -1430,32 +1149,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Built from parts on Base UI's Menu, shared with Context menu. One highlight glides between items, and each item sounds a step higher down the list. Items line up in columns of icon, label and shortcut. Ticks and dots grow in, submenus open beside their item, and an action that removes something is red. The Sidebar example's service switcher is a Dropdown menu.",
-    props: [
-      reference("DropdownMenuTrigger", "Button props and { chevron, render }", "Part"),
-      reference("MenuContent", "{ side, align, anchor, finalFocus }", "Part"),
-      reference(
-        "MenuItem",
-        "{ onSelect, icon, shortcut, destructive, disabled, keepOpen }",
-        "Part",
-      ),
-      reference(
-        "MenuCheckboxItem",
-        "{ checked, defaultChecked, onCheckedChange, disabled }",
-        "Part",
-      ),
-      reference(
-        "MenuRadioGroup / MenuRadioItem",
-        "{ label, value, onValueChange } / { value }",
-        "Part",
-      ),
-      reference("MenuSubmenu", "{ label, icon }", "Part"),
-      reference("MenuGroup / MenuSeparator / MenuLinkItem", "{ label } / none / { href }", "Part"),
-      reference(
-        "MenuHeader",
-        "The head of a MenuGroup given no label, such as who is signed in",
-        "Part",
-      ),
-    ],
+    props: [],
     example: [
       toggle("icons", true, { note: "Shows an icon beside each action." }),
       toggle("shortcuts", true, { note: "Shows the shortcuts for Edit and Duplicate." }),
@@ -1469,11 +1163,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Base UI's Context Menu with the same items as Dropdown menu. It opens where the pointer is, with the open sound, since a right-click is not a press the page hears. On a touch screen a long press opens it. Every action should also be available elsewhere, because a context menu is easy to miss.",
-    props: [
-      reference("ContextMenuTrigger", "<div> props and { render }", "Part"),
-      reference("MenuContent and items", "As in Dropdown menu", "Part"),
-      reference("onOpenChange", "(open: boolean) => void"),
-    ],
+    props: [],
   },
   "hover-card": {
     name: "Hover card",
@@ -1497,8 +1187,6 @@ const entries = {
       ),
       toggle("arrow", true, { default: "true" }),
       number("delay", 200, { min: 0, default: "200", note: "Milliseconds before it opens." }),
-      reference("closeDelay", "number", "250"),
-      reference("HoverCardTrigger", "<a> props and { href, delay, closeDelay, render }", "Part"),
     ],
   },
   table: {
@@ -1510,22 +1198,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "GOV.UK's table, built from parts, with bold headings, keylines between rows and numbers aligned right. A row is shaded under the pointer. A sortable heading is a button with arrows for its order, and rows glide to their new places when the order changes. A table too wide for its container scrolls sideways in a Scroll area, named by its caption. The playground's props list is a Table.",
-    props: [
-      reference("Table", "<table> props", "Root"),
-      reference("TableCaption", "{ size, children }", "Part"),
-      reference(
-        "TableHeader / TableBody / TableFooter",
-        "<thead> / <tbody> / <tfoot> props",
-        "Part",
-      ),
-      reference("TableRow", "<tr> props", "Part"),
-      reference(
-        "TableHead",
-        '{ numeric, sort: "ascending" | "descending" | "none", onSort, after }',
-        "Part",
-      ),
-      reference("TableCell", "{ numeric }", "Part"),
-    ],
+    props: [],
     example: [
       choice(
         "size",
@@ -1550,7 +1223,6 @@ const entries = {
     changes:
       "A block of code with its filename and a Copy button. Code is coloured from the GOV.UK palette by sugar-high, which knows about 30 languages, with line numbers left out of copies. It scrolls both ways in a Scroll area. Copy sits in a header beside the filename, or floats over the code, and its icon turns to a tick. Editable, it is a code editor. A clear text box over the coloured code takes what is typed, so the caret, selection, undo and screen readers are the browser's own, and the code is coloured again at each key. The two share one font and size, and break their lines in the same places, so the text sits on its colours in any typeface. Tab moves on from it, as from any text box. Wrapped, long lines break at the block's width, and the rest of a line starts under its code, beside its number. rows and maxRows set the block's height in lines of code. The example sets both to the short sample's length, for each language, so Long's 2,000 or so lines scroll in a box of that size, to try scrolling and typing at length. The workbench's usage panel is a Code block, and the Editor's source is an editable one.",
     props: [
-      reference("code / defaultCode", "string", "Required"),
       choice(
         "language",
         [
@@ -1576,12 +1248,6 @@ const entries = {
         default: "None",
         note: "Lines before it scrolls inside. 0 is the short sample's length here.",
       }),
-      reference("onCodeChange", "(code) => void"),
-      reference("inputProps", "The text box's props, such as name, id or ref"),
-      reference("filename", "string"),
-      reference("label", "string"),
-      reference("children", "ReactNode", "Actions"),
-      reference("CodeBlockCopy", "{ labels: { copy, copied, failed } }", "Part"),
     ],
     example: [
       toggle("header", true, { note: "Names the file in a header. Without it, Copy floats." }),
@@ -1610,14 +1276,6 @@ const entries = {
       text("label", "Updates to this page", {
         note: "Names the box for screen readers once it scrolls.",
       }),
-      reference("labelledBy", "string"),
-      reference("viewportRef", "Ref<HTMLDivElement>"),
-      reference(
-        "viewportRender",
-        "An element for the viewport, such as <motion.div layoutScroll />",
-        "<div>",
-      ),
-      reference("children", "ReactNode", "Required"),
     ],
   },
   tiles: {
@@ -1675,16 +1333,6 @@ const entries = {
       toggle("previewResize", false, {
         note: "A dragged divider moves on its own, and the tiles resize once it is let go.",
       }),
-      reference("value / defaultValue / onValueChange", "TilesLayout | null", "Optional"),
-      reference("renderTile", "(id: string) => ReactElement", "Required"),
-      reference("createTile", "() => string | null | Promise<string | null>"),
-      reference("tiles", "{ id, title }[]", "Optional"),
-      reference("maximised / onMaximisedChange", "string | null / (id) => void", "Optional"),
-      reference(
-        "active / onActiveChange",
-        "string | null / (id) => void, the tile in use, which a small screen shows",
-        "Optional",
-      ),
       {
         ...choice(
           "mobileBreakpoint",
@@ -1698,42 +1346,6 @@ const entries = {
         ),
         note: "Below it, the tiles show one at a time, the one in use, with a pager in its bar.",
       },
-      reference("storageKey / minSize / empty", "string / number / ReactNode", "— / 120 / —"),
-      reference(
-        "TilesProvider / TilesBoard",
-        "Tiles' own props, split: the arrangement's and the board's",
-        "Part",
-      ),
-      reference("Tile", "{ title, headingLevel, controls, bar, draggable }", "Part"),
-      reference("TileBar / TileGrip / TileTitle / TileControls", "div and heading props", "Part"),
-      reference("TileContent", "{ scroll, padded }", "Part"),
-      reference("TileSplit", '{ direction: "across" | "down" } and Button props', "Part"),
-      reference("TileMenu / TileMaximise / TileClose", "Button props", "Part"),
-      reference("TilePager", "On a small screen, 2 of 3 between the tile before and after", "Part"),
-      reference("TilesDock", "{ label, hint, place }", "Part"),
-      reference("TilesDockItem", "{ tile, place }", "Part"),
-      reference("TilesTidy", "Button props", "Part"),
-      reference(
-        "placeTile / removeTile / swapTiles / replaceTile / expandTile / balanceTiles / keepTiles / normaliseLayout",
-        "(layout, …) => TilesLayout | null",
-        "Helper",
-      ),
-      reference("tileIds / isTilesLayout", "(layout) => string[] / (value) => boolean", "Helper"),
-      reference(
-        "useTilesActions / useTilesState / useTile",
-        "() => actions / () => { layout, open, closed, maximised, titleOf } / () => { id, title }",
-        "Hook",
-      ),
-      reference(
-        "useTilesLayout",
-        "({ storageKey, defaultValue, ids }) => [layout, setLayout]",
-        "Hook",
-      ),
-      reference(
-        "ResizableHandle",
-        '{ orientation, label, controls, value, min, max, step, defaultValue, onValueChange, onValueCommitted, onDraggingChange, panel: "before" | "after", snap, grip, disabled }',
-        "Part",
-      ),
     ],
   },
   separator: {
@@ -1781,8 +1393,6 @@ const entries = {
         restart: true,
         note: "The example starts again when it changes.",
       }),
-      reference("open / onOpenChange", "boolean / (open: boolean) => void"),
-      reference("children", "ReactNode", "Required"),
     ],
   },
   tabs: {
@@ -1794,13 +1404,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Built from parts on Base UI's Tabs. A link-blue bar glides beneath the open tab, as GOV.UK's service navigation marks the current page. The arrow keys move between tabs and open each in turn, and the new panel replaces the old one at once. Each tab keeps the width of its bold label, so the tabs never shift.",
-    props: [
-      reference("value / onValueChange", "string / (value: string) => void"),
-      reference("defaultValue", "string"),
-      reference("TabsList", "{ aria-label, children }", "Part"),
-      reference("TabsTrigger", "{ value, disabled, children }", "Part"),
-      reference("TabsPanel", "{ value, children }", "Part"),
-    ],
+    props: [],
   },
   button: {
     name: "Button",
@@ -1836,8 +1440,6 @@ const entries = {
       ),
       toggle("loading"),
       toggle("disabled"),
-      reference("ref", "HTMLButtonElement"),
-      reference("ButtonGroup", "{ stack, children }", "Part"),
     ],
     example: [
       toggle("group", false, { note: "Puts a Cancel link button beside it in a ButtonGroup." }),
@@ -1878,13 +1480,7 @@ const entries = {
         ],
         3,
       ),
-      reference("value / defaultValue", "string[]", "[]"),
-      reference("onValueChange", "(value: string[]) => void"),
       toggle("disabled"),
-      reference("AccordionItem", "{ value, disabled }", "Part"),
-      reference("AccordionTrigger", "{ summary, children }", "Part"),
-      reference("AccordionPanel", "{ hiddenUntilFound, children }", "Part"),
-      reference("AccordionShowAll", "{ labels: { showAll, hideAll } }", "Part"),
     ],
     example: [
       toggle("showAll", true, { note: "Shows AccordionShowAll.", needs: [whenOn("multiple")] }),
@@ -1921,11 +1517,6 @@ const entries = {
         6,
         { restart: true },
       ),
-      reference("placeholder", "string, one character per slot"),
-      reference("errorMessage", "string"),
-      reference("verifying", "boolean, while the service checks the code", "false"),
-      reference("success", "boolean, once the code is accepted", "false"),
-      reference("onChange", "(value: string) => void"),
       toggle("disabled"),
     ],
     example: [
@@ -1948,11 +1539,6 @@ const entries = {
         note: "Names the navigation for screen readers. It is not shown.",
       }),
       toggle("disabled"),
-      reference("delay / closeDelay", "number", "80 / 180"),
-      reference("NavigationMenuItem", "{ value, children }", "Part"),
-      reference("NavigationMenuTrigger", "{ children }", "Part"),
-      reference("NavigationMenuContent", "{ children }", "Part"),
-      reference("NavigationMenuLink", "{ href, current, description, render, … }", "Part"),
     ],
   },
   toast: {
@@ -1965,7 +1551,6 @@ const entries = {
     changes:
       "Compact pills stack and fan out on hover or focus. Promises turn a spinner into a tick or a cross in place. Tap a toast to dismiss it, or choose drag, where it follows the pointer, eases back if released early and slides away past the threshold. Press F6 to reach the stack and Escape to dismiss one. A close button is optional, and toasts that stay open always have one. A line along the foot of each toast that times out shrinks as its time runs out, in the colour of its type, and stops while the stack is held or the window is in the background, as the timers do. It can be turned off for every toast, or for one.",
     props: [
-      reference("children", "ReactNode", "Required"),
       choice(
         "position",
         toastPositions.map(
@@ -1993,15 +1578,6 @@ const entries = {
         note: "A line shrinks as each toast's time runs out, and stops while the stack is held.",
         needs: [whenAbove0("timeout")],
       }),
-      reference("useToastManager", "add / update / close / promise", "Hook"),
-      reference("type", "loading | success | error | warning | info"),
-      reference("data.sound", "SoundCue", "Chosen by type"),
-      reference("data.countdown", "boolean", "As the provider"),
-      reference(
-        "--x-govuk-ui-countdown-colour / --x-govuk-ui-countdown-height",
-        "CSS",
-        "Type colour",
-      ),
     ],
     presets: [
       { name: "Drag to dismiss", args: { dismiss: "drag" } },
@@ -2022,11 +1598,6 @@ const entries = {
         default: "Required",
         note: "Names the carousel for screen readers. It is not shown.",
       }),
-      reference("CarouselViewport", "{ children }", "Part"),
-      reference("CarouselSlide", "{ label, children }", "Part"),
-      reference("CarouselControls", "{ children }", "Part"),
-      reference("CarouselPrevious / CarouselNext", "{ label }", "Part"),
-      reference("CarouselPosition", 'Reads as "2 of 3"', "Part"),
     ],
   },
   "command-menu": {
@@ -2036,24 +1607,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Built from parts. Base UI's Autocomplete sits inline in a dialog, as Base UI recommends for a command palette, so the first command is always highlighted. Commands sit in labelled groups, show their shortcuts as keyboard keys, and can open pages of further commands, with a trail back and Backspace to return. CommandMenuBestMatches shows the commands whose names are the search, or start with it, before the groups, so typing a command's name finds it first, even where a whole group's keywords match too. A service places it, and can give it a limit and a ranking of its own, and the menu a search of its own. One highlight slides between commands, and the list, a Scroll area, eases to its new height as the search narrows it. Command-K or Control-K opens it anywhere on the page. This workbench uses it as its site-wide command menu.",
-    props: [
-      reference("open / defaultOpen / onOpenChange", "boolean / (open) => void", "Uncontrolled"),
-      toggle("keyboardShortcut", true),
-      reference("labels", "Partial<CommandMenuLabels>", "Open command menu, No commands found."),
-      toggle("disabled"),
-      reference("CommandMenuGroup", "{ label, children }", "Part"),
-      reference(
-        "CommandMenuItem",
-        "{ onSelect, page, description, shortcut, icon, keywords, textValue, disabled }",
-        "Part",
-      ),
-      reference("CommandMenuPage", "{ id, label, placeholder, children }", "Part"),
-      reference("CommandMenuBestMatches", "{ label, limit, rank }", "Part"),
-      reference("filter", "(search, command) => boolean", "matchesCommand"),
-      reference("CommandMenuTrigger", "Button props and { render }", "Part"),
-      reference("CommandMenuContent", "{ placeholder, finalFocus, empty, help, children }", "Part"),
-      reference("useCommandMenu", "() => { search, setSearch, close }", "Hook"),
-    ],
+    props: [toggle("keyboardShortcut", true), toggle("disabled")],
     example: [
       text("placeholder", "Search commands…", { note: "CommandMenuContent's search placeholder." }),
       text("triggerLabel", "Open command menu", {
@@ -2089,15 +1643,6 @@ const entries = {
         "default",
         { default: "default", note: "The user's bubbles in the example." },
       ),
-      reference("align", '"start" | "end"', "start"),
-      reference("BubbleContent", "{ render, children }", "Part"),
-      reference("BubbleReactions", '{ side: "top" | "bottom", align: "start" | "end" }', "Part"),
-      reference(
-        "BubbleReactionPicker",
-        "{ options: { emoji, label }[], value, defaultValue, onValueChange, label, hold = 300 }",
-        "Part",
-      ),
-      reference("BubbleGroup", "{ children }", "Part"),
     ],
   },
   conversation: {
@@ -2117,32 +1662,6 @@ const entries = {
         default: "Service assistant",
         note: "Screen readers hear it before each reply and while the assistant thinks. It is not shown.",
       }),
-      reference("empty", "ReactNode, shown in the empty log", "None"),
-      reference("headingLevel", "2 | 3 | 4 | 5 | 6", "3"),
-      reference(
-        "ConversationMessage",
-        '{ from: "user" | "assistant", streaming, children }',
-        "Part",
-      ),
-      reference("ConversationContent", "The message's text", "Part"),
-      reference("ConversationNote", "A quiet note, such as a reply stopped", "Part"),
-      reference("ConversationActions", "Tools for one message", "Part"),
-      reference("ConversationCopy", "{ labels: { copy, copied, failed } }", "Part"),
-      reference(
-        "MessageRating / MessageRetry / MessageAction",
-        "{ value, onValueChange } / { onRetry } / { label, icon, onClick }",
-        "Part",
-      ),
-      reference(
-        "MessageSuggestions / MessageSuggestion",
-        "{ aria-label } / Button's props",
-        "Part",
-      ),
-      reference(
-        "ConversationThinking",
-        "{ statuses = defaultThinkingStatuses, or playfulThinkingStatuses }",
-        "Part",
-      ),
     ],
     example: [
       toggle("thinking", false, { note: "Keeps ConversationThinking showing." }),
@@ -2175,22 +1694,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Rows sit under bands, such as issues by status, and pressing a band folds its rows away on Base UI's Collapsible. Each column is as wide as its widest cell, and the columns line up across every group, with the first band heading them. No text is ever cut short or wrapped. As the table narrows, the columns give way in steps, each taken only once the one before would cut text short. Some columns are left out, then some join each row's title and the marks go, then some merge into others, as the dates into the people, and the people stand closer together. Each step moves through the rows from the top down, a little later in each row, and goes back the same way as the table widens. Past the last step, the groups scroll sideways in a Scroll area. Screen readers hear each cell's column before it, wherever it sits. With resizable, a Resizable handle on the right edge narrows and widens the table, by dragging or with the arrow keys. The example's To do band starts folded, with defaultOpen.",
-    props: [
-      reference("label", "string", "Required"),
-      reference(
-        "columns",
-        '{ id, label, icon?, align?, collapse?: "drop" | "inline" | { into } }[]',
-        "Required",
-      ),
-      reference("toolbar", "ReactNode"),
-      toggle("resizable", true, { default: "false" }),
-      reference(
-        "GroupedTableGroup",
-        "{ label, icon, count, defaultOpen, open, onOpenChange }",
-        "Part",
-      ),
-      reference("GroupedTableRow", "{ title, icon, cells }", "Part"),
-    ],
+    props: [toggle("resizable", true, { default: "false" })],
   },
   "data-table": {
     name: "Data table",
@@ -2201,13 +1705,6 @@ const entries = {
     changes:
       "A dense table for working through many records, as a CRM's is. It is built from Table's parts in a Scroll area that scrolls both ways. The headings stay at the top, the foot at the bottom and the first columns at the side, and once the rest has scrolled under them they cast a shadow along their edge. It is as tall as its rows, up to its most rows, and given less height, as a page laid out to fill the window gives it, it takes what it is given and its rows scroll within it, so the page need not scroll. The columns fill the table's width: where the table has more room than their widths add up to, each column takes a share of the rest, in proportion to its width, so no space is left empty at the side. Each column's edge is a Resizable handle, dragged or moved with the arrow keys. A column resized keeps the width users give it, and the others share what room is left. Double-clicking the edge returns the column to its width and its share. Sortable headings sort the rows, which glide to their new places. Rows can be chosen with checkboxes, the heading one choosing every row or none, and acted on from a Selection bar that floats over the rows. The foot counts the rows, and offers each column's figure, such as a sum or an average, on a button. The rows scroll between the headings and the foot, with the scrollbar beside them alone, and stop at either end without a bounce, which would move the headings and the foot too. A row that takes focus from the keyboard scrolls clear of the headings and the foot, never under them. minRows and maxRows set the table's height in rows of data. The example sets both to 8, so Long's 1,000 or so rows scroll in a box of that size.",
     props: [
-      reference("label", "string", "Required"),
-      reference(
-        "columns",
-        "{ id, header, icon?, cell, sortBy?, numeric?, width, minWidth?, summary? }[]",
-        "Required",
-      ),
-      reference("rows / rowKey / rowName", "Row[] / (row) => string", "Required"),
       choice(
         "pinned",
         [
@@ -2219,10 +1716,6 @@ const entries = {
         { default: "1" },
       ),
       toggle("selectable", true, { default: "false" }),
-      reference("selected / onSelectedChange", "string[] / (selected: string[]) => void"),
-      reference("sort / onSortChange", "{ id, direction } | null / (sort: DataTableSort) => void"),
-      reference("count", "(rows: number) => ReactNode"),
-      reference("selectionBar", "a SelectionBar for the chosen rows"),
       number("minRows", 8, {
         min: 0,
         default: "None",
@@ -2334,30 +1827,6 @@ const entries = {
         note: "Shows licence holders by age and sex, men running the other way from the baseline.",
         needs: [when("type", "bar"), whenOn("stacked"), when("orientation", "horizontal")],
       }),
-      reference("bins", "number | number[]", "By Sturges' rule"),
-      reference("highlight", "string"),
-      reference("totals", "string[]"),
-      reference("references", "{ at: number | string; to?; label? }[]"),
-      reference("domain", "[number, number]"),
-      reference("range / defaultRange", "[from: number, to: number]"),
-      reference("onRangeChange", "(range: [from, to]) => void"),
-      reference("title / subtitle / source", "ReactNode", "Or children"),
-      reference(
-        "children",
-        "FigureCaption, ChartKey, ChartPlot, ChartBrush, FigureSource, ChartTable",
-        "Or title",
-      ),
-      reference("description", "string", "Required"),
-      reference("data / category", "Record<string, string | number | null>[] / string", "Required"),
-      reference("categoryLabel", "string", "The category, capitalised"),
-      reference(
-        "series",
-        "{ key, label, as?, dashed?, continues?, range?, format? }[]",
-        "Required",
-      ),
-      reference("format", "(value: number) => string"),
-      reference("height", "number", "280"),
-      reference("labels", "Partial<ChartLabels>", "English"),
     ],
     example: [
       toggle("references", false, {
@@ -2420,23 +1889,7 @@ const entries = {
     dependencies: "React · Recharts",
     changes:
       "Several charts of one kind in a grid, each showing one slice of the figures on one shared scale, so the eye compares the panels without reading their axes, as the Analysis Function suggests in place of a crowded chart or a stacked bar with negatives. The set has Chart's rule, headline, key and source once, and each panel keeps its own title. The panels are given as data, each a chart's figures with its title, so the set knows its scale before it draws any. The scale runs from the lowest figure to the highest that the panels draw, such as their tallest stack, a waterfall's running total or a band's bounds, across every panel whose type has a value axis. Moving over one panel shows the same category's card in every panel, matched by its name. Screen readers hear the set's point with its title and each panel's own, and every panel's figures are in tables in one Details beneath. The panels stack on a phone. The set's own parts can be set out as its children, as a Chart's can, ChartPlot being the panels.",
-    props: [
-      number("columns", 2, { min: 1, note: "How many panels sit side by side." }),
-      reference("height", "number", "160"),
-      reference(
-        "panels",
-        "{ title, description, type, data, category, series, ... }[]",
-        "Required",
-      ),
-      reference("title / subtitle / source", "ReactNode", "Or children"),
-      reference(
-        "children",
-        "FigureCaption, ChartKey, ChartPlot, FigureSource, ChartTable",
-        "Or title",
-      ),
-      reference("description", "string", "Required"),
-      reference("labels", "Partial<ChartLabels>", "English"),
-    ],
+    props: [number("columns", 2, { min: 1, note: "How many panels sit side by side." })],
     example: [
       choice(
         "type",
@@ -2457,16 +1910,7 @@ const entries = {
     dependencies: "React",
     changes:
       "A year of weeks side by side, as the Analysis Function suggests for a time series with a pattern by the day of the week, after Mantine's Heatmap. Each day is a small square in one of five shades of the palette's first colour, a class of figures each, named in the key, and a day with no figure is hatched, as the key's No figure is. Months are named along the top and days of the week down the side, Monday first. Moving over a day shows its date and figure in a card, and outlines it. It has a Chart's rule, headline and source. Screen readers hear its point in a sentence, and every day's figure is in a table beneath, set as the calendar is, a row for each week. On a narrow screen the weeks scroll sideways. Its `labels` take its words for another language, and their `locale`, such as \"cy\" for Welsh, names its months and days and writes its dates. The example's figures are made up from the season and the day of the week, and Christmas Day has none. Its parts can be laid out as its children, as a Chart's can.",
-    props: [
-      reference("title / subtitle / source", "ReactNode"),
-      reference("description", "string", "Required"),
-      reference("data", "Record<string, number>", "Required"),
-      reference("label", "string", "Required"),
-      reference("start / end", "string", "The year to the last day with a figure"),
-      reference("format", "(value: number) => string"),
-      reference("domain", "[number, number]"),
-      reference("labels", "Partial<ChartLabels>", "English"),
-    ],
+    props: [],
     example: [
       toggle("season", false, { note: "Starts the calendar in April, with the `start` prop." }),
     ],
@@ -2480,18 +1924,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Areas shaded by their figures, as the Analysis Function suggests for figures that differ by place, in the five classes a heat map uses, named in the key. An area without a figure is hatched, and the key says so. Mantine has no map. The boundaries are the service's own, as GeoJSON, so the map brings no geography of its own. The example's are the Office for National Statistics' nine regions of England, simplified to within about a kilometre, under the Open Government Licence. They are drawn on a plain projection that keeps a small country's shape, its longitude narrowed by the cosine of its middle latitude, and the map keeps its shape in the middle of its width. Moving over an area outlines it and shows its name and figure in a card. It has a Chart's rule, headline and source. Screen readers hear its point in a sentence, and every area's figure is in a table beneath, as a map alone tells a screen reader nothing. Its parts can be laid out as its children, as a Chart's can.",
-    props: [
-      reference("title / subtitle / source", "ReactNode"),
-      reference("description", "string", "Required"),
-      reference("areas", "{ code, name, geometry }[]", "Required"),
-      reference("data", "Record<string, number>", "Required"),
-      reference("label", "string", "Required"),
-      reference("nameLabel", "string", "Area"),
-      reference("format", "(value: number) => string"),
-      reference("domain", "[number, number]"),
-      reference("height", "number", "440"),
-      reference("labels", "Partial<ChartLabels>", "English"),
-    ],
+    props: [],
     example: [
       toggle("missing", false, { note: "Leaves London without a figure, which hatches it." }),
     ],
@@ -2506,15 +1939,7 @@ const entries = {
     dependencies: "React · Recharts",
     changes:
       "Rectangles as large as their figures, nested in their branches, as the Analysis Function suggests for part-to-whole with many parts, after Mantine's Treemap. Each branch at the top takes the next colour of the Analysis Function's palette, named in the key, and its parts share it, parted by lines of the paper's colour. Each part is named with its figure in the ink that reads on its colour, where the words fit in the page's own font, measured as they render. Moving over a part shows its path, figure and share in a card. It has a Chart's rule, headline and source. Screen readers hear its point in a sentence, and every branch and part is in a table beneath, by its path, with its figure and share. The parts grow into place as it first shows, unless motion is reduced. Its parts can be laid out as its children, as a Chart's can.",
-    props: [
-      reference("title / subtitle / source", "ReactNode"),
-      reference("description", "string", "Required"),
-      reference("data", "{ name, value?, children? }[]", "Required"),
-      reference("nameLabel / valueLabel", "string", "Required"),
-      reference("format", "(value: number) => string"),
-      reference("height", "number", "320"),
-      reference("labels", "Partial<ChartLabels>", "English"),
-    ],
+    props: [],
     example: [
       toggle("nested", true, { note: "Splits each area of spending into its programmes." }),
     ],
@@ -2527,15 +1952,7 @@ const entries = {
     dependencies: "React · Recharts",
     changes:
       "A tree of figures in rings, after Mantine's SunburstChart. Each branch is an arc in the middle ring, as long as its figure, and its parts are in the rings beyond, in a paler shade of its colour. The branches are named in the key. Recharts writes each arc's raw figure on it, which the card and table give in the service's own format, so the arcs are left without words. Moving over an arc shows its path, figure and share in a card. It has a Chart's rule, headline and source, and every part's figure is in a table beneath. Arcs are read less exactly than lengths, so prefer a Treemap or a Chart's bars to compare the parts. Its parts can be laid out as its children, as a Chart's can.",
-    props: [
-      reference("title / subtitle / source", "ReactNode"),
-      reference("description", "string", "Required"),
-      reference("data", "{ name, value?, children? }[]", "Required"),
-      reference("nameLabel / valueLabel", "string", "Required"),
-      reference("format", "(value: number) => string"),
-      reference("height", "number", "320"),
-      reference("labels", "Partial<ChartLabels>", "English"),
-    ],
+    props: [],
   },
   sankey: {
     name: "Sankey",
@@ -2546,15 +1963,7 @@ const entries = {
     dependencies: "React · Recharts",
     changes:
       "A Sankey diagram, as the Analysis Function suggests for flows, after Mantine's SankeyChart. The flows are given by the names of the stages they join, instead of Recharts' indexes, and the stages are set in columns by how far along they are. Each stage is a bar as tall as what passes through it, in the next colour of the palette, named with its figure beside it. The name comes after the bar, or before it for the last stages. Each flow is a band in the colour of the stage it leaves, faint until the pointer is on it. Moving over a flow or a stage shows its figure in a card. It has a Chart's rule, headline and source. Screen readers hear its point in a sentence, and every flow is in a table beneath, from, to and figure. Its parts can be laid out as its children, as a Chart's can. A flow can only go forward, so one that loops back to a stage it came through is left out of the drawing, though the table lists it.",
-    props: [
-      reference("title / subtitle / source", "ReactNode"),
-      reference("description", "string", "Required"),
-      reference("links", "{ from, to, value }[]", "Required"),
-      reference("valueLabel", "string", "Required"),
-      reference("format", "(value: number) => string"),
-      reference("height", "number", "320"),
-      reference("labels", "Partial<ChartLabels>", "English"),
-    ],
+    props: [],
   },
   "bar-list": {
     name: "Bar list",
@@ -2565,13 +1974,7 @@ const entries = {
     dependencies: "React",
     changes:
       "A ranked list as GOV.UK draws a horizontal bar chart in HTML, after Mantine's BarsList. Each name sits over a bar as long as its figure, with the figure at the row's end. It is a GOV.UK table, so screen readers hear each name with its figure, and it needs no description or table of its own. The bars are a tint of the palette's first colour, so the names read on them in the page's ink, with a solid edge where each ends. They lie behind the names, out of the flow, so as they grow when the list first shows, and as they change, they move no text.",
-    props: [
-      reference("data", "{ label, value, id? }[]", "Required"),
-      reference("nameLabel / valueLabel", "ReactNode", "Required"),
-      text("caption", "Licences sold by region, 2025", { type: "ReactNode" }),
-      reference("format", "(value: number) => string"),
-      reference("max", "number", "The largest figure"),
-    ],
+    props: [text("caption", "Licences sold by region, 2025", { type: "ReactNode" })],
   },
   "bullet-chart": {
     name: "Bullet chart",
@@ -2582,15 +1985,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Stephen Few's bullet graph, after Mantine's BulletChart. It has a bar for the figure, a mark across it for the target, and bands of grey behind it that darken as they rise, such as poor, fair and good, with a scale beneath. The label, the figure and the target are words above the bar, and the bands are named in a key, so no reader needs the greys, and screen readers hear each band's range too. Several one above another compare measures in little space, as the example's three do. The bar grows from its start as it first shows, unless motion is reduced. Its bands' greys darken evenly from the palest to the darkest, however many bands there are.",
-    props: [
-      reference("label / description", "ReactNode"),
-      reference("value", "number", "Required"),
-      reference("target", "number"),
-      reference("ranges", "{ to, label }[]"),
-      reference("min / max", "number", "0 / the last range's end"),
-      reference("format", "(value: number) => string"),
-      reference("labels", "Partial<ChartLabels>", "English"),
-    ],
+    props: [],
     example: [
       toggle("bands", true, { note: "Shades the bands behind each bar, with `ranges`." }),
       toggle("targets", true, { note: "Marks each measure's `target`." }),
@@ -2606,9 +2001,7 @@ const entries = {
     changes:
       "One figure on a dial two thirds of a turn round, after Mantine's GaugeChart, with the figure large in its middle and what it measures beneath. The dial fills in the palette's first colour, or GOV.UK's green or red for good or bad news, from its start as it first shows, and eases as the figure changes, unless motion is reduced. A target is a mark across the dial. Screen readers hear a meter named by its label, with the figure, the range and the target in words. A dial is read less exactly than a bar, so use one for a single figure that matters, and a Bullet chart to compare several.",
     props: [
-      reference("label / description", "ReactNode"),
       range("value", 82, 0, 100, 1),
-      reference("min / max", "number", "0 / 100"),
       choice(
         "sentiment",
         [
@@ -2619,8 +2012,6 @@ const entries = {
         "neutral",
       ),
       number("size", 180, { min: 120 }),
-      reference("format", "(value: number) => string"),
-      reference("labels", "Partial<ChartLabels>", "English"),
     ],
     example: [toggle("target", true, { note: "Marks the target of 90%." })],
     presets: [
@@ -2638,13 +2029,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Parts of a whole as a grid of cells, a hundred by default, so each cell is one in a hundred, as ONS shows \"1 in 4\", after Mantine's WaffleChart. Each part takes the next colour of the palette, and its cells by the largest remainder, so they always add up and no part gains or loses more than one by rounding. A whole larger than its parts, such as everyone asked when some did not answer, leaves the rest of the cells empty. The key names each part with its figure and share, so the words say what the colours show, and screen readers hear only the key. The grid sits beside the key while there is space, by the waffle's own width, and above it when there is not. Its cells fill in, in reading order, as it first shows, unless motion is reduced.",
-    props: [
-      reference("data", "{ label, value }[]", "Required"),
-      number("rows", 10, { min: 1 }),
-      number("columns", 10, { min: 1 }),
-      reference("total", "number", "The parts' sum"),
-      reference("format", "(value: number) => string"),
-    ],
+    props: [number("rows", 10, { min: 1 }), number("columns", 10, { min: 1 })],
     example: [
       toggle("total", true, {
         note: "Counts everyone asked, so the 12 who did not answer leave their cells empty.",
@@ -2660,8 +2045,6 @@ const entries = {
     changes:
       "A line as small as a word, as Tufte drew them, after Mantine's Sparkline. It has no axes and no grid, only the line, shaded beneath, with its latest figure marked by a dot. It stretches to its container's width and keeps its stroke and its dot round as it does, and a missing figure leaves a gap. The line is the palette's first colour, or GOV.UK's green or red for a trend that is good or bad news, as Stat's change is. It draws in from the left as it first shows, unless motion is reduced. Screen readers hear its description, as a line alone tells them nothing, so give the figures beside it, as the example's table does. The North East's July is missing.",
     props: [
-      reference("data", "(number | null)[]", "Required"),
-      reference("description", "string", "Required"),
       toggle("area", true, { note: "Shades the area beneath the line." }),
       choice(
         "curve",
@@ -2681,8 +2064,6 @@ const entries = {
         ],
         "neutral",
       ),
-      reference("domain", "[number, number]"),
-      reference("height", "number", "32"),
     ],
   },
   stat: {
@@ -2694,13 +2075,6 @@ const entries = {
     changes:
       "One figure that matters, set as The Economist sets a big number. The figure is large and bold in tabular numerals, with what it counts above it in quiet small text. Beneath it is a line such as the period, or how the figure has moved since the last one, with an arrow. A move that is good news is GOV.UK's green and one that is bad its red, with the arrow and the words saying it too, so colour never works alone. Each stat's words are a description list, so screen readers hear the label as a term and the figure as what it means. Stats sets several side by side with a keyline between each, or one above another, in a Figure, so with a title, a subtitle and a source they read as a Chart does, and a dashboard's numbers and its charts read as one. The row is a grid of equal cells, as many across as fit, wrapping as the space runs out, and each stat sizes its figure and icon to the space its cell has.",
     props: [
-      reference("label / value", "ReactNode", "Required"),
-      reference("description", "ReactNode"),
-      reference(
-        "change",
-        "{ value, direction: up | down | flat, sentiment?: good | bad | neutral }",
-      ),
-      reference("icon", "ReactNode"),
       choice(
         "orientation",
         [
@@ -2719,8 +2093,6 @@ const entries = {
         "start",
         { note: "On Stats. Centres each stat's words." },
       ),
-      reference("title / subtitle / source", "ReactNode", "On Stats"),
-      reference("children", "Stat parts", "On Stats"),
     ],
     example: [
       toggle("titled", true, { note: "Heads the figures with a rule, a headline and a source." }),
@@ -2742,12 +2114,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "The frame every chart and Stats are set in, as GOV.UK's statistics set their figures. It has a short rule in brand blue over a headline and a line saying what is measured, then the content, then where it comes from, and the figures in a table a reader opens. A service sets its own content in it the same way, such as a drawing or a table, and a chart's parts can be laid out in it in another order. The figure is named by its headline. A drawing is a picture to screen readers, so its figures go in FigureData beneath it, as GOV.UK asks.",
-    props: [
-      reference("description", "string", "Optional"),
-      reference("FigureCaption", "{ title, subtitle }", "Part"),
-      reference("FigureSource", "children", "Part"),
-      reference("FigureData", "{ summary, open, defaultOpen, onOpenChange, children }", "Part"),
-    ],
+    props: [],
     example: [
       toggle("subtitle", true),
       toggle("source", true),
@@ -2765,19 +2132,7 @@ const entries = {
     changes:
       "The Home Office design system's timeline, with a tick as thick as the rail at each heading, and the date and who did it on one line beneath it, such as 12 March 2026 at 2:05pm by the Passport Office. Here, the events since users last looked are highlighted. Add the next update adds an event above them, which joins them. Show earlier events loads 3 more events beneath the others, after a moment, as a service's API would, then the last one.",
     functions: ["formatDateTime", "formatDate", "formatTime"],
-    props: [
-      reference("label", "string"),
-      reference("headingLevel", "2 | 3 | 4 | 5 | 6", "3"),
-      reference(
-        "TimelineItem",
-        "{ title, by, date, highlighted, children, actions, labels }",
-        "Part",
-      ),
-      reference("TimelineMore", "{ loading, onClick, children, labels }", "Part"),
-      reference("formatDateTime", "(date: Date) => string", "Helper"),
-      reference("formatDate", "(date: Date) => string", "Helper"),
-      reference("formatTime", "(date: Date) => string", "Helper"),
-    ],
+    props: [],
   },
   "summary-list": {
     name: "Summary list",
@@ -2787,12 +2142,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's summary list and summary card, built from parts. Keys, values and actions line up in columns across every row, rows without actions included, and stack when the list is narrow. An action is a link, or a button that can open a Dialog to edit the answer in place. When a value changes, it glows for a moment in a tint of brand blue, so users see what they changed. A summary card puts the list under a tinted title band with actions for the whole card.",
-    props: [
-      toggle("noBorder"),
-      reference("SummaryListRow", "{ label, children, actions }", "Part"),
-      reference("SummaryListAction", "{ href, onClick, hiddenText, render, children }", "Change"),
-      reference("SummaryCard", "{ title, headingLevel, actions, children }", "Part"),
-    ],
+    props: [toggle("noBorder")],
     example: [toggle("card", true, { note: "Puts the list in a SummaryCard." })],
   },
   "task-list": {
@@ -2803,14 +2153,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's task list, built from parts. Each task's link covers its row, which tints under the pointer, and screen readers hear the hint and status with the name. Statuses are GOV.UK's, as Tags or plain text, and each new status rises into place. It is also an agent's task list. The task an agent is on shows a spinner, and each task it completes ticks softly.",
-    props: [
-      reference("TaskListItem", "{ href, render, hint, status, statusText, children }", "Part"),
-      reference(
-        "status",
-        '"completed" | "incomplete" | "not-started" | "in-progress" | "cannot-start" | "error" | "working"',
-        "Required",
-      ),
-    ],
+    props: [],
     example: [
       toggle("agent", true, { note: "An agent works through the tasks." }),
       toggle("hints", false, { note: "Gives some tasks a hint." }),
@@ -2848,21 +2191,6 @@ const entries = {
           note: "Where the log opens, which is at the newest message, at the first, or at the last question with its answer below, or the end if that turn fits.",
         },
       ),
-      reference("framed", "boolean", "true"),
-      reference("label", "string", "Messages"),
-      reference("footer", "ReactNode"),
-      reference("busy", "boolean"),
-      reference("empty", "ReactNode, shown while there are no messages", "None"),
-      reference("ref", "{ scrollToMessage(id), scrollToEnd(), scrollToStart() }"),
-      {
-        ...reference("MessageScrollerItem", "{ id, anchor, children }", "Part"),
-        note: "One row, known by its id. An anchor, such as a question, starts a turn.",
-      },
-      reference(
-        "MessageSuggestions / MessageSuggestion",
-        "{ aria-label } / Button's props",
-        "Part",
-      ),
     ],
     example: [
       toggle("tip", true, {
@@ -2884,10 +2212,6 @@ const entries = {
         type: "ReactNode",
         default: "Required",
       }),
-      reference("description", "ReactNode"),
-      reference("children", "ReasoningStep parts", "Required"),
-      reference("actions", "ReactNode"),
-      reference("eyebrow", "ReactNode", "Plan"),
     ],
     example: [toggle("description", true, { note: "Says what the plan will do." })],
   },
@@ -2902,11 +2226,6 @@ const entries = {
     changes:
       "A card that asks questions one at a time, with the steps of shadcn's Questionnaire. It is Form steps in its card layout, made from a list of questions as an agent sends them. A question can ask for a choice from Choices, with a letter or number for each answer that pressing chooses, one answer or several, and a last row that takes any words, or for some words, a number, a date, or one answer from a list. The questions come under a header whose ring fills as they are answered. Next, or Command with Enter, moves on, Previous goes back, and Skip passes over a question that need not be answered. Pressing Next without an answer shows GOV.UK's error message beside the question. The words change at once and the card eases to each question's height, while the footer stays put. Once done, the card lists the answers in a Summary list, each with Change to ask that question again. A date question can take a min and max, such as today for a date in the past, and a date outside them has GOV.UK's message, such as “The date must be today or in the past”. With calendar, it offers a Calendar beside its fields, which offers only the days between them.",
     props: [
-      reference(
-        "questions",
-        '{ name, question, hint?, type?: "choice" | "text" | "number" | "date" | "select", options?, other?, multiple?, required?, min?, max?, calendar? }[]',
-        "Required",
-      ),
       choice(
         "markers",
         [
@@ -2916,11 +2235,6 @@ const entries = {
         ],
         "letters",
       ),
-      reference("title", "ReactNode", "Questions"),
-      reference("onComplete", "(answers: Record<string, string | string[] | null>) => void"),
-      reference("labels", "Partial<QuestionCardLabels>", "Next, Previous, Continue"),
-      reference("defaultValues", "Record<string, string | string[]>", "None"),
-      reference("defaultSettled", "{ answered?: number[], skipped?: number[] }", "None"),
     ],
   },
   "file-diff": {
@@ -2944,10 +2258,6 @@ const entries = {
         default: "None",
         note: "Rows before it scrolls inside. 17 is the short diff's own. 0 sets none here.",
       }),
-      reference("filename", "string", "Required"),
-      reference("before / after", "string", "Required"),
-      reference("language", "string", "tsx"),
-      reference("children", "Actions, such as Accept and Reject"),
     ],
     example: [toggle("long", false, { note: "Repeats the file to about 2,000 lines." })],
   },
@@ -2975,7 +2285,6 @@ const entries = {
         "medium",
         { default: '"medium"' },
       ),
-      reference("render", "A link, such as to the organisation's page", "<span>"),
     ],
   },
   "logo-carousel": {
@@ -2987,8 +2296,6 @@ const entries = {
     changes:
       "A wall of logos, for the organisations a service is run with. A row of places each shows one logo, and every few seconds one place turns over, the logo there rolling up and away as the next rises in, each place in turn. An organisation without a logo shows its name as GOV.UK sets an organisation's, beside a bar of its colour. The wall is as tall as its tallest logo, so a long name is never cut short, and it keeps that height as the logos turn over. It stops while the pointer is over it or something in it has focus, and a Pause button stops it for good, as WCAG asks of anything that moves on its own. With reduced motion it starts paused. Screen readers hear every organisation in a list, instead of the moving wall.",
     props: [
-      reference("label", "string", "Required"),
-      reference("items", "{ name, logo?, colour? }[]", "Required"),
       choice(
         "visible",
         [
@@ -2999,7 +2306,6 @@ const entries = {
         4,
         { default: "4" },
       ),
-      reference("interval", "number", "2600"),
     ],
   },
   "qr-code": {
@@ -3011,8 +2317,6 @@ const entries = {
     changes:
       "A QR code that uqr encodes and the library draws. Each module is a dot, and the three corner squares are rounded rings around rounded squares. It is dark on a white tile in either theme and in high contrast mode, so phones read it in any light. Each time what it encodes changes, the new dots ripple out from the middle, each a little after the one nearer the middle, over the time ripple sets. Changing ripple here plays it again. Screen readers hear it as a picture named by what it leads to.",
     props: [
-      reference("value", "string", "Required"),
-      reference("label", "string"),
       range("size", 200, 120, 320, 20),
       choice(
         "errorCorrection",
@@ -3036,12 +2340,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Photos in justified rows, each row filling the width at the photos' own proportions, laid out by CSS alone so nothing moves as they load. Pressing a photo dips it a little, then it moves to the centre and grows, while the others spread outwards and fade and the page blurs under a light veil of its own colour. The arrow keys, the buttons or a swipe move between photos, each sliding in from its side, and screen readers hear which photo is showing. A press anywhere outside the photo, Escape or Close sends it back to its place as the blur clears and the others gather again. Each photo can have its photographer's name, which shows as a MediaCredit on the thumbnail and beside the caption. The viewer is a Base UI Dialog, so focus stays inside it and returns to the photo it ends on.",
-    props: [
-      range("rowHeight", 200, 120, 300, 10),
-      reference("images", "{ src, alt, width, height, caption?, credit? }[]", "Required"),
-      reference("gap", "number", "8"),
-      reference("label", "string", "Photos"),
-    ],
+    props: [range("rowHeight", 200, 120, 300, 10)],
     example: [toggle("captions", true, { note: "Gives each photo a caption in the viewer." })],
   },
   link: {
@@ -3067,7 +2366,6 @@ const entries = {
       toggle("underline", true, { default: "true" }),
       toggle("visited", true, { default: "true", note: "Shows visited links in GOV.UK's purple." }),
       toggle("newTab", false, { note: "Opens a new tab, and says so in the link." }),
-      reference("href / render", "string / ReactElement"),
     ],
   },
   sound: {
@@ -3084,13 +2382,6 @@ const entries = {
       range("volume", 0.5, 0, 1, 0.05),
       range("detune", 0, -1200, 1200, 100),
       range("velocity", 1, 0, 1, 0.05),
-      reference("useSound", "({ muted, volume }) => PlaySound", "Hook"),
-      reference("PlaySound", "(cue, { detune, velocity }) => Promise<void>", "Function"),
-      reference("SoundScope", "{ play, children }", "Part"),
-      reference("useScopeSound", "() => (cue, { detune, velocity }) => void", "Hook"),
-      reference("data-sound", 'SoundCue | "off"', "Chosen by the control"),
-      reference("data-sound-enter", "SoundCue", "None"),
-      reference("soundCues", "SoundCue[]", "Constant"),
     ],
   },
   "theme-picker": {
@@ -3101,16 +2392,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Not in GOV.UK. It starts light, as GOV.UK is, until users switch. In the example, it sets the theme of the card beneath it, so the workbench keeps its own. In a dark workbench, the card can be light, and in a light one, dark. The workbench's own toolbar uses one.",
-    props: [
-      reference("value / defaultValue / onValueChange", '"light" | "dark"', "light"),
-      reference("storageKey", "string", "None"),
-      reference("labels", "{ toDark, toLight }", "English"),
-      reference(
-        "useTheme",
-        "({ storageKey, defaultTheme, element }) => { theme, setTheme }",
-        "Hook",
-      ),
-    ],
+    props: [],
   },
   "visually-hidden": {
     name: "Visually hidden",
@@ -3120,10 +2402,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's visually hidden text, such as the rest of a Change link's name, as a component. The words stay in the page and are read in place, but take no space. The library's own parts use the same class.",
-    props: [
-      reference("children", "ReactNode", "Required"),
-      reference("render", "An element, such as a heading only screen readers hear", "<span>"),
-    ],
+    props: [],
     example: [toggle("reveal", false, { note: "Outlines the hidden words in place." })],
   },
   card: {
@@ -3134,12 +2413,7 @@ const entries = {
     dependencies: "React",
     changes:
       "A keyline box built from parts. When its title is a link, the whole card is the link, and GOV.UK's focus rings the card. The card stays still under the pointer. The footer sits above the card's link, so its own links and buttons still work. The Carousel example's slides are Cards. A MediaCredit in the image's corner names its photographer as a small Tag, which rises into view when the pointer is over the card or it has focus.",
-    props: [
-      reference("CardMedia", "An image or video", "Part"),
-      reference("CardTitle", "{ href, render, headingLevel, children }", "Part"),
-      reference("CardDescription / CardFooter", "ReactNode", "Part"),
-      reference("MediaCredit", "{ prefix, children }", "Part"),
-    ],
+    props: [],
     example: [
       toggle("media", true, { note: "Gives each card an image." }),
       toggle("links", true, { note: "Makes each card a link." }),
@@ -3153,11 +2427,7 @@ const entries = {
     dependencies: "React",
     changes:
       "A complementary landmark named by its title, under a brand-blue rule, as GOV.UK's related links. Its links are the library's Link.",
-    props: [
-      text("title", "Related content", { type: "ReactNode", default: "Required" }),
-      reference("headingLevel", "2 | 3 | 4", "2"),
-      reference("children", "ReactNode"),
-    ],
+    props: [text("title", "Related content", { type: "ReactNode", default: "Required" })],
   },
   "aspect-ratio": {
     name: "Aspect ratio",
@@ -3187,13 +2457,7 @@ const entries = {
     dependencies: "React",
     changes:
       "A row built from parts, with media, such as an Avatar, a title and a description, and actions. An ItemGroup rules lines between items, and the outline variant gives an item a keyline of its own.",
-    props: [
-      reference("variant", '"plain" | "outline"', "plain"),
-      reference("ItemMedia", '{ variant: "plain" | "tile" }', "Part"),
-      reference("ItemContent / ItemActions", "ReactNode", "Part"),
-      reference("ItemTitle / ItemDescription", "ReactNode", "Part"),
-      reference("ItemGroup", "A list of items", "Part"),
-    ],
+    props: [],
     example: [
       toggle("outline", false, { note: "Gives each item a keyline." }),
       toggle("actions", true, { note: "Gives each item a Message button." }),
@@ -3226,8 +2490,6 @@ const entries = {
         ],
         "circle",
       ),
-      reference("src", "string"),
-      reference("AvatarGroup", "{ more, children, labels }", "Part"),
     ],
     example: [toggle("group", true, { note: "Shows an AvatarGroup." })],
   },
@@ -3250,7 +2512,6 @@ const entries = {
         ],
         "yellow",
       ),
-      reference("children", "ReactNode", "Required"),
     ],
   },
   attachment: {
@@ -3262,12 +2523,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "As GOV.UK lists its attachments, with a thumbnail of the document with its format, the title as a link, and its format, size and pages. A file that may not suit assistive technology says so, with a Details that explains how to ask for an accessible format. The format on the thumbnail takes the colour users know it by, red for PDF and green for a spreadsheet. The thumbnail lifts as the pointer reaches the title.",
-    props: [
-      reference("title / href", "ReactNode / string", "Required"),
-      reference("format / size / pages", "string / string / number"),
-      reference("thumbnail", "string"),
-      reference("accessibleFormatEmail", "string"),
-    ],
+    props: [],
     example: [
       toggle("accessibility", true, {
         note: "Adds the notice and the request for an accessible format.",
@@ -3283,12 +2539,7 @@ const entries = {
     dependencies: "React · Motion",
     changes:
       "GOV.UK's cookie banner, with its question and buttons. Once users choose, the question gives way at once to a message saying what they chose, as the banner eases to its new height, which takes focus so screen readers hear it, with an outline button to hide it. Hiding it folds the banner away.",
-    props: [
-      text("serviceName", "Apply for a licence", { type: "ReactNode", default: "GOV.UK" }),
-      reference("cookiesHref", "string", "/help/cookies"),
-      reference("onChoose", '(choice: "accepted" | "rejected") => void'),
-      reference("choice", '"accepted" | "rejected" | null', "null"),
-    ],
+    props: [text("serviceName", "Apply for a licence", { type: "ReactNode", default: "GOV.UK" })],
   },
   feedback: {
     name: "Feedback",
@@ -3300,11 +2551,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's “Is this page useful?” band, with outline Yes and No buttons and one to report a problem, which stand out on its tint. It shows one stage at a time, as GOV.UK's does. Once users answer, the question gives way. Yes turns to thanks. No and the report button turn to a short Form built from Textarea, whose Cancel brings the question back with focus on the button that opened it, and what was typed is kept. Sending turns to thanks, which takes focus so screen readers hear it. The band eases to each stage's height with the AutoHeight that FormSteps' card uses, and its words never fade or move. The example is the foot of a service's page, with the band at the end of the page's content, then the Footer.",
-    props: [
-      text("question", "Is this page useful?", { default: "Is this page useful?" }),
-      reference("onAnswer", "(useful: boolean) => void"),
-      reference("onReport", "({ doing, wrong }) => void"),
-    ],
+    props: [text("question", "Is this page useful?", { default: "Is this page useful?" })],
   },
   "filter-chips": {
     name: "Filter chips",
@@ -3318,9 +2565,6 @@ const entries = {
       toggle("multiple", true, {
         note: "Off, one chip at most is on, and pressing it again leaves none.",
       }),
-      reference("label", "string", "Required"),
-      reference("value / onValueChange", "string[] / (value) => void"),
-      reference("FilterChip", "{ value, count, disabled, children }", "Part"),
     ],
     example: [toggle("counts", true, { note: "Counts the results each filter would show." })],
   },
@@ -3332,11 +2576,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Base UI's Menubar containing the library's Dropdown menus, with their items, shortcuts, submenus, checkboxes and choices. The arrow keys move along the bar, and once one menu is open, moving to another opens it in its place.",
-    props: [
-      reference("aria-label", "string"),
-      reference("MenubarTrigger", "<button> props and { render }", "Part"),
-      reference("DropdownMenu / MenuContent", "The menus' own parts", "Part"),
-    ],
+    props: [],
   },
   "chat-input": {
     name: "Chat input",
@@ -3363,23 +2603,6 @@ const entries = {
         note: "Its own rounded box. Without it, it takes its container's edges.",
       }),
       toggle("disabled"),
-      reference("label", "string", "Message"),
-      reference("onSubmit", "(message: string, files: File[]) => void"),
-      reference("busy / onStop", "boolean / () => void", "false"),
-      reference("value / onValueChange", "string / (value: string) => void"),
-      reference("files / defaultFiles / onFilesChange", "File[] / File[] / (files) => void"),
-      reference("attachments", "ChatInputAttachments, in place of the files' own chips"),
-      reference("tools", "Parts at the start of the bar, such as ChatInputAttach"),
-      reference("children", "Parts beside Send, such as ChatInputModel and ChatInputDictation"),
-      reference("ChatInputAttach", "{ accept, multiple, label }", "Part"),
-      reference("ChatInputAttachments", "File chips, named Attached files", "Part"),
-      reference(
-        "ChatInputAttachment",
-        "A File chip whose removal puts focus back in the message",
-        "Part",
-      ),
-      reference("ChatInputModel", "{ models, value, defaultValue, onValueChange, label }", "Part"),
-      reference("ChatInputDictation", "{ lang, recogniser = browserRecogniser }", "Part"),
     ],
     example: [
       toggle("attach", true, { note: "Adds ChatInputAttach to the tools." }),
@@ -3410,11 +2633,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Chat input's chips, as parts that can sit anywhere, such as under a sent question to list the documents it was asked about. Each chip has a page icon, the name and the kind, such as PDF, in the muted colour. A long name is cut short in its middle, as a file's name is in ChatGPT and Claude, so its last word and extension show, where names that differ often differ, such as by a date. It shows in full in its title, and screen readers hear it in full. Given onRemove, a chip has a × button, and focus goes to the next chip's button as the chip is removed. Given render, its name links to the document, as GOV.UK's link in the text's colour. Screen readers hear the chips as a list, named by its label. Chat input's ChatInputAttachments and ChatInputAttachment are File chips that put focus back in the message.",
-    props: [
-      text("label", "Documents with this question", { default: "Files" }),
-      reference("children", "FileChip parts", "Required"),
-      reference("FileChip", "{ name, kind, icon, onRemove, labels, render }", "Part"),
-    ],
+    props: [text("label", "Documents with this question", { default: "Files" })],
     example: [
       toggle("removable", false, { note: "Gives each chip onRemove, so it has a × button." }),
       toggle("links", false, { note: "Makes each name a link to its document, with render." }),
@@ -3428,14 +2647,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Each word fades in, behind a pulsing dot that disappears once the text is complete. The words still to come already take their space, unseen, so the lines break where they will in the end and nothing beneath the text moves as it arrives. Text that grows, as from a live stream, joins the end, and a stream that runs ahead is caught up within about a second. Screen readers hear the whole reply once instead of a word at a time, either at once when the text is known, or when a live stream ends. Stopped, it keeps what it has written. With reduced motion, the whole text shows at once.",
-    props: [
-      { ...range("speed", 30, 5, 80, 5), needs: [whenOff("instant")] },
-      toggle("instant"),
-      reference("text", "string", "Required"),
-      reference("streaming", "boolean", "false"),
-      reference("stopped", "boolean", "false"),
-      reference("onComplete", "() => void"),
-    ],
+    props: [{ ...range("speed", 30, 5, 80, 5), needs: [whenOff("instant")] }, toggle("instant")],
   },
   "reasoning-steps": {
     name: "Reasoning steps",
@@ -3445,16 +2657,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "A quiet title that opens the steps, which run down a line. Each step has a tick once done, a spinner while under way, and a hollow dot before it starts, and screen readers hear which. While the assistant works, the title shimmers and the steps stay open, and they fold away once it has finished. New steps rise into place. Built from parts on Base UI's Collapsible.",
-    props: [
-      reference("active", "boolean", "false"),
-      reference("activeTitle / title", "ReactNode", "Thinking / Show the steps"),
-      reference("open / onOpenChange", "boolean / (open) => void", "Open while active"),
-      reference(
-        "ReasoningStep",
-        '{ status: "done" | "active" | "pending", detail, children }',
-        "Part",
-      ),
-    ],
+    props: [],
     example: [toggle("details", true, { note: "Gives each step a detail." })],
   },
   "image-generation": {
@@ -3465,14 +2668,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Most image services only say when the image is done, so until it arrives a mosaic of small cells fills the frame, drawn on a canvas, with ridges of brand tint flowing through it and cells popping now and then. If the service sends a rough preview part way, as OpenAI's partial images do, the mosaic takes its colours. When the image arrives, it forms out of the cells in a sweep from the top left, each cell showing the image's colour as a block before it clears, and the image comes into focus beneath, with the success sound. Making another breaks the image back into cells, which keep its colours while the next is made. A band at the foot shows the label in Text shimmer, with a bar and the share done if the service reports progress. The mosaic's tones come from the theme in CSS, it redraws fifteen times a second while it flows, and stops out of sight. Screen readers hear a progress bar while it works, and the image's description once it is made. With reduced motion, the mosaic stays still and fades away as the image arrives.",
-    props: [
-      reference("src", "string, once the image is made", "None"),
-      reference("preview", "string, a rough early version", "None"),
-      reference("alt", "string", "Required"),
-      reference("width / height", "number", "Required"),
-      reference("progress", "number from 0 to 1, if the service reports it", "None"),
-      reference("label", "ReactNode", "Creating image"),
-    ],
+    props: [],
     example: [
       range("seconds", 6, 3, 12, 1),
       toggle("progress", false, { note: "The service reports how far along it is." }),
@@ -3491,13 +2687,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "A small grey pill after the claim with the site's mark and name, which turns brand blue under the pointer. GOV.UK pages get the crown, and other sites their initial, by its address, unless crown says otherwise. Several sources stack in one pill, as GOV.UK +2. Resting on it, or pressing it, opens a card with each source's site, title, summary and date, and arrows step through a stack, each source sliding in from its side. The card is a Base UI Popover, so it opens from the keyboard too, focus moves into it, and each title is a link. Copying a message leaves the pills out. A source with no address, such as a passage from a document the user uploaded, names where it is instead of a site, and its title is not a link. Its detail says where in the source the claim comes from, such as its pages, and a source's render takes a router's link for its title.",
-    props: [
-      reference(
-        "sources",
-        "{ title, url?, site?, detail?, render?, description?, date?, icon?, crown? }[], with site when there is no url",
-        "Required",
-      ),
-    ],
+    props: [],
     example: [
       toggle("stacked", true, { note: "Stacks three sources behind the second claim." }),
       toggle("document", false, {
@@ -3514,12 +2704,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's header, with the crown and logotype in white on brand blue, and GOV.UK's teal dot. The logo is the library's GOVUKLockup, GOV.UK's crown beside its wordmark, and GOVUKCrown gives the crown alone. A government service that is not part of GOV.UK gives its own logo, and the header becomes GOV.UK's generic header, with its mark and name in white on black at 30 pixels, because the crown and the blue are only for GOV.UK services.",
-    props: [
-      text("productName", "", { type: "ReactNode" }),
-      reference("homepageUrl", "string", "https://www.gov.uk/"),
-      reference("logo / logoLabel", "ReactNode / string", "GOV.UK"),
-      reference("children", "ReactNode"),
-    ],
+    props: [text("productName", "", { type: "ReactNode" })],
     example: [
       toggle("generic", false, {
         note: "Gives the service's own logo, which makes it GOV.UK's generic header.",
@@ -3534,12 +2719,7 @@ const entries = {
     dependencies: "React · Base UI · Motion",
     changes:
       "GOV.UK's service navigation, built from parts. The current section is bold, with a brand-blue bar that glides to the next section when the page changes in place. On a small screen the sections fold away behind a Menu button. Links take a render prop for a router's link.",
-    props: [
-      text("serviceName", "Apply for a licence", { type: "ReactNode" }),
-      reference("serviceUrl", "string"),
-      reference("labels", "Partial<ServiceNavigationLabels>", "Menu"),
-      reference("ServiceNavigationItem", "{ href, current, render }", "Part"),
-    ],
+    props: [text("serviceName", "Apply for a licence", { type: "ReactNode" })],
   },
   footer: {
     name: "Footer",
@@ -3550,21 +2730,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's footer under a band of brand blue, on its tinted surface. The crown sits at the top, then any navigation in sections, each a heading over a rule with its links, sharing the row by GOV.UK's widths and setting a long list in columns. A rule closes the navigation. Then come the support links, anything else given, such as who built the service, and the Open Government Licence, with Crown copyright under the Royal Arms at the end of the row. Built from parts. The crown is the library's GOVUKCrown, and the Royal Arms is GOV.UK Frontend's image, drawn in the text's colour. Both are only for GOV.UK services, so crown false leaves them out. Links are GOV.UK's blue, and the sections stack on a phone. The example sits at the foot of the preview, as it would at the foot of a page.",
-    props: [
-      toggle("crown", true, { default: "true" }),
-      reference("crest", "string", "None"),
-      reference("licence", "ReactNode | null", "Open Government Licence"),
-      reference("copyright", "ReactNode", "© Crown copyright"),
-      reference("copyrightUrl", "string | null", "Crown copyright's terms"),
-      reference("copyrightRender", "A router's link", "None"),
-      reference("navigation", "ReactNode", "FooterSection parts"),
-      reference(
-        "FooterSection",
-        '{ title, width: "full" | "two-thirds" | "one-third" | …, columns: 1 | 2 | 3, children }',
-        "Part",
-      ),
-      reference("FooterLinks / FooterLink", "{ aria-label } / { href, render }", "Part"),
-    ],
+    props: [toggle("crown", true, { default: "true" })],
     example: [
       toggle("sections", true, { note: "Adds GOV.UK's navigation above the support links." }),
     ],
@@ -3578,19 +2744,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's page template as one component. It puts a skip link first, then the header, then the content in a width container with anything before it, such as a phase banner and a back link, and the footer last, which stays at the foot of the screen on a short page. The content goes in a MainWrapper, the main landmark the skip link goes to, which leaves GOV.UK's space above it, more when nothing sits there. A width given to the page reaches every width container inside, so the header, content and footer line up at any width.",
-    props: [
-      reference(
-        "ServicePage",
-        "{ serviceName, serviceUrl, homepageUrl, navigation, phase, phaseMessage, feedbackUrl, back, footerLinks, crest, render, header, footer, column, labels }",
-        "Part",
-      ),
-      reference("header", "ReactNode"),
-      reference("beforeContent", "ReactNode"),
-      reference("footer", "ReactNode"),
-      reference("skipLink", "ReactNode | null", "<SkipLink />"),
-      reference("width", "number | string", "960"),
-      reference("MainWrapper", '{ size: "medium" | "large", id, render }', "Part"),
-    ],
+    props: [],
     example: [
       toggle("phaseBanner", true, { note: "Puts a Phase banner above the content." }),
       toggle("backLink", true, { note: "Puts a Back link above the content." }),
@@ -3605,22 +2759,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's layout as parts. The width container keeps content to 960 pixels in the middle of the screen, with space at its sides when the screen is narrower. GridRow and GridColumn share a row in GOV.UK's quarters, thirds and halves, with its 30 pixel gutter. The columns follow their row's width instead of the screen's, so a row in a narrow space stacks even on a wide screen. Header, Service navigation, Footer, Cookie banner and Page use the width container, so they line up, and the workbench sets each example in one. Stack sets parts one beneath another, and Inline sets them side by side, each spaced by GOV.UK's spacing scale. 30 pixels between a stack's parts is the space between a form's fields, and a field in a line shrinks beside its button. GOV.UK's components each have their own margin beneath them. These parts have none, and the box they sit in spaces them. MainWrapper and GridColumn stack their parts as a Stack does, 20 pixels apart on a phone and 30 from tablet width.",
-    props: [
-      range("width", 960, 480, 1200, 20),
-      toggle("gutters", true, { default: "true" }),
-      reference("GridRow", "div props", "Part"),
-      reference(
-        "GridColumn",
-        '{ width: "full" | "three-quarters" | "two-thirds" | "one-half" | "one-third" | "one-quarter", from: "tablet" | "desktop" }',
-        "Part",
-      ),
-      reference("Stack", "{ gap: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9, render }", "Part"),
-      reference(
-        "Inline",
-        '{ gap: Spacing, wrap: boolean, align: "start" | "centre" | "end" | "baseline", render }',
-        "Part",
-      ),
-    ],
+    props: [range("width", 960, 480, 1200, 20), toggle("gutters", true, { default: "true" })],
     example: [
       choice(
         "layout",
@@ -3652,8 +2791,6 @@ const entries = {
         "Beta",
         { type: "ReactNode" },
       ),
-      reference("tagColour", "TagColour", "blue"),
-      reference("children", "ReactNode", "Required"),
     ],
   },
   heading: {
@@ -3713,9 +2850,6 @@ const entries = {
         "chevron",
       ),
       toggle("collapseOnMobile", false),
-      reference("inverse", "boolean", "false"),
-      reference("BreadcrumbsItem", "{ href, current, render }", "Part"),
-      reference("BreadcrumbsEllipsis", "{ label, children: MenuLinkItem }", "Part"),
     ],
     example: [toggle("ellipsis", true, { note: "Leaves the middle steps out, behind a menu." })],
   },
@@ -3726,11 +2860,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's back link. Its chevron leans back under the pointer, and it takes a render prop for a router's link.",
-    props: [
-      text("children", "Back", { type: "ReactNode", default: "Back" }),
-      reference("href", "string", "#"),
-      reference("inverse / render", "boolean / ReactElement"),
-    ],
+    props: [text("children", "Back", { type: "ReactNode", default: "Back" })],
   },
   pagination: {
     name: "Pagination",
@@ -3743,14 +2873,7 @@ const entries = {
     dependencies: "React · Motion",
     changes:
       "GOV.UK's pagination, with Previous and Next beside arrows that lean the way they go, and the page numbers around the current one with ellipses for the rest. The numbers always take seven slots of one width, and Previous and Next are disabled instead of removed at either end, so it never changes width. The current page's fill glides to the new number when the page changes in place, and each number sounds a step higher. Block mode stacks Previous and Next with their pages' titles, and leaves out the one that leads nowhere on the first and last pages, as GOV.UK's does.",
-    props: [
-      reference("page / pageCount", "number", "Required"),
-      reference("href", "(page: number) => string", "Required"),
-      reference("onPageChange", "(page: number, event) => void"),
-      toggle("block", false),
-      reference("previousTitle / nextTitle", "ReactNode"),
-      reference("labels", "Partial<PaginationLabels>", "Previous, Next, Page n"),
-    ],
+    props: [toggle("block", false)],
     example: [
       number("pageCount", 10, { min: 1, note: "The number of pages.", needs: [whenOff("block")] }),
     ],
@@ -3763,10 +2886,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's skip link. It drops into view in GOV.UK's yellow when it has focus. Following it moves focus to the content, as GOV.UK's does, so the next Tab continues from there. The workbench's own skip link is a Skip link.",
-    props: [
-      reference("href", "string", "#main-content"),
-      reference("children", "ReactNode", "Skip to main content"),
-    ],
+    props: [],
   },
   "language-navigation": {
     name: "Language navigation",
@@ -3776,14 +2896,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's language navigation, built from parts. Each language is named in itself, with its lang and hreflang set so screen readers pronounce it. The current language is bold text, and a description such as (Welsh) can follow for screen readers.",
-    props: [
-      reference("aria-label", "string", "Language"),
-      reference(
-        "LanguageNavigationItem",
-        "{ href, lang, current, description, dir, render }",
-        "Part",
-      ),
-    ],
+    props: [],
   },
   "exit-this-page": {
     name: "Exit this page",
@@ -3798,9 +2911,6 @@ const entries = {
         default: "BBC Weather",
         note: "Here it is the next component.",
       }),
-      reference("onExit", "() => void"),
-      reference("children", "ReactNode", "Exit this page"),
-      reference("labels", "Partial<ExitThisPageLabels>", "GOV.UK's"),
     ],
   },
   "notification-banner": {
@@ -3821,14 +2931,11 @@ const entries = {
         ],
         "important",
       ),
-      reference("title", "ReactNode", "Important or Success"),
-      reference("titleLevel", "2 | 3 | 4 | 5 | 6", "2"),
       toggle("autoFocus", false, {
         default: "true",
         note: "A success banner takes focus as it appears. It starts off here, so changing the type does not move focus.",
         restart: true,
       }),
-      reference("NotificationBannerHeading", "ReactNode", "Part"),
     ],
   },
   "warning-text": {
@@ -3857,11 +2964,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's green confirmation panel with softened corners. It rises into place, and plays the success sound when it appears after the page has loaded.",
-    props: [
-      text("title", "Application complete", { type: "ReactNode", default: "Required" }),
-      reference("titleLevel", "1 | 2 | 3", "1"),
-      reference("children", "ReactNode"),
-    ],
+    props: [text("title", "Application complete", { type: "ReactNode", default: "Required" })],
   },
   tag: {
     name: "Tag",
@@ -3871,15 +2974,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's tag in its nine colours, with softened corners. When a status changes, the tag eases from its old colour to its new one. In the dark theme each pair is turned round. The outline variant sets the colour's text and a keyline in it on the page's paper, so a status stands out on a tinted surface, as File diff and Plan card use it.",
-    props: [
-      reference(
-        "colour",
-        '"grey" | "blue" | "teal" | "green" | "purple" | "magenta" | "red" | "orange" | "yellow"',
-        "blue",
-      ),
-      reference("variant", '"solid" | "outline"', "solid"),
-      reference("children", "ReactNode", "Required"),
-    ],
+    props: [],
     example: [toggle("outline", false, { note: "Shows every tag with the outline variant." })],
   },
   spinner: {
@@ -3914,13 +3009,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Built on Base UI's Progress, so screen readers hear the label and the value. The bar eases forward in brand blue, sweeps along the track while the amount is unknown, and turns green with the success sound when the task is complete.",
-    props: [
-      toggle("showValue", true, { default: "true", needs: [whenOff("indeterminate")] }),
-      reference("label", "ReactNode", "Required"),
-      reference("value", "number | null", "Required"),
-      reference("min / max", "number", "0 / 100"),
-      reference("format", "Intl.NumberFormatOptions"),
-    ],
+    props: [toggle("showValue", true, { default: "true", needs: [whenOff("indeterminate")] })],
     example: [toggle("indeterminate", false, { note: "Sets the value to null." })],
   },
   skeleton: {
@@ -3933,8 +3022,6 @@ const entries = {
       "Grey shapes for text, blocks and circles. One soft light sweeps across every skeleton on the page together, and stays still with reduced motion. Skeletons are hidden from screen readers, so a status nearby says what is loading. The usage panel shows skeleton lines while its code loads, and SidebarSkeleton stands in for a Sidebar's items.",
     props: [
       number("lines", 3, { min: 1, default: "1", note: "For text.", needs: [whenOn("loading")] }),
-      reference("variant", '"text" | "block" | "circle"', "text"),
-      reference("width / height", "CSS length"),
     ],
     example: [toggle("loading", true, { note: "Off, the content it stood in for appears." })],
   },
@@ -3955,9 +3042,6 @@ const entries = {
         ],
         "medium",
       ),
-      reference("EmptyStateMedia", "ReactNode", "Part"),
-      reference("EmptyStateTitle", "{ level, children }", "Part"),
-      reference("EmptyStateDescription / EmptyStateActions", "ReactNode", "Part"),
     ],
     example: [
       toggle("media", true, { note: "Shows the icon." }),
@@ -3972,7 +3056,7 @@ const entries = {
     dependencies: "React",
     changes:
       "GOV.UK's type for content written as plain elements. It has 19 pixel body text, bold headings from the second level down, bullets and numbers with GOV.UK's spacing, quotations as inset text, code on a tint, tables ruled between rows, and GOV.UK's links. Its rules reach plain elements at no weight of their own, so a part of the library's inside it keeps its own look, as the Link in the example does. Rich text and the Editor set their documents in it.",
-    props: [reference("children", "Plain elements and the library's parts", "Required")],
+    props: [],
   },
   "rich-text": {
     name: "Rich text",
@@ -4005,12 +3089,6 @@ const entries = {
         "## Who can apply\n\nYou can apply for a **rod fishing licence** if you are 13 or over. Children under 13 do not need one.\n\nA licence covers:\n\n- salmon and sea trout, or\n- trout, coarse fish and eels\n\nRead the [byelaws for your region](https://www.gov.uk/) before you fish.\n",
         { rows: 8, needs: [when("format", "markdown")], note: "Give html or markdown, not both." },
       ),
-      reference(
-        "components",
-        "{ a, pre, table, … }, each ({ attributes, children, text }) => ReactNode",
-        "None",
-      ),
-      reference("headingOffset", "number", "0"),
     ],
   },
   "inset-text": {
@@ -4049,18 +3127,6 @@ const entries = {
     changes:
       "Collapses to icons, off the screen or not at all, on either side. The edge drags to resize, and the rows scroll in a Scroll area. Groups and items with sub-items can fold. One highlight glides to the row under the pointer, on the same curve as the current item's line, which glides when it changes. On small screens, the sidebar opens as a sheet that a swipe closes. It can remember whether it was open, and its width. Command-B or Control-B toggles it. Users can arrange it for themselves. useSidebarArrangement keeps which items are pinned to the top, hidden and in what order. SidebarItemMenu gives each item a menu from three dots at the end of its row to pin, move or hide it. SidebarCustomise is a sheet of lists to show, pin and move every item and group, with Reset. An item's action, such as that menu or a SidebarItemAction, shows while the row is under the pointer or the action has keyboard focus, and rides the highlight from row to row. The workbench's own sidebar is arranged this way.",
     props: [
-      reference(
-        "SidebarItem action",
-        "ReactNode, such as a SidebarItemMenu or SidebarItemAction",
-        "None",
-      ),
-      reference("useSidebarArrangement", "({ entries, groups?, storageKey? }) => arranger", "Hook"),
-      reference("SidebarItemMenu", "{ arranger, id, labels? }", "Part"),
-      reference(
-        "SidebarCustomise",
-        "{ arranger, open, defaultOpen, onOpenChange, labels? }",
-        "Part",
-      ),
       toggle("defaultOpen", true, {
         restart: true,
         note: "A SidebarProvider prop. The example starts again when it changes.",
@@ -4097,18 +3163,6 @@ const entries = {
       number("minWidth", 200, { min: 120, needs: [whenOn("resizable")] }),
       number("maxWidth", 360, { min: 120, needs: [whenOn("resizable")] }),
       toggle("activeLine", true),
-      reference("SidebarGroup", "{ label, icon, collapsible, defaultOpen }", "Part"),
-      reference("SidebarItem", "{ icon, badge, current, tooltip, render, action }", "Part"),
-      reference("SidebarSubmenu", "{ label, icon, defaultOpen, tooltip, children }", "Part"),
-      reference("SidebarInput", "Input props, with a search icon", "Part"),
-      reference("SidebarSkeleton", "{ rows, icons }", "Part"),
-      reference("SidebarText", "Words that wrap, in the header or footer", "Part"),
-      reference("MoreIcon", "SidebarItemAction's three dots, for a trigger of a row's own", "Icon"),
-      reference("SidebarLayout", "The frame: the Sidebar and a SidebarInset", "Part"),
-      reference("SidebarInset", "The page beside the sidebar, raised beside an inset one", "Part"),
-      reference("SidebarPageBar", "A bar along the page's top, for a trigger and a title", "Part"),
-      reference("storageKey", "string · a SidebarProvider prop", "Optional"),
-      reference("useSidebar", "state, toggleSidebar, isMobile…", "Hook"),
     ],
     example: [
       choice(
@@ -4155,8 +3209,6 @@ const entries = {
     changes:
       "Tooltips in a TooltipGroup share one popup, which glides between buttons and morphs its size and text. Elsewhere, a TooltipProvider shares one delay, so once a tooltip opens the next opens at once. Hints can show a keyboard shortcut and an arrow. Tooltips are visual only, so every trigger keeps its own accessible name, and touch screens do not show them.",
     props: [
-      reference("content", "ReactNode", "Required"),
-      reference("shortcut", "string"),
       choice(
         "side",
         [
@@ -4169,8 +3221,6 @@ const entries = {
       ),
       toggle("disabled"),
       toggle("arrow"),
-      reference("TooltipGroup", "{ side, arrow, children }", "Part"),
-      reference("TooltipProvider", "{ delay, closeDelay, timeout, children }", "Part"),
     ],
     example: [
       toggle("grouped", true, {
@@ -4186,13 +3236,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Not in GOV.UK. A pill with a thing's avatar or logo and its name, sized by its text, so it fits any typeface, and its avatar with it. Given `href` or `render`, it links to the thing, in GOV.UK's link blue, and its words underline under the pointer. Its focus is the yellow ring of Filter chips. Without either, it only names the thing. A RecordChipGroup lists chips, wrapping onto as many lines as it needs, and counts any more in a quieter last chip, which screen readers hear as and 2 more. The count only counts, so the rest belong where users can reach them, such as on the page the chips belong to. Around an organisation's square Avatar, the chip's corners follow the avatar's, not a pill's. The example is a company, with an Avatar in the square shape organisations take, above its contacts.",
-    props: [
-      reference("children", "ReactNode", "Required"),
-      reference("media", "ReactNode, such as an Avatar"),
-      reference("href", "string"),
-      reference("render", "a router's link, in place of the anchor"),
-      reference("RecordChipGroup", "{ more, children, labels }", "Part"),
-    ],
+    props: [],
     example: [
       toggle("links", true, { note: "Links each chip to its page." }),
       number("more", 2, { min: 0, note: "Counts the contacts not shown." }),
@@ -4206,10 +3250,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Not in GOV.UK. A Button joined to a chevron that opens a Dropdown menu, with a hairline of the page between them, so each shows its own press and GOV.UK's yellow focus. The outer corners are the button's. An outline button shares its keyline with its chevron, and a quiet one is parted from it by a line. The button does what most users want, such as Save as a new view, and the menu has the other ways, such as Update this view or Discard changes. Give the chevron the button's variant and size, so the two read as one. On a phone, where GOV.UK's buttons take the full width, the button takes what the chevron leaves. Name the group with `aria-label`, as the example does, and the chevron is named for its menu. An action that takes the split button away must move focus somewhere that stays.",
-    props: [
-      reference("children", "a Button, then a DropdownMenu with a SplitButtonTrigger", "Required"),
-      reference("SplitButtonTrigger", "{ label, variant, size }", "Part"),
-    ],
+    props: [],
     example: [
       choice(
         "variant",
@@ -4234,12 +3275,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Not in GOV.UK. A bar that rises while any rows are chosen. Given to a Data table as its selectionBar, it floats over the rows just above the foot, so the count and the figures stay in view, and the rows make room for it beneath the last one, so nothing moves as it comes and goes. Elsewhere, it takes its room after the list it follows, and stays at the foot of the scrolling area as the list scrolls beneath it. Either way, a control that takes focus from the keyboard scrolls clear of it. It says how many, and screen readers hear the count as it changes, from a region that is always in the page, so the first count is heard too. It never takes focus as it appears, because users are still choosing. If it goes while it has focus, such as once an action clears the selection, focus goes back to where it was before it came into the bar, such as the last row's checkbox. Its × clears the selection. Its actions are Buttons, and a Dropdown menu holds any that are used less, or destroy. It rises into place, unless users ask for reduced motion, and its actions wrap rather than clip. Data table chooses the rows. The example is a table of applications, one already chosen, which Approve approves. Its rows scroll in a table five rows tall, beneath the bar.",
-    props: [
-      reference("count", "number", "Required"),
-      reference("onClear", "() => void", "Required"),
-      reference("children", "the actions, as Buttons and a Dropdown menu", "Required"),
-      reference("labels", "Partial<SelectionBarLabels>", "English"),
-    ],
+    props: [],
     example: [toggle("actions", true, { note: "Adds a More menu of rarer actions." })],
   },
   board: {
@@ -4253,18 +3289,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Not in GOV.UK. Stages side by side, each a column with its name, its count and its cards, which scroll sideways in a Scroll area where there are more than fit, fading at the edges with more beyond. The board fills the height its container gives it, such as a page laid out to fill the window or a tile, so its stages reach its foot, each scrolls its own cards, and the scrollbar sits at the foot. In a page that flows, it is as tall as its tallest stage. Each stage's cards are in the service's order. Each card has a menu at its corner that moves it up or down its stage, or to the foot of another stage, from the keyboard, a pointer or a touch screen alike, so moving needs no drag, as WCAG 2.2 asks. A mouse or pen can also drag a card, by anywhere but a control, and a finger once it has held the card for a moment, so a swipe still scrolls the board. Dragged, a copy follows the pointer, and the cards make way for it where it would drop: the stage it leaves closes its space, and the stage it is over opens one where it is. Where it would drop follows the card's middle, not the pointer, so a card held by its foot drops where it is seen, and passes another once it is half over it. Over its own stage, the faded card goes to the place it would take. Another stage is outlined with a tick, and near the board's edge, or a stage's top or foot, the cards scroll. Escape, or a drop outside any stage, puts it back. onMove hears the card it goes before, or null at the foot. Once the card is in its new place, at once or once the service has saved the move, it rises into it, unless users ask for reduced motion, and screen readers hear where it went, as its place among the stage's cards. Moved from its menu, its menu takes focus there. A move that fails says nothing, so the service says why. Each stage is a group named by its heading, so the board adds one landmark. A stage without cards says None. A stage's heading says how many cards it has to screen readers. The example is companies being onboarded, each stage with a Tag in its colour.",
-    props: [
-      reference("label", "string", "Required"),
-      reference(
-        "onMove",
-        "(card: string, stage: string, before: string | null) => void",
-        "Required",
-      ),
-      reference("headingLevel", "2 | 3 | 4 | 5 | 6", "3"),
-      reference("BoardColumn", "{ value, label, marker, children }", "Part"),
-      reference("BoardCard", "{ value, label, children }", "Part"),
-      reference("labels", "Partial<BoardLabels>", "English"),
-    ],
+    props: [],
     example: [toggle("markers", true, { note: "Marks each stage with a Tag in its colour." })],
   },
   "side-panel": {
@@ -4277,27 +3302,7 @@ const entries = {
     dependencies: "React · Base UI",
     changes:
       "Not in GOV.UK. A panel that stays beside the work while users move around it, such as Piscine Assist in the workspace. A handle on its edge resizes it with a drag or the arrow keys, between its least and greatest widths. Closed, it slides away over the edge, out of reach of the keyboard and screen readers. The work takes its space at once, and the panel slides by a transform, so the work lays out once, not at every frame of the slide. Opened, it takes its space and slides in over it the same way. Its trigger gives it focus as it opens, and takes focus back as it closes. SidePanelLayout measures its own width, not the window's, so a sidebar beside it leaves it less room. Where it has no room for the panel beside the work, the panel opens as a Sheet over the work, which a swipe closes. A storageKey keeps whether it is open, and its width, for the next visit. The panel's head, SidePanelHeader, is as tall as a tile's bar, so their keylines meet beside Tiles. Its content, SidePanelBody, fills the rest of the panel with its padding, stacks its parts a surface's space apart, and scrolls in a Scroll area where it is taller, so the head stays in place. useSidePanel opens and closes it from anywhere inside its SidePanelProvider, such as a command menu. The example is an application, with its case notes beside it, and a button in its bar that shows or hides them, so the bar keeps its height.",
-    props: [
-      reference(
-        "label",
-        "string, which names the panel, its handle and its close button",
-        "Required",
-      ),
-      reference("initialFocus", "() => HTMLElement, where focus goes as it opens"),
-      reference("labels", "Partial<SidePanelLabels>", "English"),
-      reference(
-        "SidePanelProvider",
-        "{ id, open, defaultOpen, onOpenChange, defaultWidth, minWidth, maxWidth, besideFrom, storageKey, storage }",
-        "Part",
-      ),
-      reference("SidePanelLayout", "{ children }", "Part"),
-      reference("SidePanelHeader", "{ children }", "Part"),
-      reference("SidePanelTitle", "{ children }", "Part"),
-      reference("SidePanelClose", "{ labels }", "Part"),
-      reference("SidePanelBody", "{ children }", "Part"),
-      reference("SidePanelTrigger", "{ render, children }", "Part"),
-      reference("useSidePanel", "() => { shown, beside, show, close }", "Hook"),
-    ],
+    props: [],
     example: [toggle("open", true, { note: "Starts with the case notes open." })],
   },
   "change-summary": {
@@ -4312,10 +3317,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Not in GOV.UK. The values that changed, together on GOV.UK's tinted surface, as a description list. Each is on a line of its own: what changed, with the names lined up in a column, then what it was in the muted colour, an arrow, and what it is now in bold, so the eye finds the new values first. Where the line is short, the values go beneath the name. Screen readers do not see the arrow, so it says, as Owner, changed from Lord Rosebery to William Gladstone. A value that was not set, or was removed, is None. A value wraps rather than clip. It suits a record's history in a Timeline, where each event says who changed what, and when. The example is a company's history, with a handover and the reason for it.",
-    props: [
-      reference("children", "ChangeSummaryItem parts", "Required"),
-      reference("ChangeSummaryItem", "{ label, from, to, labels }", "Part"),
-    ],
+    props: [],
     example: [toggle("timeline", true, { note: "Shows the changes in a Timeline." })],
   },
   "relative-time": {
@@ -4326,10 +3328,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Not in GOV.UK. A time from now, rounded to its largest whole unit, such as just now, 5 minutes ago, 1 day ago, 1 week ago or in 2 hours. It is always in figures, because a gap rounded to days is not a calendar day, and a word such as yesterday would sometimes name the wrong one. Its words are British English, whatever the browser's language, and a service in Welsh gives its own `relative`. It keeps itself up to date, on one clock for the whole page that ticks once a minute only while a time is shown. The exact time, as GOV.UK writes it, shows under the pointer, and the `time` element carries it for machines. Neither reaches a keyboard, a touch screen or a screen reader, so where users must know the exact time, such as a deadline, write it too. Rendered on a server, it writes the date in UTC, because a server cannot know the time where the page is read, and it becomes the time from now once the page is hydrated. The example is a Summary list of a company's last call, last meeting and next visit.",
-    props: [
-      reference("date", "Date", "Required"),
-      reference("labels", "Partial<RelativeTimeLabels>", "English"),
-    ],
+    props: [],
     example: [number("hours", 3, { min: 0, note: "How many hours ago the last call was." })],
   },
   kbd: {
@@ -4339,15 +3338,7 @@ const entries = {
     dependencies: "React",
     changes:
       "Separate keys with spaces to show each one as its own key cap. Subtle caps sit quietly beside a label, as in the Command menu. Outline caps have a keyline and bottom edge in the text colour, as outline Buttons do, for a shortcut that must stand out. Given a shortcut, such as K, it shows the device's own, ⌘ K on Apple devices and Ctrl K elsewhere.",
-    props: [
-      reference("children", "ReactNode, with spaces between keys", "Required"),
-      reference("variant", '"subtle" | "outline"', "subtle"),
-      reference(
-        "shortcut",
-        'string, such as "K", shown with ⌘ on Apple devices and Ctrl elsewhere',
-        "None",
-      ),
-    ],
+    props: [],
     example: [toggle("outline", false, { note: "Shows the shortcuts with outline caps." })],
   },
 } satisfies Record<string, Entry>;

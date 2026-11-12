@@ -39,7 +39,7 @@ export type ResizableHandleProps = Omit<
    * Called once a size is chosen, which is as a drag ends, if it moved, and with each key and
    * double-click. Save the size here, such as in storage, not at every step of a drag.
    */
-  onValueCommit?: (value: number) => void;
+  onValueCommitted?: (value: number) => void;
   /** Which side of the handle the resized panel is on. */
   panel?: "before" | "after";
   /** The id of the resized panel. */
@@ -87,7 +87,7 @@ export function ResizableHandle({
   max = Number.POSITIVE_INFINITY,
   defaultValue,
   onValueChange,
-  onValueCommit,
+  onValueCommitted,
   panel = "after",
   controls,
   step: ownStep,
@@ -142,7 +142,7 @@ export function ResizableHandle({
   // call.
   const choose = (next: number) => {
     const size = apply(next);
-    onValueCommit?.(size);
+    onValueCommitted?.(size);
   };
   const finish = () => {
     if (!drag.current) return;
@@ -151,7 +151,7 @@ export function ResizableHandle({
     setLive(null);
     setDragging(false);
     onDraggingChange?.(false);
-    if (reached !== undefined) onValueCommit?.(reached);
+    if (reached !== undefined) onValueCommitted?.(reached);
   };
 
   // If the handle is disabled mid-drag, the drag ends where it is.

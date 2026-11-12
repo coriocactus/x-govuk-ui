@@ -1700,7 +1700,7 @@ const entries = {
       ),
       reference(
         "ResizableHandle",
-        '{ orientation, label, controls, value, min, max, step, defaultValue, onValueChange, onValueCommit, onDraggingChange, panel: "before" | "after", snap, grip, disabled }',
+        '{ orientation, label, controls, value, min, max, step, defaultValue, onValueChange, onValueCommitted, onDraggingChange, panel: "before" | "after", snap, grip, disabled }',
         "Part",
       ),
     ],

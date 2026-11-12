@@ -393,7 +393,7 @@ export function SidePanel({
         max={sizes.maxWidth}
         disabled={!panel.open}
         onValueChange={sizes.setDragWidth}
-        onValueCommit={(kept) => {
+        onValueCommitted={(kept) => {
           sizes.setKeptWidth(kept);
           sizes.setDragWidth(null);
         }}

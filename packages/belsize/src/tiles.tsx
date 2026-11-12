@@ -1210,7 +1210,7 @@ function TileDivider({
         if (preview) setMoved(share(size));
         onShareChange(share(size));
       }}
-      onValueCommit={(size) => {
+      onValueCommitted={(size) => {
         setMoved(null);
         onShareCommit(share(size));
       }}

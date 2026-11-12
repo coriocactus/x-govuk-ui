@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Button, Input, InsetText } from "x-govuk-ui";
 import { glideEasing } from "../../packages/core/src/motion";
@@ -112,6 +113,43 @@ test("validateWith's module, and each of the library's modules it imports at run
     }
   }
   expect(marked).toEqual([]);
+});
+
+test("a page of fields, a table and buttons loads almost none of Motion", async () => {
+  // Motion's runtime is about 150 KB, minified. The parts of a form page ease in CSS or by the
+  // library's own code, so the page loads none of it. Service navigation's `LayoutGroup` brings
+  // about 3 KB. One `motion` element in a module these parts share would bring the whole runtime
+  // back, and no other check would show it.
+  const folder = mkdtempSync(join(tmpdir(), "x-govuk-ui-motion-"));
+  try {
+    const parts =
+      "ServicePage, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary, Button";
+    const entry = join(folder, "page.ts");
+    await Bun.write(
+      entry,
+      `import { ${parts} } from ${JSON.stringify(resolve("packages/core/src/index.ts"))};\nconsole.log(${parts});\n`,
+    );
+    const built = await Bun.build({
+      entrypoints: [entry],
+      target: "browser",
+      minify: true,
+      metafile: true,
+      define: { "process.env.NODE_ENV": '"production"' },
+    });
+    expect(built.success).toBe(true);
+    const inputs = Object.values(built.metafile?.outputs ?? {}).flatMap((output) =>
+      Object.entries(output.inputs),
+    );
+    const motion = inputs
+      .filter(([file]) =>
+        /\/node_modules\/(motion|motion-dom|motion-utils|framer-motion)\//.test(file),
+      )
+      .reduce((bytes, [, input]) => bytes + input.bytesInOutput, 0);
+    expect(inputs.length).toBeGreaterThan(100);
+    expect(motion).toBeLessThan(10_000);
+  } finally {
+    rmSync(folder, { recursive: true, force: true });
+  }
 });
 
 test("a part keeps a latest value with useLatest, not by writing a ref as it renders", async () => {

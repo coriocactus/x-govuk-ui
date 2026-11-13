@@ -19,6 +19,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed the box that eases to its content's height, in Form, FormSteps, Feedback and CookieBanner, where it turns back to the height it was leaving. The way back takes a share of the 300ms, as ErrorMessage's does.
 - Changed the bar under ServiceNavigationItem's current section, `.x-govuk-ui-service-navigation-bar`, to stay on its section when a render moves the section, such as when the service's name grows. It glided after the section, which was already in its new place. The bar still glides from one section to the next.
 - Changed the fill behind Pagination's current page, `.x-govuk-ui-pagination-fill`, to stay on its number when a render moves the number, such as when `pageCount` changes. It glided after the number, which was already in its new place. The fill still glides from one number to the next.
+- Changed the highlight behind a pressed ToggleGroupItem, `.x-govuk-ui-toggle-indicator`, to stay on its item when a render moves or resizes the item, such as when the group's `size` changes. It glided there after the item had changed. The highlight still glides from one item to the next.
 
 ### Added
 
@@ -47,11 +48,13 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed Radios' dot, and the dials of DateInput and TimeInput, to ease by the library's own code, not Motion's.
 - Changed ServiceNavigation and ServiceNavigationItem to load none of Motion. The current section's bar glides to the next section by a transform that the browser runs, over the same time and on the same curve. The bar is a plain `span`, and no longer has `transform`, `transform-origin` and `opacity` as inline styles.
 - Changed Pagination to load none of Motion. The current page's fill glides to the new number by a transform that the browser runs, over the same time and on the same curve. The fill is a plain `span`, and no longer has `transform`, `transform-origin` and `opacity` as inline styles.
+- Changed ToggleGroup, ToggleGroupItem and TimeInput to load none of Motion. The pressed item's highlight glides to the next item by a transform that the browser runs, over the same time and on the same curve. The highlight is a plain `span`, and no longer has `transform`, `transform-origin` and `opacity` as inline styles.
 
 ### Fixed
 
 - Fixed `validateWith` failing when server code calls it, such as a Next.js server action or server component, with "Attempted to call validateWith() from the server but validateWith is on the client". A service can now check its answers again on its server, with the schema its Form checks them with.
 - Fixed a record's `export` in `dist/lib/docs` for Dialog, Sheet, Popover, Callout, Hover card, Command menu, Dropdown menu, Context menu and Input OTP. It named another part, such as `DialogTrigger`, because the records left out a part with no class, such as Dialog. Each record's `parts` now has them.
+- Fixed the highlight behind a pressed ToggleGroupItem covering the item's focus colour. It covered the yellow of a pressed item with keyboard focus until it first glided, and again during each glide. Motion set an inline `opacity` on the highlight. The stylesheet's rule that hides the highlight under focus now applies.
 
 ## [0.6.0] - 2026-11-09
 

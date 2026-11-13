@@ -2,22 +2,23 @@
 
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup as Primitive } from "@base-ui/react/toggle-group";
-import { motion } from "motion/react";
 import {
   type ComponentPropsWithRef,
   createContext,
   type ReactNode,
+  type RefObject,
   useContext,
-  useId,
   useLayoutEffect,
+  useRef,
   useState,
 } from "react";
 import { useControllableState } from "./controllable-state";
 import { useField, useFormDefault } from "./field";
-import { springs, useMotionTiming } from "./motion";
+import { type GlideBox, useGlide } from "./glide";
 
 type GroupContextValue = {
-  id: string;
+  /** Where the pressed item's highlight was last drawn, for the next to glide from. */
+  indicator: RefObject<GlideBox | null>;
   multiple: boolean;
   value: readonly string[];
   /** Each item's words, by its value, for Check your answers. */
@@ -67,7 +68,7 @@ export function ToggleGroup({
   className = "",
   ...props
 }: ToggleGroupProps) {
-  const id = useId();
+  const indicator = useRef<GlideBox>(null);
   // A Form can give the group its answers to start with, such as ones kept from an earlier visit.
   const saved = useFormDefault(name);
   const [value, setValue] = useControllableState(
@@ -83,7 +84,7 @@ export function ToggleGroup({
     answer: (data) => (name ? data.getAll(name).map((each) => labels.get(String(each))) : []),
   });
   return (
-    <GroupContext value={{ id, multiple, value, labels }}>
+    <GroupContext value={{ indicator, multiple, value, labels }}>
       <Primitive
         {...props}
         id={name || ownId ? field.id : undefined}
@@ -123,7 +124,7 @@ export function ToggleGroupItem({
 }: ToggleGroupItemProps) {
   const group = useContext(GroupContext);
   if (!group) throw new Error("ToggleGroupItem must be inside ToggleGroup.");
-  const timing = useMotionTiming();
+  const indicator = useGlide(group.indicator);
   const pressed = group.value.includes(value);
   const { labels } = group;
   useLayoutEffect(() => {
@@ -135,12 +136,7 @@ export function ToggleGroupItem({
   return (
     <Toggle {...props} value={value} className={`x-govuk-ui-toggle ${className}`.trim()}>
       {pressed && !group.multiple && (
-        <motion.span
-          className="x-govuk-ui-toggle-indicator"
-          aria-hidden="true"
-          layoutId={`${group.id}-indicator`}
-          transition={timing.spring(springs.glide)}
-        />
+        <span ref={indicator} className="x-govuk-ui-toggle-indicator" aria-hidden="true" />
       )}
       <span className="x-govuk-ui-toggle-content">{children}</span>
     </Toggle>

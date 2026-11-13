@@ -290,7 +290,7 @@ const entries = {
     anchor: "top",
     description: "Ask for a time as hours and minutes, typed or turned like a dial.",
     upstream: "",
-    dependencies: "React · Motion",
+    dependencies: "React",
     changes:
       "GOV.UK has no time input. Ours asks as its date input does, with Hour and Minute as short fields in a row, each labelled above, and on a 12-hour clock a Toggle group for am or pm. Each field can be typed into, or turned like a dial. A faint shade at its top and bottom and the grab cursor invite a drag. Drag it up or down, scroll over it once it has focus, or press the arrow keys, Up for the value above on the drum and Down for the one below, and a drum rises out of the field as the values click past one step at a time, ticking as each passes, then fades. A press without a drag selects the value, ready to type over. The values wrap around, so 59 minutes turns to 00, and the dial can stop every 5 or 15 minutes while typing takes any minute. The fields stay text fields, as GOV.UK's date fields are, so screen readers hear what is typed. Each field submits as its own name, and an error summary links to the hour.",
     props: [
@@ -803,7 +803,7 @@ const entries = {
     name: "Toggle group",
     description: "Switch between a few views or options pressed in place.",
     upstream: "",
-    dependencies: "React · Base UI · Motion",
+    dependencies: "React · Base UI",
     changes:
       "Base UI provides the behaviour. With one choice, a raised highlight glides to the pressed item, and one item always stays pressed. With several, each pressed item is shaded.",
     props: [

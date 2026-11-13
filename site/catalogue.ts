@@ -2685,7 +2685,7 @@ const entries = {
     width: 860,
     description: "Show the service's name and its sections in a band under the header.",
     upstream: "service-navigation",
-    dependencies: "React · Base UI · Motion",
+    dependencies: "React · Base UI",
     changes:
       "GOV.UK's service navigation, built from parts. The current section is bold, with a brand-blue bar that glides to the next section when the page changes in place. On a small screen the sections fold away behind a Menu button. Links take a render prop for a router's link.",
     props: [text("serviceName", "Apply for a licence", { type: "ReactNode" })],

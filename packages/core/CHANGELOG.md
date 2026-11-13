@@ -17,6 +17,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 - Changed ErrorMessage where it turns back, such as a message that shows again while it closes. The way back takes the share of the 220ms that the message had already moved, not all of it. The browser shortens a transition that turns back, which Motion did not.
 - Changed the box that eases to its content's height, in Form, FormSteps, Feedback and CookieBanner, where it turns back to the height it was leaving. The way back takes a share of the 300ms, as ErrorMessage's does.
+- Changed the bar under ServiceNavigationItem's current section, `.x-govuk-ui-service-navigation-bar`, to stay on its section when a render moves the section, such as when the service's name grows. It glided after the section, which was already in its new place. The bar still glides from one section to the next.
 
 ### Added
 
@@ -39,10 +40,11 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed a record's `props` in `dist/lib/docs` to the own props of the component's own export, as that part's `props` gives them. They were written by hand, and listed parts, hooks and custom properties among the props. A prop no longer has `note`, and has `default` only where the part gives one.
 - Changed `usage` in `dist/lib/docs/index.json`, which the MCP server's `get_usage` gives, to name `Labels` and `ComponentLabels` without writing them out. It listed all 74 maps of words twice, and is 8 KB where it was 16 KB. Each component's record gives its own words. A type that TypeScript writes in more than 200 characters now has its name and the first sentence of its JSDoc there.
 - Changed Sound's record in `dist/lib/docs` to give `SoundCue` among its `types`. `usage` no longer lists it.
-- Changed ServicePage, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary and Button to load almost none of Motion. A page built from them has 3 KB of Motion's code, minified, where it had 151 KB, and is 50 KB smaller gzipped. What is left comes with the `LayoutGroup` in ServiceNavigation. Motion is still a peer dependency, and the parts that need its presence, layout or drag, such as Toast, Conversation and Timeline, load it as before.
+- Changed ServicePage, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary and Button to load none of Motion. A page built from them had 151 KB of Motion's code, minified, and is 51 KB smaller gzipped. Motion is still a peer dependency, and the parts that need its presence, layout or drag, such as Toast, Conversation and Timeline, load it as before.
 - Changed ErrorMessage to open and close with CSS transitions, not Motion. Its box, `.x-govuk-ui-error-container`, is now a grid with one row, and no longer has its height and opacity as inline styles. The box has `data-opened` when it opened after its field first rendered, and `data-closing` while it closes.
 - Changed the box that eases to its content's height, in Form, FormSteps, Feedback and CookieBanner, to ease with a CSS transition, not Motion. The box, `.x-govuk-ui-auto-height`, no longer eases or clips its content as it first shows.
 - Changed Radios' dot, and the dials of DateInput and TimeInput, to ease by the library's own code, not Motion's.
+- Changed ServiceNavigation and ServiceNavigationItem to load none of Motion. The current section's bar glides to the next section by a transform that the browser runs, over the same time and on the same curve. The bar is a plain `span`, and no longer has `transform`, `transform-origin` and `opacity` as inline styles.
 
 ### Fixed
 

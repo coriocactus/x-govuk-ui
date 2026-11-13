@@ -117,13 +117,12 @@ test("validateWith's module, and each of the library's modules it imports at run
 
 test("a page of fields, a table and buttons loads almost none of Motion", async () => {
   // Motion's runtime is about 150 KB, minified. The parts of a form page ease in CSS or by the
-  // library's own code, so the page loads none of it. Service navigation's `LayoutGroup` brings
-  // about 3 KB. One `motion` element in a module these parts share would bring the whole runtime
-  // back, and no other check would show it.
+  // library's own code, so the page loads none of it. One `motion` element in a module these parts
+  // share would bring the whole runtime back, and no other check would show it.
   const folder = mkdtempSync(join(tmpdir(), "x-govuk-ui-motion-"));
   try {
     const parts =
-      "ServicePage, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary, Button";
+      "ServicePage, ServiceNavigationItem, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary, Button";
     const entry = join(folder, "page.ts");
     await Bun.write(
       entry,

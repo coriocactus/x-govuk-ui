@@ -2,22 +2,37 @@
 
 import { Collapsible } from "@base-ui/react/collapsible";
 import { useRender } from "@base-ui/react/use-render";
-import { LayoutGroup, motion } from "motion/react";
 import {
   type ComponentPropsWithRef,
   createContext,
   type ReactNode,
+  type RefObject,
   useContext,
-  useId,
+  useRef,
 } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
+import { type GlideBox, useGlide } from "./glide";
 import { ChevronIcon } from "./icons";
 import { useLabels } from "./labels";
 import { useMediaQuery } from "./media-query";
-import { springs, useMotionTiming } from "./motion";
 import { WidthContainer } from "./width-container";
 
-const NavigationContext = createContext<string>("");
+const NavigationContext = createContext<RefObject<GlideBox | null>>({ current: null });
+
+/**
+ * The list of sections, which keeps where the current section's bar last was. The wide layout and
+ * the Menu's panel each render a list of their own, so a bar never glides from one layout to the
+ * other.
+ * @internal
+ */
+function Sections({ children }: { children: ReactNode }) {
+  const from = useRef<GlideBox>(null);
+  return (
+    <ul className="x-govuk-ui-service-navigation-list">
+      <NavigationContext value={from}>{children}</NavigationContext>
+    </ul>
+  );
+}
 
 export type ServiceNavigationProps = ComponentPropsWithRef<"section"> & {
   /** The service's name, which leads its navigation. */
@@ -61,49 +76,42 @@ export function ServiceNavigation({
   ...props
 }: ServiceNavigationProps) {
   const labels = useLabels("serviceNavigation", defaultServiceNavigationLabels, ownLabels);
-  const id = useId();
   const small = useMediaQuery("(max-width: 40em)");
-  const list = (
-    <ul className="x-govuk-ui-service-navigation-list">
-      <LayoutGroup id={id}>{children}</LayoutGroup>
-    </ul>
-  );
+  const list = <Sections>{children}</Sections>;
   return (
-    <NavigationContext value={id}>
-      <section
-        aria-label={labels.serviceInformation}
-        {...props}
-        className={`x-govuk-ui-service-navigation ${className}`.trim()}
-      >
-        <WidthContainer className="x-govuk-ui-service-navigation-container">
-          {serviceName && (
-            <span className="x-govuk-ui-service-navigation-name">
-              {serviceUrl ? (
-                <Anchor href={serviceUrl} render={serviceRender}>
-                  {serviceName}
-                </Anchor>
-              ) : (
-                serviceName
-              )}
-            </span>
-          )}
-          {children &&
-            (small ? (
-              <Collapsible.Root className="x-govuk-ui-service-navigation-menu">
-                <Collapsible.Trigger className="x-govuk-ui-service-navigation-toggle">
-                  {labels.menu}
-                  <ChevronIcon size={12} strokeWidth={2} />
-                </Collapsible.Trigger>
-                <Collapsible.Panel className="x-govuk-ui-service-navigation-panel">
-                  <nav aria-label={labels.navigation}>{list}</nav>
-                </Collapsible.Panel>
-              </Collapsible.Root>
+    <section
+      aria-label={labels.serviceInformation}
+      {...props}
+      className={`x-govuk-ui-service-navigation ${className}`.trim()}
+    >
+      <WidthContainer className="x-govuk-ui-service-navigation-container">
+        {serviceName && (
+          <span className="x-govuk-ui-service-navigation-name">
+            {serviceUrl ? (
+              <Anchor href={serviceUrl} render={serviceRender}>
+                {serviceName}
+              </Anchor>
             ) : (
-              <nav aria-label={labels.navigation}>{list}</nav>
-            ))}
-        </WidthContainer>
-      </section>
-    </NavigationContext>
+              serviceName
+            )}
+          </span>
+        )}
+        {children &&
+          (small ? (
+            <Collapsible.Root className="x-govuk-ui-service-navigation-menu">
+              <Collapsible.Trigger className="x-govuk-ui-service-navigation-toggle">
+                {labels.menu}
+                <ChevronIcon size={12} strokeWidth={2} />
+              </Collapsible.Trigger>
+              <Collapsible.Panel className="x-govuk-ui-service-navigation-panel">
+                <nav aria-label={labels.navigation}>{list}</nav>
+              </Collapsible.Panel>
+            </Collapsible.Root>
+          ) : (
+            <nav aria-label={labels.navigation}>{list}</nav>
+          ))}
+      </WidthContainer>
+    </section>
   );
 }
 
@@ -130,8 +138,7 @@ export function ServiceNavigationItem({
   className = "",
   ...props
 }: ServiceNavigationItemProps) {
-  const navigation = useContext(NavigationContext);
-  const timing = useMotionTiming();
+  const bar = useGlide(useContext(NavigationContext));
   const link = useRender({
     defaultTagName: "a",
     render,
@@ -159,12 +166,7 @@ export function ServiceNavigationItem({
     >
       {link}
       {current && (
-        <motion.span
-          layoutId={`${navigation}-current`}
-          className="x-govuk-ui-service-navigation-bar"
-          aria-hidden="true"
-          transition={timing.spring(springs.glide)}
-        />
+        <span ref={bar} className="x-govuk-ui-service-navigation-bar" aria-hidden="true" />
       )}
     </li>
   );

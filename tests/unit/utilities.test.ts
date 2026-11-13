@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { soundCues } from "x-govuk-ui";
 import { soundFamilies } from "x-govuk-ui/internal";
-import { bezier, easeDrawer, easeOut } from "../../packages/core/src/motion";
+import { bezier, easeDrawer, easeNumber, easeOut } from "../../packages/core/src/motion";
 import { durationOf, ribbonsOf } from "../../site/examples/sound/shape";
 
 test("every sound is in one family, and each draws as a ribbon a voice", () => {
@@ -37,4 +37,62 @@ test("a bezier curve is where CSS's cubic-bezier() is, at every share of its tim
   expect(bezier([0.25, 0.25, 0.75, 0.75], 0.3)).toBeCloseTo(0.3, 8);
   expect(bezier(easeOut, 0)).toBeCloseTo(0, 8);
   expect(bezier(easeOut, 1)).toBeCloseTo(1, 8);
+});
+
+test("a number that is stopped first comes up to where it is at that moment", () => {
+  // A Dial starts its turn again at each step of a drag, and stops the last turn first. The steps
+  // can come faster than the frames. A stop that gave no value would leave the drum still while
+  // they came, to catch up in one long glide once they stopped.
+  const real = {
+    now: performance.now,
+    request: globalThis.requestAnimationFrame,
+    cancel: globalThis.cancelAnimationFrame,
+  };
+  let clock = 1000;
+  const frames = new Map<number, () => void>();
+  performance.now = () => clock;
+  globalThis.requestAnimationFrame = (frame) =>
+    frames.set(frames.size + 1, () => frame(clock)).size;
+  globalThis.cancelAnimationFrame = (id) => void frames.delete(id);
+  try {
+    const values: number[] = [];
+    let completed = 0;
+    const turn = easeNumber(10, 20, {
+      seconds: 0.16,
+      curve: easeOut,
+      onUpdate: (value) => values.push(value),
+      onComplete: () => completed++,
+    });
+    // No frame has come by the time it is stopped, 40ms in, a quarter of its time.
+    clock += 40;
+    turn.stop();
+    expect(values).toEqual([10 + 10 * bezier(easeOut, 0.25)]);
+    expect(turn.running).toBe(false);
+    // Stopped, it asks for no more frames, gives no more values and never completes.
+    expect(frames.size).toBe(0);
+    turn.stop();
+    expect(values.length).toBe(1);
+    expect(completed).toBe(0);
+
+    // Left to run, it gives a value at each frame, then the end itself, and completes once.
+    const whole = easeNumber(0, 1, {
+      seconds: 0.16,
+      curve: easeOut,
+      onUpdate: (value) => values.push(value),
+      onComplete: () => completed++,
+    });
+    for (const elapsed of [80, 200]) {
+      clock += elapsed;
+      const [id, frame] = [...frames][0] ?? [];
+      frames.delete(id ?? 0);
+      frame?.();
+    }
+    expect(values.slice(1)).toEqual([bezier(easeOut, 0.5), 1]);
+    expect(completed).toBe(1);
+    expect(whole.running).toBe(false);
+  } finally {
+    performance.now = real.now;
+    globalThis.requestAnimationFrame = real.request;
+    globalThis.cancelAnimationFrame = real.cancel;
+  }
 });

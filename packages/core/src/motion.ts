@@ -54,9 +54,14 @@ export function bezier([x1, y1, x2, y2]: Bezier, share: number) {
  * Eases a number from one value to another along a curve, one animation frame at a time, for a
  * movement that CSS cannot run, such as one that measures where it lands at each frame. `seconds`
  * is how long it takes, from the call, so the first frame is already part of the way. `onUpdate`
- * is given each value, and `to` itself last. `onComplete` then runs. `stop` ends it with no more
- * values, and `running` says whether any are still to come. It moves whatever the setting of
- * reduced motion, so a part asks `useMotionTiming` first.
+ * is given each value, and `to` itself last. `onComplete` then runs. `running` says whether any
+ * values are still to come. It moves whatever the setting of reduced motion, so a part asks
+ * `useMotionTiming` first.
+ *
+ * `stop` first gives `onUpdate` the value the number has reached at that moment, then ends it. A
+ * part that starts again at each event, as a Dial does at each step of a drag, stops the last
+ * movement first. The events can come faster than the frames. If `stop` gave no value, the number
+ * would then never move while they came, and would catch up in one long glide once they stopped.
  * @internal
  */
 export function easeNumber(
@@ -77,11 +82,13 @@ export function easeNumber(
   // Both times are the clock's. The time a frame is given can be earlier than the clock's time at
   // the call.
   const start = performance.now();
+  const share = () => (performance.now() - start) / (seconds * 1000);
+  const at = (share: number) => (share < 1 ? from + (to - from) * bezier(curve, share) : to);
   const step = () => {
-    const share = (performance.now() - start) / (seconds * 1000);
-    if (share < 1) {
+    const now = share();
+    if (now < 1) {
       frame = requestAnimationFrame(step);
-      onUpdate(from + (to - from) * bezier(curve, share));
+      onUpdate(at(now));
       return;
     }
     onUpdate(to);
@@ -94,8 +101,10 @@ export function easeNumber(
       return frame !== 0;
     },
     stop() {
+      if (frame === 0) return;
       cancelAnimationFrame(frame);
       frame = 0;
+      onUpdate(at(share()));
     },
   };
 }

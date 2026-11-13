@@ -6,7 +6,7 @@ type Props = Pick<
 >;
 
 export default function ToastExample({
-  position = "top-center",
+  position = "top-centre",
   timeout = 4000,
   limit = 4,
   dismiss = "tap",

@@ -1531,7 +1531,7 @@ const entries = {
           (position) =>
             [position, position[0]!.toUpperCase() + position.slice(1).replace("-", " ")] as const,
         ),
-        "top-center",
+        "top-centre",
       ),
       number("timeout", 4000, { min: 0, note: "Milliseconds. 0 keeps toasts until dismissed." }),
       number("limit", 4, { min: 1 }),

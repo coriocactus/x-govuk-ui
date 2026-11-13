@@ -73,7 +73,7 @@
   bottom: 0;
   transform-origin: bottom center;
 }
-.x-govuk-ui-toast-viewport[data-align="center"] .x-govuk-ui-toast {
+.x-govuk-ui-toast-viewport[data-align="centre"] .x-govuk-ui-toast {
   left: 50%;
   translate: -50% 0;
 }

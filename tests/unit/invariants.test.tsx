@@ -504,7 +504,7 @@ test("each page lists its words with their English defaults, and its hooks, func
     name: "toastPositions",
     package: "x-govuk-ui",
     signature:
-      'readonly ["top-start", "top-center", "top-end", "bottom-start", "bottom-center", "bottom-end"]',
+      'readonly ["top-start", "top-centre", "top-end", "bottom-start", "bottom-centre", "bottom-end"]',
     doc: "Where a stack of toasts can sit in the window.",
   });
   expect(doc("sound")?.functions.map((one) => one.name)).toContain("soundCues");

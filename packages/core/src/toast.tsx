@@ -68,10 +68,10 @@ export function useToastManager() {
 /** Where a stack of toasts can sit in the window. */
 export const toastPositions = [
   "top-start",
-  "top-center",
+  "top-centre",
   "top-end",
   "bottom-start",
-  "bottom-center",
+  "bottom-centre",
   "bottom-end",
 ] as const;
 export type ToastPosition = (typeof toastPositions)[number];
@@ -107,7 +107,7 @@ export type ToastProviderProps = {
  */
 export function ToastProvider({
   children,
-  position = "top-center",
+  position = "top-centre",
   timeout = 4000,
   limit = 4,
   dismiss = "tap",
@@ -300,7 +300,7 @@ function ToastRegion({
     play("close");
     close(id);
   };
-  const [side, align] = position.split("-") as ["top" | "bottom", "start" | "center" | "end"];
+  const [side, align] = position.split("-") as ["top" | "bottom", "start" | "centre" | "end"];
   // A toast is dragged off sideways, or towards the edge its stack sits at.
   let swipeDirections: SwipeDirection[] = [];
   if (dismiss === "drag") swipeDirections = [side === "top" ? "up" : "down", "left", "right"];

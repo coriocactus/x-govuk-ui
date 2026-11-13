@@ -88,6 +88,14 @@ type Exported =
   | keyof typeof import("@x-govuk-ui/jorjorwel")
   | keyof typeof import("@x-govuk-ui/memetics");
 
+/**
+ * The types a page's `shows` can name. TypeScript cannot list the types a package exports, so each
+ * is named here, where the compiler checks that the package exports it.
+ */
+type ExportedTypes = {
+  SoundCue: import("x-govuk-ui").SoundCue;
+};
+
 type Entry = Placement & {
   name: string;
   /**
@@ -118,8 +126,10 @@ type Entry = Placement & {
    *   part that the styling contract gives no component, such as `ResizableHandle`.
    * - A hook, a function or a constant shows with those declared in its parts' own files. It is
    *   for one kept in a file that components share, such as `dateFromParts`.
+   * - A type shows with the types the page names. It is for a type that no prop, signature or
+   *   word on the page names, such as `SoundCue`, which the compiler writes out as its cues.
    */
-  shows?: readonly Exported[];
+  shows?: readonly (Exported | keyof ExportedTypes)[];
   /**
    * Where the example sits for its current settings, over the placement above, such as a page for
    * one example and a card for another.
@@ -2336,7 +2346,7 @@ const entries = {
     dependencies: "React · Web Audio",
     changes:
       "Not in GOV.UK. Every sound is made as it plays, with the Web Audio API, from a tone or a burst of noise or two, each shaped by an envelope and sometimes a filter, so the library ships no audio files, and each play is detuned a little at random, so a repeat never sounds mechanical. The cues come in six families, which are presses, toggles, surfaces, values, outcomes and small moments. SoundScope plays the one for each interaction inside it, from what was pressed. A toggle rises turning on and falls turning off, a warning button sounds weightier, a row sounds a step higher down its list, and outcomes that arrive by themselves, such as an error or a toast, play theirs too. data-sound names a cue for a part of the page, or turns sound off there, and data-sound-enter names one for content that arrives. Nothing plays until the user has used the page, as browsers ask. The example is every cue on a card, with a drawing of what plays it beside a drawing of the sound itself. The sound's pitch runs from left to right, as thick as it is loud, on one scale for every cue. The cards run in their families, which only their colour tells apart. A press plays the cue, the icon acts out what plays it, and the drawing lights at the sound's own pace. A card that steps, such as a row in a list, moves on a step each press, and a drag across the cards plays each in turn. The board has a SoundScope of its own, whose play sets every cue at the playground's volume, pitch and softness, and each card plays through it with useScopeSound. The workbench's mute silences it.",
-    shows: ["useSound", "soundCues"],
+    shows: ["useSound", "soundCues", "SoundCue"],
     props: [
       range("volume", 0.5, 0, 1, 0.05),
       range("detune", 0, -1200, 1200, 100),

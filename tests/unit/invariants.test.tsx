@@ -575,6 +575,9 @@ test("each page gives the types it names, an object type by its members", async 
     ["children", false, "readonly TreeNode[]"],
   ]);
   expect(types("tree-select").map((type) => type.name)).toContain("TreeNode");
+  // A type the catalogue names for a page is there, though nothing on the page names it.
+  expect(types("sound").map((type) => type.name)).toContain("SoundCue");
+  expect(all.types.map((type) => type.name)).not.toContain("SoundCue");
   // A type another type names comes with it.
   expect(types("combobox").map((type) => type.name)).toEqual(["ComboboxItem", "ComboboxOption"]);
   // The type of a part's props, or of a map of words, is named with them, and not shown again.
@@ -643,6 +646,12 @@ test("everything a package exports is on a component's page, or listed in what e
   expect(usage).toContain(
     "- `LabelsProvider`, from `x-govuk-ui`. Gives every component inside it the words of a service's language, such as Welsh, in one place. Its own props, of the type `LabelsProviderProps`:\n    - `labels`, `Labels`, required. The words to use, by component.",
   );
+  // A type the compiler writes in more than 200 characters has its name and what it is, as a hook
+  // has. Each component's page gives its own words, so the maps of every word are not written out.
+  expect(usage).toContain(
+    "  - `ComponentLabels`, from `x-govuk-ui`. The words each component writes itself, by component, such as Pagination's Previous and Next.\n  - `Labels`, from `x-govuk-ui`.",
+  );
+  expect(usage).not.toContain("AccordionLabels");
   const propsTypes = all.parts.map((part) => part.propsType);
   for (const name of propsTypes) expect(usage).toContain(`of the type \`${name}\``);
   // Every name each package's index exports, read from its source, so an export the compiler's

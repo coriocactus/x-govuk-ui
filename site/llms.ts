@@ -140,6 +140,13 @@ const membersList = (members: readonly ApiMember[]) =>
       `    - \`${name}\`, ${asCode(type)}${required ? ", required" : ""}.${doc ? ` ${doc.replaceAll("\n", " ")}` : ""}`,
   );
 
+/** A member as the compiler writes it in an object type. */
+const memberCode = ({ name, type, required }: ApiMember) =>
+  `${name}${required ? "" : "?"}: ${type};`;
+
+/** The most characters of a type that what every component shares writes out. */
+const LONG_TYPE = 200;
+
 /**
  * What every component shares, as `/llms.txt` and the MCP server's `get_usage` say it. It ends
  * with whatever the packages export that is on no component's page.
@@ -162,16 +169,17 @@ function usageText({ parts, functions, types }: Omit<LibraryDocs, "components">)
         `  - \`${name}\`, from \`${from}\`, is ${asCode(signature)}. ${firstSentence(doc)}`,
     ),
     "- These types are on no component's page:",
-    ...types.flatMap(({ name, parameters = "", package: from, doc, members, type }) =>
-      members
-        ? [
-            `  - \`${name}${parameters}\`, from \`${from}\`.${doc ? ` ${firstSentence(doc)}` : ""} Its members:`,
-            ...membersList(members),
-          ]
-        : [
-            `  - \`${name}${parameters}\`, from \`${from}\`, is ${asCode(type ?? "")}.${doc ? ` ${firstSentence(doc)}` : ""}`,
-          ],
-    ),
+    ...types.flatMap(({ name, parameters = "", package: from, doc, members, type = "" }) => {
+      const start = `  - \`${name}${parameters}\`, from \`${from}\``;
+      const about = doc ? ` ${firstSentence(doc)}` : "";
+      // A long type is named and not written out. The longest are the maps of every component's
+      // words, which each component's page gives already.
+      const written = members ? `{ ${members.map(memberCode).join(" ")} }` : type;
+      if (written.length > LONG_TYPE) return [`${start}.${about}`];
+      return members
+        ? [`${start}.${about} Its members:`, ...membersList(members)]
+        : [`${start}, is ${asCode(type)}.${about}`];
+    }),
   ].join("\n");
 }
 
@@ -442,9 +450,9 @@ export type LibraryDocs = {
  *   source file, and on each page whose entry in the catalogue names it.
  * - A type is on the page of each component with a part declared in its source file. It is also on
  *   each page that names it, in a prop's type, a hook's signature, a word's type or another type
- *   there, so a page that gives `items` as `TreeNode[]` says what a `TreeNode` has. The type of a
- *   part's props, or of a map of words, is not shown again, because the page gives its members as
- *   the props or the words.
+ *   there, so a page that gives `items` as `TreeNode[]` says what a `TreeNode` has. It is on each
+ *   page whose entry in the catalogue names it, too. The type of a part's props, or of a map of
+ *   words, is not shown again, because the page gives its members as the props or the words.
  * - A map of words is on the page of each component with a part that takes it in `labels`. Many
  *   parts take their words from a LabelsProvider alone, so no `labels` says which map is theirs.
  *   A map that no part takes in `labels` is on the page of each component with a part declared in
@@ -509,6 +517,7 @@ export async function libraryDocs(
         ...values.map((value) => value.signature),
         ...words.flatMap((map) => map.words.map((word) => word.type)),
         ...api.types.flatMap(({ name, file }) => (files.has(file) ? [name] : [])),
+        ...(entry.shows ?? []),
       ]);
       const record = {
         slug,

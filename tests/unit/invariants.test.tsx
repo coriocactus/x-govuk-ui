@@ -115,7 +115,7 @@ test("validateWith's module, and each of the library's modules it imports at run
   expect(marked).toEqual([]);
 });
 
-test("a page of fields, a table and buttons loads almost none of Motion", async () => {
+test("a page of navigation, fields, a table and buttons loads none of Motion", async () => {
   // Motion's runtime is about 150 KB, minified. The parts of a form page ease in CSS or by the
   // library's own code, so the page loads none of it. One `motion` element in a module these parts
   // share would bring the whole runtime back, and no other check would show it.
@@ -145,7 +145,7 @@ test("a page of fields, a table and buttons loads almost none of Motion", async 
       )
       .reduce((bytes, [, input]) => bytes + input.bytesInOutput, 0);
     expect(inputs.length).toBeGreaterThan(100);
-    expect(motion).toBeLessThan(10_000);
+    expect(motion).toBe(0);
   } finally {
     rmSync(folder, { recursive: true, force: true });
   }

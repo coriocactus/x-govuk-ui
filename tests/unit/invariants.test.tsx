@@ -122,7 +122,7 @@ test("a page of fields, a table and buttons loads almost none of Motion", async 
   const folder = mkdtempSync(join(tmpdir(), "x-govuk-ui-motion-"));
   try {
     const parts =
-      "ServicePage, ServiceNavigationItem, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary, Button";
+      "ServicePage, ServiceNavigationItem, Pagination, Form, Fieldset, Input, Textarea, Select, Radios, Checkboxes, DateInput, Table, SummaryList, ErrorSummary, Button";
     const entry = join(folder, "page.ts");
     await Bun.write(
       entry,

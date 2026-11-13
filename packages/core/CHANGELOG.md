@@ -18,6 +18,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed ErrorMessage where it turns back, such as a message that shows again while it closes. The way back takes the share of the 220ms that the message had already moved, not all of it. The browser shortens a transition that turns back, which Motion did not.
 - Changed the box that eases to its content's height, in Form, FormSteps, Feedback and CookieBanner, where it turns back to the height it was leaving. The way back takes a share of the 300ms, as ErrorMessage's does.
 - Changed the bar under ServiceNavigationItem's current section, `.x-govuk-ui-service-navigation-bar`, to stay on its section when a render moves the section, such as when the service's name grows. It glided after the section, which was already in its new place. The bar still glides from one section to the next.
+- Changed the fill behind Pagination's current page, `.x-govuk-ui-pagination-fill`, to stay on its number when a render moves the number, such as when `pageCount` changes. It glided after the number, which was already in its new place. The fill still glides from one number to the next.
 
 ### Added
 
@@ -45,6 +46,7 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 - Changed the box that eases to its content's height, in Form, FormSteps, Feedback and CookieBanner, to ease with a CSS transition, not Motion. The box, `.x-govuk-ui-auto-height`, no longer eases or clips its content as it first shows.
 - Changed Radios' dot, and the dials of DateInput and TimeInput, to ease by the library's own code, not Motion's.
 - Changed ServiceNavigation and ServiceNavigationItem to load none of Motion. The current section's bar glides to the next section by a transform that the browser runs, over the same time and on the same curve. The bar is a plain `span`, and no longer has `transform`, `transform-origin` and `opacity` as inline styles.
+- Changed Pagination to load none of Motion. The current page's fill glides to the new number by a transform that the browser runs, over the same time and on the same curve. The fill is a plain `span`, and no longer has `transform`, `transform-origin` and `opacity` as inline styles.
 
 ### Fixed
 

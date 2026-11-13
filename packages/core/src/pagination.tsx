@@ -1,19 +1,17 @@
 "use client";
 
-import { LayoutGroup, motion } from "motion/react";
 import {
   type ComponentPropsWithRef,
   type MouseEvent,
   type ReactNode,
-  useId,
   useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { Anchor, type AnchorProps } from "./anchor";
+import { type GlideBox, useGlide } from "./glide";
 import { pagesAround } from "./helpers";
 import { useLabels } from "./labels";
-import { springs, useMotionTiming } from "./motion";
 import { useMergedRef } from "./refs";
 
 /**
@@ -105,7 +103,6 @@ export function Pagination({
   ...props
 }: PaginationProps) {
   const labels = useLabels("pagination", defaultPaginationLabels, ownLabels);
-  const id = useId();
   const root = useRef<HTMLElement>(null);
   const merged = useMergedRef(root, ref);
   // The space is the pagination's own width, which its content does not set. What each fit needs
@@ -137,7 +134,8 @@ export function Pagination({
     if (measurer) observer.observe(measurer);
     return () => observer.disconnect();
   }, [block]);
-  const timing = useMotionTiming();
+  const filled = useRef<GlideBox>(null);
+  const fill = useGlide(filled);
   const follow = (target: number) => (event: MouseEvent<HTMLAnchorElement>) =>
     onPageChange?.(target, event);
   // Previous and Next always keep their places. At either end, the one that leads nowhere is
@@ -209,44 +207,37 @@ export function Pagination({
       {step("previous")}
       {!block && (
         <ul className="x-govuk-ui-pagination-list">
-          <LayoutGroup id={id}>
-            {pagesAround(page, pageCount, fit === "few" ? 5 : 7).map((item, index) =>
-              item === null ? (
-                <li
-                  key={index < 3 ? "gap-start" : "gap-end"}
-                  className="x-govuk-ui-pagination-ellipsis"
-                  aria-hidden="true"
+          {pagesAround(page, pageCount, fit === "few" ? 5 : 7).map((item, index) =>
+            item === null ? (
+              <li
+                key={index < 3 ? "gap-start" : "gap-end"}
+                className="x-govuk-ui-pagination-ellipsis"
+                aria-hidden="true"
+              >
+                ⋯
+              </li>
+            ) : (
+              <li
+                key={item}
+                className="x-govuk-ui-pagination-item"
+                data-current={item === page || undefined}
+              >
+                {item === page && (
+                  <span ref={fill} className="x-govuk-ui-pagination-fill" aria-hidden="true" />
+                )}
+                <Anchor
+                  render={render}
+                  className="x-govuk-ui-pagination-number"
+                  href={href(item)}
+                  aria-label={labels.pageNumber(item)}
+                  aria-current={item === page ? "page" : undefined}
+                  onClick={follow(item)}
                 >
-                  ⋯
-                </li>
-              ) : (
-                <li
-                  key={item}
-                  className="x-govuk-ui-pagination-item"
-                  data-current={item === page || undefined}
-                >
-                  {item === page && (
-                    <motion.span
-                      layoutId="current"
-                      className="x-govuk-ui-pagination-fill"
-                      aria-hidden="true"
-                      transition={timing.spring(springs.glide)}
-                    />
-                  )}
-                  <Anchor
-                    render={render}
-                    className="x-govuk-ui-pagination-number"
-                    href={href(item)}
-                    aria-label={labels.pageNumber(item)}
-                    aria-current={item === page ? "page" : undefined}
-                    onClick={follow(item)}
-                  >
-                    {item}
-                  </Anchor>
-                </li>
-              ),
-            )}
-          </LayoutGroup>
+                  {item}
+                </Anchor>
+              </li>
+            ),
+          )}
         </ul>
       )}
       {step("next")}

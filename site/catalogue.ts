@@ -2838,7 +2838,7 @@ const entries = {
     anchor: "top",
     description: "Link to the pages of a long list, or the next and previous parts of a guide.",
     upstream: "pagination",
-    dependencies: "React · Motion",
+    dependencies: "React",
     changes:
       "GOV.UK's pagination, with Previous and Next beside arrows that lean the way they go, and the page numbers around the current one with ellipses for the rest. The numbers always take seven slots of one width, and Previous and Next are disabled instead of removed at either end, so it never changes width. The current page's fill glides to the new number when the page changes in place, and each number sounds a step higher. Block mode stacks Previous and Next with their pages' titles, and leaves out the one that leads nowhere on the first and last pages, as GOV.UK's does.",
     props: [toggle("block", false)],

@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-13
+
 ### Breaking Changes
 
 - Removed `page` from `PaginationLabels`, and added `previousPage` and `nextPage`. Each is the whole name that screen readers hear for its link, by default "Previous page" and "Next page", so a language can put the words in its own order. Pagination no longer makes the name by joining `previous` or `next` to `page`. Where you gave `page`, give `previousPage` and `nextPage`, such as "Tudalen flaenorol" and "Tudalen nesaf".

@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-13
+
 ### Added
 
 - Added each part's own props to `get_props`, with each prop's type, default and JSDoc, where the project's x-govuk-ui gives them. The records of x-govuk-ui up to 0.6.0 give only the component's props, and the server still answers from them.

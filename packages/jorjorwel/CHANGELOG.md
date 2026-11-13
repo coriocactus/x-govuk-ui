@@ -4,6 +4,8 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-13
+
 ### Visual
 
 - Changed EditorAISuggestion's panel where it turns back to the height it was leaving. The way back takes the share of the 300ms that the panel had already moved, not all of it. The browser shortens a transition that turns back, which Motion did not.

@@ -33,6 +33,12 @@ export type InputOTPProps = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
+  /**
+   * `small` suits a question among others. `large` suits a question that is the page's only one.
+   */
+  labelSize?: "small" | "medium" | "large";
+  /** Puts the label in the page's `h1`, for a page that asks one question. */
+  pageHeading?: boolean;
   errorMessage?: ReactNode;
   maxLength?: number;
   /** Characters shown faintly in empty slots, one per slot. */
@@ -57,6 +63,8 @@ export function InputOTP({
   label,
   hint,
   hideLabel = false,
+  labelSize = "small",
+  pageHeading = false,
   errorMessage,
   id,
   "aria-describedby": describedBy,
@@ -71,7 +79,9 @@ export function InputOTP({
       errorMessage={errorMessage}
       describedBy={describedBy}
     >
-      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Label visuallyHidden={hideLabel} size={labelSize} pageHeading={pageHeading}>
+        {label}
+      </Label>
       <Hint>{hint}</Hint>
       <ErrorMessage />
       <InputOTPControl {...props} />
@@ -81,7 +91,7 @@ export function InputOTP({
 
 export type InputOTPControlProps = Omit<
   InputOTPProps,
-  "label" | "hint" | "hideLabel" | "errorMessage"
+  "label" | "hint" | "hideLabel" | "labelSize" | "pageHeading" | "errorMessage"
 >;
 
 /**

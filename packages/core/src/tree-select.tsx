@@ -70,6 +70,12 @@ type FieldWords = {
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
+  /**
+   * `small` suits a question among others. `large` suits a question that is the page's only one.
+   */
+  labelSize?: "small" | "medium" | "large";
+  /** Puts the label in the page's `h1`, for a page that asks one question. */
+  pageHeading?: boolean;
   errorMessage?: ReactNode;
 };
 
@@ -127,6 +133,8 @@ export function TreeSelect({
   label,
   hint,
   hideLabel = false,
+  labelSize = "small",
+  pageHeading = false,
   errorMessage,
   id,
   "aria-describedby": describedBy,
@@ -141,7 +149,9 @@ export function TreeSelect({
       errorMessage={errorMessage}
       describedBy={describedBy}
     >
-      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Label visuallyHidden={hideLabel} size={labelSize} pageHeading={pageHeading}>
+        {label}
+      </Label>
       <Hint>{hint}</Hint>
       <ErrorMessage />
       <TreeSelectControl {...props} />

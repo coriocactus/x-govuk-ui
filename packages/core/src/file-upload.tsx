@@ -27,6 +27,12 @@ export type FileUploadProps = Omit<
   hint?: ReactNode;
   /** Hides the label visually. Screen readers still announce it. */
   hideLabel?: boolean;
+  /**
+   * `small` suits a question among others. `large` suits a question that is the page's only one.
+   */
+  labelSize?: "small" | "medium" | "large";
+  /** Puts the label in the page's `h1`, for a page that asks one question. */
+  pageHeading?: boolean;
   errorMessage?: ReactNode;
   /**
    * The chosen files. Leave it out to let the field keep track. The input sends the files given,
@@ -91,6 +97,8 @@ export function FileUpload({
   label,
   hint,
   hideLabel = false,
+  labelSize = "small",
+  pageHeading = false,
   errorMessage,
   id,
   "aria-describedby": describedBy,
@@ -105,7 +113,9 @@ export function FileUpload({
       errorMessage={errorMessage}
       describedBy={describedBy}
     >
-      <Label visuallyHidden={hideLabel}>{label}</Label>
+      <Label visuallyHidden={hideLabel} size={labelSize} pageHeading={pageHeading}>
+        {label}
+      </Label>
       <Hint>{hint}</Hint>
       <ErrorMessage />
       <FileUploadControl {...props} />
@@ -115,7 +125,7 @@ export function FileUpload({
 
 export type FileUploadControlProps = Omit<
   FileUploadProps,
-  "label" | "hint" | "hideLabel" | "errorMessage"
+  "label" | "hint" | "hideLabel" | "labelSize" | "pageHeading" | "errorMessage"
 >;
 
 /**

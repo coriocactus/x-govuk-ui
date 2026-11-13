@@ -611,6 +611,30 @@ test("a label takes a size, and as the page's heading it sits in the h1 and stil
   );
 });
 
+test("a file upload, a combobox, a multi-select, a tree select and a code input pass the size and the heading to their label", () => {
+  const heading = (id: string) =>
+    `<h1 class="x-govuk-ui-label-heading"><label for="${id}" class="x-govuk-ui-label x-govuk-ui-label--large">What do you need?</label></h1>`;
+  const words = { label: "What do you need?", labelSize: "large", pageHeading: true } as const;
+  const fields = {
+    upload: <FileUpload id="upload" {...words} />,
+    country: <Combobox id="country" items={["France"]} {...words} />,
+    languages: <MultiSelect id="languages" items={["Welsh"]} {...words} />,
+    river: <TreeSelect id="river" items={rivers} {...words} />,
+    code: <InputOTP id="code" {...words} />,
+  };
+  for (const [id, field] of Object.entries(fields)) {
+    const html = renderToStaticMarkup(field);
+    expect(html).toContain(heading(id));
+    // The label's `for` is the id of the control, which takes neither prop.
+    expect(html).toMatch(new RegExp(`<(input|button) [^>]*id="${id}"`));
+    expect(html).not.toMatch(/labelsize|pageheading/i);
+  }
+  // With neither prop, each label is as it was.
+  expect(renderToStaticMarkup(<InputOTP id="code" label="Code" />)).toContain(
+    '<label for="code" class="x-govuk-ui-label">Code</label>',
+  );
+});
+
 test("a select given its items' labels shows the chosen label in the first HTML", () => {
   // The options are in a component of the service's own, so the Select cannot read their labels
   // as it renders. Given them, it shows the chosen one's label at once.

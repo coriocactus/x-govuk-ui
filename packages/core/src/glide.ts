@@ -36,19 +36,25 @@ export function useGlide(from: RefObject<GlideBox | null>) {
     (mark: HTMLElement | null) => {
       if (!mark) return;
       const was = from.current;
+      let glide: Animation | undefined;
       if (was && !reduced) {
         const now = boxOf(mark);
         // The mark scales about its middle, so it moves by as far as the two middles are apart.
         const x = was.left + was.width / 2 - (now.left + now.width / 2);
         const y = was.top + was.height / 2 - (now.top + now.height / 2);
         const scale = `${was.width / now.width}, ${was.height / now.height}`;
-        mark.animate(
+        glide = mark.animate(
           [{ transform: `translate(${x}px, ${y}px) scale(${scale})` }, { transform: "none" }],
           glideEasing,
         );
       }
       return () => {
         from.current = boxOf(mark);
+        // In development, React attaches a ref, detaches it and attaches it again. The glide ends
+        // with the ref, so the second attach measures the mark where it rests. Left running, the
+        // first glide would hold the mark at the last mark's place, and the second would glide
+        // from that place to itself.
+        glide?.cancel();
       };
     },
     [from, reduced],

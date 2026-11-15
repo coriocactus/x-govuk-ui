@@ -4,6 +4,10 @@ All five x-govuk-ui packages are released together, at one version. A minor vers
 
 ## [Unreleased]
 
+### Visual
+
+- Changed Radios and Checkboxes so that a closed follow-up question, from a Radio's or Checkbox's `conditional` or a ChoiceConditional, takes no space. Each one added the space between two answers, 8px or 12px when small. The answer before it sat further from the next answer than the others did, and a follow-up after the last answer left that space beneath the list. An open follow-up question sits where it did.
+
 ## [0.7.0] - 2026-11-13
 
 ### Breaking Changes

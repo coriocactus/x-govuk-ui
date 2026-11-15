@@ -170,7 +170,7 @@
 /* The bar beside a follow-up question has rounded ends, as Inset text's and the error bar do. */
 .x-govuk-ui-conditional-content {
   position: relative;
-  margin: 4px 0 12px calc(var(--x-govuk-ui-choice-size) / 2 - 2px);
+  margin: 12px 0 12px calc(var(--x-govuk-ui-choice-size) / 2 - 2px);
   padding: 4px 0 4px calc(var(--x-govuk-ui-choice-size) / 2 + 14px);
 }
 .x-govuk-ui-conditional-content::before {
@@ -188,6 +188,20 @@
     forced-color-adjust: none;
     background: CanvasText;
   }
+}
+/* A follow-up question is an item in the answers' grid, so the grid puts a gap before it even while
+   it is closed. Its answer takes that gap back, so a closed one takes no space, and its content
+   gives the gap back as it opens. A grid's row cannot be less than nothing, so the follow-up cannot
+   take the gap back itself. In a row of inline answers, the margin would stretch the answer. */
+.x-govuk-ui-choices:not([data-inline]) > .x-govuk-ui-choice:has(+ .x-govuk-ui-conditional) {
+  margin-bottom: -8px;
+}
+.x-govuk-ui-choices[data-size="small"]:not([data-inline])
+  > .x-govuk-ui-choice:has(+ .x-govuk-ui-conditional) {
+  margin-bottom: -12px;
+}
+.x-govuk-ui-choices[data-size="small"] .x-govuk-ui-conditional-content {
+  margin-top: 16px;
 }
 @media (prefers-reduced-motion: reduce) {
   .x-govuk-ui-choice-box path,

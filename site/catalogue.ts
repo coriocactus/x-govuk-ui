@@ -711,7 +711,7 @@ const entries = {
       toggle("disabled"),
     ],
     example: [
-      toggle("conditional", true, {
+      toggle("conditional", false, {
         note: "Asks for the address or number once a way is chosen. GOV.UK keeps them out of inline radios.",
         needs: [whenOff("inline")],
       }),

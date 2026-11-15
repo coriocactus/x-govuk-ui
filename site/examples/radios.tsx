@@ -21,7 +21,7 @@ export default function RadiosExample({
   inline = false,
   size = "medium",
   disabled = false,
-  conditional = true,
+  conditional = false,
 }: Props) {
   const [contact, setContact] = useState<string | null>(null);
   // GOV.UK keeps follow-up questions out of inline radios, which sit side by side.

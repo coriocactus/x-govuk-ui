@@ -42,30 +42,6 @@
   color: rgb(11, 12, 12)
   row-gap: 8px
   column-gap: 8px
-.x-govuk-ui-conditional
-  display: grid
-  font-size: 14px
-  font-weight: 400
-  line-height: 1.5
-  color: rgb(11, 12, 12)
-.x-govuk-ui-conditional-content
-  display: block
-  font-size: 14px
-  font-weight: 400
-  line-height: 1.5
-  color: rgb(11, 12, 12)
-  padding-top: 4px
-  padding-bottom: 4px
-  padding-left: 30px
-  margin-top: 4px
-  margin-bottom: 12px
-  margin-left: 14px
-.x-govuk-ui-conditional-inner
-  display: block
-  font-size: 14px
-  font-weight: 400
-  line-height: 1.5
-  color: rgb(11, 12, 12)
 .x-govuk-ui-field
   display: block
   font-size: 14px

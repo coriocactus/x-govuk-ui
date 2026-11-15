@@ -78,7 +78,7 @@ test("an icon beside a button's words sits in their middle, whatever the variant
   }
 });
 
-test("pressing Shift three times exits the page, here to the next component", async ({
+test("pressing Shift three times exits the page, here to the workbench's overview", async ({
   page,
   frame,
   open,
@@ -86,8 +86,8 @@ test("pressing Shift three times exits the page, here to the next component", as
   await open("exit-this-page");
   await frame.locator(".preview-hint").click();
   for (let press = 0; press < 3; press++) await page.keyboard.press("Shift");
-  await expect(page).toHaveURL(/\/workbench\/checkboxes$/);
-  await expect(frame.getByRole("group").first()).toBeVisible();
+  await expect(page).toHaveURL(/\/workbench$/);
+  await expect(frame.locator(".landing-number")).toBeVisible();
 });
 
 test("a split button's chevron opens its other ways, and focus comes back to it", async ({

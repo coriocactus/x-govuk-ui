@@ -2873,10 +2873,10 @@ const entries = {
     upstream: "exit-this-page",
     dependencies: "React",
     changes:
-      "GOV.UK's Exit this page. The red button stays at the top as the page scrolls, and pressing Shift three times also leaves, with three dots under the label counting the presses. The page is covered at once as it goes. It makes no sound, because a sound could give it away. Here it goes to the next component.",
+      "GOV.UK's Exit this page. The red button stays at the top as the page scrolls, and pressing Shift three times also leaves, with three dots under the label counting the presses. The page is covered at once as it goes. It makes no sound, because a sound could give it away. Here it goes to the workbench's overview.",
     props: [
-      text("href", "/workbench/checkboxes", {
-        note: "Here it is the next component.",
+      text("href", "/workbench", {
+        note: "Here it is the workbench's overview.",
       }),
     ],
   },
